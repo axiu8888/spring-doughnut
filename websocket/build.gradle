@@ -1,0 +1,9 @@
+
+apply from: "${getRootDir()}/base-springboot.gradle"
+
+dependencies {
+  //implementation "org.apache.commons:commons-pool2:2.6.2"
+
+  compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
+
+}

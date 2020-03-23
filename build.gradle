@@ -1,0 +1,15 @@
+
+allprojects {
+
+  group = 'com.benefit'
+  version = '0.0.1-SNAPSHOT'
+
+  ext {
+    springBootVersion = "2.2.5.RELEASE"
+    jacksonVersion = "2.10.1"
+    lombokVersion = "1.18.6"
+  }
+
+}
+
+

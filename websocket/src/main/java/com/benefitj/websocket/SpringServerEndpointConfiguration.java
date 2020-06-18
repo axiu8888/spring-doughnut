@@ -14,7 +14,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import javax.websocket.server.ServerEndpoint;
-import java.util.List;
+import java.util.*;
 
 /**
  * 注册被 {@link SpringServerEndpoint} 注解的WebSocket组件
@@ -45,10 +45,23 @@ public class SpringServerEndpointConfiguration extends DelegatingWebSocketConfig
         }
       }
 
+      final Map<String, Object> serverEndpoints = context.getBeansWithAnnotation(ServerEndpoint.class);
+      final Map<String, Object> webSocketMap = new HashMap<>(serverEndpoints.size());
+      serverEndpoints.forEach((s, o) ->
+          webSocketMap.put(o.getClass().getAnnotation(ServerEndpoint.class).value(), o));
       for (SpringWebSocketServer server : servers) {
         Class<? extends SpringWebSocketServer> serverClass = server.getClass();
         SpringServerEndpoint endpoint = serverClass.getAnnotation(SpringServerEndpoint.class);
         if (endpoint != null) {
+          String match = Arrays.stream(endpoint.value())
+              .filter(webSocketMap::containsKey)
+              .findFirst()
+              .orElse(null);
+          if (match != null) {
+            throw new IllegalStateException("WebSocket URI [" + match + "]已经被"
+                + webSocketMap.get(match).getClass() + "定义了, 重复定义的实现类: " + serverClass);
+          }
+
           // 注册handler
           WebSocketHandlerRegistration registration = registry.addHandler(server, endpoint.value());
           // 允许的域

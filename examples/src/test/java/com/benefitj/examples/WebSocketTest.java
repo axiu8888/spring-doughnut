@@ -17,9 +17,8 @@ public class WebSocketTest {
   public void testWebSocketClient() {
     final CountDownLatch latch = new CountDownLatch(1);
 
-//    URI uri = URI.create("http://localhost:8080/api/sockets/spring");
-    URI uri = URI.create("http://localhost:8080/api/sockets/javax");
-//    URI uri = URI.create("http://localhost:8080/sockets/javax");
+    URI uri = URI.create("http://localhost:8080/api/sockets/spring");
+//    URI uri = URI.create("http://localhost:8080/api/sockets/javax");
     WebSocketClient client = new WebSocketClient(uri) {
       @Override
       public void onOpen(ServerHandshake handshakedata) {

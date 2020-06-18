@@ -15,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 测试 WebSocket
  */
 @Component
-//@ServerEndpoint("/sockets/javax") // 注册多次会无法运行
+//@ServerEndpoint("/sockets/spring") // 注册多次会无法运行
 @SpringServerEndpoint("/sockets/spring")
-public class SimpleWebSocketServer implements SpringWebSocketServer {
+public class SimpleSpringWebSocketServer implements SpringWebSocketServer {
 
   private static final Map<String, WebSocketSession> SOCKETS = new ConcurrentHashMap<>();
 

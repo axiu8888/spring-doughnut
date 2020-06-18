@@ -1,4 +1,4 @@
-package com.benefit.aop;
+package com.benefitj.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Web请求的切入点
  */
+@ConditionalOnMissingBean(AopWebRequestAspect.class)
 @Aspect
 public class AopWebRequestAspect {
   /**
@@ -61,7 +63,7 @@ public class AopWebRequestAspect {
    * 切入点表达式
    */
   @Pointcut(
-      "!execution(@com.benefit.aop.AopIgnore * *(..))" // 没有被AopIgnore注解注释
+      "!execution(@com.benefitj.aop.AopIgnore * *(..))" // 没有被AopIgnore注解注释
           + " && ("
           + " (@annotation(org.springframework.web.bind.annotation.RequestMapping)"
           + " || @annotation(org.springframework.web.bind.annotation.RestController)"
@@ -74,8 +76,8 @@ public class AopWebRequestAspect {
           + " || @annotation(org.springframework.web.bind.annotation.Mapping)"
           + ")" // 被springMVC注解注释
           + " && ("
-          + "(@within(com.benefit.aop.AopWebPointCut) && execution(public * *(..)))"// method
-          + " || @annotation(com.benefit.aop.AopWebPointCut)"  // class
+          + "(@within(com.benefitj.aop.AopWebPointCut) && execution(public * *(..)))"// method
+          + " || @annotation(com.benefitj.aop.AopWebPointCut)"  // class
           + ")"
           + ")"
   )

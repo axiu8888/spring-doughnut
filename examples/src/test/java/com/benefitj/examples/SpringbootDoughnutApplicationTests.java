@@ -1,4 +1,4 @@
-package com.benefit.examples;
+package com.benefitj.examples;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

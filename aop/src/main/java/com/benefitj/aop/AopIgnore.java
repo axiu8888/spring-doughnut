@@ -1,12 +1,12 @@
-package com.benefit.aop;
+package com.benefitj.aop;
 
 import java.lang.annotation.*;
 
 /**
- * AOP切入点
+ * 忽略
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Inherited
-public @interface AopWebPointCut {
+public @interface AopIgnore {
 }

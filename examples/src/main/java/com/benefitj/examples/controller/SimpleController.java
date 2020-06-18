@@ -1,7 +1,7 @@
-package com.benefit.examples.controller;
+package com.benefitj.examples.controller;
 
 
-import com.benefit.aop.AopWebPointCut;
+import com.benefitj.aop.AopWebPointCut;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

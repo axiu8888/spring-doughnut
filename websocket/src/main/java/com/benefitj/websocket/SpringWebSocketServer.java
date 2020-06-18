@@ -1,4 +1,4 @@
-package com.benefit.websocket;
+package com.benefitj.websocket;
 
 import org.springframework.web.socket.WebSocketHandler;
 

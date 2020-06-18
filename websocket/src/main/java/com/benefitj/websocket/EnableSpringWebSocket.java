@@ -1,6 +1,5 @@
-package com.benefit.websocket;
+package com.benefitj.websocket;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -8,10 +7,9 @@ import java.lang.annotation.*;
 /**
  * Spring websocket
  */
+@Import(SpringServerEndpointConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(SpringServerEndpointConfiguration.class)
-@ConditionalOnMissingBean(SpringServerEndpointConfiguration.class)
 public @interface EnableSpringWebSocket {
 }

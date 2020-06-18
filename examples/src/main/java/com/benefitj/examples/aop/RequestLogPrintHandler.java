@@ -1,7 +1,7 @@
-package com.benefit.examples.aop;
+package com.benefitj.examples.aop;
 
 import com.alibaba.fastjson.JSON;
-import com.benefit.aop.WebPointCutHandler;
+import com.benefitj.aop.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -38,8 +38,7 @@ public class RequestLogPrintHandler implements WebPointCutHandler {
     ServletRequestAttributes attrs = getRequestAttributes();
     if (attrs != null) {
       ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
-      MethodSignature signature = (MethodSignature) point.getSignature();
-      Method method = signature.getMethod();
+      Method method = ((MethodSignature) point.getSignature()).getMethod();
       //method = AopUtils.getMostSpecificMethod(signature.getMethod(), signature.getDeclaringType());
       final Map<String, Object> argsMap = new LinkedHashMap<>();
       Object[] args = point.getArgs();
@@ -51,7 +50,9 @@ public class RequestLogPrintHandler implements WebPointCutHandler {
         } else if (arg instanceof ServletResponse) {
           argsMap.put(parameters[i].getName(), "[ServletResponse]");
         } else if (arg instanceof MultipartFile) {
-          argsMap.put(parameters[i].getName(), "[MultipartFile]");
+          MultipartFile mf = (MultipartFile) arg;
+          argsMap.put(parameters[i].getName(), String.format("[MultipartFile(%s, %d)]"
+              , mf.getOriginalFilename(), mf.getSize()));
         } else if (arg instanceof InputStream) {
           argsMap.put(parameters[i].getName(), "[InputStream]");
         } else if (arg instanceof OutputStream) {

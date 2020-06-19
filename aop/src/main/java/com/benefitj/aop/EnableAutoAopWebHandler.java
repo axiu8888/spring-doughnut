@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * Aop Web 请求自动配置
  */
 @EnableAspectJAutoProxy
-@Import({AopWebRequestAspect.class})
+@Import({WebRequestAspect.class})
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

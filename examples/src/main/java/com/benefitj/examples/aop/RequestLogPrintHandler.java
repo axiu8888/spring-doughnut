@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.benefitj.aop.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,6 @@ import java.util.Map;
  */
 @Order(100)
 @Component
-@Aspect
 public class RequestLogPrintHandler implements WebPointCutHandler {
 
   private static final Logger log = LoggerFactory.getLogger(RequestLogPrintHandler.class);
@@ -39,26 +37,26 @@ public class RequestLogPrintHandler implements WebPointCutHandler {
     if (attrs != null) {
       ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
       Method method = ((MethodSignature) point.getSignature()).getMethod();
-      //method = AopUtils.getMostSpecificMethod(signature.getMethod(), signature.getDeclaringType());
       final Map<String, Object> argsMap = new LinkedHashMap<>();
       Object[] args = point.getArgs();
       Parameter[] parameters = method.getParameters();
       for (int i = 0; i < parameters.length; i++) {
         Object arg = args[i];
+        Parameter parameter = parameters[i];
         if (arg instanceof ServletRequest) {
-          argsMap.put(parameters[i].getName(), "[ServletRequest]");
+          argsMap.put(parameter.getName(), "[ServletRequest]");
         } else if (arg instanceof ServletResponse) {
-          argsMap.put(parameters[i].getName(), "[ServletResponse]");
+          argsMap.put(parameter.getName(), "[ServletResponse]");
         } else if (arg instanceof MultipartFile) {
           MultipartFile mf = (MultipartFile) arg;
-          argsMap.put(parameters[i].getName(), String.format("[MultipartFile(%s, %d)]"
+          argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %d)]"
               , mf.getOriginalFilename(), mf.getSize()));
         } else if (arg instanceof InputStream) {
-          argsMap.put(parameters[i].getName(), "[InputStream]");
+          argsMap.put(parameter.getName(), "[InputStream]");
         } else if (arg instanceof OutputStream) {
-          argsMap.put(parameters[i].getName(), "[OutputStream]");
+          argsMap.put(parameter.getName(), "[OutputStream]");
         } else {
-          argsMap.put(parameters[i].getName(), arg);
+          argsMap.put(parameter.getName(), arg);
         }
       }
       HttpServletRequest request = attrs.getRequest();

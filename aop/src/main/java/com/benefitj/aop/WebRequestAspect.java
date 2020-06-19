@@ -14,9 +14,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Web请求的切入点
  */
-@ConditionalOnMissingBean(AopWebRequestAspect.class)
+@ConditionalOnMissingBean(WebRequestAspect.class)
 @Aspect
-public class AopWebRequestAspect {
+public class WebRequestAspect {
   /**
    * 处理器
    */
@@ -26,7 +26,7 @@ public class AopWebRequestAspect {
    */
   private final ThreadLocal<Object> returnValueCache = new ThreadLocal<>();
 
-  public AopWebRequestAspect() {
+  public WebRequestAspect() {
   }
 
   /**
@@ -88,19 +88,75 @@ public class AopWebRequestAspect {
   @Around("pointcut()")
   public Object doAround(JoinPoint joinPoint) throws Throwable {
     final ProceedingJoinPoint pjp = (ProceedingJoinPoint) joinPoint;
+
+    List<WebPointCutHandler> handlers = getHandlers();
+
+    if (handlers.isEmpty()) {
+      return onEmptyHandlerProcess(pjp);
+    }
+
     Object returnValue = null;
     try {
-      doBefore(pjp, getHandlers());
+      doBefore(pjp, handlers);
       returnValue = pjp.proceed(pjp.getArgs());
       setReturnValueCache(returnValue);
-      doAfter(pjp, getHandlers());
+      doAfter(pjp, handlers);
     } catch (Throwable e) {
-      doAfterThrowing(pjp, e, getHandlers());
+      doAfterThrowing(pjp, e, handlers);
       throw e;
     } finally {
-      doAfterReturning(pjp, returnValue, getHandlers());
+      doAfterReturning(pjp, returnValue, handlers);
     }
     return getReturnValueCache();
+  }
+
+  /**
+   * 空Handler时调用
+   */
+  public Object onEmptyHandlerProcess(ProceedingJoinPoint pjp) throws Throwable {
+    return pjp.proceed(pjp.getArgs());
+  }
+
+  /**
+   * 执行之前
+   *
+   * @param point    连接点
+   * @param handlers 处理器
+   */
+  public void doBefore(ProceedingJoinPoint point, List<WebPointCutHandler> handlers) {
+    handlers.forEach(h -> h.doBefore(point));
+  }
+
+  /**
+   * 执行之后
+   *
+   * @param point    连接点
+   * @param handlers 处理器
+   */
+  public void doAfter(ProceedingJoinPoint point, List<WebPointCutHandler> handlers) {
+    handlers.forEach(h -> h.doAfter(point));
+  }
+
+  /**
+   * 抛出异常时
+   *
+   * @param point    连接点
+   * @param e        异常
+   * @param handlers 处理器
+   */
+  public void doAfterThrowing(ProceedingJoinPoint point, Throwable e, List<WebPointCutHandler> handlers) {
+    handlers.forEach(h -> h.doAfterThrowing(point, e));
+  }
+
+  /**
+   * 执行之后，返回值时
+   *
+   * @param point       连接点
+   * @param returnValue 返回值
+   * @param handlers    处理器
+   */
+  public void doAfterReturning(ProceedingJoinPoint point, Object returnValue, List<WebPointCutHandler> handlers) {
+    handlers.forEach(h -> h.doAfterReturning(point, returnValue));
   }
 
   /**
@@ -117,57 +173,6 @@ public class AopWebRequestAspect {
    */
   public Object getReturnValueCache() {
     return returnValueCache.get();
-  }
-
-
-  /**
-   * 执行之前
-   *
-   * @param point    连接点
-   * @param handlers 处理器
-   */
-  public void doBefore(ProceedingJoinPoint point, List<WebPointCutHandler> handlers) {
-    if (!handlers.isEmpty()) {
-      handlers.forEach(h -> h.doBefore(point));
-    }
-  }
-
-  /**
-   * 执行之后
-   *
-   * @param point    连接点
-   * @param handlers 处理器
-   */
-  public void doAfter(ProceedingJoinPoint point, List<WebPointCutHandler> handlers) {
-    if (!handlers.isEmpty()) {
-      handlers.forEach(h -> h.doAfter(point));
-    }
-  }
-
-  /**
-   * 抛出异常时
-   *
-   * @param point    连接点
-   * @param e        异常
-   * @param handlers 处理器
-   */
-  public void doAfterThrowing(ProceedingJoinPoint point, Throwable e, List<WebPointCutHandler> handlers) {
-    if (!handlers.isEmpty()) {
-      handlers.forEach(h -> h.doAfterThrowing(point, e));
-    }
-  }
-
-  /**
-   * 执行之后，返回值时
-   *
-   * @param point       连接点
-   * @param returnValue 返回值
-   * @param handlers    处理器
-   */
-  public void doAfterReturning(ProceedingJoinPoint point, Object returnValue, List<WebPointCutHandler> handlers) {
-    if (!handlers.isEmpty()) {
-      handlers.forEach(h -> h.doAfterReturning(point, returnValue));
-    }
   }
 
 }

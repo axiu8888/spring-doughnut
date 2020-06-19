@@ -1,4 +1,4 @@
-package com.benefitj.applicationlistener;
+package com.benefitj.applicationevent;
 
 import org.springframework.boot.context.event.*;
 import org.springframework.context.ApplicationEvent;
@@ -6,14 +6,28 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
+import org.springframework.web.context.support.ServletRequestHandledEvent;
 
-public interface IApplicationEventListener {
+public interface IApplicationEventListener extends
+    IApplicationEnvironmentPreparedEventListener,
+    IApplicationContextInitializedEventListener,
+    IApplicationStartingEventListener,
+    IApplicationStartedEventListener,
+    IApplicationPreparedEventListener,
+    IContextRefreshedEventListener,
+    IContextStartedEventListener,
+    IApplicationReadyEventListener,
+    IContextStoppedEventListener,
+    IContextClosedEventListener,
+    IServletRequestHandledEventListener,
+    IOtherApplicationEventListener {
 
   /**
    * 初始化环境变量
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
     // ~
   }
@@ -23,6 +37,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationContextInitializedEvent(ApplicationContextInitializedEvent event) {
     // ~
   }
@@ -32,6 +47,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationStartingEvent(ApplicationStartingEvent event) {
     // ~
   }
@@ -41,6 +57,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationStartedEvent(ApplicationStartedEvent event) {
     // ~
   }
@@ -50,6 +67,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
     // ~
   }
@@ -59,6 +77,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onContextRefreshedEvent(ContextRefreshedEvent event) {
     // ~
   }
@@ -68,6 +87,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onContextStartedEvent(ContextStartedEvent event) {
     // ~
   }
@@ -77,6 +97,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onApplicationReadyEvent(ApplicationReadyEvent event) {
     // ~
   }
@@ -86,6 +107,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onContextStoppedEvent(ContextStoppedEvent event) {
     // ~
   }
@@ -95,7 +117,18 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
-  default void onContextClosedEventEvent(ContextClosedEvent event) {
+  @Override
+  default void onContextClosedEvent(ContextClosedEvent event) {
+    // ~
+  }
+
+  /**
+   * Servlet请求
+   *
+   * @param event 事件
+   */
+  @Override
+  default void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
     // ~
   }
 
@@ -104,6 +137,7 @@ public interface IApplicationEventListener {
    *
    * @param event 事件
    */
+  @Override
   default void onOtherApplicationEvent(ApplicationEvent event) {
     // ~
   }

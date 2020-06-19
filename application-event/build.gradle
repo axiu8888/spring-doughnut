@@ -1,0 +1,9 @@
+
+apply from: "${getRootDir()}/base-springboot.gradle"
+
+dependencies {
+
+//  compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
+}

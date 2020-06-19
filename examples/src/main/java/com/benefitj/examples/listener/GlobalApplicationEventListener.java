@@ -1,6 +1,6 @@
 package com.benefitj.examples.listener;
 
-import com.benefitj.applicationlistener.IApplicationEventListener;
+import com.benefitj.applicationevent.IApplicationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.*;
@@ -10,6 +10,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 @Component
 public class GlobalApplicationEventListener implements IApplicationEventListener {
@@ -62,8 +63,13 @@ public class GlobalApplicationEventListener implements IApplicationEventListener
   }
 
   @Override
-  public void onContextClosedEventEvent(ContextClosedEvent event) {
+  public void onContextClosedEvent(ContextClosedEvent event) {
     log.info("onContextClosedEventEvent");
+  }
+
+  @Override
+  public void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
+    log.info("onServletRequestHandledEvent: " + event.getRequestUrl());
   }
 
   @Override

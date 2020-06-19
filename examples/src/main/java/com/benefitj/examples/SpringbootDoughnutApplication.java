@@ -1,7 +1,7 @@
 package com.benefitj.examples;
 
 import com.benefitj.aop.EnableAutoAopWebHandler;
-import com.benefitj.applicationlistener.EnableAutoApplicationListener;
+import com.benefitj.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

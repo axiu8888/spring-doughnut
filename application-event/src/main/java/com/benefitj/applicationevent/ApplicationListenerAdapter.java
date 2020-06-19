@@ -1,4 +1,4 @@
-package com.benefitj.applicationlistener;
+package com.benefitj.applicationevent;
 
 import org.springframework.boot.context.event.*;
 import org.springframework.context.ApplicationEvent;
@@ -7,8 +7,22 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
+import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 public class ApplicationListenerAdapter implements ApplicationListener {
+
+  private static final boolean STARTER_WEB;
+
+  static {
+    boolean servletCtx;
+    try {
+      Class.forName("org.springframework.web.context.support.ServletRequestHandledEvent");
+      servletCtx = true;
+    } catch (ClassNotFoundException e) {
+      servletCtx = false;
+    }
+    STARTER_WEB = servletCtx;
+  }
 
   public ApplicationListenerAdapter() {
   }
@@ -45,10 +59,16 @@ public class ApplicationListenerAdapter implements ApplicationListener {
       onContextStoppedEvent((ContextStoppedEvent) event);
     } else if (event instanceof ContextClosedEvent) {
       // ContextClosedEvent： 应用关闭
-      onContextClosedEventEvent((ContextClosedEvent) event);
+      onContextClosedEvent((ContextClosedEvent) event);
     } else {
-      // 其他事件
-      onOtherApplicationEvent(event);
+      if (STARTER_WEB
+          && (event instanceof ServletRequestHandledEvent)) {
+        // servlet请求
+        onServletRequestHandledEvent((ServletRequestHandledEvent) event);
+      } else {
+        // 其他事件
+        onOtherApplicationEvent(event);
+      }
     }
   }
 
@@ -138,7 +158,16 @@ public class ApplicationListenerAdapter implements ApplicationListener {
    *
    * @param event 事件
    */
-  public void onContextClosedEventEvent(ContextClosedEvent event) {
+  public void onContextClosedEvent(ContextClosedEvent event) {
+    // ~
+  }
+
+  /**
+   * Servlet请求
+   *
+   * @param event 事件
+   */
+  public void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
     // ~
   }
 

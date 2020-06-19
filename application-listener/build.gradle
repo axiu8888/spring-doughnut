@@ -1,8 +1,0 @@
-
-apply from: "${getRootDir()}/base-springboot.gradle"
-
-dependencies {
-
-  compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
-
-}

@@ -12,6 +12,7 @@ dependencies {
 
   compile project(":websocket")
   compile project(":aop")
+  compile project(":application-listener")
 
   implementation 'org.aspectj:aspectjweaver:1.9.4'
   implementation("org.springframework.boot:spring-boot-starter-web")

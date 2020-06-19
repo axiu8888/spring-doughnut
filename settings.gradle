@@ -3,4 +3,7 @@ rootProject.name = 'springboot-doughnut'
 
 include ":aop"
 include ":websocket"
+include ":application-listener"
+
+
 include ":examples"

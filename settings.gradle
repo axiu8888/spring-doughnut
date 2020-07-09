@@ -8,3 +8,4 @@ include ":eventbus"
 
 
 include ":examples"
+include ":samples:websocket"

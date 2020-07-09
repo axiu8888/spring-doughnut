@@ -1,13 +1,14 @@
 package com.benefitj.examples;
 
-import com.benefitj.aop.EnableAutoAopWebHandler;
+import com.benefitj.aop.log.EnableRequestLoggingHandler;
 import com.benefitj.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableSpringWebSocket // 自定义WebSocket注册
-@EnableAutoAopWebHandler // AOP
+//@EnableAutoAopWebHandler // AOP
+@EnableRequestLoggingHandler
 @EnableAutoApplicationListener // 监听事件
 @SpringBootApplication
 public class SpringbootDoughnutApplication {

@@ -1,8 +1,5 @@
 package com.benefitj.websocket;
 
-import com.alibaba.fastjson.JSON;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -23,8 +20,6 @@ import java.util.*;
 @EnableWebSocket
 @Configuration
 public class SpringServerEndpointConfiguration extends DelegatingWebSocketConfiguration implements WebSocketConfigurer {
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired(required = false)
   private List<SpringWebSocketServer> webSocketServers;
@@ -71,7 +66,6 @@ public class SpringServerEndpointConfiguration extends DelegatingWebSocketConfig
           for (Class<? extends HandshakeInterceptor> klass : interceptorClasses) {
             registration.addInterceptors(context.getBean(klass));
           }
-          logger.info("注册WebSocket服务: {}", JSON.toJSONString(endpoint.value()));
         }
       }
     }

@@ -4,6 +4,7 @@ rootProject.name = 'springboot-doughnut'
 include ":aop"
 include ":websocket"
 include ":application-event"
+include ":eventbus"
 
 
 include ":examples"

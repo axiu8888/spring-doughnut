@@ -1,7 +1,8 @@
 package com.benefitj.aop.log;
 
-import com.alibaba.fastjson.JSON;
 import com.benefitj.aop.WebPointCutHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -32,6 +33,8 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
   private static final Logger log = LoggerFactory.getLogger(HttpServletRequestLoggingHandler.class);
 
+  private final ObjectMapper mapper = new ObjectMapper();
+
   @Override
   public void doBefore(JoinPoint joinPoint) {
     ServletRequestAttributes attrs = getRequestAttributes();
@@ -61,20 +64,29 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
             argsMap.put(parameter.getName(), arg);
           }
         }
-        printLog(attrs, argsMap);
+        printLog(method, attrs, argsMap);
       } else {
-        printLog(attrs, null);
+        printLog(method, attrs, null);
       }
     }
   }
 
-  public void printLog(ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
+  public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
     HttpServletRequest request = attrs.getRequest();
     if (argsMap != null && !argsMap.isEmpty()) {
-      log.info("uri: {}, method: {}, params: {}",
-          request.getRequestURI(), request.getMethod(), JSON.toJSONString(argsMap));
+      log.info("uri: {}, method: {}, {}.{}(), params: {}", request.getRequestURI(),
+          request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
     } else {
-      log.info("uri: {}, method: {}", request.getRequestURI(), request.getMethod());
+      log.info("uri: {}, method: {} {}.{}()", request.getRequestURI(), request.getMethod()
+          , method.getDeclaringClass().getName(), method.getName());
+    }
+  }
+
+  public String toJson(Object o) {
+    try {
+      return mapper.writeValueAsString(o);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
     }
   }
 

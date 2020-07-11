@@ -15,6 +15,7 @@ dependencies {
   compile project(":application-event")
   compile project(":eventbus")
 
+  implementation 'com.alibaba:fastjson:1.2.62'
   implementation 'org.aspectj:aspectjweaver:1.9.4'
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")

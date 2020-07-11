@@ -24,9 +24,7 @@ dependencies {
     compileOnly fileTree(dir: 'libs-source', include: ['*.jar'])
 
     //testImplementation 'junit:junit:4.12'
-    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
-        //exclude group: 'org.junit.vintage'//, module: 'junit-vintage-engine'
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 
     compileOnly "org.apache.commons:commons-pool2:2.6.2"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"

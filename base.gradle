@@ -62,7 +62,7 @@ dependencies {
 //    compileOnly "org.apache.commons:commons-pool2:2.6.2"
 
     compileOnly 'com.google.guava:guava:29.0-jre'
-    compileOnly 'com.alibaba:fastjson:1.2.62'
+//    compileOnly 'com.alibaba:fastjson:1.2.62'
 
     compileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
     testCompileOnly 'org.slf4j:slf4j-log4j12:1.7.26'

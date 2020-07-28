@@ -1,6 +1,6 @@
 package com.benefitj.examples.websocket;
 
-import com.benefitj.websocket.JavaxWebSocketServer;
+import com.benefitj.spring.websocket.JavaxWebSocketServer;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

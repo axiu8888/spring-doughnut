@@ -1,6 +1,6 @@
 package com.benefitj.examples.listener;
 
-import com.benefitj.applicationevent.IApplicationEventListener;
+import com.benefitj.spring.applicationevent.IApplicationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.*;

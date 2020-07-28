@@ -9,6 +9,8 @@ apply from: "${getRootDir()}/base-springboot.gradle"
 description("examples")
 
 dependencies {
+  compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
   compile project(":websocket")
   compile project(":aop")

@@ -3,6 +3,15 @@ apply from: "${getRootDir()}/base-springboot.gradle"
 
 dependencies {
 
+  compileOnly 'com.google.guava:guava:29.0-jre'
+  compileOnly 'org.aspectj:aspectjweaver:1.9.4'
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
+  compile project(":aop")
+  compile project(":application-event")
+  compile project(":eventbus")
+  compile project(":websocket")
+
 }
+
+apply from: "${getRootDir()}/package-allinone.gradle"

@@ -1,8 +1,8 @@
 package com.benefitj.examples.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.benefitj.websocket.SpringServerEndpoint;
-import com.benefitj.websocket.SpringWebSocketServer;
+import com.benefitj.spring.websocket.SpringServerEndpoint;
+import com.benefitj.spring.websocket.SpringWebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

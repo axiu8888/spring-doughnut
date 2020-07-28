@@ -1,0 +1,94 @@
+apply plugin: 'maven'
+
+// 配置是否将代码打包到一个jar中
+def allInOne = true
+
+def ignoreProjects = ['examples', 'samples']
+
+jar {
+    from {
+        if (allInOne) {
+            def allProjects = new HashMap<>()
+            getRootProject().subprojects.stream()
+                    .filter { isAllowProject(it, ignoreProjects) }
+                    .forEach { allProjects.put("${it.name}-${it.version}.jar" as String, it) }
+            return configurations.compile.collect {
+                if (allProjects.containsKey(it.name)) {
+                    it.isDirectory() ? it : zipTree(it)
+                }
+            }
+        } else {
+            return it
+        }
+    }
+}
+
+sourceJar {
+    from {
+        if (allInOne) {
+            def allProjects = new HashMap<>()
+            getRootProject().subprojects.stream()
+                    .filter { isAllowProject(it, ignoreProjects) }
+                    .forEach({ allProjects.put("${it.name}-${it.version}.jar" as String, it) })
+            return configurations.compile.collect {
+                if (allProjects.containsKey(it.name)) {
+                    allProjects.get(it.name).sourceSets.main.allSource
+                }
+            }
+        } else {
+            return sourceSets.main.allSource
+        }
+    }
+}
+
+/**
+ * 忽略的 project
+ *
+ * @param project 被检查的 project
+ * @param ignoreProjects 忽略的 project names
+ * @return 返回是否添加项目
+ */
+static boolean isAllowProject(Project project, List<String> ignoreProjects) {
+    if (ignoreProjects.contains(project.name as String)) {
+        return false
+    }
+    return project.getParent() == null || isAllowProject(project.getParent(), ignoreProjects);
+}
+
+//
+//ext.groupId = getOrDefault(ext.groupId, "com.benefitj")
+//ext.artifactId = getOrDefault(ext.artifactId, "${archivesBaseName}")
+//ext.versionId = getOrDefault(ext.versionId, "${version}")
+//
+////上传到nexus
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.groupId = "$groupId"
+//            pom.artifactId = "$artifactId"
+//            pom.version = "$versionId"
+//
+//            if (allInOne) {
+//                def allProjects = new ConcurrentHashMap<>()
+//                getRootProject().subprojects.forEach({
+//                    allProjects.put("${it.name}" as String, it)
+//                })
+//                pom.whenConfigured { pom ->
+//                    def deps = pom.dependencies.stream()
+//                            .filter {dep -> !allProjects.containsKey(dep.groupId)}
+//                            .collect {dep -> dep}
+//                    pom.dependencies.clear()
+//                    pom.dependencies.addAll(deps)
+//                }
+//            }
+//
+////            repository(url: "http://192.168.124.128:9001/repository/nexusCenter/") {
+////                authentication(userName: "admin", password: "admin123")
+////            }
+//        }
+//    }
+//}
+//
+//static String getOrDefault(String str, String defaultValue) {
+//    return str != null && !str.trim().isEmpty() ? str : defaultValue
+//}

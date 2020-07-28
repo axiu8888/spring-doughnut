@@ -1,9 +1,9 @@
 package com.benefitj.examples;
 
-import com.benefitj.aop.log.EnableRequestLoggingHandler;
-import com.benefitj.applicationevent.EnableAutoApplicationListener;
+import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
+import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.spring.eventbus.EnableAutoEventBusPoster;
-import com.benefitj.websocket.EnableSpringWebSocket;
+import com.benefitj.spring.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

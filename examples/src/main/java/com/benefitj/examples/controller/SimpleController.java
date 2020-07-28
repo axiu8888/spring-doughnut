@@ -1,8 +1,8 @@
 package com.benefitj.examples.controller;
 
 
-import com.benefitj.aop.AopIgnore;
-import com.benefitj.aop.AopWebPointCut;
+import com.benefitj.spring.aop.AopIgnore;
+import com.benefitj.spring.aop.AopWebPointCut;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
 import org.springframework.beans.factory.annotation.Autowired;

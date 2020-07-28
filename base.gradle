@@ -23,15 +23,12 @@ tasks.withType(Javadoc) {
 //    from sourceSets.main.allSource
 //}
 
-task packageSources(type: Jar) {
+task sourceJar(type: Jar) {
     classifier = 'sources'
-
-//    from fileTree(dir: 'src/main/resources', includes: ['*'])
-//    from fileTree(dir: 'src/main/java', includes: ['*'])
     from sourceSets.main.allSource
 }
 
-artifacts.archives packageSources
+artifacts.archives sourceJar
 
 configurations {
     developmentOnly

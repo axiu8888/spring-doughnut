@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -34,6 +35,14 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   private static final Logger log = LoggerFactory.getLogger(HttpServletRequestLoggingHandler.class);
 
   private final ObjectMapper mapper = new ObjectMapper();
+  /**
+   * 是否分多行打印
+   */
+  @Value("#{ @environment['com.benefitj.aop.log.multi-line'] ?: false }")
+  private boolean multiLine = false;
+
+  public HttpServletRequestLoggingHandler() {
+  }
 
   @Override
   public void doBefore(JoinPoint joinPoint) {
@@ -73,12 +82,23 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
   public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
     HttpServletRequest request = attrs.getRequest();
+
     if (argsMap != null && !argsMap.isEmpty()) {
-      log.info("uri: {}, method: {}, {}.{}(), params: {}", request.getRequestURI(),
-          request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
+      if (isMultiLine()) {
+        log.info("\nuri: {}\nrequest method: {}\nclass: {}\nclass method: {}\nargs: {}", request.getRequestURI(),
+            request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
+      } else {
+        log.info("uri: {}, request method: {}, class: {}, class method: {}, args: {}", request.getRequestURI(),
+            request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
+      }
     } else {
-      log.info("uri: {}, method: {} {}.{}()", request.getRequestURI(), request.getMethod()
-          , method.getDeclaringClass().getName(), method.getName());
+      if (isMultiLine()) {
+        log.info("\nuri: {}\nrequest method: {}\nclass: {}\nclass method: {}", request.getRequestURI(),
+            request.getMethod(), method.getDeclaringClass().getName(), method.getName());
+      } else {
+        log.info("uri: {}, request method: {}, class: {}, class method: {}", request.getRequestURI(),
+            request.getMethod(), method.getDeclaringClass().getName(), method.getName());
+      }
     }
   }
 
@@ -90,5 +110,11 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     }
   }
 
+  public boolean isMultiLine() {
+    return multiLine;
+  }
 
+  public void setMultiLine(boolean multiLine) {
+    this.multiLine = multiLine;
+  }
 }

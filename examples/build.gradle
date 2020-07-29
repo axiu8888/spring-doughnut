@@ -12,10 +12,12 @@ dependencies {
   compile fileTree(dir: 'libs/jar', include: ['*.jar'])
   compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-  compile project(":websocket")
-  compile project(":aop")
-  compile project(":application-event")
-  compile project(":eventbus")
+//  compile project(":websocket")
+//  compile project(":aop")
+//  compile project(":application-event")
+//  compile project(":eventbus")
+
+  compile project(":spring")
 
   implementation 'com.alibaba:fastjson:1.2.62'
   implementation 'org.aspectj:aspectjweaver:1.9.4'

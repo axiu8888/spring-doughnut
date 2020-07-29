@@ -36,10 +36,15 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
   private final ObjectMapper mapper = new ObjectMapper();
   /**
+   * 是否打印日志
+   */
+  @Value("#{ @environment['com.benefitj.aop.log.print'] ?: true }")
+  private boolean print = true;
+  /**
    * 是否分多行打印
    */
-  @Value("#{ @environment['com.benefitj.aop.log.multi-line'] ?: false }")
-  private boolean multiLine = false;
+  @Value("#{ @environment['com.benefitj.aop.log.multi-line'] ?: true }")
+  private boolean multiLine = true;
 
   public HttpServletRequestLoggingHandler() {
   }
@@ -81,8 +86,11 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   }
 
   public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
-    HttpServletRequest request = attrs.getRequest();
+    if (!isPrint()) {
+      return;
+    }
 
+    HttpServletRequest request = attrs.getRequest();
     if (argsMap != null && !argsMap.isEmpty()) {
       if (isMultiLine()) {
         log.info("\nuri: {}\nrequest method: {}\nclass: {}\nclass method: {}\nargs: {}", request.getRequestURI(),
@@ -104,10 +112,22 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
   public String toJson(Object o) {
     try {
-      return mapper.writeValueAsString(o);
+      return getMapper().writeValueAsString(o);
     } catch (JsonProcessingException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public ObjectMapper getMapper() {
+    return mapper;
+  }
+
+  public boolean isPrint() {
+    return print;
+  }
+
+  public void setPrint(boolean print) {
+    this.print = print;
   }
 
   public boolean isMultiLine() {

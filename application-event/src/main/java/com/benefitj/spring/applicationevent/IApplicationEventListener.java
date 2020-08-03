@@ -6,7 +6,6 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
-import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 public interface IApplicationEventListener extends
     IApplicationEnvironmentPreparedEventListener,
@@ -19,7 +18,6 @@ public interface IApplicationEventListener extends
     IApplicationReadyEventListener,
     IContextStoppedEventListener,
     IContextClosedEventListener,
-    IServletRequestHandledEventListener,
     IOtherApplicationEventListener {
 
   /**
@@ -119,16 +117,6 @@ public interface IApplicationEventListener extends
    */
   @Override
   default void onContextClosedEvent(ContextClosedEvent event) {
-    // ~
-  }
-
-  /**
-   * Servlet请求
-   *
-   * @param event 事件
-   */
-  @Override
-  default void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
     // ~
   }
 

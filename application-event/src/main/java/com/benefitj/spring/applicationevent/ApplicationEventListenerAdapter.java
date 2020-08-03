@@ -10,7 +10,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -94,11 +93,6 @@ public class ApplicationEventListenerAdapter extends ApplicationListenerAdapter 
   @Override
   public void onContextClosedEvent(ContextClosedEvent event) {
     apply(IContextClosedEventListener.class, (name, listener) -> listener.onContextClosedEvent(event));
-  }
-
-  @Override
-  public void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
-    apply(IServletRequestHandledEventListener.class, (name, listener) -> listener.onServletRequestHandledEvent(event));
   }
 
   @Override

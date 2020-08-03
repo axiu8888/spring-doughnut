@@ -7,22 +7,8 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
-import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 public class ApplicationListenerAdapter implements ApplicationListener {
-
-  private static final boolean STARTER_WEB;
-
-  static {
-    boolean servletCtx;
-    try {
-      Class.forName("org.springframework.web.context.support.ServletRequestHandledEvent");
-      servletCtx = true;
-    } catch (ClassNotFoundException e) {
-      servletCtx = false;
-    }
-    STARTER_WEB = servletCtx;
-  }
 
   public ApplicationListenerAdapter() {
   }
@@ -61,14 +47,8 @@ public class ApplicationListenerAdapter implements ApplicationListener {
       // ContextClosedEvent： 应用关闭
       onContextClosedEvent((ContextClosedEvent) event);
     } else {
-      if (STARTER_WEB
-          && (event instanceof ServletRequestHandledEvent)) {
-        // servlet请求
-        onServletRequestHandledEvent((ServletRequestHandledEvent) event);
-      } else {
-        // 其他事件
-        onOtherApplicationEvent(event);
-      }
+      // 其他事件
+      onOtherApplicationEvent(event);
     }
   }
 
@@ -163,15 +143,6 @@ public class ApplicationListenerAdapter implements ApplicationListener {
   }
 
   /**
-   * Servlet请求
-   *
-   * @param event 事件
-   */
-  public void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
-    // ~
-  }
-
-  /**
    * 其他事件
    *
    * @param event 事件
@@ -179,4 +150,5 @@ public class ApplicationListenerAdapter implements ApplicationListener {
   public void onOtherApplicationEvent(ApplicationEvent event) {
     // ~
   }
+
 }

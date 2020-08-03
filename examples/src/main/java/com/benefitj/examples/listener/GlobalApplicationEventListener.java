@@ -68,12 +68,12 @@ public class GlobalApplicationEventListener implements IApplicationEventListener
   }
 
   @Override
-  public void onServletRequestHandledEvent(ServletRequestHandledEvent event) {
-    log.info("onServletRequestHandledEvent: " + event.getRequestUrl());
-  }
-
-  @Override
   public void onOtherApplicationEvent(ApplicationEvent event) {
-    log.info("onOtherApplicationEvent: " + event.getClass());
+    if (event instanceof ServletRequestHandledEvent) {
+      ServletRequestHandledEvent srhe = (ServletRequestHandledEvent) event;
+      log.info("onServletRequestHandledEvent: {}, clientAddress: {}", srhe.getRequestUrl(), srhe.getClientAddress());
+    } else {
+      log.info("onOtherApplicationEvent: {}", event.getClass());
+    }
   }
 }

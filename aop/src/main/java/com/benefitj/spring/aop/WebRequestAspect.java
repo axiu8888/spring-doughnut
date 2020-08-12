@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,14 +18,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ConditionalOnMissingBean(WebRequestAspect.class)
 @Aspect
 public class WebRequestAspect {
+
+  /**
+   * 返回值缓存
+   */
+  private static final ThreadLocal<Object> returnValueCache = new ThreadLocal<>();
   /**
    * 处理器
    */
   private final List<WebPointCutHandler> handlers = new CopyOnWriteArrayList<>();
-  /**
-   * 返回值缓存
-   */
-  private final ThreadLocal<Object> returnValueCache = new ThreadLocal<>();
 
   public WebRequestAspect() {
   }
@@ -89,7 +91,7 @@ public class WebRequestAspect {
   public Object doAround(JoinPoint joinPoint) throws Throwable {
     final ProceedingJoinPoint pjp = (ProceedingJoinPoint) joinPoint;
 
-    List<WebPointCutHandler> handlers = getHandlers();
+    List<WebPointCutHandler> handlers = Collections.unmodifiableList(getHandlers());
 
     if (handlers.isEmpty()) {
       return onEmptyHandlerProcess(pjp);
@@ -164,14 +166,14 @@ public class WebRequestAspect {
    *
    * @param value 返回值
    */
-  public void setReturnValueCache(Object value) {
+  public static void setReturnValueCache(Object value) {
     returnValueCache.set(value);
   }
 
   /**
    * 获取返回值
    */
-  public Object getReturnValueCache() {
+  public static Object getReturnValueCache() {
     return returnValueCache.get();
   }
 

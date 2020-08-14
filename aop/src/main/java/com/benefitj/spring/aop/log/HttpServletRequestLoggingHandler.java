@@ -51,6 +51,9 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
   @Override
   public void doBefore(JoinPoint joinPoint) {
+    if (!isPrint()) {
+      return;
+    }
     ServletRequestAttributes attrs = getRequestAttributes();
     if (attrs != null) {
       ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
@@ -86,10 +89,6 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   }
 
   public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
-    if (!isPrint()) {
-      return;
-    }
-
     HttpServletRequest request = attrs.getRequest();
     if (argsMap != null && !argsMap.isEmpty()) {
       if (isMultiLine()) {

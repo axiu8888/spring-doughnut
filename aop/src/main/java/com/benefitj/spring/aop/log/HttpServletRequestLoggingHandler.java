@@ -18,8 +18,6 @@ import javax.annotation.Nullable;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.LinkedHashMap;
@@ -58,34 +56,31 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     if (attrs != null) {
       ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
       Method method = ((MethodSignature) point.getSignature()).getMethod();
-      Parameter[] parameters = method.getParameters();
-      if (parameters != null && parameters.length > 0) {
-        Object[] args = point.getArgs();
-        final Map<String, Object> argsMap = new LinkedHashMap<>();
-        for (int i = 0; i < parameters.length; i++) {
-          Object arg = args[i];
-          Parameter parameter = parameters[i];
-          if (arg instanceof ServletRequest) {
-            argsMap.put(parameter.getName(), "[ServletRequest]");
-          } else if (arg instanceof ServletResponse) {
-            argsMap.put(parameter.getName(), "[ServletResponse]");
-          } else if (arg instanceof MultipartFile) {
-            MultipartFile mf = (MultipartFile) arg;
-            argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %d)]"
-                , mf.getOriginalFilename(), mf.getSize()));
-          } else if (arg instanceof InputStream) {
-            argsMap.put(parameter.getName(), "[InputStream]");
-          } else if (arg instanceof OutputStream) {
-            argsMap.put(parameter.getName(), "[OutputStream]");
-          } else {
-            argsMap.put(parameter.getName(), arg);
-          }
-        }
-        printLog(method, attrs, argsMap);
-      } else {
-        printLog(method, attrs, null);
-      }
+      printLog(method, attrs, mapToArgs(method.getParameters(), point.getArgs()));
     }
+  }
+
+  private Map<String, Object> mapToArgs(Parameter[] parameters, Object[] args) {
+    if (parameters != null && parameters.length > 0) {
+      final Map<String, Object> argsMap = new LinkedHashMap<>();
+      for (int i = 0; i < parameters.length; i++) {
+        Object arg = args[i];
+        Parameter parameter = parameters[i];
+        if (arg instanceof ServletRequest) {
+          argsMap.put(parameter.getName(), "[ServletRequest]");
+        } else if (arg instanceof ServletResponse) {
+          argsMap.put(parameter.getName(), "[ServletResponse]");
+        } else if (arg instanceof MultipartFile) {
+          MultipartFile mf = (MultipartFile) arg;
+          argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %d)]"
+              , mf.getOriginalFilename(), mf.getSize()));
+        } else {
+          argsMap.put(parameter.getName(), arg);
+        }
+      }
+      return argsMap;
+    }
+    return null;
   }
 
   public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {

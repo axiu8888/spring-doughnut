@@ -1,9 +1,9 @@
 package com.benefitj.spring;
 
-import com.google.common.net.HttpHeaders;
 import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -19,124 +19,157 @@ public class BreakPointTransmissionHelper {
   private static final Logger logger = LoggerFactory.getLogger(BreakPointTransmissionHelper.class);
 
   /**
-   * 支持断点续传的下载方式
+   * 支持断点续传的上传方式
    *
-   * @param request          请求
-   * @param response         响应
-   * @param file             下载的文件
-   * @param downloadFilename 下载的文件名
-   * @return 返回下载的长度
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @param request 请求
+   * @param source  上传的文件
+   * @param target  保存的文件
+   * @return 返回上传的长度
+   * @throws IOException IO异常
    */
-  public static BreakPointTransmissionHelper.RangeSettings download(HttpServletRequest request,
-                                                                    HttpServletResponse response,
-                                                                    final File file,
-                                                                    final String downloadFilename) throws FileNotFoundException, IOException {
-    return download(request, response, file, downloadFilename, true);
+  public static RangeSettings upload(HttpServletRequest request,
+                                     final MultipartFile source,
+                                     final File target) throws IOException {
+    if (source == null || source.getSize() <= 0) {
+      return new RangeSettings(0, 0, 0, 0, false);
+    }
+
+    final RangeSettings settings = parseRangeHeader(request, source.getSize(), true);
+    try (final RandomAccessFile out = new RandomAccessFile(target, "rw");
+         final BufferedInputStream bis = new BufferedInputStream(source.getInputStream());) {
+      out.seek(settings.getStart());
+      transferTo(bis, settings, (buff, len) -> out.write(buff, 0, len));
+    }
+    return settings;
   }
 
   /**
    * 支持断点续传的下载方式
    *
-   * @param request          请求
-   * @param response         响应
-   * @param file             下载的文件
-   * @param downloadFilename 下载的文件名
-   * @param acceptRanges     是否支持断点续传
+   * @param request  请求
+   * @param response 响应
+   * @param source   下载的文件
+   * @param filename 下载的文件名
    * @return 返回下载的长度
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @throws FileNotFoundException 文件找不到
+   * @throws IOException           IO异常
    */
   public static BreakPointTransmissionHelper.RangeSettings download(HttpServletRequest request,
                                                                     HttpServletResponse response,
-                                                                    final File file,
-                                                                    final String downloadFilename,
+                                                                    final File source,
+                                                                    final String filename) throws FileNotFoundException, IOException {
+    return download(request, response, source, filename, true);
+  }
+
+  /**
+   * 支持断点续传的下载方式
+   *
+   * @param request      请求
+   * @param response     响应
+   * @param source       下载的文件
+   * @param filename     下载的文件名
+   * @param acceptRanges 是否支持断点续传
+   * @return 返回下载的长度
+   * @throws FileNotFoundException 文件找不到
+   * @throws IOException           IO异常
+   */
+  public static BreakPointTransmissionHelper.RangeSettings download(HttpServletRequest request,
+                                                                    HttpServletResponse response,
+                                                                    final File source,
+                                                                    final String filename,
                                                                     final boolean acceptRanges) throws FileNotFoundException, IOException {
-    if (!file.exists()) {
-      throw new FileNotFoundException(file.getAbsolutePath());
+    if (!source.exists()) {
+      throw new FileNotFoundException(source.getAbsolutePath());
     }
-    long count = 0;
-    final BreakPointTransmissionHelper.RangeSettings settings =
-        BreakPointTransmissionHelper.setResponseHeaders(request, response, file, downloadFilename, acceptRanges);
-    try (final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));) {
+
+    final BreakPointTransmissionHelper.RangeSettings settings = setResponseHeaders(request, response, source, filename, acceptRanges);
+    try (final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(source));) {
       // 跳过 n 个字节
-      if (settings.getStart() > 0) {
-        bis.skip(settings.getStart());
-      }
+      bis.skip(settings.getStart());
 
       final ServletOutputStream out = response.getOutputStream();
+      transferTo(bis, settings, (buff, len) -> out.write(buff, 0, len));
+      out.flush();
+    } catch (ClientAbortException e) {
+      // 客户端被强制关闭，
+      logger.error("throws: {}", e.getMessage());
+    }
+    return settings;
+  }
 
+  private static void transferTo(BufferedInputStream bis, RangeSettings settings, BiConsumer<byte[], Integer> consumer) throws IOException {
+    long count = 0;
+    try {
       final byte[] buff = new byte[1024 << 4];
       int len;
       while (count < settings.getContentLength()) {
         len = bis.read(buff, 0, (int) Math.min(buff.length, settings.getContentLength() - count));
         count += len;
-        out.write(buff, 0, len);
+        consumer.accept(buff, len);
       }
-      out.flush();
-    } catch (ClientAbortException e) {
-      // 客户端被强制关闭，
-      logger.error("throws: {}", e.getMessage());
     } finally {
       settings.setDownloadLength(count);
     }
-    return settings;
   }
 
   /**
    * 设置响应
    *
-   * @param request          请求
-   * @param response         响应
-   * @param file             文件
-   * @param downloadFilename 下载的文件名
-   * @param acceptRanges     是否支持断线续传
+   * @param request      请求
+   * @param response     响应
+   * @param source       文件
+   * @param filename     下载的文件名
+   * @param acceptRanges 是否支持断线续传
    * @return
    */
   public static RangeSettings setResponseHeaders(HttpServletRequest request,
                                                  HttpServletResponse response,
-                                                 File file,
-                                                 String downloadFilename,
+                                                 File source,
+                                                 String filename,
                                                  boolean acceptRanges) {
-    RangeSettings settings = parseRangeHeader(request, file, acceptRanges);
-    setResponseHeaders(response, settings, downloadFilename);
+    RangeSettings settings = parseRangeHeader(request, source.length(), acceptRanges);
+    setResponseHeaders(response, settings, filename);
     return settings;
   }
 
   /**
    * Range
+   *
+   * @param request      HttpServletRequest
+   * @param totalLength  数据的总长度
+   * @param acceptRanges 是否断点续传
+   * @return 返回解析的参数
    */
-  public static RangeSettings parseRangeHeader(HttpServletRequest request, File downloadFile, boolean acceptRanges) {
+  public static RangeSettings parseRangeHeader(HttpServletRequest request, long totalLength, boolean acceptRanges) {
     String rangeHeader = request.getHeader("Range");
     RangeSettings settings;
     if ((rangeHeader == null || "".equals(rangeHeader.trim())) || !acceptRanges) {
-      settings = new RangeSettings(downloadFile);
+      settings = new RangeSettings(totalLength);
     } else {
-      settings = getSettings(downloadFile, rangeHeader.replaceFirst("bytes=", ""));
+      settings = getSettings(totalLength, rangeHeader.replaceFirst("bytes=", ""));
     }
     return settings;
   }
 
-  public static void setResponseHeaders(HttpServletResponse response, RangeSettings settings, String fileName) {
+  public static void setResponseHeaders(HttpServletResponse response, RangeSettings settings, String filename) {
     response.addHeader("Content-Disposition", "attachment; filename=" +
-        new String(fileName.getBytes(), StandardCharsets.ISO_8859_1));
+        new String(filename.getBytes(), StandardCharsets.ISO_8859_1));
     // set the MIME type.
-    response.setContentType(getContentType(fileName));
+    response.setContentType(getContentType(filename));
     if (settings.isRange()) {
       // 支持断点续传
-      response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
-      response.addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(settings.getContentLength()));
+      response.setHeader("Accept-Ranges", "bytes");
+      response.addHeader("Content-Length", String.valueOf(settings.getContentLength()));
       String contentRange = "bytes " + settings.getStart() + "-" + settings.getEnd() + "/" + settings.getTotalLength();
-      response.setHeader(HttpHeaders.CONTENT_RANGE, contentRange);
-      response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+      response.setHeader("Content-Range", contentRange);
+      response.setStatus(206);
     } else {
-      response.addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(settings.getTotalLength()));
+      response.addHeader("Content-Length", String.valueOf(settings.getTotalLength()));
     }
   }
 
-  private static RangeSettings getSettings(File downloadFile, String range) {
-    long start, end, contentLength, totalLength = downloadFile.length();
+  private static RangeSettings getSettings(long totalLength, String range) {
+    long start, end, contentLength;
     if (range.startsWith("-")) {
       contentLength = Long.parseLong(range.substring(1));
       end = totalLength - 1;
@@ -151,14 +184,108 @@ public class BreakPointTransmissionHelper {
       end = Long.parseLong(splits[1]);
       contentLength = end - start + 1;
     }
-    return new RangeSettings(downloadFile, start, end, contentLength, totalLength, true);
+    return new RangeSettings(start, end, contentLength, totalLength, true);
+  }
+
+
+  public static class RangeSettings {
+
+    /**
+     * 开始的位置
+     */
+    private long start;
+    /**
+     * 结束的位置（包含）
+     */
+    private long end;
+    /**
+     * 数据长度
+     */
+    private long contentLength;
+    /**
+     * 数据总长度
+     */
+    private long totalLength;
+    /**
+     * 是否包含Range
+     */
+    private boolean range;
+    /**
+     * 实际下载长度
+     */
+    private long downloadLength;
+
+    public RangeSettings(long length) {
+      this(0, length - 1, length, length, false);
+    }
+
+    public RangeSettings(long start, long end, long contentLength, long totalLength, boolean range) {
+      this.start = start;
+      this.end = end;
+      this.contentLength = contentLength;
+      this.totalLength = totalLength;
+      this.range = range;
+    }
+
+    public long getStart() {
+      return start;
+    }
+
+    public void setStart(long start) {
+      this.start = start;
+    }
+
+    public long getEnd() {
+      return end;
+    }
+
+    public void setEnd(long end) {
+      this.end = end;
+    }
+
+    public long getContentLength() {
+      return contentLength;
+    }
+
+    public void setContentLength(long contentLength) {
+      this.contentLength = contentLength;
+    }
+
+    public long getTotalLength() {
+      return totalLength;
+    }
+
+    public void setTotalLength(long totalLength) {
+      this.totalLength = totalLength;
+    }
+
+    public boolean isRange() {
+      return range;
+    }
+
+    public void setRange(boolean range) {
+      this.range = range;
+    }
+
+    public long getDownloadLength() {
+      return downloadLength;
+    }
+
+    public void setDownloadLength(long downloadLength) {
+      this.downloadLength = downloadLength;
+    }
+
+    public boolean isSuccessful() {
+      return getContentLength() == getDownloadLength();
+    }
   }
 
 
   public static String getContentType(String returnFileName) {
     String contentType = "application/octet-stream";
-    if (returnFileName.lastIndexOf(".") < 0)
+    if (returnFileName.lastIndexOf(".") < 0) {
       return contentType;
+    }
     returnFileName = returnFileName.toLowerCase();
     returnFileName = returnFileName.substring(returnFileName.lastIndexOf(".") + 1);
     switch (returnFileName) {
@@ -327,102 +454,20 @@ public class BreakPointTransmissionHelper {
   }
 
 
-  public static class RangeSettings {
+  /**
+   * consumer
+   */
+  @FunctionalInterface
+  interface BiConsumer<T, U> {
 
-    private final File downloadFile;
     /**
-     * 开始的位置
+     * Performs this operation on the given arguments.
+     *
+     * @param t the first input argument
+     * @param u the second input argument
      */
-    private long start;
-    /**
-     * 结束的位置（包含）
-     */
-    private long end;
-    /**
-     * 数据长度
-     */
-    private long contentLength;
-    /**
-     * 数据总长度
-     */
-    private long totalLength;
-    /**
-     * 是否包含Range
-     */
-    private boolean range;
-    /**
-     * 实际下载长度
-     */
-    private long downloadLength;
-
-    public RangeSettings(File downloadFile) {
-      this(downloadFile, 0, downloadFile.length() - 1, downloadFile.length(), downloadFile.length(), false);
-    }
-
-    public RangeSettings(File downloadFile, long start, long end, long contentLength, long totalLength, boolean range) {
-      this.downloadFile = downloadFile;
-      this.start = start;
-      this.end = end;
-      this.contentLength = contentLength;
-      this.totalLength = totalLength;
-      this.range = range;
-    }
-
-    public File getDownloadFile() {
-      return downloadFile;
-    }
-
-    public long getStart() {
-      return start;
-    }
-
-    public void setStart(long start) {
-      this.start = start;
-    }
-
-    public long getEnd() {
-      return end;
-    }
-
-    public void setEnd(long end) {
-      this.end = end;
-    }
-
-    public long getContentLength() {
-      return contentLength;
-    }
-
-    public void setContentLength(long contentLength) {
-      this.contentLength = contentLength;
-    }
-
-    public long getTotalLength() {
-      return totalLength;
-    }
-
-    public void setTotalLength(long totalLength) {
-      this.totalLength = totalLength;
-    }
-
-    public boolean isRange() {
-      return range;
-    }
-
-    public void setRange(boolean range) {
-      this.range = range;
-    }
-
-    public long getDownloadLength() {
-      return downloadLength;
-    }
-
-    public void setDownloadLength(long downloadLength) {
-      this.downloadLength = downloadLength;
-    }
-
-    public boolean isSuccessful() {
-      return getContentLength() == getDownloadLength();
-    }
+    void accept(T t, U u) throws IOException;
   }
+
 
 }

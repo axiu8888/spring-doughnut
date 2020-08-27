@@ -1,11 +1,11 @@
 
 allprojects {
 
-  group = 'com.benefitj'
-  version = '0.1.0-SNAPSHOT'
+  group = 'com.benefitj.spring'
+  version = '1.0.0-SNAPSHOT'
 
   ext {
-    springBootVersion = "2.3.1.RELEASE"
+    springBootVersion = "2.3.2.RELEASE"
     jacksonVersion = "2.10.1"
     lombokVersion = "1.18.6"
   }

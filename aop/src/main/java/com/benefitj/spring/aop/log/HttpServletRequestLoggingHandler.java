@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Nullable;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +43,11 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   @Value("#{ @environment['com.benefitj.aop.log.multi-line'] ?: true }")
   private boolean multiLine = true;
 
+  /**
+   * 打印的参数
+   */
+  private static final ThreadLocal<Map<String, Object>> printArgs = ThreadLocal.withInitial(LinkedHashMap::new);
+
   public HttpServletRequestLoggingHandler() {
   }
 
@@ -54,13 +58,28 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     }
     ServletRequestAttributes attrs = getRequestAttributes();
     if (attrs != null) {
-      ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
-      Method method = ((MethodSignature) point.getSignature()).getMethod();
-      printLog(method, attrs, mapToArgs(method.getParameters(), point.getArgs()));
+      try {
+        Map<String, Object> argsMap = getPrintArgs();
+        ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
+        Method method = ((MethodSignature) point.getSignature()).getMethod();
+        fillPrintArgs(point, method, attrs, argsMap);
+        printLog(argsMap);
+      } finally {
+        getPrintArgsLocal().remove();
+      }
     }
   }
 
-  private Map<String, Object> mapToArgs(Parameter[] parameters, Object[] args) {
+  public void fillPrintArgs(ProceedingJoinPoint point, Method method, ServletRequestAttributes attrs, Map<String, Object> argsMap) {
+    HttpServletRequest request = attrs.getRequest();
+    argsMap.put("uri", request.getRequestURI());
+    argsMap.put("request method", request.getMethod());
+    argsMap.put("class", method.getDeclaringClass().getName());
+    argsMap.put("class method", method.getName());
+    argsMap.put("class method args", mapToArgs(method.getParameters(), point.getArgs()));
+  }
+
+  public Map<String, Object> mapToArgs(Parameter[] parameters, Object[] args) {
     if (parameters != null && parameters.length > 0) {
       final Map<String, Object> argsMap = new LinkedHashMap<>();
       for (int i = 0; i < parameters.length; i++) {
@@ -83,29 +102,29 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     return null;
   }
 
-  public void printLog(Method method, ServletRequestAttributes attrs, @Nullable Map<String, Object> argsMap) {
-    HttpServletRequest request = attrs.getRequest();
-    if (argsMap != null && !argsMap.isEmpty()) {
-      if (isMultiLine()) {
-        log.info("\nuri: {}\nrequest method: {}\nclass: {}\nclass method: {}\nargs: {}", request.getRequestURI(),
-            request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
-      } else {
-        log.info("uri: {}, request method: {}, class: {}, class method: {}, args: {}", request.getRequestURI(),
-            request.getMethod(), method.getDeclaringClass().getName(), method.getName(), toJson(argsMap));
-      }
-    } else {
-      if (isMultiLine()) {
-        log.info("\nuri: {}\nrequest method: {}\nclass: {}\nclass method: {}", request.getRequestURI(),
-            request.getMethod(), method.getDeclaringClass().getName(), method.getName());
-      } else {
-        log.info("uri: {}, request method: {}, class: {}, class method: {}", request.getRequestURI(),
-            request.getMethod(), method.getDeclaringClass().getName(), method.getName());
-      }
-    }
+
+  public void printLog(Map<String, Object> argsMap) {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(isMultiLine() ? "\n" : "");
+    String separator = separator();
+    argsMap.forEach((key, value) ->
+        sb.append(key).append(": ").append(toJson(value)).append(separator));
+    sb.replace(sb.length() - separator.length(), sb.length(), "");
+    log.info(sb.toString());
+  }
+
+  private String separator() {
+    return isMultiLine() ? "\n" : ", ";
   }
 
   public String toJson(Object o) {
     try {
+      if (o instanceof Number
+          || o instanceof Boolean
+          || o instanceof CharSequence
+          || o instanceof Character) {
+        return String.valueOf(o);
+      }
       return getMapper().writeValueAsString(o);
     } catch (JsonProcessingException e) {
       throw new IllegalStateException(e);
@@ -131,4 +150,25 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   public void setMultiLine(boolean multiLine) {
     this.multiLine = multiLine;
   }
+
+  public static ThreadLocal<Map<String, Object>> getPrintArgsLocal() {
+    return printArgs;
+  }
+
+  public static Map<String, Object> getPrintArgs() {
+    return getPrintArgsLocal().get();
+  }
+
+  public static void putArg(String key, Object value) {
+    getPrintArgs().put(key, value);
+  }
+
+  public static Object removeArg(String key) {
+    return getPrintArgs().remove(key);
+  }
+
+  public static void putArgs(Map<String, Object> args) {
+    getPrintArgs().putAll(args);
+  }
+
 }

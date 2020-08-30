@@ -118,6 +118,9 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   }
 
   public String toJson(Object o) {
+    if (o == null) {
+      return "";
+    }
     try {
       if (o instanceof Number
           || o instanceof Boolean

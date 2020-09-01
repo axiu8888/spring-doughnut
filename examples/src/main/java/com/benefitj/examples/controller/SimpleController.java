@@ -1,6 +1,7 @@
 package com.benefitj.examples.controller;
 
-
+import com.alibaba.fastjson.JSON;
+import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.AopWebPointCut;
 import com.benefitj.event.EventBusPoster;
@@ -22,6 +23,7 @@ public class SimpleController {
   @GetMapping
   public ResponseEntity<?> get(String id) {
     poster.postSync(RawEvent.of(id));
+    System.err.println("请求信息: " + JSON.toJSONString(ServletUtils.getRequestInfo()));
     return ResponseEntity.ok("id ==>: " + id);
   }
 

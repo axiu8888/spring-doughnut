@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -44,24 +45,25 @@ public class ServletUtils {
   }
 
   /**
-   * 获取请求参数
+   * 获取当前请求的参数
    */
   public static Map<String, String[]> getParameterMap() {
     return getRequest().getParameterMap();
   }
 
   /**
-   * 获取请求首部
+   * 获取当前请求的首部
    */
   public static String getHeader(String headerName) {
     return getRequest().getHeader(headerName);
   }
 
   /**
-   * 获取请求首部
+   * 获取当前请求的首部
    */
   public static Map<String, String> getHeaderMap() {
-    return getHeaderMap(getRequest());
+    HttpServletRequest request = getRequest();
+    return getHeaderMap(request);
   }
 
   /**
@@ -69,6 +71,63 @@ public class ServletUtils {
    */
   public static Map<String, String> getHeaderMap(HttpServletRequest request) {
     return enumerationToMap(request.getHeaderNames(), request::getHeader);
+  }
+
+  /**
+   * 获取当前请求的IP地址
+   *
+   * @return 返回IP地址
+   */
+  public static String getIp() {
+    HttpServletRequest request = getRequest();
+    return getIp(request);
+  }
+
+  /**
+   * 获取IP地址
+   *
+   * @param request 请求
+   * @return 返回IP地址
+   */
+  public static String getIp(HttpServletRequest request) {
+    String ip = request.getHeader("x_forward_for");
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      request.getHeader("X-Forwarded-For");
+    }
+
+    if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+      // 多次反向代理后会有多个ip值，第一个ip才是真实ip
+      int index = ip.indexOf(",");
+      return index > 0 ? ip.substring(0, index) : ip;
+    }
+
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("x-real_ip");
+    }
+
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("X-Real-IP");
+    }
+
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("X-Forwarded-For");
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("Proxy-Client-IP");
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("WL-Proxy-Client-IP");
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("HTTP_CLIENT_IP");
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getRemoteAddr();
+    }
+    return ip;
   }
 
   /**
@@ -107,15 +166,23 @@ public class ServletUtils {
     return infoMap;
   }
 
-
-  public static <T, R> Map<T, R> enumerationToMap(Enumeration<T> enumeration, Function<T, R> func) {
-    Map<T, R> map = new LinkedHashMap<>();
-    T t;
-    R r;
+  /**
+   * 将Enumeration转换为Map
+   *
+   * @param enumeration e
+   * @param func        处理函数
+   * @param <K>         键
+   * @param <V>         值
+   * @return 返回 Map
+   */
+  public static <K, V> Map<K, V> enumerationToMap(Enumeration<K> enumeration, Function<K, V> func) {
+    K k;
+    V v;
+    Map<K, V> map = new LinkedHashMap<>();
     while (enumeration.hasMoreElements()) {
-      t = enumeration.nextElement();
-      r = func.apply(t);
-      map.put(t, r);
+      k = enumeration.nextElement();
+      v = func.apply(k);
+      map.put(k, v);
     }
     return map;
   }

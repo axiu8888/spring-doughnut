@@ -8,7 +8,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
-public class ApplicationListenerAdapter implements ApplicationListener {
+public class ApplicationListenerAdapter implements ApplicationListener<ApplicationEvent> {
 
   public ApplicationListenerAdapter() {
   }
@@ -38,13 +38,13 @@ public class ApplicationListenerAdapter implements ApplicationListener {
       // ApplicationReadyEvent： 应用已启动完成
       onApplicationReadyEvent((ApplicationReadyEvent) event);
     } else if (event instanceof ContextStartedEvent) {
-      // ContextStartedEvent： 应用启动
+      // ContextStartedEvent： 上下文启动
       onContextStartedEvent((ContextStartedEvent) event);
     } else if (event instanceof ContextStoppedEvent) {
-      // ContextStoppedEvent： 应用停止
+      // ContextStoppedEvent： 上下文停止
       onContextStoppedEvent((ContextStoppedEvent) event);
     } else if (event instanceof ContextClosedEvent) {
-      // ContextClosedEvent： 应用关闭
+      // ContextClosedEvent： 上下文关闭
       onContextClosedEvent((ContextClosedEvent) event);
     } else {
       // 其他事件

@@ -1,0 +1,28 @@
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+group = "spring-family"
+version = "1.0.0-SNAPSHOT"
+
+// 更新 groupId
+ext.groupId = "${group}"
+
+archivesBaseName = "${group}"
+
+dependencies {
+
+  compileOnly "com.google.guava:guava:${guavaVersion}"
+  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
+  compile project(":spring")
+  compile project(":aop")
+  compile project(":application-event")
+  compile project(":eventbus")
+  compile project(":websocket")
+  compile project(":redis")
+  compile project(":mqtt")
+
+}
+
+apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"

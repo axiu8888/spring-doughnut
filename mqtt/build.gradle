@@ -4,7 +4,8 @@ apply from: "${getRootDir()}/buildSystem/base.gradle"
 dependencies {
 
 	compileOnly(project(":commons"))
-	compileOnly(project(":spring"))
+	compileOnly(project(":application-event"))
+	compileOnly(project(":eventbus"))
 
 	compile "org.springframework.boot:spring-boot-starter-integration:${springBootVersion}"
 	compile "org.springframework.integration:spring-integration-stream:${springIntegrationVersion}"

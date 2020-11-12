@@ -3,15 +3,9 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-  compileOnly "com.google.guava:guava:${guavaVersion}"
-  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
+//  compileOnly "com.google.guava:guava:${guavaVersion}"
+//  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-
-  compile project(":aop")
-  compile project(":application-event")
-  compile project(":eventbus")
-  compile project(":websocket")
-
 }
 
 apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"

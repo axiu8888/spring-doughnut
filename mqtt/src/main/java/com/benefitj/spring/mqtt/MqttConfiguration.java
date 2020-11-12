@@ -1,10 +1,6 @@
 package com.benefitj.spring.mqtt;
 
 import com.benefitj.core.IdUtils;
-import com.benefitj.spring.mqtt.MessagePublisherAdapter;
-import com.benefitj.spring.mqtt.MqttMessageSubscriber;
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
-import com.benefitj.spring.mqtt.MqttPublisher;
 import com.benefitj.spring.eventbus.EnableAutoEventBusPoster;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

@@ -8,6 +8,7 @@ include ":commons"
 /**
  * spring包
  */
+include ":all" // 全部的依赖
 include ":spring"
 include ":aop"
 include ":application-event"
@@ -20,6 +21,10 @@ include ":websocket", ":websocket:sample"
  * MQTT
  */
 include ":mqtt", ":mqtt:samples:publisher", ":mqtt:samples:subscriber"
+/**
+ * redis
+ */
+include ":redis", ":redis:samples:publisher", ":redis:samples:subscriber"
 
 
 include ":examples"

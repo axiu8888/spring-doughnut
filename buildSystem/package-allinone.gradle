@@ -56,10 +56,6 @@ static boolean isAllowProject(Project project, List<String> ignoreProjects) {
 }
 
 //
-//ext.groupId = getOrDefault(ext.groupId, "com.benefitj")
-//ext.artifactId = getOrDefault(ext.artifactId, "${archivesBaseName}")
-//ext.versionId = getOrDefault(ext.versionId, "${version}")
-//
 ////上传到nexus
 //uploadArchives {
 //    repositories {
@@ -82,7 +78,7 @@ static boolean isAllowProject(Project project, List<String> ignoreProjects) {
 //                }
 //            }
 //
-////            repository(url: "http://192.168.124.128:9001/repository/nexusCenter/") {
+////            repository(url: "http://192.168.232.130:9001/repository/nexusCenter/") {
 ////                authentication(userName: "admin", password: "admin123")
 ////            }
 //        }

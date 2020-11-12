@@ -6,23 +6,13 @@ plugins {
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
-description("examples")
+description("注册websocket的几种方式")
 
 dependencies {
-  compile fileTree(dir: 'libs/jar', include: ['*.jar'])
-  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
-
-//  compile project(":websocket")
-//  compile project(":aop")
-//  compile project(":application-event")
-//  compile project(":eventbus")
 
   compile project(":commons")
   compile project(":spring")
 
-  implementation "com.google.guava:guava:${guavaVersion}"
-  implementation "com.alibaba:fastjson:${fastjsonVersion}"
-  implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")
 

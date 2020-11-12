@@ -1,11 +1,9 @@
 
-apply from: "${getRootDir()}/base-springboot.gradle"
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
-  compileOnly fileTree(dir: 'libs/jar', include: ['*.jar'])
-  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-  compileOnly 'com.google.guava:guava:29.0-jre'
+  compileOnly "com.google.guava:guava:${guavaVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
 
 }

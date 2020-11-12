@@ -1,10 +1,10 @@
 
 
-apply from: "${getRootDir()}/base-springboot.gradle"
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-  compileOnly 'org.aspectj:aspectjweaver:1.9.4'
+  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
 }

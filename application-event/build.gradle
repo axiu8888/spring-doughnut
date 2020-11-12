@@ -1,5 +1,5 @@
 
-apply from: "${getRootDir()}/base-springboot.gradle"
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 

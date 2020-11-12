@@ -1,0 +1,41 @@
+//plugins {
+//    id 'org.springframework.boot' version '2.3.5.RELEASE'
+//    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+//    id 'java'
+//}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs-source', include: ['*.jar'])
+
+    //testImplementation 'junit:junit:4.12'
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+
+    compileOnly "org.apache.commons:commons-pool2:2.6.2"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.6.2"
+
+}
+
+test {
+    useJUnitPlatform()
+}

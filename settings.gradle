@@ -1,12 +1,25 @@
 rootProject.name = 'springboot-doughnut'
 
+/**
+ * 依赖包
+ */
+include ":commons"
 
+/**
+ * spring包
+ */
 include ":spring"
 include ":aop"
-include ":websocket"
 include ":application-event"
 include ":eventbus"
+/**
+ * websocket
+ */
+include ":websocket", ":websocket:sample"
+/**
+ * MQTT
+ */
+include ":mqtt", ":mqtt:samples:publisher", ":mqtt:samples:subscriber"
 
 
 include ":examples"
-include ":samples:websocket"

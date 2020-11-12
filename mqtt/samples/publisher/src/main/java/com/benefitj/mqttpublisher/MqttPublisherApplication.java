@@ -2,11 +2,11 @@ package com.benefitj.mqttpublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
-import com.benefitj.spring.mqtt.MqttPublisher;
-import com.benefitj.spring.mqtt.EnableMqttConfiguration;
 import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.spring.applicationevent.IApplicationReadyEventListener;
+import com.benefitj.spring.mqtt.EnableMqttConfiguration;
+import com.benefitj.spring.mqtt.MqttOptionsProperty;
+import com.benefitj.spring.mqtt.MqttPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

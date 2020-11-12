@@ -2,9 +2,9 @@ package com.benefitj.redispublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.redis.EnableRedisMessageChannelConfiguration;
 import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.spring.applicationevent.IApplicationReadyEventListener;
+import com.benefitj.spring.redis.EnableRedisMessageChannelConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

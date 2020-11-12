@@ -9,11 +9,10 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 dependencies {
 
 	compile(project(":commons"))
-	compile(project(":spring"))
+	compile(project(":application-event"))
 	compile(project(":redis"))
 
 	implementation 'org.springframework.boot:spring-boot-starter'
-	//implementation 'org.springframework.boot:spring-boot-starter-web'
 
 }
 

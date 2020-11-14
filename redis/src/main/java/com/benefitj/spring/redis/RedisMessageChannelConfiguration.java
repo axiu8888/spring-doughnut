@@ -78,9 +78,26 @@ public class RedisMessageChannelConfiguration {
           if (StringUtils.isBlank(channel)) {
             throw new IllegalArgumentException("redis channel不能为空: " + listener.getClass());
           }
-          channel = channel.startsWith("channel:") ? channel : "channel:" + channel;
-          PatternTopic topic = new PatternTopic(channel);
-          container.addMessageListener(adapter, topic);
+          channel = channel.trim();
+          if((channel.startsWith("${") || channel.startsWith("#{")) && channel.endsWith("}")) {
+            StringBuilder sb = new StringBuilder(channel);
+            sb.delete(0, 2);
+            sb.delete(sb.length() - 1, sb.length());
+            channel = ctx.getEnvironment().getProperty(sb.toString());
+            if (StringUtils.isBlank(channel)) {
+              throw new IllegalStateException("redis channel不能为空: " + sb.toString());
+            }
+            String[] split = channel.split(",");
+            for (String ch : split) {
+              if (StringUtils.isNoneBlank(ch)) {
+                PatternTopic topic = new PatternTopic(ch.trim());
+                container.addMessageListener(adapter, topic);
+              }
+            }
+          } else {
+            PatternTopic topic = new PatternTopic(channel);
+            container.addMessageListener(adapter, topic);
+          }
         }
       }
     }

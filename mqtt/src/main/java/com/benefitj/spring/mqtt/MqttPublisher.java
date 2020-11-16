@@ -20,7 +20,7 @@ public class MqttPublisher {
   /**
    * 客户端
    */
-  private volatile IMqttClient client;
+  private IMqttClient client;
   /**
    * 上次获取的时间
    */

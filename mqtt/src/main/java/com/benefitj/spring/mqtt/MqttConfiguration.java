@@ -16,9 +16,8 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * MQTT服务配置
@@ -120,13 +119,17 @@ public class MqttConfiguration {
     //Collections.addAll(topics, property.getPublishTopics().split(","));
     // 订阅消息
     String subscribeTopics = property.getSubscribeTopics();
+    final AtomicInteger index = new AtomicInteger(0);
     if (StringUtils.isNotBlank(subscribeTopics)) {
-      List<String> topics = new ArrayList<>();
-      Collections.addAll(topics, subscribeTopics.split(","));
-      topics.stream().filter(StringUtils::isNotBlank)
-          .forEach(topic -> adapter.addTopic(topic, property.getQos()));
-    } else {
-      // 默认的topic
+      Arrays.stream(subscribeTopics.split(","))
+          .filter(StringUtils::isNotBlank)
+          .forEach(topic -> {
+            adapter.addTopic(topic, property.getQos());
+            index.incrementAndGet();
+          });
+    }
+    // 添加默认的topic
+    if (index.get() == 0) {
       adapter.addTopic("/empty", 0);
     }
   }

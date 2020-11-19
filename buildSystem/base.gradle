@@ -54,7 +54,9 @@ dependencies {
     compileOnly "com.google.guava:guava:${guavaVersion}"
     compileOnly "com.alibaba:fastjson:${fastjsonVersion}"
 
-    compileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
-    testCompileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
+    compileOnly 'ch.qos.logback:logback-classic:1.2.3'
+    testCompileOnly 'ch.qos.logback:logback-classic:1.2.3'
+    //compileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
+    //testCompileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
 
 }

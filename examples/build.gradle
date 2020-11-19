@@ -18,7 +18,7 @@ dependencies {
 //  compile project(":eventbus")
 
   compile project(":commons")
-  compile project(":spring")
+  compile project(":all")
 
   implementation "com.google.guava:guava:${guavaVersion}"
   implementation "com.alibaba:fastjson:${fastjsonVersion}"

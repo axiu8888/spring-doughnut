@@ -49,8 +49,8 @@ public class RedisPublisherApplication {
       single.scheduleAtFixedRate(() -> {
         // 发布消息
         String msg = "now: " + DateFmtter.fmtNow();
-        redisTemplate.convertAndSend(publishChannel, msg);
         log.info("发布消息: "+ msg);
+        redisTemplate.convertAndSend(publishChannel, msg);
       }, 1, 5, TimeUnit.SECONDS);
     }
 

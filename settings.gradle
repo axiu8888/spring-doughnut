@@ -26,5 +26,7 @@ include ":mqtt", ":mqtt:samples:publisher", ":mqtt:samples:subscriber"
  */
 include ":redis", ":redis:samples:publisher", ":redis:samples:subscriber"
 
+include ":influxdb", ":influxdb:example"
+
 
 include ":examples"

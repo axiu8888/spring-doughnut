@@ -1,5 +1,5 @@
 plugins {
-  id 'org.springframework.boot' version '2.3.5.RELEASE'
+  id 'org.springframework.boot' version '2.4.0'
   id 'io.spring.dependency-management' version '1.0.10.RELEASE'
   id 'java'
 }
@@ -11,11 +11,6 @@ description("examples")
 dependencies {
   compile fileTree(dir: 'libs/jar', include: ['*.jar'])
   compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
-
-//  compile project(":websocket")
-//  compile project(":aop")
-//  compile project(":application-event")
-//  compile project(":eventbus")
 
   compile project(":commons")
   compile project(":all")

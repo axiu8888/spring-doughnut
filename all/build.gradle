@@ -2,7 +2,6 @@
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 group = "spring-doughnut"
-version = "1.1.0-SNAPSHOT"
 
 // 更新 groupId
 ext.groupId = "${group}"

@@ -1,0 +1,22 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+}
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+group = "athenapdf"
+
+archivesBaseName = "athenapdf-sample"
+
+dependencies {
+
+	compile project(":all")
+	compile project(":commons")
+	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
+	compile "com.alibaba:fastjson:${fastjsonVersion}"
+
+}
+

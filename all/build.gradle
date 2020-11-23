@@ -22,6 +22,7 @@ dependencies {
   compile project(":redis")
   compile project(":mqtt")
   compile project(":influxdb")
+  compile project(":athenapdf")
 
 }
 

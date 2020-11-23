@@ -3,9 +3,8 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-//  compileOnly "com.google.guava:guava:${guavaVersion}"
-//  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
 }
 
-apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"
+//apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"

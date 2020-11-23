@@ -1,0 +1,15 @@
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+group = "athenapdf"
+
+dependencies {
+
+	compileOnly project(":commons")
+	compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
+}
+

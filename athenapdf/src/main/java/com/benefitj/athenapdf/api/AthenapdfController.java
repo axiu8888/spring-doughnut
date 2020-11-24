@@ -7,6 +7,7 @@ import com.benefitj.core.IdUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * 生成报告的接口
  */
+@ConditionalOnClass(RequestMapping.class)
 @RestController
 @RequestMapping("/athenapdf")
 public class AthenapdfController {

@@ -3,6 +3,8 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
+  compileOnly project(":commons")
+
   compileOnly "com.google.guava:guava:${guavaVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
 

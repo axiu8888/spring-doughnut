@@ -8,7 +8,7 @@ ext {
   guavaVersion = "30.0-jre"
   fastjsonVersion = "1.2.75"
 
-  springIntegrationVersion = "5.3.1.RELEASE"
+  springIntegrationVersion = "5.4.1"
 
 }
 

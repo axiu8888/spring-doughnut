@@ -6,9 +6,9 @@ plugins {
 
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
-group = "athenapdf"
+group = "athenapdf-sample"
 
-archivesBaseName = "athenapdf-sample"
+archivesBaseName = "athenapdf"
 
 dependencies {
 

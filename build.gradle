@@ -12,11 +12,16 @@ ext {
 
 }
 
-allprojects {
+subprojects {
+
+  apply plugin: 'java'
+  apply plugin: 'maven'
 
   group = 'com.benefitj.spring'
   version = "1.1.0-SNAPSHOT"
 
-}
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 
+}
 

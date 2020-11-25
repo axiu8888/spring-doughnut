@@ -2,21 +2,25 @@ plugins {
 	id 'org.springframework.boot' version '2.4.0'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
+	id 'maven'
 }
 
-apply from: "${getRootDir()}/buildSystem/base.gradle"
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 group = "athenapdf-sample"
 
+version = ''
 archivesBaseName = "athenapdf"
 
 dependencies {
 
-	compile project(":all")
+	//compile project(":all")
 	compile project(":commons")
-	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
+	compile 'ch.qos.logback:logback-classic:1.2.3'
+	compile "org.aspectj:aspectjweaver:${aspectjVersion}"
 	compile "com.alibaba:fastjson:${fastjsonVersion}"
+	compile("org.springframework.boot:spring-boot-starter-web")
 
 }
 

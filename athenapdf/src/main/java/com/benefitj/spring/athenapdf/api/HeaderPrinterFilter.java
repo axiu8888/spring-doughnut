@@ -1,4 +1,4 @@
-package com.benefitj.athenapdf.api;
+package com.benefitj.spring.athenapdf.api;
 
 import com.alibaba.fastjson.JSON;
 import com.benefitj.spring.ServletUtils;

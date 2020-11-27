@@ -1,4 +1,4 @@
-package com.benefitj.athenapdf.spring;
+package com.benefitj.spring.athenapdf;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;

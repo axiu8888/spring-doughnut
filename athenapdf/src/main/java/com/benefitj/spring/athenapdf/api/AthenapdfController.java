@@ -1,7 +1,7 @@
-package com.benefitj.athenapdf.api;
+package com.benefitj.spring.athenapdf.api;
 
-import com.benefitj.athenapdf.AthenapdfCall;
-import com.benefitj.athenapdf.AthenapdfHelper;
+import com.benefitj.spring.athenapdf.AthenapdfCall;
+import com.benefitj.spring.athenapdf.AthenapdfHelper;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
@@ -116,7 +116,6 @@ public class AthenapdfController {
     }
     try {
       BreakPointTransmissionHelper.download(request, response, pdf, filename);
-      scheduleDeleteTimer(url, pdf);
     } finally {
       // 最终删除文件
       scheduleDeleteTimer(url, pdf);

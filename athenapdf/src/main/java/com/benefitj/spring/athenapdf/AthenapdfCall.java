@@ -1,4 +1,4 @@
-package com.benefitj.athenapdf;
+package com.benefitj.spring.athenapdf;
 
 import com.benefitj.core.cmd.CmdCall;
 

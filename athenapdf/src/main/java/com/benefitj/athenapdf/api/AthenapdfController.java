@@ -3,6 +3,7 @@ package com.benefitj.athenapdf.api;
 import com.benefitj.athenapdf.AthenapdfCall;
 import com.benefitj.athenapdf.AthenapdfHelper;
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.spring.BreakPointTransmissionHelper;
@@ -24,10 +25,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 生成报告的接口
@@ -53,7 +54,7 @@ public class AthenapdfController {
   @Autowired
   private AthenapdfHelper athenapdfHelper;
 
-  private final Map<String, ScheduledFuture<?>> deleteTimers = new ConcurrentHashMap<>();
+  private final Map<String, DeleteTimer<?>> deleteTimers = new ConcurrentHashMap<>();
 
   /**
    * 生成PDF
@@ -66,7 +67,9 @@ public class AthenapdfController {
   public void create(HttpServletRequest request,
                      HttpServletResponse response,
                      String url,
-                     String filename) throws IOException {
+                     String filename,
+                     Boolean force) throws IOException {
+    url = url != null ? url.trim() : "";
     long start = System.currentTimeMillis();
     try {
       if (StringUtils.isBlank(url)) {
@@ -83,44 +86,160 @@ public class AthenapdfController {
       return;
     }
 
+    File pdf;
+    // 取消删除的调度
+    DeleteTimer<?> timer = get(url);
+    if (timer != null) {
+      cancelDeleteTimer(timer.getUrl(), timer.getPdf());
+      pdf = timer.getPdf();
+      if (Boolean.TRUE.equals(force)) {
+        IOUtils.deleteFile(pdf);
+      }
+    } else {
+      pdf = new File(cacheDir, IdUtils.uuid() + ".pdf");
+    }
+
     filename = StringUtils.isNotBlank(filename)
         ? (filename.endsWith(".pdf") ? filename : (filename + ".pdf"))
-        : IdUtils.uuid() + ".pdf";
-    File pdf = new File(cacheDir, filename);
+        : pdf.getName();
 
-    // 取消删除的调度
-    cancelDeleteTimer(pdf);
+    boolean callAthenaPdf = false;
 
-    try {
-      if (!pdf.exists()) {
-        AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(cacheDir), url, filename, null);
-        if (!call.isSuccessful()) {
-          log.info("生成PDF失败, filename: {}, url: {}", filename, url);
-          return;
-        }
-        pdf = call.getPdf();
+    if (!pdf.exists()) {
+      callAthenaPdf = true;
+      AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(cacheDir), url, pdf.getName(), null);
+      if (!call.isSuccessful()) {
+        log.info("生成PDF失败, filename: {}, destFile: {}, url: {}", filename, pdf.getAbsolutePath(), url);
+        return;
       }
+      pdf = call.getPdf();
+    }
+    try {
       BreakPointTransmissionHelper.download(request, response, pdf, filename);
-      scheduleDeleteTimer(pdf);
+      scheduleDeleteTimer(url, pdf);
     } finally {
       // 最终删除文件
-      scheduleDeleteTimer(pdf);
+      scheduleDeleteTimer(url, pdf);
     }
-    log.info("{}, 使用时长: {}", filename, (System.currentTimeMillis() - start));
+    log.info("{}, size: {}, callAthenaPdf: {}, 使用时长: {}"
+        , pdf.getAbsolutePath()
+        , pdf.length()
+        , callAthenaPdf
+        , (System.currentTimeMillis() - start)
+    );
   }
 
-  private void scheduleDeleteTimer(final File deletePdf) {
-    ScheduledFuture<?> deleteTimer = EventLoop.single().schedule(() -> {
-      IOUtils.deleteFile(deletePdf);
-      deleteTimers.remove(deletePdf.getAbsolutePath());
-    }, delay, TimeUnit.SECONDS);
-    deleteTimers.put(deletePdf.getAbsolutePath(), deleteTimer);
+  private void scheduleDeleteTimer(final String url, File pdf) {
+    if (!pdf.exists()) {
+      return;
+    }
+    DeleteTimer<?> timer = DeleteTimer.wrap(
+        EventLoop.single().schedule(() -> {
+          IOUtils.deleteFile(pdf);
+          deleteTimers.remove(url);
+        }, delay, TimeUnit.SECONDS));
+    timer.setUrl(url);
+    timer.setPdf(pdf);
+    deleteTimers.put(url, timer);
   }
 
-  private void cancelDeleteTimer(File pdf) {
-    ScheduledFuture<?> deleteTimer = deleteTimers.remove(pdf.getAbsolutePath());
-    if (deleteTimer != null) {
-      deleteTimer.cancel(true);
+  private DeleteTimer<?> get(String url) {
+    return deleteTimers.remove(url);
+  }
+
+  private void cancelDeleteTimer(String url, File pdf) {
+    DeleteTimer<?> timer = deleteTimers.remove(url);
+    if (timer != null && timer.getPdf().equals(pdf)) {
+      timer.cancel(true);
+    }
+  }
+
+
+  private String md5(String url) {
+    try {
+      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      md5.update(url.getBytes(StandardCharsets.UTF_8));
+      byte[] digest = md5.digest();
+      return HexUtils.bytesToHex(digest);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+
+  static class DeleteTimer<V> implements ScheduledFuture<V> {
+
+    public static <V> DeleteTimer<V> wrap(ScheduledFuture<V> timer) {
+      return new DeleteTimer<>(timer);
+    }
+
+    private final ScheduledFuture<V> original;
+    /**
+     * URL
+     */
+    private String url;
+    /**
+     * PDF文件
+     */
+    private File pdf;
+
+    public DeleteTimer(ScheduledFuture<V> original) {
+      this.original = original;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+      return original.getDelay(unit);
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+      return original.compareTo(o);
+    }
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+      return original.cancel(mayInterruptIfRunning);
+    }
+
+    @Override
+    public boolean isCancelled() {
+      return original.isDone();
+    }
+
+    @Override
+    public boolean isDone() {
+      return original.isDone();
+    }
+
+    @Override
+    public V get() throws InterruptedException, ExecutionException {
+      return original.get();
+    }
+
+    @Override
+    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+      return original.get(timeout, unit);
+    }
+
+    public ScheduledFuture<V> getOriginal() {
+      return original;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public void setUrl(String url) {
+      this.url = url;
+    }
+
+    public File getPdf() {
+      return pdf;
+    }
+
+    public void setPdf(File pdf) {
+      this.pdf = pdf;
     }
   }
 

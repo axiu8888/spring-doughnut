@@ -1,33 +1,93 @@
 package com.benefitj.spring.mqtt;
 
-import com.benefitj.core.ReflectUtils;
+import com.benefitj.core.IdUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 
 import java.nio.charset.StandardCharsets;
 
 /**
  * MQTT发送端
  */
-public class MqttPublisher {
+public class MqttPublisher implements SmartLifecycle, DisposableBean {
 
-  /**
-   * MQTT适配器
-   */
-  private MqttPahoMessageDrivenChannelAdapter channelAdapter;
   /**
    * 客户端
    */
-  private IMqttClient client;
-  /**
-   * 上次获取的时间
-   */
-  private volatile long obtainTime;
+  private MqttPahoClientFactory clientFactory;
+  private String clientIdPrefix;
 
-  public MqttPublisher(MqttPahoMessageDrivenChannelAdapter channelAdapter) {
-    this.channelAdapter = channelAdapter;
+  private IMqttClient client;
+
+  private volatile long lastTryConnectTime = System.currentTimeMillis();
+
+  private volatile boolean running = false;
+
+  public MqttPublisher(String clientIdPrefix, MqttPahoClientFactory clientFactory) {
+    this.clientIdPrefix = clientIdPrefix;
+    this.clientFactory = clientFactory;
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    stop();
+  }
+
+  @Override
+  public void start() {
+    try {
+      IMqttClient c = getClient0();
+      if (!c.isConnected()) {
+        c.connect(clientFactory.getConnectionOptions());
+      }
+      this.running = true;
+    } catch (MqttException e) {
+      throw new MqttPublishException(e);
+    }
+  }
+
+  @Override
+  public void stop() {
+    try {
+      IMqttClient c = getClient0();
+      if (c.isConnected()) {
+        c.disconnect();
+      }
+      this.running = false;
+    } catch (MqttException e) {
+      throw new MqttPublishException(e);
+    }
+  }
+
+  private IMqttClient getClient0() {
+    IMqttClient c = this.client;
+    if (c == null) {
+      synchronized (this) {
+        if ((c = this.client) == null) {
+          try {
+            String clientId = clientIdPrefix != null
+                ? (clientIdPrefix.trim() + "send-" + IdUtils.nextLowerLetterId(6))
+                : IdUtils.nextLowerLetterId(12);
+            MqttConnectOptions options = clientFactory.getConnectionOptions();
+            c = clientFactory.getClientInstance(options.getServerURIs()[0], clientId);
+            this.client = c;
+          } catch (MqttException e) {
+            throw new MqttPublishException(e);
+          }
+        }
+      }
+    }
+    return c;
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
   }
 
   /**
@@ -206,33 +266,33 @@ public class MqttPublisher {
     }
   }
 
+  public void setClient(IMqttClient client) {
+    this.client = client;
+  }
+
   /**
    * 获取客户端
    */
   public IMqttClient getClient() {
-    return getClient(false);
-  }
-
-  /**
-   * 获取客户端
-   */
-  public IMqttClient getClient(boolean force) {
-    IMqttClient c = this.client;
-    if (c == null || !c.isConnected()) {
-      if (force || isObtain()) {
-        c = this.client = ReflectUtils.getFieldValue(channelAdapter
-            , f -> f.getType().isAssignableFrom(IMqttClient.class));
-        this.obtainTime = System.currentTimeMillis();
+    IMqttClient c = getClient0();
+    long now = System.currentTimeMillis();
+    if (!c.isConnected() && isRunning()) {
+      if (now - lastTryConnectTime <= 3000) {
+        return c;
+      }
+      synchronized (this) {
+        if (now - lastTryConnectTime > 3000) {
+          try {
+            c.connect(clientFactory.getConnectionOptions());
+          } catch (MqttException ignore) {
+            // ~
+          } finally {
+            this.lastTryConnectTime = now;
+          }
+        }
       }
     }
     return c;
-  }
-
-  /**
-   * 是否获取客户端
-   */
-  protected boolean isObtain() {
-    return System.currentTimeMillis() - obtainTime >= 3_000;
   }
 
 }

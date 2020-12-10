@@ -1,18 +1,19 @@
-package com.benefitj.spring.mqtt;
+package com.benefitj.spring.mqtt.annotaion;
 
+import com.benefitj.spring.mqtt.config.MqttSubscriberConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 
 import java.lang.annotation.*;
 
 /**
- * MQTT服务配置
+ * MQTT订阅
  */
 @Lazy
-@Import(MqttConfiguration.class)
+@Import({MqttSubscriberConfiguration.class})
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableMqttConfiguration {
+public @interface EnableMqttSubscriber {
 }

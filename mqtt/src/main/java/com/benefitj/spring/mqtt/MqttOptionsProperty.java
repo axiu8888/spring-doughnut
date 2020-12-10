@@ -11,9 +11,13 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.*;
 public class MqttOptionsProperty {
 
   /**
-   * 客户端ID
+   * 客户端数量
    */
-  private String clientId;
+  private Integer clientCount = 1;
+  /**
+   * 客户端ID的前缀
+   */
+  private String clientIdPrefix = "mqtt-";
   /**
    * 保持连接数
    */
@@ -63,16 +67,24 @@ public class MqttOptionsProperty {
    */
   private int recoveryInterval = 3000;
   /**
-   * 服务质量，默认 1
+   * 服务质量，默认 0
    */
-  private int qos = 1;
+  private int qos = 0;
 
-  public String getClientId() {
-    return clientId;
+  public Integer getClientCount() {
+    return clientCount;
   }
 
-  public void setClientId(String clientId) {
-    this.clientId = clientId;
+  public void setClientCount(Integer clientCount) {
+    this.clientCount = clientCount;
+  }
+
+  public String getClientIdPrefix() {
+    return clientIdPrefix;
+  }
+
+  public void setClientIdPrefix(String clientIdPrefix) {
+    this.clientIdPrefix = clientIdPrefix;
   }
 
   public Integer getKeepalive() {

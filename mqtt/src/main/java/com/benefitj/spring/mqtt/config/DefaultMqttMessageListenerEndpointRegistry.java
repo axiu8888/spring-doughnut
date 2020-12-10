@@ -9,9 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
@@ -26,8 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageListenerEndpointRegistry,
-    BeanFactoryAware, ApplicationEventPublisherAware, ApplicationContextAware, SmartLifecycle, DisposableBean {
-
+    BeanFactoryAware, ApplicationEventPublisherAware, ApplicationContextAware {
 
   private ConfigurableListableBeanFactory beanFactory;
 
@@ -47,15 +48,11 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
   /**
    * 代理
    */
-  private MqttPahoClientFactoryWrapper clientFactoryDelegate;
+  private MqttPahoClientFactoryWrapper clientFactoryWrapper;
   /**
    * adapter
    */
   private final List<MqttPahoMessageDrivenChannelAdapter> channelAdapters = Collections.synchronizedList(new ArrayList<>());
-  /**
-   * 执行状态
-   */
-  private volatile boolean running = false;
 
   public DefaultMqttMessageListenerEndpointRegistry() {
   }
@@ -75,43 +72,6 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
   }
 
   @Override
-  public void start() {
-    // 启动客户端
-    for (MqttPahoMessageDrivenChannelAdapter adapter : channelAdapters) {
-      try {
-        adapter.start();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    this.running = true;
-  }
-
-  @Override
-  public void stop() {
-    for (MqttPahoMessageDrivenChannelAdapter adapter : channelAdapters) {
-      try {
-        if (adapter.isRunning()) {
-          adapter.stop();
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    this.running = false;
-  }
-
-  @Override
-  public boolean isRunning() {
-    return this.running;
-  }
-
-  @Override
-  public void destroy() throws Exception {
-    stop();
-  }
-
-  @Override
   public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
     this.applicationEventPublisher = applicationEventPublisher;
   }
@@ -122,10 +82,9 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
   }
 
   @Override
-  public void registerEndpoint(Object bean, Method method, MqttMessageListenerEndpoint endpoint, MessageHandlerMethodFactory handlerMethodFactory) {
-    String beanName = method.getDeclaringClass() + "_" + method.getName();
+  public void registerEndpoint(Object bean, String beanName, Method method, MqttMessageListenerEndpoint endpoint, MessageHandlerMethodFactory handlerMethodFactory) {
     String clientId = generateId(property.getClientIdPrefix());
-    MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(clientId, getClientFactoryDelegate());
+    MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(clientId, getClientFactoryWrapper());
     adapter.setCompletionTimeout(property.getCompletionTimeout());
     adapter.setRecoveryInterval(property.getRecoveryInterval());
     DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter();
@@ -134,13 +93,13 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
     adapter.setConverter(converter);
     adapter.setApplicationEventPublisher(applicationEventPublisher);
     adapter.setApplicationContext(applicationContext);
-    adapter.setBeanName(beanName);
+    adapter.setBeanName(beanName + "ChannelAdapter_" + method.getName());
 
     // 服务质量
     adapter.setQos(property.getQos());
     // 设置订阅通道
     DirectChannel mqttOutputChannel = new DirectChannel();
-    mqttOutputChannel.setBeanName(beanName + "MqttOutputChannel");
+    mqttOutputChannel.setBeanName(beanName + "MqttOutputChannel_" + method.getName());
     InvocableHandlerMethod handlerMethod = handlerMethodFactory.createInvocableHandlerMethod(bean, method);
     mqttOutputChannel.subscribe(message -> {
       try {
@@ -150,7 +109,7 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
       }
     });
     adapter.setOutputChannel(mqttOutputChannel);
-    adapter.setErrorChannelName(beanName + "ErrorChannelName");
+    adapter.setErrorChannelName(beanName + "ErrorChannelName_" + method.getName());
     adapter.setErrorChannel((message, timeout) -> {
       // ignore
       return true;
@@ -182,16 +141,16 @@ public class DefaultMqttMessageListenerEndpointRegistry implements MqttMessageLi
     this.property = property;
   }
 
-  public MqttPahoClientFactoryWrapper getClientFactoryDelegate() {
-    MqttPahoClientFactoryWrapper delegate = this.clientFactoryDelegate;
-    if (delegate == null) {
+  public MqttPahoClientFactoryWrapper getClientFactoryWrapper() {
+    MqttPahoClientFactoryWrapper wrapper = this.clientFactoryWrapper;
+    if (wrapper == null) {
       synchronized (this) {
-        if ((delegate = this.clientFactoryDelegate) == null) {
-          delegate = (this.clientFactoryDelegate = new MqttPahoClientFactoryWrapper(clientFactory));
+        if ((wrapper = this.clientFactoryWrapper) == null) {
+          this.clientFactoryWrapper = (wrapper = new MqttPahoClientFactoryWrapper(clientFactory));
         }
       }
     }
-    return delegate;
+    return wrapper;
   }
 
   public MqttPahoClientFactory getClientFactory() {

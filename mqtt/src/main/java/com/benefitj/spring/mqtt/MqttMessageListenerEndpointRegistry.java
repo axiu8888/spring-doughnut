@@ -14,10 +14,11 @@ public interface MqttMessageListenerEndpointRegistry {
    * 注册
    *
    * @param bean                 bean实例
+   * @param beanName             bean名称
    * @param method               方法
    * @param endpoint             注解
    * @param handlerMethodFactory 处理工厂
    */
-  void registerEndpoint(Object bean, Method method, MqttMessageListenerEndpoint endpoint, MessageHandlerMethodFactory handlerMethodFactory);
+  void registerEndpoint(Object bean, String beanName, Method method, MqttMessageListenerEndpoint endpoint, MessageHandlerMethodFactory handlerMethodFactory);
 
 }

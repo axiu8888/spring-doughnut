@@ -24,7 +24,7 @@ public class MqttPublisher implements SmartLifecycle, DisposableBean {
 
   private IMqttClient client;
 
-  private volatile long lastTryConnectTime = System.currentTimeMillis();
+  private volatile long tryReconnectTime = System.currentTimeMillis();
 
   private volatile boolean running = false;
 
@@ -40,54 +40,81 @@ public class MqttPublisher implements SmartLifecycle, DisposableBean {
 
   @Override
   public void start() {
-    try {
-      IMqttClient c = getClient0();
-      if (!c.isConnected()) {
-        c.connect(clientFactory.getConnectionOptions());
-      }
+    synchronized (this) {
+      try {
+        IMqttClient c = getClient0();
+        if (!c.isConnected()) {
+          c.connect(clientFactory.getConnectionOptions());
+        }
+      } catch (MqttException ignore) { /* ~ */}
       this.running = true;
-    } catch (MqttException e) {
-      throw new MqttPublishException(e);
     }
   }
 
   @Override
   public void stop() {
-    try {
-      IMqttClient c = getClient0();
-      if (c.isConnected()) {
-        c.disconnect();
-      }
+    synchronized (this) {
+      try {
+        getClient0().disconnect();
+      } catch (MqttException ignore) { /* ~ */}
       this.running = false;
-    } catch (MqttException e) {
-      throw new MqttPublishException(e);
     }
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
   }
 
   private IMqttClient getClient0() {
     IMqttClient c = this.client;
     if (c == null) {
       synchronized (this) {
-        if ((c = this.client) == null) {
-          try {
-            String clientId = clientIdPrefix != null
-                ? (clientIdPrefix.trim() + "send-" + IdUtils.nextLowerLetterId(6))
-                : IdUtils.nextLowerLetterId(12);
-            MqttConnectOptions options = clientFactory.getConnectionOptions();
-            c = clientFactory.getClientInstance(options.getServerURIs()[0], clientId);
-            this.client = c;
-          } catch (MqttException e) {
-            throw new MqttPublishException(e);
-          }
+        if ((c = this.client) != null) {
+          return c;
+        }
+        try {
+          String clientId = clientIdPrefix != null
+              ? (clientIdPrefix.trim() + "send-" + IdUtils.nextLowerLetterId(6))
+              : IdUtils.nextLowerLetterId(12);
+          MqttConnectOptions options = clientFactory.getConnectionOptions();
+          c = clientFactory.getClientInstance(options.getServerURIs()[0], clientId);
+          this.client = c;
+        } catch (MqttException e) {
+          throw new MqttPublishException(e);
         }
       }
     }
     return c;
   }
 
-  @Override
-  public boolean isRunning() {
-    return running;
+  public void setClient(IMqttClient client) {
+    this.client = client;
+  }
+
+  /**
+   * 获取客户端
+   */
+  public IMqttClient getClient() {
+    IMqttClient c = getClient0();
+    if (!c.isConnected() && isRunning()) {
+      long now = System.currentTimeMillis();
+      if (now - tryReconnectTime <= 3000) {
+        return c;
+      }
+      synchronized (this) {
+        if (now - tryReconnectTime > 3000) {
+          try {
+            //c.connect(clientFactory.getConnectionOptions());
+            c.reconnect();
+          } catch (MqttException ignore) { /* ~ */ }
+          finally {
+            this.tryReconnectTime = now;
+          }
+        }
+      }
+    }
+    return c;
   }
 
   /**
@@ -264,35 +291,6 @@ public class MqttPublisher implements SmartLifecycle, DisposableBean {
         throw new MqttPublishException(e);
       }
     }
-  }
-
-  public void setClient(IMqttClient client) {
-    this.client = client;
-  }
-
-  /**
-   * 获取客户端
-   */
-  public IMqttClient getClient() {
-    IMqttClient c = getClient0();
-    long now = System.currentTimeMillis();
-    if (!c.isConnected() && isRunning()) {
-      if (now - lastTryConnectTime <= 3000) {
-        return c;
-      }
-      synchronized (this) {
-        if (now - lastTryConnectTime > 3000) {
-          try {
-            c.connect(clientFactory.getConnectionOptions());
-          } catch (MqttException ignore) {
-            // ~
-          } finally {
-            this.lastTryConnectTime = now;
-          }
-        }
-      }
-    }
-    return c;
   }
 
 }

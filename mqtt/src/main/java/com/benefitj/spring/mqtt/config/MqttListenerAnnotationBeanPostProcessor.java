@@ -69,7 +69,7 @@ public class MqttListenerAnnotationBeanPostProcessor implements BeanPostProcesso
   protected void registerEndpoint(Class<?> beanClass, EndpointTypeMetadata typeMetadata) {
     MqttMessageListenerEndpointRegistry registry = beanFactory.getBean(MqttMessageListenerEndpointRegistry.class);
     for (EndpointTypeMetadata.ListenerMethod method : typeMetadata.getListenerMethods()) {
-      registry.registerEndpoint(typeMetadata.getBean(),
+      registry.registerEndpoint(typeMetadata.getBean(), typeMetadata.getBeanName(),
           method.getMethod(), method.getAnnotation(), getHandlerMethodFactory());
     }
   }

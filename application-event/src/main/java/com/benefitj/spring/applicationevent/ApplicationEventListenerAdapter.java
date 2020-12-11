@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * SpringBoot事件监听
@@ -27,7 +26,6 @@ public class ApplicationEventListenerAdapter extends ApplicationListenerAdapter 
   private ApplicationContext context;
 
   private final Map<Class<?>, Map<String, ?>> listenerMap = new WeakHashMap<>();
-  private final Function<Class<?>, Map<String, ?>> func = type -> context.getBeansOfType(type);
 
   public ApplicationEventListenerAdapter() {
     super();
@@ -42,7 +40,7 @@ public class ApplicationEventListenerAdapter extends ApplicationListenerAdapter 
    * 获取监听
    */
   public <T> Map<String, T> getListeners(Class<T> listenerType) {
-    return (Map<String, T>) listenerMap.computeIfAbsent(listenerType, func);
+    return (Map<String, T>) listenerMap.computeIfAbsent(listenerType, type -> context.getBeansOfType(type));
   }
 
   @Override

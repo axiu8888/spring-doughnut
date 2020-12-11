@@ -11,14 +11,14 @@ public class EventBusConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public EventBusPoster poster() {
+  public EventBusPoster eventBusPoster() {
     return EventBusPoster.getInstance();
   }
 
   @ConditionalOnMissingBean
   @Bean
-  public EventBusAdapterRegister eventBusAdapterRegister(EventBusPoster poster) {
-    return new EventBusAdapterRegister(poster);
+  public EventBusListenerAnnotationBeanPostProcessor eventBusListenerAnnotationBeanPostProcessor() {
+    return new EventBusListenerAnnotationBeanPostProcessor();
   }
 
 }

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -16,8 +15,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author DINGXIUAN
  */
-public class MqttMessageListenerAnnotationBeanPostProcessor extends MethodAnnotationBeanPostProcessor
-    implements TypeMetadataResolver {
+public class MqttMessageListenerAnnotationBeanPostProcessor extends MethodAnnotationBeanPostProcessor implements TypeMetadataResolver {
 
   public MqttMessageListenerAnnotationBeanPostProcessor() {
     this.setMetadataResolver(this);
@@ -33,7 +31,7 @@ public class MqttMessageListenerAnnotationBeanPostProcessor extends MethodAnnota
   public AnnotationTypeMetadata resolve(Class<?> targetClass, Object bean, String beanName, BeanFactory beanFactory) {
     Collection<Method> methods = findAnnotationMethods(targetClass, MqttMessageListener.class);
     if (methods.isEmpty()) {
-      return new AnnotationTypeMetadata(targetClass, bean, beanName);
+      return null;
     }
     AnnotationTypeMetadata.MethodElement[] elements = methods.stream()
         .map(method -> new AnnotationTypeMetadata.MethodElement(
@@ -46,9 +44,10 @@ public class MqttMessageListenerAnnotationBeanPostProcessor extends MethodAnnota
   protected void doProcessAnnotations(ConcurrentMap<Class<?>, AnnotationTypeMetadata> typeMetadatas, ConfigurableListableBeanFactory beanFactory) {
     // 注册
     MqttMessageListenerRegistrar registrar = beanFactory.getBean(MqttMessageListenerRegistrar.class);
-    for (Map.Entry<Class<?>, AnnotationTypeMetadata> entry : typeMetadatas.entrySet()) {
-      registrar.register(entry.getValue(), beanFactory);
-    }
+    typeMetadatas.values()
+        .stream()
+        .filter(atm -> atm.getMethodElements().length > 0)
+        .forEach(atm -> registrar.register(atm, beanFactory));
   }
 
 }

@@ -1,4 +1,4 @@
-package com.benefitj.athenapdf.example;
+package com.benefitj.athenapdfservice;
 
 import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
 import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;

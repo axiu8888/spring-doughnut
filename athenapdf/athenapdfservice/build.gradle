@@ -7,14 +7,14 @@ plugins {
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
-group = "athenapdf-sample"
+group = "athenapdfservice"
 
 version = ''
-archivesBaseName = "athenapdf"
+archivesBaseName = "athenapdfservice"
 
 dependencies {
 
-	//compile project(":all")
+	compile project(":all")
 	compile project(":commons")
 
 	compile 'ch.qos.logback:logback-classic:1.2.3'

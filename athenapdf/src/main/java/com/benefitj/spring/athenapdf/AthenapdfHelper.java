@@ -1,9 +1,11 @@
 package com.benefitj.spring.athenapdf;
 
 import com.benefitj.core.cmd.CmdExecutor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * athenapdf 调用命令，生成PDF
@@ -14,7 +16,18 @@ public class AthenapdfHelper extends CmdExecutor {
 
   public static final AthenapdfHelper INSTANCE = new AthenapdfHelper();
 
+  private final AtomicReference<Boolean> supportDocker = new AtomicReference<>();
+
   public AthenapdfHelper() {
+  }
+
+  public boolean supportDocker() {
+    if (supportDocker.get() == null) {
+      AthenapdfCall call = (AthenapdfCall) call("docker -v");
+      String message = call.getMessage();
+      supportDocker.set(StringUtils.isNotBlank(message) && message.contains("Docker version"));
+    }
+    return supportDocker.get();
   }
 
   @Override

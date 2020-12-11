@@ -1,18 +1,16 @@
-package com.benefitj.spring.athenapdf.api;
+package com.benefitj.athenapdfservice.controller;
 
-import com.benefitj.spring.athenapdf.AthenapdfCall;
-import com.benefitj.spring.athenapdf.AthenapdfHelper;
 import com.benefitj.core.EventLoop;
-import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.spring.BreakPointTransmissionHelper;
 import com.benefitj.spring.aop.AopWebPointCut;
+import com.benefitj.spring.athenapdf.AthenapdfCall;
+import com.benefitj.spring.athenapdf.AthenapdfHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +23,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -34,7 +30,6 @@ import java.util.concurrent.*;
  * 生成报告的接口
  */
 @Slf4j
-@ConditionalOnClass(RequestMapping.class)
 @AopWebPointCut
 @RestController
 @RequestMapping("/athenapdf")
@@ -79,6 +74,10 @@ public class AthenapdfController {
         return;
       }
       URL ignore = new URL(url);
+
+      if (!athenapdfHelper.supportDocker()) {
+        throw new UnsupportedOperationException("不支持docker环境!");
+      }
     } catch (MalformedURLException e) {
       response.setCharacterEncoding(StandardCharsets.UTF_8.name());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -128,7 +127,7 @@ public class AthenapdfController {
     );
   }
 
-  private void scheduleDeleteTimer(final String url, File pdf) {
+  protected void scheduleDeleteTimer(final String url, File pdf) {
     if (!pdf.exists()) {
       return;
     }
@@ -142,26 +141,14 @@ public class AthenapdfController {
     deleteTimers.put(url, timer);
   }
 
-  private DeleteTimer<?> get(String url) {
+  protected DeleteTimer<?> get(String url) {
     return deleteTimers.remove(url);
   }
 
-  private void cancelDeleteTimer(String url, File pdf) {
+  protected void cancelDeleteTimer(String url, File pdf) {
     DeleteTimer<?> timer = deleteTimers.remove(url);
     if (timer != null && timer.getPdf().equals(pdf)) {
       timer.cancel(true);
-    }
-  }
-
-
-  private String md5(String url) {
-    try {
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
-      md5.update(url.getBytes(StandardCharsets.UTF_8));
-      byte[] digest = md5.digest();
-      return HexUtils.bytesToHex(digest);
-    } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException(e);
     }
   }
 

@@ -1,8 +1,5 @@
 
-apply plugin: 'java'
-apply plugin: 'maven'
-
-apply from: "${getRootDir()}/buildSystem/base.gradle"
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 group = "athenapdf"
 

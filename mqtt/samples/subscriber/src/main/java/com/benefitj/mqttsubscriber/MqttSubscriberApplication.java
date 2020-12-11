@@ -1,9 +1,9 @@
 package com.benefitj.mqttsubscriber;
 
 import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
-import com.benefitj.spring.mqtt.annotaion.MqttMessageListenerEndpoint;
-import com.benefitj.spring.mqtt.annotaion.EnableMqttSubscriber;
 import com.benefitj.spring.mqtt.MqttHeaders;
+import com.benefitj.spring.mqtt.MqttMessageListener;
+import com.benefitj.spring.mqtt.config.EnableMqttSubscriber;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,12 +22,11 @@ public class MqttSubscriberApplication {
     SpringApplication.run(MqttSubscriberApplication.class, args);
   }
 
-
   @Slf4j
   @Component
   public static class DefaultMqttMessageSubscriber {
 
-    @MqttMessageListenerEndpoint(topics = "/device/+")
+    @MqttMessageListener(topics = "/device/+")
     public void handleMessage(Message<?> message) throws MessagingException {
       log.info("{}, payload: {}"
           , MqttHeaders.of(message.getHeaders())
@@ -36,16 +35,16 @@ public class MqttSubscriberApplication {
     }
   }
 
-  @Slf4j
-  @Component
-  public static class DefaultMqttMessageSubscriber2 {
-
-    @MqttMessageListenerEndpoint(topics = "/device/010003b8")
-    public void handleMessage(Message<?> message) throws MessagingException {
-      log.info("{}, payload: {}"
-          , MqttHeaders.of(message.getHeaders())
-          , new String((byte[]) message.getPayload())
-      );
-    }
-  }
+//  @Slf4j
+//  @Component
+//  public static class DefaultMqttMessageSubscriber2 {
+//
+//    @MqttMessageListener(topics = "/device/010003b8", clientIdPrefix = "handleMessage-")
+//    public void handleMessage(Message<?> message) throws MessagingException {
+//      log.info("{}, payload: {}"
+//          , MqttHeaders.of(message.getHeaders())
+//          , new String((byte[]) message.getPayload())
+//      );
+//    }
+//  }
 }

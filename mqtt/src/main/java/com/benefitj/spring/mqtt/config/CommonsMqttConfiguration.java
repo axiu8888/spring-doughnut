@@ -6,6 +6,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 
@@ -13,7 +14,8 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
  * MQTT服务配置
  */
 @EnableConfigurationProperties
-public abstract class AbstractMqttConfiguration {
+@Configuration
+public class CommonsMqttConfiguration {
 
   /**
    * MQTT配置

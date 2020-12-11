@@ -1,10 +1,12 @@
 package com.benefitj.spring.mqtt.config;
 
+import com.benefitj.spring.mqtt.DefaultMqttMessageListenerRegistrar;
+import com.benefitj.spring.mqtt.MqttMessageListenerAnnotationBeanPostProcessor;
+import com.benefitj.spring.mqtt.MqttMessageListenerRegistrar;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
@@ -12,9 +14,8 @@ import org.springframework.integration.mqtt.support.MqttMessageConverter;
 /**
  * MQTT消息订阅
  */
-@Import({MqttListenerAnnotationBeanPostProcessor.class})
 @Configuration
-public class MqttSubscriberConfiguration extends AbstractMqttConfiguration {
+public class MqttSubscriberConfiguration {
 
   /**
    * 消息转换
@@ -32,9 +33,18 @@ public class MqttSubscriberConfiguration extends AbstractMqttConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
-  public DefaultMqttMessageListenerEndpointRegistry endpointRegistry(MqttOptionsProperty property,
-                                                                     MqttPahoClientFactory clientFactory) {
-    return new DefaultMqttMessageListenerEndpointRegistry(property, clientFactory);
+  public MqttMessageListenerRegistrar mqttMessageListenerRegistrar(MqttOptionsProperty property,
+                                                                   MqttPahoClientFactory clientFactory) {
+    return new DefaultMqttMessageListenerRegistrar(property, clientFactory);
+  }
+
+  /**
+   * MQTT方法注解的后置处理器
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public MqttMessageListenerAnnotationBeanPostProcessor mqttMessageListenerAnnotationBeanPostProcessor() {
+    return new MqttMessageListenerAnnotationBeanPostProcessor();
   }
 
 }

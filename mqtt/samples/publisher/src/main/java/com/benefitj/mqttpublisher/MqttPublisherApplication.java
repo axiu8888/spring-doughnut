@@ -6,7 +6,7 @@ import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
 import com.benefitj.spring.applicationevent.IApplicationReadyEventListener;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.mqtt.MqttPublisher;
-import com.benefitj.spring.mqtt.annotaion.EnableMqttPublisher;
+import com.benefitj.spring.mqtt.config.EnableMqttPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

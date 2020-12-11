@@ -6,10 +6,11 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.*;
 
 /**
  * MQTT配置
+ *
+ * @author DINGXIUAN
  */
 @ConfigurationProperties(prefix = "spring.mqtt")
 public class MqttOptionsProperty {
-
   /**
    * 客户端数量
    */

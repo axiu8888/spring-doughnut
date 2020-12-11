@@ -10,6 +10,7 @@ dependencies {
 
 	compile(project(":commons"))
 	compile(project(":application-event"))
+	compile(project(":spring"))
 	compile(project(":mqtt"))
 
 	implementation 'org.springframework.boot:spring-boot-starter'

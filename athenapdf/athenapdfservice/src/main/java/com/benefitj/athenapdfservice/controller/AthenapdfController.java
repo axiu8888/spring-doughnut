@@ -70,18 +70,20 @@ public class AthenapdfController {
       if (StringUtils.isBlank(url)) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.getOutputStream().write("缺少url参数".getBytes(StandardCharsets.UTF_8));
+        response.getWriter().write("缺少url参数");
         return;
       }
       URL ignore = new URL(url);
 
       if (!athenapdfHelper.supportDocker()) {
-        throw new UnsupportedOperationException("不支持docker环境!");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.getWriter().write("不支持docker环境!");
       }
     } catch (MalformedURLException e) {
       response.setCharacterEncoding(StandardCharsets.UTF_8.name());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
-      response.getOutputStream().write("错误的url参数".getBytes(StandardCharsets.UTF_8));
+      response.getWriter().write("错误的url参数");
       return;
     }
 

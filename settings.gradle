@@ -31,7 +31,7 @@ include ":influxdb", ":influxdb:example"
 /**
  * athenapdf 调用docker生成PDF
  */
-include ":athenapdf", ":athenapdf:sample"
+include ":athenapdf", ":athenapdf:athenapdfservice"
 
 
 include ":examples"

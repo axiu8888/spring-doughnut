@@ -8,7 +8,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,7 +27,8 @@ import java.util.Map;
 /**
  * 打印请求日志
  */
-@Order(100)
+@Order
+@ConditionalOnMissingBean(HttpServletRequestLoggingHandler.class)
 @Component
 public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
 
@@ -35,12 +38,12 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   /**
    * 是否打印日志
    */
-  @Value("#{ @environment['com.benefitj.aop.log.print'] ?: true }")
+  @Value("#{ @environment['spring.aop.http-request-logging.print'] ?: true }")
   private boolean print = true;
   /**
    * 是否分多行打印
    */
-  @Value("#{ @environment['com.benefitj.aop.log.multi-line'] ?: true }")
+  @Value("#{ @environment['spring.aop.http-request-logging.multi-line'] ?: true }")
   private boolean multiLine = true;
 
   /**
@@ -61,7 +64,8 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
       try {
         Map<String, Object> argsMap = getPrintArgs();
         ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
-        Method method = ((MethodSignature) point.getSignature()).getMethod();
+        Object bean = AopUtils.getTargetClass(joinPoint.getTarget());
+        Method method = checkProxy(((MethodSignature) point.getSignature()).getMethod(), bean);
         fillPrintArgs(point, method, attrs, argsMap);
         printLog(argsMap);
       } finally {
@@ -113,7 +117,7 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     log.info(sb.toString());
   }
 
-  private String separator() {
+  protected String separator() {
     return isMultiLine() ? "\n" : ", ";
   }
 

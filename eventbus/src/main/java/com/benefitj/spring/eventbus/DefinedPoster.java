@@ -19,11 +19,11 @@ public @interface DefinedPoster {
   /**
    * EventBusPoster的bean名称
    */
-  String posterName() default "";
+  String name() default "";
 
   /**
    * EventBusPoster的class类型
    */
-  Class<? extends EventBusPoster> posterType() default EventBusPoster.class;
+  Class<? extends EventBusPoster> type() default EventBusPoster.class;
 
 }

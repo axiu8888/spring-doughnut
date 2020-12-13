@@ -65,10 +65,10 @@ public class EventBusListenerAnnotationBeanPostProcessor extends MethodAnnotatio
       EventBusPoster poster;
       if (method.isAnnotationPresent(DefinedPoster.class)) {
         DefinedPoster definedPoster = method.getAnnotation(DefinedPoster.class);
-        if (StringUtils.isNotBlank(definedPoster.posterName())) {
-          poster = beanFactory.getBean(definedPoster.posterName(), definedPoster.posterType());
+        if (StringUtils.isNotBlank(definedPoster.name())) {
+          poster = beanFactory.getBean(definedPoster.name(), definedPoster.type());
         } else {
-          poster = beanFactory.getBean(definedPoster.posterType());
+          poster = beanFactory.getBean(definedPoster.type());
         }
       } else {
         poster = beanFactory.getBean(EventBusPoster.class);

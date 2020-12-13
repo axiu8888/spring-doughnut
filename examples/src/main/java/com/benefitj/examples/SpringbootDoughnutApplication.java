@@ -1,5 +1,7 @@
 package com.benefitj.examples;
 
+import com.alibaba.fastjson.JSON;
+import com.benefitj.event.Event;
 import com.benefitj.event.RawEvent;
 import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
 import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
@@ -34,8 +36,8 @@ public class SpringbootDoughnutApplication {
     }
 
     @Subscribe
-    public void onEvent2(RawEvent event) {
-      log.info("onEvent2: {}, hash: {}", event.getPayload(), Integer.toHexString(event.hashCode()));
+    public void onEvent2(Event event) {
+      log.info("onEvent2: {}, hash: {}", JSON.toJSONString(event), Integer.toHexString(event.hashCode()));
     }
   }
 }

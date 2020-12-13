@@ -20,7 +20,7 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
   @Bean
   public MqttPublisher mqttPublisher(MqttPahoClientFactory clientFactory,
                                      MqttOptionsProperty property) {
-    return new MqttPublisher(property.getClientIdPrefix(), clientFactory);
+    return new MqttPublisher(clientFactory, property.getClientIdPrefix());
   }
 
 }

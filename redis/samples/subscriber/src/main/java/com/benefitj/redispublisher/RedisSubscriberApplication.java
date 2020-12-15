@@ -4,7 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.spring.redis.EnableRedisMessageChannelConfiguration;
 import com.benefitj.spring.redis.RedisMessageChannel;
 import com.benefitj.spring.redis.RedisMessageListener;
-import com.benefitj.spring.applicationevent.EnableAutoApplicationListener;
+import com.benefitj.spring.applicationevent.EnableApplicationListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 /**
  * redis通道消息订阅
  */
-@EnableAutoApplicationListener
+@EnableApplicationListener
 @EnableRedisMessageChannelConfiguration
 @SpringBootApplication
 public class RedisSubscriberApplication {

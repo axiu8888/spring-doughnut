@@ -7,9 +7,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletInputStream;
@@ -29,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * PUT请求的处理，只处理 application/json
  */
-@Order(10)
-@Component
+//@Order(10)
+//@Component
 public class PutRequestHandler implements WebPointCutHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(PutRequestHandler.class);

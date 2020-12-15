@@ -7,9 +7,9 @@ import java.lang.annotation.*;
 /**
  * SpringBoot 事件监听
  */
-@Import({ApplicationEventListenerAdapter.class})
+@Import({ApplicationEventConfiguration.class})
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface EnableAutoApplicationListener {
+public @interface EnableApplicationListener {
 }

@@ -2,6 +2,7 @@ package com.benefitj.spring.applicationevent;
 
 import com.benefitj.spring.registrar.AnnotationTypeMetadata;
 import com.benefitj.spring.registrar.SingleAnnotationBeanPostProcessor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationEvent;
 
@@ -40,21 +41,17 @@ public class ApplicationListenerAnnotationBeanPostProcessor extends SingleAnnota
 
       ApplicationEventListener listener = (ApplicationEventListener)element.getAnnotations()[0];
 
+      EventAdapterFactory factory;
+      if (StringUtils.isNotBlank(listener.adapterFactoryName())) {
+        factory = beanFactory.getBean(listener.adapterFactoryName(), listener.adapterFactory());
+      } else {
+        factory = beanFactory.getBean(listener.adapterFactory());
+      }
+
+      ApplicationEventAdapter adapter = factory.create(bean, method, (Class<ApplicationEvent>) parameterTypes[0]);
       // 注册
       String beanName = metadata.getBeanName() + "." + method.getName() + "_" + INDEXER.incrementAndGet();
-      ApplicationEventAdapter adapter = newEventAdapter(listener.adapterType());
-      adapter.setBean(bean);
-      adapter.setMethod(method);
-      adapter.setEventType((Class<ApplicationEvent>) parameterTypes[0]);
       getAdapterHandler().register(beanName, adapter);
-    }
-  }
-
-  private ApplicationEventAdapter newEventAdapter(Class<? extends ApplicationEventAdapter> adapterType) {
-    try {
-      return adapterType.newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalStateException(e);
     }
   }
 

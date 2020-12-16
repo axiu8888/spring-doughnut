@@ -14,8 +14,13 @@ import java.lang.annotation.*;
 public @interface ApplicationEventListener {
 
   /**
-   * 适配器类型
+   * 适配器工厂名称
    */
-  Class<? extends ApplicationEventAdapter> adapterType() default ApplicationEventAdapter.class;
+  String adapterFactoryName() default "";
+
+  /**
+   * 适配器工厂类型
+   */
+  Class<? extends EventAdapterFactory> adapterFactory() default DefaultEventAdapterFactory.class;
 
 }

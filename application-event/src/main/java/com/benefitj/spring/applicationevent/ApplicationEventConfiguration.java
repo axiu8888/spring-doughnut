@@ -12,6 +12,14 @@ import org.springframework.core.annotation.Order;
 public class ApplicationEventConfiguration {
 
   /**
+   * 适配器工厂
+   */
+  @Bean
+  public DefaultEventAdapterFactory eventAdapterFactory() {
+    return new DefaultEventAdapterFactory();
+  }
+
+  /**
    * 事件代理
    */
   @ConditionalOnMissingBean

@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface SpringServerEndpoint {
+public @interface SpringWebSocketServerEndpoint {
 
   /**
    * URI or URI-template that the annotated class should be mapped to.

@@ -1,8 +1,11 @@
 package com.benefitj.samples.websocket;
 
+import com.benefitj.spring.websocket.SpringWebSocket;
+import com.benefitj.spring.websocket.SpringWebSocketServerEndpoint;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
 import java.nio.ByteBuffer;
@@ -10,8 +13,9 @@ import java.nio.ByteBuffer;
 /**
  * 注冊WebSocket
  */
-// "/websocket/users"
-public class SpringUserWebSocketClient implements WebSocketHandler {
+@Component
+@SpringWebSocketServerEndpoint("/websocket/users")
+public class SpringUserWebSocketClient implements SpringWebSocket {
 
   private static final Logger log = LoggerFactory.getLogger(SpringUserWebSocketClient.class);
 

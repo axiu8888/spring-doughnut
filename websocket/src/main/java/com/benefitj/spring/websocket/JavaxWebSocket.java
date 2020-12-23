@@ -6,7 +6,17 @@ import java.nio.ByteBuffer;
 /**
  * WebSocket Server 端的接口(标识)
  */
-public abstract class JavaxWebSocketServer {
+public abstract class JavaxWebSocket {
+
+  /**
+   * WebSocket Open
+   *
+   * @param session Session
+   */
+  @OnOpen
+  public void onOpen0(Session session) {
+    this.onOpen(session);
+  }
 
   /**
    * WebSocket Open
@@ -16,13 +26,15 @@ public abstract class JavaxWebSocketServer {
   public abstract void onOpen(Session session);
 
   /**
-   * WebSocket Open
+   * 接收到消息
    *
    * @param session Session
+   * @param text    文本数据
+   * @param isLast  是否为最后的数据
    */
-  @OnOpen
-  public final void onOpen0(Session session) {
-    this.onOpen(session);
+  @OnMessage
+  public void onTextMessage0(Session session, String text, boolean isLast) {
+    this.onTextMessage(session, text, isLast);
   }
 
   /**
@@ -35,15 +47,15 @@ public abstract class JavaxWebSocketServer {
   public abstract void onTextMessage(Session session, String text, boolean isLast);
 
   /**
-   * 接收到消息
+   * 接收到二进制数据
    *
    * @param session Session
-   * @param text    文本数据
+   * @param buffer  数据
    * @param isLast  是否为最后的数据
    */
   @OnMessage
-  public final void onTextMessage0(Session session, String text, boolean isLast) {
-    this.onTextMessage(session, text, isLast);
+  public void onBinaryMessage0(Session session, ByteBuffer buffer, boolean isLast) {
+    this.onBinaryMessage(session, buffer, isLast);
   }
 
   /**
@@ -56,15 +68,13 @@ public abstract class JavaxWebSocketServer {
   public abstract void onBinaryMessage(Session session, ByteBuffer buffer, boolean isLast);
 
   /**
-   * 接收到二进制数据
+   * 连接关闭调用的方法
    *
    * @param session Session
-   * @param buffer  数据
-   * @param isLast  是否为最后的数据
    */
-  @OnMessage
-  public final void onBinaryMessage0(Session session, ByteBuffer buffer, boolean isLast) {
-    this.onBinaryMessage(session, buffer, isLast);
+  @OnClose
+  public void onClose0(Session session, CloseReason reason) {
+    this.onClose(session, reason);
   }
 
   /**
@@ -75,13 +85,14 @@ public abstract class JavaxWebSocketServer {
   public abstract void onClose(Session session, CloseReason reason);
 
   /**
-   * 连接关闭调用的方法
+   * 发生错误时调用
    *
    * @param session Session
+   * @param e       异常
    */
-  @OnClose
-  public final void onClose0(Session session, CloseReason reason) {
-    this.onClose(session, reason);
+  @OnError
+  public void onError0(Session session, Throwable e) {
+    this.onError(session, e);
   }
 
   /**
@@ -91,16 +102,5 @@ public abstract class JavaxWebSocketServer {
    * @param e       异常
    */
   public abstract void onError(Session session, Throwable e);
-
-  /**
-   * 发生错误时调用
-   *
-   * @param session Session
-   * @param e       异常
-   */
-  @OnError
-  public final void onError0(Session session, Throwable e) {
-    this.onError(session, e);
-  }
 
 }

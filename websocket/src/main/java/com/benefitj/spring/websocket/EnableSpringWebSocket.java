@@ -7,6 +7,7 @@ import java.lang.annotation.*;
 /**
  * Spring websocket
  */
+@Inherited
 @Import(SpringServerEndpointConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

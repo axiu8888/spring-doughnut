@@ -20,7 +20,7 @@ public class UserWebSocketClientTest {
   public void before() throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    URI uri = URI.create("http://localhost:8080/api/websocket/users");
+    URI uri = URI.create("http://127.0.0.1:8080/api/websocket/users");
     client = new WebSocketClient(uri) {
       @Override
       public void onOpen(ServerHandshake handshakedata) {

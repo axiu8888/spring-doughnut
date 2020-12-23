@@ -87,7 +87,7 @@ public class WebRequestAspect {
           + ")"
           + ")"
   )
-  public void pointcut() {
+  public final void pointcut() {
     // ~
   }
 

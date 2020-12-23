@@ -13,7 +13,7 @@ public class LineFileWriter extends LineFileSlicer {
   /**
    * 初始化时间
    */
-  private long initializedTime = System.currentTimeMillis();
+  private volatile long initializedTime = System.currentTimeMillis();
 
   public LineFileWriter() {
   }

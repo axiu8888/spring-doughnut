@@ -1,8 +1,8 @@
 package com.benefitj.examples.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.benefitj.spring.websocket.SpringServerEndpoint;
-import com.benefitj.spring.websocket.SpringWebSocketServer;
+import com.benefitj.spring.websocket.SpringWebSocketServerEndpoint;
+import com.benefitj.spring.websocket.SpringWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 //@ServerEndpoint("/sockets/spring") // 注册多次会无法运行
-@SpringServerEndpoint("/sockets/spring")
-public class SimpleSpringWebSocketServer implements SpringWebSocketServer {
+@SpringWebSocketServerEndpoint("/sockets/spring")
+public class SimpleSpringWebSocket implements SpringWebSocket {
 
   private static final Map<String, WebSocketSession> SOCKETS = new ConcurrentHashMap<>();
 

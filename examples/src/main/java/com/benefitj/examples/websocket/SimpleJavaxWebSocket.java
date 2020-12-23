@@ -1,6 +1,6 @@
 package com.benefitj.examples.websocket;
 
-import com.benefitj.spring.websocket.JavaxWebSocketServer;
+import com.benefitj.spring.websocket.JavaxWebSocket;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @ServerEndpoint("/sockets/javax")
-public class SimpleJavaxWebSocketServer extends JavaxWebSocketServer {
+public class SimpleJavaxWebSocket extends JavaxWebSocket {
 
   private static final Map<String, Session> SOCKETS = new ConcurrentHashMap<>();
 

@@ -7,7 +7,7 @@ import java.io.File;
 /**
  * 行协议文件写入配置
  */
-@ConfigurationProperties(prefix = "com.benefitj.influxdb.write")
+@ConfigurationProperties(prefix = "spring.influxdb.write")
 public class InfluxWriteProperty {
 
   /**

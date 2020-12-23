@@ -23,7 +23,7 @@ public class ApplicationEventAdapterHandler implements ApplicationListener<Appli
       try {
         adapter.onApplicationEvent(event);
       } catch (Exception e) {
-        logger.error("throws onApplicationEvent: " + e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     });
   }

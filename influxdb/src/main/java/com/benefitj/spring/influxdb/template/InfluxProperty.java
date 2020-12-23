@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * InfluxDB的配置
  */
-@ConfigurationProperties(prefix = "com.benefitj.influxdb")
+@ConfigurationProperties(prefix = "spring.influxdb")
 public class InfluxProperty {
 
   /**

@@ -44,7 +44,7 @@ public class InfluxDBApplicationTest {
   @Test
   public void testDropMeasurements() {
     String database = template.getDatabase();
-    QueryResult result = template.postQuery(database, "DROP MEASUREMENT hs_all_rates");
+    QueryResult result = template.postQuery(database, "DROP MEASUREMENT sys_all_rates");
     System.err.println(JSON.toJSONString(result));
   }
 

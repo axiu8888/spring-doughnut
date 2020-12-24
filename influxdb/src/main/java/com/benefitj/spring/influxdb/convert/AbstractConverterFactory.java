@@ -3,7 +3,7 @@ package com.benefitj.spring.influxdb.convert;
 import com.benefitj.spring.influxdb.InfluxDBUtils;
 import com.benefitj.spring.influxdb.ReflectUtils;
 import com.benefitj.spring.influxdb.dto.ColumnIgnore;
-import com.benefitj.spring.influxdb.dto.InfluxTagNullable;
+import com.benefitj.spring.influxdb.dto.TagNullable;
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 import org.influxdb.annotation.TimeColumn;
@@ -127,7 +127,7 @@ public abstract class AbstractConverterFactory<U> implements ConverterFactory<U>
                 + column.name() + "\"的类型为\"" + field.getType() + "\"");
           }
           // 设置TAG是否允许为 null
-          InfluxTagNullable tagNullable = field.getAnnotation(InfluxTagNullable.class);
+          TagNullable tagNullable = field.getAnnotation(TagNullable.class);
           if (tagNullable != null) {
             columnField.setTagNullable(tagNullable.value());
           } else {

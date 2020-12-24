@@ -4,6 +4,8 @@ import java.lang.annotation.*;
 
 /**
  * 忽略字段
+ *
+ * @author DINGXIUAN
  */
 @Inherited
 @Documented

@@ -4,12 +4,14 @@ import java.lang.annotation.*;
 
 /**
  * tag是否允许为null
+ *
+ * @author DINGXIUAN
  */
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
-public @interface InfluxTagNullable {
+public @interface TagNullable {
 
   /**
    * tag是否允许为null

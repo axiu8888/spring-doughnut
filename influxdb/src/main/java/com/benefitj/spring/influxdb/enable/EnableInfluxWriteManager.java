@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 
 /**
  * 引用 InfluxWriteManagerConfiguration
+ *
+ * @author DINGXIUAN
  */
 @Lazy
 @Import(InfluxWriteManagerConfiguration.class)

@@ -392,6 +392,7 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
         // last
         + String.format("; SELECT %s AS last %s ORDER BY time DESC LIMIT 1", column, clause);
     final InfluxCountInfo countInfo = new InfluxCountInfo();
+    countInfo.setSql(sql);
     query(createQuery(sql), 100, qr -> {
       if (qr.hasError() && !"DONE".equalsIgnoreCase(qr.getError())) {
         countInfo.setError(qr.getError());

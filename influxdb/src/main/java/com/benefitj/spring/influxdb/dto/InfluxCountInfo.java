@@ -6,6 +6,10 @@ package com.benefitj.spring.influxdb.dto;
 public class InfluxCountInfo {
 
   /**
+   * SQL语句
+   */
+  private String sql;
+  /**
    * 条数
    */
   private long count = 0L;
@@ -25,10 +29,19 @@ public class InfluxCountInfo {
   public InfluxCountInfo() {
   }
 
-  public InfluxCountInfo(long count, Long startTime, Long endTime) {
+  public InfluxCountInfo(String sql, long count, Long startTime, Long endTime) {
+    this.sql = sql;
     this.count = count;
     this.startTime = startTime;
     this.endTime = endTime;
+  }
+
+  public String getSql() {
+    return sql;
+  }
+
+  public void setSql(String sql) {
+    this.sql = sql;
   }
 
   public InfluxCountInfo(String error) {

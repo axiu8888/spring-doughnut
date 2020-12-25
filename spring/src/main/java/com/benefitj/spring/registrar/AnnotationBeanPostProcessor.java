@@ -80,14 +80,33 @@ public interface AnnotationBeanPostProcessor extends BeanPostProcessor, Ordered,
    * @return 返回是否被注解注释
    */
   default boolean isAnnotationPresent(AnnotatedElement element, Class<? extends Annotation>[] annotationTypes) {
+    return isAnnotationPresent(element, annotationTypes, true);
+  }
+
+  /**
+   * 判断元素是否被注解注释
+   *
+   * @param element         元素
+   * @param annotationTypes 注解数组
+   * @param allMatch        是否全部匹配
+   * @return 返回是否被注解注释
+   */
+  default boolean isAnnotationPresent(AnnotatedElement element, Class<? extends Annotation>[] annotationTypes, boolean allMatch) {
     if (annotationTypes != null && annotationTypes.length > 0) {
       for (Class<? extends Annotation> annotationType : annotationTypes) {
-        if (!element.isAnnotationPresent(annotationType)) {
-          return false;
+        if (allMatch) {
+          if (!element.isAnnotationPresent(annotationType)) {
+            return false;
+          }
+        } else {
+          if (element.isAnnotationPresent(annotationType)) {
+            return true;
+          }
         }
       }
+      return allMatch;
     }
-    return true;
+    return false;
   }
 
   /**
@@ -110,8 +129,7 @@ public interface AnnotationBeanPostProcessor extends BeanPostProcessor, Ordered,
             method = iface.getMethod(method.getName(), method.getParameterTypes());
             break;
           }
-          catch (@SuppressWarnings("unused") NoSuchMethodException noMethod) {
-          }
+          catch (NoSuchMethodException ignore) { /* ~ */ }
         }
       }
       catch (SecurityException ex) {

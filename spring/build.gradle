@@ -3,6 +3,7 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
+  compileOnly "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
 }

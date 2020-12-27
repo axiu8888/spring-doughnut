@@ -26,7 +26,7 @@ public class MqttSubscriberApplication {
   @Component
   public static class DefaultMqttMessageSubscriber {
 
-    @MqttMessageListener(topics = "/device/+")
+    @MqttMessageListener(topics = "/device/+", clientIdPrefix = "mqtt-subscriber-")
     public void handleMessage(Message<?> message) throws MessagingException {
       log.info("{}, payload: {}"
           , MqttHeaders.of(message.getHeaders())

@@ -29,17 +29,38 @@ public interface AnnotationBeanPostProcessor extends BeanPostProcessor, Ordered,
   void setBeanFactory(BeanFactory beanFactory) throws BeansException;
 
   @Override
-  void afterSingletonsInstantiated();
+  default void afterSingletonsInstantiated() {
+    // ~
+  }
 
   @Override
-  Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
+  default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    return bean;
+  }
 
   @Override
-  Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+  default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    return bean;
+  }
 
   @Override
   default int getOrder() {
     return Ordered.LOWEST_PRECEDENCE;
+  }
+
+  /**
+   * 查找method集合
+   *
+   * @param targetClass 目标对象
+   * @param filter      过滤
+   * @return 返回被注解注释的method集合
+   */
+  default Collection<Method> findMethods(Class<?> targetClass, ReflectionUtils.MethodFilter filter) {
+    final List<Method> methods = new ArrayList<>();
+    ReflectionUtils.MethodFilter userFilter = ReflectionUtils.USER_DECLARED_METHODS;
+    ReflectionUtils.doWithMethods(targetClass, methods::add
+        , method -> userFilter.matches(method) && filter.matches(method));
+    return methods;
   }
 
   /**

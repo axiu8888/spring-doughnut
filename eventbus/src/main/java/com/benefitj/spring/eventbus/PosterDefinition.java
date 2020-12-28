@@ -14,16 +14,16 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface DefinedPoster {
+public @interface PosterDefinition {
 
   /**
    * EventBusPoster的bean名称
    */
-  String name() default "";
+  String[] name() default {};
 
   /**
    * EventBusPoster的class类型
    */
-  Class<? extends EventBusPoster> type() default EventBusPoster.class;
+  Class<? extends EventBusPoster>[] type() default {EventBusPoster.class};
 
 }

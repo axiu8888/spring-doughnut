@@ -58,7 +58,7 @@ public abstract class SingleAnnotationBeanPostProcessor
     typeMetadatas.values()
         .stream()
         .filter(atm -> atm.getMethodElements().length > 0)
-        .forEach(atm -> doProcessAnnotations0(atm, beanFactory));
+        .forEach(atm -> doFinalProcessAnnotations(atm, beanFactory));
   }
 
   /**
@@ -67,6 +67,6 @@ public abstract class SingleAnnotationBeanPostProcessor
    * @param metadata    元数据
    * @param beanFactory bean工程
    */
-  protected abstract void doProcessAnnotations0(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory);
+  protected abstract void doFinalProcessAnnotations(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory);
 
 }

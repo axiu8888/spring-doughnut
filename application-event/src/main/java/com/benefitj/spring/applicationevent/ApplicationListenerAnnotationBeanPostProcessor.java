@@ -26,7 +26,7 @@ public class ApplicationListenerAnnotationBeanPostProcessor extends SingleAnnota
   }
 
   @Override
-  protected void doProcessAnnotations0(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
+  protected void doFinalProcessAnnotations(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
     Object bean = metadata.getBean();
     for (AnnotationTypeMetadata.MethodElement element : metadata.getMethodElements()) {
       Method method = element.getMethod();

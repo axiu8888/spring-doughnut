@@ -27,4 +27,13 @@ public class EventBusConfiguration {
     return new EventBusListenerAnnotationBeanPostProcessor();
   }
 
+  /**
+   * adapter工厂
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public DefaultEventBusAdapterFactory eventBusAdapterFactory() {
+    return new DefaultEventBusAdapterFactory();
+  }
+
 }

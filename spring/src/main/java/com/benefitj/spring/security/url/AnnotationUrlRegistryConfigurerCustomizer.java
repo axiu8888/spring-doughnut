@@ -61,15 +61,16 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
   }
 
   protected boolean match(List<MappingType> methods, MappingType... requires) {
-    if (requires != null) {
-      for (MappingType m : requires) {
-        if (m == null) {
-          return methods.isEmpty();
-        } else {
-          for (MappingType method : methods) {
-            if (method == m) {
-              return true;
-            }
+    if (requires == null) {
+      return true;
+    }
+    for (MappingType m : requires) {
+      if (m == null) {
+        return methods.isEmpty();
+      } else {
+        for (MappingType method : methods) {
+          if (method == m) {
+            return true;
           }
         }
       }
@@ -98,11 +99,11 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
 
       String[] controllerPath = getControllerPath(targetClass);
       List<UrlRegistryMetadata> metadatas = methods.stream()
-          .map(method -> convertMetadata(bean, targetClass, method, controllerPath))
+          .map(method -> convertMetadata(method, controllerPath))
           .collect(Collectors.toList());
 
       if (!metadatas.isEmpty()) {
-        this.allMetadata.addAll(metadatas);
+        this.getAllMetadata().addAll(metadatas);
       }
     }
     return bean;
@@ -122,13 +123,8 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
     return controllerPath;
   }
 
-  protected UrlRegistryMetadata convertMetadata(Object bean,
-                                                Class<?> targetClass,
-                                                Method method,
-                                                String[] controllerPaths) {
+  protected UrlRegistryMetadata convertMetadata(Method method, String[] controllerPaths) {
     UrlRegistryMetadata metadata = new UrlRegistryMetadata();
-    metadata.setBean(bean);
-    metadata.setTargetClass(targetClass);
     metadata.setMethod(method);
     MappingType type = MappingType.of(method);
     if (type != null) {
@@ -199,25 +195,14 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
   }
 
   protected boolean isHttpService(Method method) {
-    if (Modifier.isStatic(method.getModifiers())) {
-      return false;
-    }
-    if (!Modifier.isPublic(method.getModifiers())) {
+    if (Modifier.isStatic(method.getModifiers())
+        || !Modifier.isPublic(method.getModifiers())) {
       return false;
     }
     return MappingType.match(method);
   }
 
   public static class UrlRegistryMetadata {
-
-    /**
-     * bean实例
-     */
-    private Object bean;
-    /**
-     * 目标类
-     */
-    private Class<?> targetClass;
     /**
      * 方法
      */
@@ -234,26 +219,8 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
     public UrlRegistryMetadata() {
     }
 
-    public UrlRegistryMetadata(Object bean, Class<?> targetClass, Method method) {
-      this.bean = bean;
-      this.targetClass = targetClass;
+    public UrlRegistryMetadata(Method method) {
       this.method = method;
-    }
-
-    public Object getBean() {
-      return bean;
-    }
-
-    public void setBean(Object bean) {
-      this.bean = bean;
-    }
-
-    public Class<?> getTargetClass() {
-      return targetClass;
-    }
-
-    public void setTargetClass(Class<?> targetClass) {
-      this.targetClass = targetClass;
     }
 
     public Method getMethod() {

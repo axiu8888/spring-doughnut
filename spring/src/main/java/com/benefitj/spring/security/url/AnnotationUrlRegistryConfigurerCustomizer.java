@@ -103,7 +103,7 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
           .collect(Collectors.toList());
 
       if (!metadatas.isEmpty()) {
-        this.getAllMetadata().addAll(metadatas);
+        this.allMetadata.addAll(metadatas);
       }
     }
     return bean;
@@ -159,10 +159,10 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
   }
 
   protected void setMetatdata(UrlRegistryMetadata metadata,
-                            String[] controllerPaths,
-                            String[] value,
-                            String[] path,
-                            RequestMethod... methods) {
+                              String[] controllerPaths,
+                              String[] value,
+                              String[] path,
+                              RequestMethod... methods) {
     if (methods.length > 0) {
       metadata.setMethodTypes(Arrays.stream(methods)
           .map(rm -> MappingType.valueOf(rm.name()))
@@ -177,15 +177,23 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
     } else {
       array = new String[0];
     }
-    List<String> uris = Stream.of(array)
-        .flatMap(p -> controllerPaths != null && controllerPaths.length > 0
-            ? Stream.of(controllerPaths).map(prefix -> jointUrl(prefix, p))
-            : Stream.of(p))
-        .collect(Collectors.toList());
+    List<String> uris;
+    if (array.length == 0) {
+      uris = controllerPaths != null ? Arrays.asList(controllerPaths) : new LinkedList<>();
+    } else {
+      uris = Stream.of(array)
+          .flatMap(p -> controllerPaths != null && controllerPaths.length > 0
+              ? Stream.of(controllerPaths).map(prefix -> jointUrl(prefix, p))
+              : Stream.of(p))
+          .collect(Collectors.toList());
+    }
     metadata.setUris(uris);
   }
 
   protected String jointUrl(String prefix, String path) {
+    if (StringUtils.isBlank(path)) {
+      return prefix;
+    }
     if (prefix.endsWith("/")) {
       return path.startsWith("/")
           ? (prefix + path.replaceFirst("/", ""))
@@ -195,14 +203,25 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
   }
 
   protected boolean isHttpService(Method method) {
-    if (Modifier.isStatic(method.getModifiers())
-        || !Modifier.isPublic(method.getModifiers())) {
+    if (Modifier.isStatic(method.getModifiers())) {
+      return false;
+    }
+    if (!Modifier.isPublic(method.getModifiers())) {
       return false;
     }
     return MappingType.match(method);
   }
 
   public static class UrlRegistryMetadata {
+
+    /**
+     * bean实例
+     */
+    private Object bean;
+    /**
+     * 目标类
+     */
+    private Class<?> targetClass;
     /**
      * 方法
      */
@@ -219,8 +238,26 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements UrlRegistryCon
     public UrlRegistryMetadata() {
     }
 
-    public UrlRegistryMetadata(Method method) {
+    public UrlRegistryMetadata(Object bean, Class<?> targetClass, Method method) {
+      this.bean = bean;
+      this.targetClass = targetClass;
       this.method = method;
+    }
+
+    public Object getBean() {
+      return bean;
+    }
+
+    public void setBean(Object bean) {
+      this.bean = bean;
+    }
+
+    public Class<?> getTargetClass() {
+      return targetClass;
+    }
+
+    public void setTargetClass(Class<?> targetClass) {
+      this.targetClass = targetClass;
     }
 
     public Method getMethod() {

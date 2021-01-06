@@ -5,7 +5,7 @@ import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.AopIgnore;
-import com.benefitj.spring.aop.AopWebPointCut;
+import com.benefitj.spring.aop.web.AopWebPointCut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

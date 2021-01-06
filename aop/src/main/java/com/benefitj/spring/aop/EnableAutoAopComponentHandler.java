@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * Aop Web 请求自动配置
+ * Spring组件的AOP处理配置
  */
 @EnableAspectJAutoProxy
-@Import({WebRequestAspect.class})
+@Import({ComponentAspect.class})
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface EnableAutoAopWebHandler {
+public @interface EnableAutoAopComponentHandler {
 }

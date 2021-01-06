@@ -1,6 +1,6 @@
 package com.benefitj.spring.aop.log;
 
-import com.benefitj.spring.aop.EnableAutoAopWebHandler;
+import com.benefitj.spring.aop.web.EnableAutoAopWebHandler;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

@@ -1,6 +1,6 @@
 package com.benefitj.spring.aop.log;
 
-import com.benefitj.spring.aop.WebPointCutHandler;
+import com.benefitj.spring.aop.web.WebPointCutHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;

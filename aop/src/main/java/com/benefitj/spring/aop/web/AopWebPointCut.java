@@ -1,4 +1,4 @@
-package com.benefitj.spring.aop;
+package com.benefitj.spring.aop.web;
 
 import java.lang.annotation.*;
 

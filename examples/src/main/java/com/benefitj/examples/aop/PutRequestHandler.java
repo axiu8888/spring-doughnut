@@ -1,7 +1,7 @@
 package com.benefitj.examples.aop;
 
 import com.alibaba.fastjson.JSON;
-import com.benefitj.spring.aop.WebPointCutHandler;
+import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;

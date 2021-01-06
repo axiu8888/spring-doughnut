@@ -1,0 +1,18 @@
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+dependencies {
+
+  compileOnly project(":commons")
+  compileOnly project(":spring")
+  compileOnly project(":aop")
+
+  compileOnly "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+
+  //compile 'com.h2database:h2:1.4.200'
+  compileOnly "mysql:mysql-connector-java:8.0.22"
+  compileOnly "com.alibaba:druid-spring-boot-starter:1.2.3"
+  compileOnly "org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3"
+//  compileOnly "tk.mybatis:mapper-spring-boot-starter:2.1.5"
+//  compileOnly "com.github.pagehelper:pagehelper-spring-boot-starter:1.3.0"
+}

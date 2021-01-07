@@ -13,13 +13,13 @@ public interface PointCutHandler {
   default void doBefore(JoinPoint joinPoint) {
   }
 
-  default void doAfterReturning(JoinPoint joinPoint, Object returnValue) {
+  default void doAfter(JoinPoint joinPoint) {
   }
 
   default void doAfterThrowing(JoinPoint joinPoint, Throwable ex) {
   }
 
-  default void doAfter(JoinPoint joinPoint) {
+  default void doAfterReturning(JoinPoint joinPoint, Object returnValue) {
   }
 
   default Method checkProxy(Method methodArg, Object bean) {

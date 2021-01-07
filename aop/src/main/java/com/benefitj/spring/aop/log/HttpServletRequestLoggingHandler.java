@@ -4,11 +4,9 @@ import com.benefitj.spring.aop.web.WebPointCutHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.annotation.Order;
@@ -63,10 +61,8 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     if (attrs != null) {
       try {
         Map<String, Object> argsMap = getPrintArgs();
-        ProceedingJoinPoint point = (ProceedingJoinPoint) joinPoint;
-        Object bean = AopUtils.getTargetClass(joinPoint.getTarget());
-        Method method = checkProxy(((MethodSignature) point.getSignature()).getMethod(), bean);
-        fillPrintArgs(point, method, attrs, argsMap);
+        Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
+        fillPrintArgs(joinPoint, method, attrs, argsMap);
         printLog(argsMap);
       } finally {
         getPrintArgsLocal().remove();
@@ -74,7 +70,7 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
     }
   }
 
-  public void fillPrintArgs(ProceedingJoinPoint point, Method method, ServletRequestAttributes attrs, Map<String, Object> argsMap) {
+  public void fillPrintArgs(JoinPoint point, Method method, ServletRequestAttributes attrs, Map<String, Object> argsMap) {
     HttpServletRequest request = attrs.getRequest();
     argsMap.put("uri", request.getRequestURI());
     argsMap.put("request method", request.getMethod());

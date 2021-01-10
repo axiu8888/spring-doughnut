@@ -10,20 +10,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 /**
  * 通过AOP动态切换数据源
  */
-@ConditionalOnMissingBean(DynamicDataSourceAspect.class)
+@ConditionalOnMissingBean(MasterSlaveDataSourceAspect.class)
 @Aspect
-public class DynamicDataSourceAspect extends AbstractAspect<DynamicDataSourcePointCutHandler> {
+public class MasterSlaveDataSourceAspect extends AbstractAspect<DataSourcePointCutHandler> {
 
   /**
    * 切入点表达式
    */
   @Pointcut(
       "!execution(@com.benefitj.spring.aop.AopIgnore * *(..))" // 没有被AopIgnore注解注释
-          + " && ("
-          + " @annotation(org.springframework.stereotype.Service)"
-          + " || @annotation(org.springframework.stereotype.Component)"
-          + " || @annotation(com.benefitj.spring.dynamicdatasource.aop.DynamicDataSourceHandler)"
-          + ")" // 被 @Component/@Service/@DynamicDataSourceHandler 注解注释
+          // 被 @Service与@DynamicDataSourceHandler 注解注释
+          + " && @annotation(org.springframework.stereotype.Service)"
+          + " && @annotation(com.benefitj.spring.dynamicdatasource.aop.DataSourceHandler)"
           + " && ("
           + "(@within(com.benefitj.spring.aop.AopPointCut) && execution(public * *(..)))"// method
           + " || @annotation(com.benefitj.spring.aop.AopPointCut)"  // class

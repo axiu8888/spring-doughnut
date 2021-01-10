@@ -1,7 +1,9 @@
-package com.benefitj.spring.dynamicdatasource;
+package com.benefitj.spring.dynamicdatasource.local;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.benefitj.spring.BeanHelper;
+import com.benefitj.spring.dynamicdatasource.DataSourceFactory;
+import com.benefitj.spring.dynamicdatasource.JdbcUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -9,19 +11,19 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import javax.sql.DataSource;
 
 /**
- * 默认数据源工厂
+ * 数据源工厂
  */
-public class DefaultDataSourceFactory implements DataSourceFactory {
+public class LocalDataSourceFactory implements DataSourceFactory {
 
   private DataSourceProperties properties;
 
-  public DefaultDataSourceFactory(DataSourceProperties properties) {
+  public LocalDataSourceFactory(DataSourceProperties properties) {
     this.setProperties(properties);
   }
 
   @Override
   public DataSource create(Object lookupKey) throws Exception {
-    if (lookupKey instanceof String) {
+    if (lookupKey instanceof DataSource) {
       return (DataSource) lookupKey;
     }
 

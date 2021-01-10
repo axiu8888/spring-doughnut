@@ -1,24 +1,13 @@
-package com.benefitj.spring.dynamicdatasource;
+package com.benefitj.spring.dynamicdatasource.aop;
 
-/**
- * 查找数据源类型
- */
-public class ThreadLocalLookupKeyContext implements LookupKeyContext<Object> {
+import com.benefitj.spring.dynamicdatasource.LookupKeyContext;
 
-  /**
-   * 获取实例
-   */
-  public static ThreadLocalLookupKeyContext getInstance() {
-    return Holder.INSTANCE;
-  }
+public class AopLookupKeyContext implements LookupKeyContext {
 
   /**
    * 缓存数据源类型
    */
   private final ThreadLocal<Object> local = new ThreadLocal<>();
-
-  private ThreadLocalLookupKeyContext() {
-  }
 
   /**
    * 获取数据源
@@ -61,14 +50,6 @@ public class ThreadLocalLookupKeyContext implements LookupKeyContext<Object> {
       local.set(key);
     }
     return oldKey;
-  }
-
-  private static class Holder {
-    private static final ThreadLocalLookupKeyContext INSTANCE;
-
-    static {
-      INSTANCE = new ThreadLocalLookupKeyContext();
-    }
   }
 
 }

@@ -5,5 +5,5 @@ import com.benefitj.spring.aop.PointCutHandler;
 /**
  * 动态数据源切换的AOP切面处理
  */
-public interface DynamicDataSourcePointCutHandler extends PointCutHandler {
+public interface DataSourcePointCutHandler extends PointCutHandler {
 }

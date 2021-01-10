@@ -1,6 +1,8 @@
 package com.benefitj.spring.dynamicdatasource;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.jdbc.datasource.lookup.DataSourceLookup;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
@@ -79,7 +81,9 @@ public class DynamicDataSource extends AbstractDataSource implements Initializin
    * {@link #setTargetDataSources targetDataSources} match the
    * {@link #determineCurrentLookupKey()} current lookup key.
    */
-  public void setDefaultTargetDataSource(@Nullable Object defaultTargetDataSource) {
+  public void setDefaultTargetDataSource(@Autowired(required = false)
+                                         @Qualifier("defaultTargetDataSource")
+                                         @Nullable Object defaultTargetDataSource) {
     this.defaultTargetDataSource = defaultTargetDataSource;
   }
 

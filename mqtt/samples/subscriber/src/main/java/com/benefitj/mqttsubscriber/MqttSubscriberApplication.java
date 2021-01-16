@@ -1,6 +1,5 @@
 package com.benefitj.mqttsubscriber;
 
-import com.benefitj.spring.applicationevent.EnableApplicationListener;
 import com.benefitj.spring.mqtt.MqttHeaders;
 import com.benefitj.spring.mqtt.MqttMessageListener;
 import com.benefitj.spring.mqtt.config.EnableMqttSubscriber;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 /**
  * MQTT消息订阅
  */
-@EnableApplicationListener
 @EnableMqttSubscriber
 @SpringBootApplication
 public class MqttSubscriberApplication {

@@ -22,7 +22,7 @@ public class MasterSlaveDataSourcePointCutHandler implements DataSourcePointCutH
 
   static {
     DEFAULT_SLAVE_METHODS = Collections.unmodifiableCollection(Arrays.asList("get", "find", "select", "query"));
-    DEFAULT_MASTER_METHODS = Collections.unmodifiableCollection(Arrays.asList("save", "insert", "write"));
+    DEFAULT_MASTER_METHODS = Collections.unmodifiableCollection(Arrays.asList("insert", "delete", "update", "save", "write"));
   }
 
   /**

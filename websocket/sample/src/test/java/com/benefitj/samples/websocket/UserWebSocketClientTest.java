@@ -2,9 +2,10 @@ package com.benefitj.samples.websocket;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
@@ -12,11 +13,12 @@ import java.util.concurrent.CountDownLatch;
 /**
  * 测试WebSocket
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserWebSocketClientTest {
 
   private WebSocketClient client;
 
-  @Before
+  @BeforeAll
   public void before() throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -65,7 +67,7 @@ public class UserWebSocketClientTest {
 
   }
 
-  @After
+  @AfterAll
   public void after() throws Exception {
     client.close();
   }

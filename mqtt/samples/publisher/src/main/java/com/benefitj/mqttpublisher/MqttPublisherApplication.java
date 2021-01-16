@@ -2,8 +2,6 @@ package com.benefitj.mqttpublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.applicationevent.ApplicationEventListener;
-import com.benefitj.spring.applicationevent.EnableApplicationListener;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.mqtt.MqttPublisher;
 import com.benefitj.spring.mqtt.config.EnableMqttPublisher;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * MQTT消息发布
  */
-@EnableApplicationListener
 @EnableMqttPublisher
 @SpringBootApplication
 public class MqttPublisherApplication {
@@ -42,8 +40,8 @@ public class MqttPublisherApplication {
     @Autowired
     private MqttOptionsProperty property;
 
-    @ApplicationEventListener
-    public void onApplicationReadyEvent(ApplicationReadyEvent applicationReadyEvent) {
+    @EventListener
+    public void onApplicationReadyEvent(ApplicationReadyEvent event) {
       single.scheduleAtFixedRate(this::sendMqttMessage, 1, 5, TimeUnit.SECONDS);
     }
 

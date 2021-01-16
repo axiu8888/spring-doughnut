@@ -8,7 +8,10 @@ import java.lang.annotation.*;
 /**
  * AOP数据源配置
  */
-@Import({AopDynamicDataSourceConfiguration.class})
+@Import({
+    MasterSlaveDataSourceAspect.class,
+    AopDynamicDataSourceConfiguration.class
+})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

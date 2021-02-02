@@ -47,9 +47,11 @@ public class MqttPublisherApplication {
 
     private void sendMqttMessage() {
       try {
-        String publishTopics = property.getPublishTopics();
         log.info("发布消息...");
-        publisher.send(publishTopics + "010003b8", DateFmtter.fmtNowS());
+        String[] topics = property.getPublishTopics().split(",");
+        for (String topic : topics) {
+          publisher.send((topic.endsWith("/") ? topic : (topic + "/")) + "010003b8", DateFmtter.fmtNowS());
+        }
       } catch (Exception e) {
         log.info("throw: {}", e.getMessage());
       }

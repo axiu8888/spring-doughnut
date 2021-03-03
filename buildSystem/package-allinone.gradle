@@ -2,57 +2,64 @@ apply plugin: 'maven'
 
 // 配置是否将代码打包到一个jar中
 def allInOne = true
+def rootDirPath = getRootDir().getAbsolutePath()
 
-def ignoreProjects = ['examples', 'samples']
+/**
+ * 查找项目
+ *
+ * @param root 根项目
+ * @param path 查找项目的路径
+ * @return 返回查找到的项目
+ */
+static Project findProject(Project root, String path) {
+  for (Project p : root.subprojects) {
+    if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
+      return p
+    } else {
+      if (!p.subprojects.isEmpty()) {
+        def project = findProject(p, path)
+        if(project != null) {
+          return project
+        }
+      }
+    }
+  }
+  return null
+}
 
 jar {
-    from {
-        if (allInOne) {
-            def allProjects = new HashMap<>()
-            getRootProject().subprojects.stream()
-                    .filter { isAllowProject(it, ignoreProjects) }
-                    .forEach { allProjects.put("${it.name}-${it.version}.jar" as String, it) }
-            return configurations.compile.collect {
-                if (allProjects.containsKey(it.name)) {
-                    it.isDirectory() ? it : zipTree(it)
-                }
-            }
-        } else {
-            return it
+  from {
+    if (allInOne) {
+      return configurations.compile.collect {
+        if (it.getAbsolutePath().startsWith(rootDirPath)) {
+          it.isDirectory() ? it : zipTree(it)
         }
+      }
+    } else {
+      return it
     }
+  }
 }
 
 sourceJar {
-    from {
-        if (allInOne) {
-            def allProjects = new HashMap<>()
-            getRootProject().subprojects.stream()
-                    .filter { isAllowProject(it, ignoreProjects) }
-                    .forEach({ allProjects.put("${it.name}-${it.version}.jar" as String, it) })
-            return configurations.compile.collect {
-                if (allProjects.containsKey(it.name)) {
-                    allProjects.get(it.name).sourceSets.main.allSource
-                }
-            }
-        } else {
-            return sourceSets.main.allSource
+  from {
+    if (allInOne) {
+      return configurations.compile.collect {
+        if (it.getAbsolutePath().startsWith(rootDirPath)) {
+          def path = it.getAbsolutePath();
+          def project = findProject(getRootProject(), path)
+          if (project == null) {
+            throw new IllegalStateException(
+                "Not found project for path: ${path}"
+                    + ", compile project: ${getProject().name}")
+          }
+          project.sourceSets.main.allSource
         }
+      }
+    } else {
+      return sourceSets.main.allSource
     }
-}
-
-/**
- * 忽略的 project
- *
- * @param project 被检查的 project
- * @param ignoreProjects 忽略的 project names
- * @return 返回是否添加项目
- */
-static boolean isAllowProject(Project project, List<String> ignoreProjects) {
-    if (ignoreProjects.contains(project.name as String)) {
-        return false
-    }
-    return project.getParent() == null || isAllowProject(project.getParent(), ignoreProjects);
+  }
 }
 
 //

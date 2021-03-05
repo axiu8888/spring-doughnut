@@ -1,4 +1,4 @@
-package com.benefitj.spring.mqtt.config;
+package com.benefitj.spring.mqtt.configuration;
 
 import com.benefitj.spring.mqtt.DefaultMqttMessageListenerRegistrar;
 import com.benefitj.spring.mqtt.MqttMessageListenerAnnotationBeanPostProcessor;

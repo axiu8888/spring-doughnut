@@ -4,7 +4,7 @@ import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.mqtt.MqttPublisher;
-import com.benefitj.spring.mqtt.config.EnableMqttPublisher;
+import com.benefitj.spring.mqtt.configuration.EnableMqttPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

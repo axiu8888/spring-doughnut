@@ -93,6 +93,7 @@ public class DefaultMqttMessageListenerRegistrar implements
     String methodName = element.getMethod().getName();
     String clientId = generateId(listener.clientIdPrefix());
     MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(clientId, getClientFactoryWrapper());
+    adapter.setBeanFactory(beanFactory);
     adapter.setCompletionTimeout(property.getCompletionTimeout());
     adapter.setRecoveryInterval(property.getRecoveryInterval());
     MqttMessageConverter converter;
@@ -124,11 +125,11 @@ public class DefaultMqttMessageListenerRegistrar implements
       }
     });
     adapter.setOutputChannel(mqttOutputChannel);
-    adapter.setErrorChannelName(beanName + "ErrorChannelName_" + methodName);
-    adapter.setErrorChannel((message, timeout) -> {
-      // ignore
-      return true;
-    });
+    //adapter.setErrorChannelName(beanName + "ErrorChannelName_" + methodName);
+    //adapter.setErrorChannel((message, timeout) -> {
+    //  // ignore
+    //  return true;
+    //});
 
     adapter.setTaskScheduler(taskScheduler);
 

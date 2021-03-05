@@ -1,4 +1,4 @@
-package com.benefitj.spring.mqtt.config;
+package com.benefitj.spring.mqtt.configuration;
 
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import org.apache.commons.lang3.StringUtils;

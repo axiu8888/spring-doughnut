@@ -16,8 +16,6 @@ dependencies {
 
   compile project(":spring")
   compile project(":aop")
-  compile project(":application-event")
-  //compile project(":dynamic-datasource")
   compile project(":eventbus")
   compile project(":websocket")
   compile project(":redis")

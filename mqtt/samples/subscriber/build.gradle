@@ -9,7 +9,6 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 dependencies {
 
 	compile(project(":commons"))
-	compile(project(":application-event"))
 	compile(project(":spring"))
 	compile(project(":mqtt"))
 

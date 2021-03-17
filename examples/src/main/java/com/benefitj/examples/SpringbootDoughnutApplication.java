@@ -1,7 +1,6 @@
 package com.benefitj.examples;
 
 import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
-import com.benefitj.spring.applicationevent.EnableApplicationListener;
 import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
@@ -13,7 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableSpringWebSocket // 自定义WebSocket注册
 //@EnableAutoAopWebHandler // AOP
 @EnableRequestLoggingHandler
-@EnableApplicationListener // 监听事件
 @EnableAthenapdfConfiguration // PDF
 @EnableEventBusPoster
 @SpringBootApplication

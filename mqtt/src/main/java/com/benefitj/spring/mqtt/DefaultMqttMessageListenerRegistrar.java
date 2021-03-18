@@ -64,7 +64,7 @@ public class DefaultMqttMessageListenerRegistrar implements
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
-    this.taskScheduler = applicationContext.getBean(TaskScheduler.class);
+    this.taskScheduler = (TaskScheduler) applicationContext.getBean("taskScheduler");
   }
 
   @Override

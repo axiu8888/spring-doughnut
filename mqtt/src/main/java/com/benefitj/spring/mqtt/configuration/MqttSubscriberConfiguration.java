@@ -1,9 +1,9 @@
 package com.benefitj.spring.mqtt.configuration;
 
-import com.benefitj.spring.mqtt.DefaultMqttMessageListenerRegistrar;
-import com.benefitj.spring.mqtt.MqttMessageListenerAnnotationBeanPostProcessor;
+import com.benefitj.spring.mqtt.MqttMessageListener;
 import com.benefitj.spring.mqtt.MqttMessageListenerRegistrar;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
+import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,16 +35,16 @@ public class MqttSubscriberConfiguration {
   @Bean
   public MqttMessageListenerRegistrar mqttMessageListenerRegistrar(MqttOptionsProperty property,
                                                                    MqttPahoClientFactory clientFactory) {
-    return new DefaultMqttMessageListenerRegistrar(property, clientFactory);
+    return new MqttMessageListenerRegistrar(property, clientFactory);
   }
 
   /**
    * MQTT方法注解的后置处理器
    */
-  @ConditionalOnMissingBean
-  @Bean
-  public MqttMessageListenerAnnotationBeanPostProcessor mqttMessageListenerAnnotationBeanPostProcessor() {
-    return new MqttMessageListenerAnnotationBeanPostProcessor();
+  @ConditionalOnMissingBean(name = "mqttMessageListenerProcessor")
+  @Bean("mqttMessageListenerProcessor")
+  public RegistrarMethodAnnotationBeanPostProcessor mqttMessageListenerProcessor(MqttMessageListenerRegistrar registrar) {
+    return new RegistrarMethodAnnotationBeanPostProcessor(registrar, MqttMessageListener.class);
   }
 
 }

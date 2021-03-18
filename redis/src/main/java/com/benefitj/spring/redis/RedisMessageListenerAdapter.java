@@ -1,29 +1,53 @@
 package com.benefitj.spring.redis;
 
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
 
 /**
- * Redis消息适配器
+ * redis消息监听适配器
  */
-public class RedisMessageListenerAdapter extends MessageListenerAdapter {
+public class RedisMessageListenerAdapter implements MessageListener {
 
+  private Object bean;
+  private Method method;
   private String[] channels;
 
   public RedisMessageListenerAdapter() {
   }
 
-  public RedisMessageListenerAdapter(String[] channels) {
+  public RedisMessageListenerAdapter(Object bean, Method method, String[] channels) {
+    this.bean = bean;
+    this.method = method;
     this.channels = channels;
   }
 
-  public RedisMessageListenerAdapter(Object delegate, String[] channels) {
-    super(delegate);
-    this.channels = channels;
+  @Override
+  public void onMessage(Message message, byte[] pattern) {
+    try {
+      ReflectionUtils.invokeMethod(getMethod(), getBean(), message, pattern);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalStateException(String.format(
+          "Redis监听方法错误，参数必须是\"%s message\"和\"byte[] pattern\"", Message.class.getName()));
+    }
   }
 
-  public RedisMessageListenerAdapter(Object delegate, String defaultListenerMethod, String[] channels) {
-    super(delegate, defaultListenerMethod);
-    this.channels = channels;
+  public Object getBean() {
+    return bean;
+  }
+
+  public void setBean(Object bean) {
+    this.bean = bean;
+  }
+
+  public Method getMethod() {
+    return method;
+  }
+
+  public void setMethod(Method method) {
+    this.method = method;
   }
 
   public String[] getChannels() {
@@ -33,5 +57,4 @@ public class RedisMessageListenerAdapter extends MessageListenerAdapter {
   public void setChannels(String[] channels) {
     this.channels = channels;
   }
-
 }

@@ -2,7 +2,7 @@ package com.benefitj.redispublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.redis.EnableRedisMessageChannelConfiguration;
+import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,19 +18,13 @@ import java.util.concurrent.TimeUnit;
 /**
  * redis通道消息发布
  */
-@EnableRedisMessageChannelConfiguration
+@EnableRedisMessageChannel
 @SpringBootApplication
 public class RedisPublisherApplication {
   public static void main(String[] args) {
     SpringApplication.run(RedisPublisherApplication.class, args);
   }
 
-
-  private static final EventLoop single = EventLoop.newSingle(false);
-
-  static {
-    single.execute(() -> System.err.println("启动..."));
-  }
 
   @Slf4j
   @Component
@@ -44,11 +38,13 @@ public class RedisPublisherApplication {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReadyEvent(ApplicationReadyEvent event) {
-      single.scheduleAtFixedRate(() -> {
+      EventLoop.io().scheduleAtFixedRate(() -> {
         // 发布消息
         String msg = "now: " + DateFmtter.fmtNow();
-        log.info("发布消息: "+ msg);
-        redisTemplate.convertAndSend(publishChannel, msg);
+        log.info("发布消息: " + msg);
+        for (int i = 0; i < 1; i++) {
+          redisTemplate.convertAndSend(publishChannel, msg + "___" + i);
+        }
       }, 1, 5, TimeUnit.SECONDS);
     }
 

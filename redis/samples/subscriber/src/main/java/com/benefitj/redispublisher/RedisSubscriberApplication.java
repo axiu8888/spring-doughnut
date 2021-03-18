@@ -1,9 +1,8 @@
 package com.benefitj.redispublisher;
 
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.redis.EnableRedisMessageChannelConfiguration;
+import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import com.benefitj.spring.redis.RedisMessageChannel;
-import com.benefitj.spring.redis.RedisMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * redis通道消息订阅
  */
-@EnableRedisMessageChannelConfiguration
+@EnableRedisMessageChannel
 @SpringBootApplication
 public class RedisSubscriberApplication {
   public static void main(String[] args) {
@@ -21,26 +20,26 @@ public class RedisSubscriberApplication {
   }
 
 
-  private static final EventLoop single = EventLoop.newSingle(false);
-
-  static {
-    single.execute(() -> System.err.println("启动..."));
-  }
-
   @Slf4j
   @Component
-//  @RedisMessageChannel({"channel:test", "channel:test2"})
-  @RedisMessageChannel({" ${spring.redis.subscribe-channel}"})
-  public static class RedisChannel implements RedisMessageListener {
+  public static class RedisChannel {
 
-    @Override
+    @RedisMessageChannel({" ${spring.redis.subscribe-channel}"})
     public void onMessage(Message message, byte[] pattern) {
-      single.execute(() -> {
+      EventLoop.io().execute(() -> {
         // 处理消息
         log.info("接收到消息: {}, pattern: {}"
             , new String(message.getBody())
             , new String(pattern)
         );
+      });
+    }
+
+    @RedisMessageChannel({" ${spring.redis.subscribe-channel}"})
+    public void onMessage2(Message message, byte[] pattern) {
+      EventLoop.io().execute(() -> {
+        // 处理消息
+        log.info("接收到消息, pattern: {}", new String(message.getBody()));
       });
     }
   }

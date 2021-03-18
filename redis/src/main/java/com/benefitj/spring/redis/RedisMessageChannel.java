@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  *
  * @author DINGXIUAN
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

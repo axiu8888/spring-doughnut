@@ -32,5 +32,10 @@ include ":influxdb", ":influxdb:example"
  */
 include ":athenapdf", ":athenapdf:athenapdfservice"
 
+/**
+ * quartz调度
+ */
+include ":quartz"
+
 
 include ":examples"

@@ -20,6 +20,7 @@ dependencies {
   compile project(":websocket")
   compile project(":redis")
   compile project(":mqtt")
+  compile project(":quartz")
   compile project(":influxdb")
   compile project(":athenapdf")
 

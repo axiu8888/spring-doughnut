@@ -9,11 +9,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableSpringCtxInit
-@EnableSpringWebSocket // 自定义WebSocket注册
-//@EnableAutoAopWebHandler // AOP
-@EnableRequestLoggingHandler
+@EnableSpringWebSocket        // 自定义WebSocket注册
+//@EnableAutoAopWebHandler    // AOP
+@EnableRequestLoggingHandler  // HTTP请求日志
+@EnableEventBusPoster         // eventbus
 @EnableAthenapdfConfiguration // PDF
-@EnableEventBusPoster
 @SpringBootApplication
 public class SpringbootDoughnutApplication {
   public static void main(String[] args) {

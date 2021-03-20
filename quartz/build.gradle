@@ -1,0 +1,14 @@
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+dependencies {
+
+	compileOnly(project(":commons"))
+	compileOnly(project(":spring"))
+//	compileOnly(project(":eventbus"))
+
+	// QUARTZ
+	compile "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
+
+}
+

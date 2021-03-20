@@ -4,6 +4,7 @@ import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
 import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
+import com.benefitj.spring.quartzservice.EnableQuartzService;
 import com.benefitj.spring.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableRequestLoggingHandler  // HTTP请求日志
 @EnableEventBusPoster         // eventbus
 @EnableAthenapdfConfiguration // PDF
+@EnableQuartzService          // quartz service
 @SpringBootApplication
 public class SpringbootDoughnutApplication {
   public static void main(String[] args) {

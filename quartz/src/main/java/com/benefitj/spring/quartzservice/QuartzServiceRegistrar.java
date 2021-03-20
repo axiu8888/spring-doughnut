@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 @Slf4j
 public class QuartzServiceRegistrar implements AnnotationListenerRegistrar {
 
+
   /**
    * 注册
    *
@@ -23,7 +24,7 @@ public class QuartzServiceRegistrar implements AnnotationListenerRegistrar {
       Method method = element.getMethod();
       QuartzService quartzService = (QuartzService) element.getAnnotations()[0];
       // 处理被注解的对象
-      log.info("{}.{}, name: {}, cron: {}, remarks: {}"
+      log.error("{}.{}, name: {}, cron: {}, remarks: {}"
           , method.getDeclaringClass().getName()
           , method.getName()
           , quartzService.name()

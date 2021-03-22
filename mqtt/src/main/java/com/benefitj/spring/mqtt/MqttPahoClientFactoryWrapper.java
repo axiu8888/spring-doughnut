@@ -29,7 +29,11 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
     IMqttClient client = mqttClientCache.get(clientId);
     if (client != null && !client.isConnected()) {
       try {
-        client.reconnect();
+        try {
+          client.reconnect();
+        } catch (NoSuchMethodError e) {
+          client.connect();
+        }
       } catch (Exception e) {
         mqttClientCache.remove(clientId);
         client = null;
@@ -55,7 +59,11 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
     IMqttAsyncClient client = mqttAsyncClientCache.get(clientId);
     if (client != null && !client.isConnected()) {
       try {
-        client.reconnect();
+        try {
+          client.reconnect();
+        } catch (NoSuchMethodError e) {
+          client.connect();
+        }
       } catch (Exception e) {
         mqttAsyncClientCache.remove(clientId);
         client = null;

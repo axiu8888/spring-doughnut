@@ -68,23 +68,6 @@ public abstract class JavaxWebSocket {
   public abstract void onBinaryMessage(Session session, ByteBuffer buffer, boolean isLast);
 
   /**
-   * 连接关闭调用的方法
-   *
-   * @param session Session
-   */
-  @OnClose
-  public void onClose0(Session session, CloseReason reason) {
-    this.onClose(session, reason);
-  }
-
-  /**
-   * 连接关闭调用的方法
-   *
-   * @param session Session
-   */
-  public abstract void onClose(Session session, CloseReason reason);
-
-  /**
    * 发生错误时调用
    *
    * @param session Session
@@ -102,5 +85,22 @@ public abstract class JavaxWebSocket {
    * @param e       异常
    */
   public abstract void onError(Session session, Throwable e);
+
+  /**
+   * 连接关闭调用的方法
+   *
+   * @param session Session
+   */
+  @OnClose
+  public void onClose0(Session session, CloseReason reason) {
+    this.onClose(session, reason);
+  }
+
+  /**
+   * 连接关闭调用的方法
+   *
+   * @param session Session
+   */
+  public abstract void onClose(Session session, CloseReason reason);
 
 }

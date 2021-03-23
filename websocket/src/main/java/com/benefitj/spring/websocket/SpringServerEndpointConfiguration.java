@@ -16,7 +16,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.*;
 
 /**
- * 注册被 {@link SpringWebSocketServerEndpoint} 注解的WebSocket组件
+ * 注册被 {@link SpringServerEndpoint} 注解的WebSocket组件
  */
 @EnableWebSocket
 @Configuration
@@ -48,7 +48,7 @@ public class SpringServerEndpointConfiguration extends DelegatingWebSocketConfig
         Class<?> socketClass = socket.getClass();
         // 检查是否被注册多次
         if (socketClass.isAnnotationPresent(ServerEndpoint.class)
-            && socketClass.isAnnotationPresent(SpringWebSocketServerEndpoint.class)) {
+            && socketClass.isAnnotationPresent(SpringServerEndpoint.class)) {
           throw new IllegalStateException("[" + socketClass + "]无法注册多次，" +
               "请在\"@ServerEndpoint\"和\"@SpringServerEndpoint\"中删除一个注解!");
         }
@@ -60,7 +60,7 @@ public class SpringServerEndpointConfiguration extends DelegatingWebSocketConfig
           webSocketMap.put(o.getClass().getAnnotation(ServerEndpoint.class).value(), o));
       for (SpringWebSocket socket : sockets) {
         Class<? extends SpringWebSocket> socketType = socket.getClass();
-        SpringWebSocketServerEndpoint endpoint = socketType.getAnnotation(SpringWebSocketServerEndpoint.class);
+        SpringServerEndpoint endpoint = socketType.getAnnotation(SpringServerEndpoint.class);
         if (endpoint != null) {
           String match = Arrays.stream(endpoint.value())
               .filter(webSocketMap::containsKey)

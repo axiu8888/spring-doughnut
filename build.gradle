@@ -19,6 +19,7 @@ subprojects {
 
   group = 'com.benefitj.spring'
   version = "1.3.0-SNAPSHOT"
+  ext.artifactId = "${project.name}"
 
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8

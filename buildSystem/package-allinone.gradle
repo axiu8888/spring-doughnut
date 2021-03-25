@@ -1,3 +1,4 @@
+
 apply plugin: 'maven'
 
 // 配置是否将代码打包到一个jar中
@@ -12,86 +13,93 @@ def rootDirPath = getRootDir().getAbsolutePath()
  * @return 返回查找到的项目
  */
 static Project findProject(Project root, String path) {
-  for (Project p : root.subprojects) {
-    if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
-      return p
-    } else {
-      if (!p.subprojects.isEmpty()) {
-        def project = findProject(p, path)
-        if(project != null) {
-          return project
+    for (Project p : root.subprojects) {
+        if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
+            return p
+        } else {
+            if (!p.subprojects.isEmpty()) {
+                def project = findProject(p, path)
+                if (project != null) {
+                    return project
+                }
+            }
         }
-      }
     }
-  }
-  return null
+    return null
 }
 
 jar {
-  from {
-    if (allInOne) {
-      return configurations.compile.collect {
-        if (it.getAbsolutePath().startsWith(rootDirPath)) {
-          it.isDirectory() ? it : zipTree(it)
+    from {
+        if (allInOne) {
+            return configurations.compile.collect {
+                if (it.getAbsolutePath().startsWith(rootDirPath)) {
+                    it.isDirectory() ? it : zipTree(it)
+                }
+            }
+        } else {
+            return it
         }
-      }
-    } else {
-      return it
     }
-  }
 }
 
 sourceJar {
-  from {
-    if (allInOne) {
-      return configurations.compile.collect {
-        if (it.getAbsolutePath().startsWith(rootDirPath)) {
-          def path = it.getAbsolutePath();
-          def project = findProject(getRootProject(), path)
-          if (project == null) {
-            throw new IllegalStateException(
-                "Not found project for path: ${path}"
-                    + ", compile project: ${getProject().name}")
-          }
-          project.sourceSets.main.allSource
+    from {
+        if (allInOne) {
+            return configurations.compile.collect {
+                if (it.getAbsolutePath().startsWith(rootDirPath)) {
+                    def path = it.getAbsolutePath();
+                    def project = findProject(getRootProject(), path)
+                    if (project == null) {
+                        throw new IllegalStateException(
+                                "Not found project for path: ${path}"
+                                        + ", compile project: ${getProject().name}")
+                    }
+                    project.sourceSets.main.allSource
+                }
+            }
+        } else {
+            return sourceSets.main.allSource
         }
-      }
-    } else {
-      return sourceSets.main.allSource
     }
-  }
 }
 
-//
-////上传到nexus
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            pom.groupId = "$groupId"
-//            pom.artifactId = "$artifactId"
-//            pom.version = "$versionId"
-//
-//            if (allInOne) {
-//                def allProjects = new ConcurrentHashMap<>()
-//                getRootProject().subprojects.forEach({
-//                    allProjects.put("${it.name}" as String, it)
-//                })
-//                pom.whenConfigured { pom ->
-//                    def deps = pom.dependencies.stream()
-//                            .filter {dep -> !allProjects.containsKey(dep.groupId)}
-//                            .collect {dep -> dep}
-//                    pom.dependencies.clear()
-//                    pom.dependencies.addAll(deps)
-//                }
-//            }
-//
-////            repository(url: "http://192.168.232.130:9001/repository/nexusCenter/") {
-////                authentication(userName: "admin", password: "admin123")
-////            }
-//        }
-//    }
-//}
-//
-//static String getOrDefault(String str, String defaultValue) {
-//    return str != null && !str.trim().isEmpty() ? str : defaultValue
-//}
+
+//上传到nexus
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.groupId = "$group"
+            pom.artifactId = "$artifactId"
+            pom.version = "$version"
+
+            if (allInOne) {
+                pom.whenConfigured { pom ->
+                    def deps = pom.dependencies.stream()
+                            .filter { dep ->
+                                print("\n--------------- ${dep} ---------------------\n")
+                                def match = getRootProject().getSubprojects()
+                                        .stream()
+                                        .anyMatch {
+                                            def match = it.getGroup() == dep.groupId && it.getName() == dep.artifactId && it.getVersion() == dep.version
+                                            println("${dep.groupId}-${dep.artifactId}.v${dep.version}  ==  ${it.getGroup()}-${it.getName()}.v${it.getVersion()} ==>: ${match}")
+                                            return match
+                                        }
+
+                                println("dep: ${dep}, find: ${match}")
+                                print("--------------- ${dep} ---------------------\n")
+                                return !match
+                            }
+                            .filter { dep -> true }
+                            .collect { dep -> dep }
+                    pom.dependencies.clear()
+                    pom.dependencies.addAll(deps)
+                }
+            }
+
+            repository(url: "http://192.168.232.130:9001/repository/nexusCenter/") {
+                authentication(userName: "admin", password: "admin123")
+            }
+        }
+    }
+}
+

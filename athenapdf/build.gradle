@@ -1,8 +1,6 @@
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
-group = "athenapdf"
-
 dependencies {
 
 	compileOnly project(":spring")

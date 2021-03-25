@@ -1,10 +1,6 @@
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
-group = 'com.benefitj.influxdb'
-//version = '1.0.0-SNAPSHOT'
-//def artifactName = "influxdb-management"
-
 
 ext {
     rxJavaVersion = '2.2.20'

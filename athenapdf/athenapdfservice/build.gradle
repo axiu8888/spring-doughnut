@@ -7,8 +7,6 @@ plugins {
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
-group = "athenapdfservice"
-
 version = ''
 archivesBaseName = "athenapdfservice"
 

@@ -2,10 +2,6 @@
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 group = "spring-doughnut"
-
-// 更新 groupId
-ext.groupId = "${group}"
-
 archivesBaseName = "${group}"
 
 dependencies {

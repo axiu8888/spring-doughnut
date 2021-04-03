@@ -17,10 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 打印请求日志
@@ -93,6 +97,14 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
           MultipartFile mf = (MultipartFile) arg;
           argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %d)]"
               , mf.getOriginalFilename(), mf.getSize()));
+        } else if (arg instanceof MultipartFile[]) {
+          argsMap.put(parameter.getName(), "MultipartFiles[" + Arrays.stream(((MultipartFile[]) arg))
+              .map(mf -> String.format("(%s, %d)", mf.getOriginalFilename(), mf.getSize()))
+              .collect(Collectors.joining(", ")) + "]");
+        } else if (arg instanceof InputStream) {
+          argsMap.put(parameter.getName(), "[input]");
+        } else if (arg instanceof OutputStream) {
+          argsMap.put(parameter.getName(), "[output]");
         } else {
           argsMap.put(parameter.getName(), arg);
         }

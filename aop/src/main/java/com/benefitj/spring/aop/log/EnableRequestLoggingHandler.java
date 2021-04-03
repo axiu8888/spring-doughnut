@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * 打印请求日志
  */
 @EnableAutoAopWebHandler
-@Import({HttpServletRequestLoggingHandler.class})
+@Import({HttpLoggingHandler.class, SimpleHttpLoggingCustomizer.class})
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

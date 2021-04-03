@@ -1,13 +1,9 @@
 package com.benefitj.spring.aop.log;
 
 import com.benefitj.spring.aop.web.WebPointCutHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -30,46 +26,46 @@ import java.util.stream.Collectors;
  * 打印请求日志
  */
 @Order
-@ConditionalOnMissingBean(HttpServletRequestLoggingHandler.class)
+@ConditionalOnMissingBean(HttpLoggingHandler.class)
 @Component
-public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
-
-  private static final Logger log = LoggerFactory.getLogger(HttpServletRequestLoggingHandler.class);
-
-  private final ObjectMapper mapper = new ObjectMapper();
-  /**
-   * 是否打印日志
-   */
-  @Value("#{ @environment['spring.aop.http-request-logging.print'] ?: true }")
-  private boolean print = true;
-  /**
-   * 是否分多行打印
-   */
-  @Value("#{ @environment['spring.aop.http-request-logging.multi-line'] ?: true }")
-  private boolean multiLine = true;
+public class HttpLoggingHandler implements WebPointCutHandler {
 
   /**
    * 打印的参数
    */
   private static final ThreadLocal<Map<String, Object>> printArgs = ThreadLocal.withInitial(LinkedHashMap::new);
 
-  public HttpServletRequestLoggingHandler() {
+  /**
+   * 自定义处理
+   */
+  private HttpLoggingCustomizer httpLoggingCustomizer = HttpLoggingCustomizer.newCustomizer();
+
+  public HttpLoggingHandler() {
+  }
+
+  public HttpLoggingCustomizer getHttpLoggingCustomizer() {
+    return httpLoggingCustomizer;
+  }
+
+  @Autowired(required = false)
+  public void setHttpLoggingCustomizer(HttpLoggingCustomizer httpLoggingCustomizer) {
+    this.httpLoggingCustomizer = httpLoggingCustomizer;
   }
 
   @Override
   public void doBefore(JoinPoint joinPoint) {
-    if (!isPrint()) {
-      return;
-    }
-    ServletRequestAttributes attrs = getRequestAttributes();
-    if (attrs != null) {
-      try {
-        Map<String, Object> argsMap = getPrintArgs();
-        Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
-        fillPrintArgs(joinPoint, method, attrs, argsMap);
-        printLog(argsMap);
-      } finally {
-        getPrintArgsLocal().remove();
+    HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
+    if (hlc.printable()) {
+      ServletRequestAttributes attrs = getRequestAttributes();
+      if (attrs != null) {
+        try {
+          Map<String, Object> args = getPrintArgs();
+          Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
+          fillPrintArgs(joinPoint, method, attrs, args);
+          hlc.customize(this, args);
+        } finally {
+          getPrintArgsLocal().remove();
+        }
       }
     }
   }
@@ -77,10 +73,9 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
   public void fillPrintArgs(JoinPoint point, Method method, ServletRequestAttributes attrs, Map<String, Object> argsMap) {
     HttpServletRequest request = attrs.getRequest();
     argsMap.put("uri", request.getRequestURI());
-    argsMap.put("request method", request.getMethod());
-    argsMap.put("class", method.getDeclaringClass().getName());
-    argsMap.put("class method", method.getName());
-    argsMap.put("class method args", mapToArgs(method.getParameters(), point.getArgs()));
+    argsMap.put("http-method", request.getMethod());
+    argsMap.put("class", method.getDeclaringClass().getSimpleName() + "." + method.getName());
+    argsMap.put("args", mapToArgs(method.getParameters(), point.getArgs()));
   }
 
   public Map<String, Object> mapToArgs(Parameter[] parameters, Object[] args) {
@@ -112,58 +107,6 @@ public class HttpServletRequestLoggingHandler implements WebPointCutHandler {
       return argsMap;
     }
     return null;
-  }
-
-
-  public void printLog(Map<String, Object> argsMap) {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(isMultiLine() ? "\n" : "");
-    String separator = separator();
-    argsMap.forEach((key, value) ->
-        sb.append(key).append(": ").append(toJson(value)).append(separator));
-    sb.replace(sb.length() - separator.length(), sb.length(), "");
-    log.info(sb.toString());
-  }
-
-  protected String separator() {
-    return isMultiLine() ? "\n" : ", ";
-  }
-
-  public String toJson(Object o) {
-    if (o == null) {
-      return "";
-    }
-    try {
-      if (o instanceof Number
-          || o instanceof Boolean
-          || o instanceof CharSequence
-          || o instanceof Character) {
-        return String.valueOf(o);
-      }
-      return getMapper().writeValueAsString(o);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  public ObjectMapper getMapper() {
-    return mapper;
-  }
-
-  public boolean isPrint() {
-    return print;
-  }
-
-  public void setPrint(boolean print) {
-    this.print = print;
-  }
-
-  public boolean isMultiLine() {
-    return multiLine;
-  }
-
-  public void setMultiLine(boolean multiLine) {
-    this.multiLine = multiLine;
   }
 
   public static ThreadLocal<Map<String, Object>> getPrintArgsLocal() {

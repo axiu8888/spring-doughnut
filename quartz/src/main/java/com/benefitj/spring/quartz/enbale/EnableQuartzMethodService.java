@@ -1,4 +1,4 @@
-package com.benefitj.spring.quartzservice;
+package com.benefitj.spring.quartz.enbale;
 
 
 import org.springframework.context.annotation.Import;
@@ -10,11 +10,11 @@ import java.lang.annotation.*;
  * Quartz服务
  */
 @Lazy
-@Import({QuartzServiceConfiguration.class})
+@Import({QuartzMethodServiceConfiguration.class})
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableQuartzService {
+public @interface EnableQuartzMethodService {
 }
 

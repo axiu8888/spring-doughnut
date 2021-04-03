@@ -51,8 +51,7 @@ sourceJar {
                     def project = findProject(getRootProject(), path)
                     if (project == null) {
                         throw new IllegalStateException(
-                                "Not found project for path: ${path}"
-                                        + ", compile project: ${getProject().name}")
+                                "Not found project for path: ${path}, compile project: ${getProject().name}")
                     }
                     project.sourceSets.main.allSource
                 }

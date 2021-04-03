@@ -1,11 +1,11 @@
 package com.benefitj.athenapdfservice;
 
-import com.benefitj.spring.aop.log.EnableRequestLoggingHandler;
+import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@EnableRequestLoggingHandler
+@EnableHttpLoggingHandler
 @EnableAthenapdfConfiguration
 @SpringBootApplication
 public class AthenapdfApplication {

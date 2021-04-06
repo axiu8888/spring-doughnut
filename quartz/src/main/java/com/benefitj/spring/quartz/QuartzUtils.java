@@ -79,8 +79,8 @@ public class QuartzUtils {
     if (task.getAsync() == null) {
       task.setAsync(false);
     }
-    if (task.getRecovery()) {
-      task.setRecovery(false);
+    if (task.getRecovery() == null) {
+      task.setRecovery(Boolean.FALSE);
     }
     if (task.getPersistent() == null) {
       task.setPersistent(false);

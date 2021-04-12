@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * 打印请求日志
  */
 @Order
-@ConditionalOnMissingBean(HttpLoggingHandler.class)
+@ConditionalOnMissingBean({HttpLoggingHandler.class, HttpLoggingCustomizer.class})
 @Component
 public class HttpLoggingHandler implements WebPointCutHandler {
 

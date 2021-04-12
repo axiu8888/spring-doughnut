@@ -1,6 +1,8 @@
 package com.benefitj.spring.eventbus;
 
 import com.benefitj.event.EventBusPoster;
+import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
+import com.google.common.eventbus.Subscribe;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +21,21 @@ public class EventBusConfiguration {
   }
 
   /**
-   * 注册后置处理器
+   * 注解处理器
+   */
+  @ConditionalOnMissingBean(name = "eventBusAnnotationBeanPostProcessor")
+  @Bean("eventBusAnnotationBeanPostProcessor")
+  public RegistrarMethodAnnotationBeanPostProcessor eventBusAnnotationBeanPostProcessor(EventBusSubscriberMetadataRegistrar registrar) {
+    return new RegistrarMethodAnnotationBeanPostProcessor(registrar, Subscribe.class);
+  }
+
+  /**
+   * 注解注册器
    */
   @ConditionalOnMissingBean
   @Bean
-  public EventBusListenerAnnotationBeanPostProcessor eventBusListenerAnnotationBeanPostProcessor() {
-    return new EventBusListenerAnnotationBeanPostProcessor();
+  public EventBusSubscriberMetadataRegistrar eventBusSubscriberMetadataRegistrar() {
+    return new EventBusSubscriberMetadataRegistrar();
   }
 
   /**

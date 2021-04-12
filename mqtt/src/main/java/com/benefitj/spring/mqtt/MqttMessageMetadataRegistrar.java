@@ -1,11 +1,10 @@
 package com.benefitj.spring.mqtt;
 
 import com.benefitj.core.IdUtils;
-import com.benefitj.spring.registrar.AnnotationListenerRegistrar;
-import com.benefitj.spring.registrar.AnnotationTypeMetadata;
+import com.benefitj.spring.registrar.AnnotationMetadataRegistrar;
+import com.benefitj.spring.registrar.AnnotationMetadata;
+import com.benefitj.spring.registrar.MethodElement;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -30,8 +29,8 @@ import java.nio.charset.StandardCharsets;
 /**
  * MQTT注册器
  */
-public class MqttMessageListenerRegistrar implements
-    AnnotationListenerRegistrar, ApplicationEventPublisherAware, ApplicationContextAware {
+public class MqttMessageMetadataRegistrar implements
+    AnnotationMetadataRegistrar, ApplicationEventPublisherAware, ApplicationContextAware {
 
   private ApplicationContext applicationContext;
   private ApplicationEventPublisher applicationEventPublisher;
@@ -54,7 +53,7 @@ public class MqttMessageListenerRegistrar implements
    */
   private MessageHandlerMethodFactory handlerMethodFactory;
 
-  public MqttMessageListenerRegistrar(MqttOptionsProperty property,
+  public MqttMessageMetadataRegistrar(MqttOptionsProperty property,
                                       MqttPahoClientFactory clientFactory) {
     this.property = property;
     this.clientFactory = clientFactory;
@@ -72,21 +71,20 @@ public class MqttMessageListenerRegistrar implements
   }
 
   @Override
-  public void register(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
+  public void register(AnnotationMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
     MessageHandlerMethodFactory methodFactory = getHandlerMethodFactory();
     if (methodFactory == null) {
       setHandlerMethodFactory(methodFactory = createMessageHandlerMethodFactory(beanFactory));
     }
-    for (AnnotationTypeMetadata.MethodElement element : metadata.getMethodElements()) {
-      registerSingleton(metadata, beanFactory, methodFactory
-          , element, (MqttMessageListener) element.getAnnotations()[0]);
+    for (MethodElement element : metadata.getMethodElements()) {
+      registerSingleton(metadata, beanFactory, methodFactory, element, (MqttMessageListener) element.getAnnotations()[0]);
     }
   }
 
-  private void registerSingleton(AnnotationTypeMetadata metadata,
+  private void registerSingleton(AnnotationMetadata metadata,
                                  ConfigurableListableBeanFactory beanFactory,
                                  MessageHandlerMethodFactory handlerMethodFactory,
-                                 AnnotationTypeMetadata.MethodElement element,
+                                 MethodElement element,
                                  MqttMessageListener listener) {
     String beanName = metadata.getBeanName();
     String methodName = element.getMethod().getName();

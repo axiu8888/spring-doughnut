@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 /**
  * bean注解解析器
  */
-public interface TypeMetadataResolver {
+public interface MetadataResolver {
 
   /**
    * 解析注解信息
@@ -19,6 +19,6 @@ public interface TypeMetadataResolver {
    * @return 返回结果的结果
    */
   @Nullable
-  AnnotationTypeMetadata resolve(Class<?> targetClass, Object bean, String beanName, BeanFactory beanFactory);
+  AnnotationMetadata resolve(Class<?> targetClass, Object bean, String beanName, BeanFactory beanFactory);
 
 }

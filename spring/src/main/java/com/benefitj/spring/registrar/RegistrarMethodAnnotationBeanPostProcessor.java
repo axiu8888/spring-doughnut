@@ -11,19 +11,19 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * 可注册的方法注解的后置处理器
  */
-public class RegistrarMethodAnnotationBeanPostProcessor
-    extends MethodAnnotationBeanPostProcessor implements TypeMetadataResolver {
+public class RegistrarMethodAnnotationBeanPostProcessor extends MethodAnnotationBeanPostProcessor
+    implements MetadataResolver {
 
   /**
    * 注册器
    */
-  private AnnotationListenerRegistrar registrar;
+  private AnnotationMetadataRegistrar registrar;
   /**
    * 注解类型
    */
   private Class<? extends Annotation> annotationType;
 
-  public RegistrarMethodAnnotationBeanPostProcessor(AnnotationListenerRegistrar registrar,
+  public RegistrarMethodAnnotationBeanPostProcessor(AnnotationMetadataRegistrar registrar,
                                                     Class<? extends Annotation> annotationType) {
     this.setMetadataResolver(this);
     this.setRegistrar(registrar);
@@ -37,20 +37,19 @@ public class RegistrarMethodAnnotationBeanPostProcessor
 
   @SuppressWarnings("unchecked")
   @Override
-  public AnnotationTypeMetadata resolve(Class<?> targetClass, Object bean, String beanName, BeanFactory beanFactory) {
+  public AnnotationMetadata resolve(Class<?> targetClass, Object bean, String beanName, BeanFactory beanFactory) {
     Collection<Method> methods = findAnnotationMethods(targetClass, getAnnotationType());
-    if (methods.isEmpty()) {
-      return null;
+    if (!methods.isEmpty()) {
+      MethodElement[] elements = methods.stream()
+          .map(method -> new MethodElement(method, method.getAnnotationsByType(getAnnotationType())))
+          .toArray(MethodElement[]::new);
+      return new AnnotationMetadata(targetClass, bean, beanName, elements);
     }
-    AnnotationTypeMetadata.MethodElement[] elements = methods.stream()
-        .map(method -> new AnnotationTypeMetadata.MethodElement(
-            method, method.getAnnotationsByType(getAnnotationType())))
-        .toArray(AnnotationTypeMetadata.MethodElement[]::new);
-    return new AnnotationTypeMetadata(targetClass, bean, beanName, elements);
+    return null;
   }
 
   @Override
-  protected void doProcessAnnotations(ConcurrentMap<Class<?>, AnnotationTypeMetadata> typeMetadatas, ConfigurableListableBeanFactory beanFactory) {
+  protected void doProcessAnnotations(ConcurrentMap<Class<?>, AnnotationMetadata> typeMetadatas, ConfigurableListableBeanFactory beanFactory) {
     // 注册
     typeMetadatas.values()
         .stream()
@@ -58,11 +57,11 @@ public class RegistrarMethodAnnotationBeanPostProcessor
         .forEach(atm -> getRegistrar().register(atm, beanFactory));
   }
 
-  public AnnotationListenerRegistrar getRegistrar() {
+  public AnnotationMetadataRegistrar getRegistrar() {
     return registrar;
   }
 
-  public void setRegistrar(AnnotationListenerRegistrar registrar) {
+  public void setRegistrar(AnnotationMetadataRegistrar registrar) {
     this.registrar = registrar;
   }
 

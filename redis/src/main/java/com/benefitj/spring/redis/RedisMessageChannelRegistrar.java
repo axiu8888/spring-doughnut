@@ -1,7 +1,8 @@
 package com.benefitj.spring.redis;
 
-import com.benefitj.spring.registrar.AnnotationListenerRegistrar;
-import com.benefitj.spring.registrar.AnnotationTypeMetadata;
+import com.benefitj.spring.registrar.AnnotationMetadataRegistrar;
+import com.benefitj.spring.registrar.AnnotationMetadata;
+import com.benefitj.spring.registrar.MethodElement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -14,7 +15,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 /**
  * Redis注册器
  */
-public class RedisMessageChannelRegistrar implements AnnotationListenerRegistrar, ApplicationContextAware {
+public class RedisMessageChannelRegistrar implements AnnotationMetadataRegistrar, ApplicationContextAware {
 
   private RedisMessageListenerContainer container;
 
@@ -40,10 +41,10 @@ public class RedisMessageChannelRegistrar implements AnnotationListenerRegistrar
    * @param beanFactory bean工厂
    */
   @Override
-  public void register(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
+  public void register(AnnotationMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
     Object bean = metadata.getBean();
     ApplicationContext ctx = getApplicationContext();
-    for (AnnotationTypeMetadata.MethodElement element : metadata.getMethodElements()) {
+    for (MethodElement element : metadata.getMethodElements()) {
       RedisMessageChannel rmc = (RedisMessageChannel) element.getAnnotations()[0];
       String[] channels = rmc.value();
       if (channels.length <= 0) {
@@ -86,8 +87,8 @@ public class RedisMessageChannelRegistrar implements AnnotationListenerRegistrar
    * @param channels 通道
    * @return 返回适配器
    */
-  protected MessageListenerAdapter createAdapter(AnnotationTypeMetadata metadata,
-                                                 AnnotationTypeMetadata.MethodElement element,
+  protected MessageListenerAdapter createAdapter(AnnotationMetadata metadata,
+                                                 MethodElement element,
                                                  String[] channels) {
     RedisMessageListenerAdapter delegate = new RedisMessageListenerAdapter(
         metadata.getBean(), element.getMethod(), channels);

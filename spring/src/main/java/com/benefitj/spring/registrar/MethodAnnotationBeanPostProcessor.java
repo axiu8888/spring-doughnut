@@ -13,16 +13,16 @@ public class MethodAnnotationBeanPostProcessor implements AnnotationBeanPostProc
   /**
    * 缓存解析的注解信息
    */
-  private final ConcurrentMap<Class<?>, AnnotationTypeMetadata> typeMethodMetadatas = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Class<?>, AnnotationMetadata> typeMethodMetadatas = new ConcurrentHashMap<>();
 
   private ConfigurableListableBeanFactory listableBeanFactory;
 
-  private TypeMetadataResolver metadataResolver;
+  private MetadataResolver metadataResolver;
 
   public MethodAnnotationBeanPostProcessor() {
   }
 
-  public MethodAnnotationBeanPostProcessor(TypeMetadataResolver metadataResolver) {
+  public MethodAnnotationBeanPostProcessor(MetadataResolver metadataResolver) {
     this.metadataResolver = metadataResolver;
   }
 
@@ -36,7 +36,7 @@ public class MethodAnnotationBeanPostProcessor implements AnnotationBeanPostProc
   @Override
   public void afterSingletonsInstantiated() {
     // 实例化
-    ConcurrentMap<Class<?>, AnnotationTypeMetadata> cache = getTypeMethodMetadatas();
+    ConcurrentMap<Class<?>, AnnotationMetadata> cache = getTypeMethodMetadatas();
     if (!cache.isEmpty()) {
       try {
         doProcessAnnotations(cache, getListableBeanFactory());
@@ -55,12 +55,12 @@ public class MethodAnnotationBeanPostProcessor implements AnnotationBeanPostProc
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     Class<?> targetClass = AopUtils.getTargetClass(bean);
     if (support(targetClass, bean, beanName)) {
-      ConcurrentMap<Class<?>, AnnotationTypeMetadata> cache = getTypeMethodMetadatas();
+      ConcurrentMap<Class<?>, AnnotationMetadata> cache = getTypeMethodMetadatas();
       if (!cache.containsKey(targetClass)) {
         // 扫描
-        TypeMetadataResolver resolver = getMetadataResolver();
+        MetadataResolver resolver = getMetadataResolver();
         if (resolver != null) {
-          AnnotationTypeMetadata metadata = resolver.resolve(targetClass, bean, beanName, getListableBeanFactory());
+          AnnotationMetadata metadata = resolver.resolve(targetClass, bean, beanName, getListableBeanFactory());
           if (metadata != null) {
             cache.put(bean.getClass(), metadata);
           }
@@ -88,7 +88,7 @@ public class MethodAnnotationBeanPostProcessor implements AnnotationBeanPostProc
    * @param typeMetadatas 注解元数据
    * @param beanFactory     beanFactory对象
    */
-  protected void doProcessAnnotations(ConcurrentMap<Class<?>, AnnotationTypeMetadata> typeMetadatas,
+  protected void doProcessAnnotations(ConcurrentMap<Class<?>, AnnotationMetadata> typeMetadatas,
                                       ConfigurableListableBeanFactory beanFactory) {
     // 处理结果
   }
@@ -102,15 +102,15 @@ public class MethodAnnotationBeanPostProcessor implements AnnotationBeanPostProc
     this.listableBeanFactory = beanFactory;
   }
 
-  public TypeMetadataResolver getMetadataResolver() {
+  public MetadataResolver getMetadataResolver() {
     return metadataResolver;
   }
 
-  public void setMetadataResolver(TypeMetadataResolver metadataResolver) {
+  public void setMetadataResolver(MetadataResolver metadataResolver) {
     this.metadataResolver = metadataResolver;
   }
 
-  public ConcurrentMap<Class<?>, AnnotationTypeMetadata> getTypeMethodMetadatas() {
+  public ConcurrentMap<Class<?>, AnnotationMetadata> getTypeMethodMetadatas() {
     return typeMethodMetadatas;
   }
 }

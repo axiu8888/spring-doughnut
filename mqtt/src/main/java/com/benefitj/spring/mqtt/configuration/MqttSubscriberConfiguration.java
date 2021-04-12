@@ -1,7 +1,7 @@
 package com.benefitj.spring.mqtt.configuration;
 
 import com.benefitj.spring.mqtt.MqttMessageListener;
-import com.benefitj.spring.mqtt.MqttMessageListenerRegistrar;
+import com.benefitj.spring.mqtt.MqttMessageMetadataRegistrar;
 import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,9 +33,9 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
-  public MqttMessageListenerRegistrar mqttMessageListenerRegistrar(MqttOptionsProperty property,
+  public MqttMessageMetadataRegistrar mqttMessageListenerRegistrar(MqttOptionsProperty property,
                                                                    MqttPahoClientFactory clientFactory) {
-    return new MqttMessageListenerRegistrar(property, clientFactory);
+    return new MqttMessageMetadataRegistrar(property, clientFactory);
   }
 
   /**
@@ -43,7 +43,7 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean(name = "mqttMessageListenerProcessor")
   @Bean("mqttMessageListenerProcessor")
-  public RegistrarMethodAnnotationBeanPostProcessor mqttMessageListenerProcessor(MqttMessageListenerRegistrar registrar) {
+  public RegistrarMethodAnnotationBeanPostProcessor mqttMessageListenerProcessor(MqttMessageMetadataRegistrar registrar) {
     return new RegistrarMethodAnnotationBeanPostProcessor(registrar, MqttMessageListener.class);
   }
 

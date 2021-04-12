@@ -1,40 +1,36 @@
 package com.benefitj.spring.eventbus;
 
 import com.benefitj.event.EventBusPoster;
-import com.benefitj.spring.registrar.AnnotationTypeMetadata;
-import com.benefitj.spring.registrar.SingleAnnotationBeanPostProcessor;
-import com.google.common.eventbus.Subscribe;
+import com.benefitj.spring.registrar.AnnotationMetadata;
+import com.benefitj.spring.registrar.AnnotationMetadataRegistrar;
+import com.benefitj.spring.registrar.MethodElement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Method;
 
 /**
- * EventBus监听注解的后置处理器
+ * EventBus监听注解注册
  *
  * @author DINGXIUAN
  */
-public class EventBusListenerAnnotationBeanPostProcessor extends SingleAnnotationBeanPostProcessor {
-
-  public EventBusListenerAnnotationBeanPostProcessor() {
-    this.setAnnotationType(Subscribe.class);
-  }
+public class EventBusSubscriberMetadataRegistrar implements AnnotationMetadataRegistrar {
 
   /**
    * 注册
    *
-   * @param metadata    元数据
-   * @param beanFactory bean工程
+   * @param metadata    注解类的信息
+   * @param beanFactory bean工厂
    */
   @Override
-  protected void doFinalProcessAnnotations(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
+  public void register(AnnotationMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
     if (metadata.getTargetClass().isAnnotationPresent(SubscriberIgnore.class)) {
       // ignore
       return;
     }
 
     Object bean = metadata.getBean();
-    for (AnnotationTypeMetadata.MethodElement element : metadata.getMethodElements()) {
+    for (MethodElement element : metadata.getMethodElements()) {
       Method method = element.getMethod();
       if (!method.isAnnotationPresent(SubscriberIgnore.class)) {
         if (method.getParameterCount() != 1) {

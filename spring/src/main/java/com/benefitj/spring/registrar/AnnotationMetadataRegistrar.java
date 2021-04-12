@@ -7,7 +7,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  *
  * @author DINGXIUAN
  */
-public interface AnnotationListenerRegistrar {
+public interface AnnotationMetadataRegistrar {
 
   /**
    * 注册
@@ -15,6 +15,6 @@ public interface AnnotationListenerRegistrar {
    * @param metadata    注解类的信息
    * @param beanFactory bean工厂
    */
-  void register(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory);
+  void register(AnnotationMetadata metadata, ConfigurableListableBeanFactory beanFactory);
 
 }

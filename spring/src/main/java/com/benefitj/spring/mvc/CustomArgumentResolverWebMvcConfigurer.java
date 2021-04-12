@@ -1,6 +1,5 @@
 package com.benefitj.spring.mvc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -11,12 +10,25 @@ import java.util.List;
  */
 public class CustomArgumentResolverWebMvcConfigurer implements WebMvcConfigurer {
 
-  @Autowired(required = false)
   private List<CustomHandlerMethodArgumentResolver> argumentResolvers;
+
+  public CustomArgumentResolverWebMvcConfigurer() {
+  }
+
+  public CustomArgumentResolverWebMvcConfigurer(List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
+    this.argumentResolvers = argumentResolvers;
+  }
 
   @Override
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-    resolvers.addAll(argumentResolvers);
+    resolvers.addAll(getArgumentResolvers());
   }
 
+  public List<CustomHandlerMethodArgumentResolver> getArgumentResolvers() {
+    return argumentResolvers;
+  }
+
+  public void setArgumentResolvers(List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
+    this.argumentResolvers = argumentResolvers;
+  }
 }

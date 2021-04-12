@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  *
  * @author DINGXIUAN
  */
-@Import({CustomArgumentResolverWebMvcConfigurer.class})
+@Import({CustomArgumentResolverConfiguration.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

@@ -1,7 +1,6 @@
 package com.benefitj.spring.aop.log;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,13 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@ConditionalOnMissingBean({HttpLoggingCustomizer.class, SimpleHttpLoggingCustomizer.class})
+@ConditionalOnMissingBean({HttpLoggingCustomizer.class})
 @Component
 public class SimpleHttpLoggingCustomizer implements HttpLoggingCustomizer {
 
   protected static final Logger log = LoggerFactory.getLogger(HttpLoggingCustomizer.class);
 
-  private final ObjectMapper mapper = new ObjectMapper();
   /**
    * 是否分多行打印
    */
@@ -57,21 +55,13 @@ public class SimpleHttpLoggingCustomizer implements HttpLoggingCustomizer {
     if (o == null) {
       return "";
     }
-    try {
-      if (o instanceof Number
-          || o instanceof Boolean
-          || o instanceof CharSequence
-          || o instanceof Character) {
-        return String.valueOf(o);
-      }
-      return getMapper().writeValueAsString(o);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
+    if (o instanceof Number
+        || o instanceof Boolean
+        || o instanceof CharSequence
+        || o instanceof Character) {
+      return String.valueOf(o);
     }
-  }
-
-  public ObjectMapper getMapper() {
-    return mapper;
+    return JSON.toJSONString(o);
   }
 
   public boolean isMultiLine() {

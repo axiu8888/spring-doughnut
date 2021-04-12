@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 注冊WebSocket
@@ -19,6 +21,8 @@ import java.nio.ByteBuffer;
 public class UserSpringWebSocketServerEndpoint extends SpringWebSocketServerEndpoint {
 
   private static final Logger log = LoggerFactory.getLogger(UserSpringWebSocketServerEndpoint.class);
+
+  public static final Map<String, UserSpringWebSocketClient> SOCKETS = new ConcurrentHashMap<>();
 
   @Override
   public boolean supportsPartialMessages() {
@@ -45,7 +49,8 @@ public class UserSpringWebSocketServerEndpoint extends SpringWebSocketServerEndp
 
     @Override
     public void onOpen() {
-      log.info("onOpen, session id: {}", getId());
+      SOCKETS.put(getId(), this);
+      log.info("onOpen, session id: {}, size[{}]", getId(), SOCKETS.size());
     }
 
     @Override
@@ -68,7 +73,8 @@ public class UserSpringWebSocketServerEndpoint extends SpringWebSocketServerEndp
 
     @Override
     public void onClose(String reason, int code) {
-      log.info("onClose, session id: {}, reason: {}, code: {}", getId(), reason, code);
+      SOCKETS.remove(getId());
+      log.info("onClose, session id: {}, reason: {}, code: {}, size[{}]", getId(), reason, code, SOCKETS.size());
     }
 
   }

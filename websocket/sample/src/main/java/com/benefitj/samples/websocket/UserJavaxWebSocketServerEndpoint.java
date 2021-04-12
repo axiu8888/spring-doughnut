@@ -5,11 +5,11 @@ import com.benefitj.spring.websocket.JavaxWebSocketServerEndpoint;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 注冊WebSocket
@@ -19,6 +19,8 @@ import java.nio.ByteBuffer;
 public class UserJavaxWebSocketServerEndpoint extends JavaxWebSocketServerEndpoint {
 
   private static final Logger log = LoggerFactory.getLogger(UserJavaxWebSocketServerEndpoint.class);
+
+  public static final Map<String, UserJavaxWebSocketClient> SOCKETS = new ConcurrentHashMap<>();
 
   /**
    * 创建 WebSocket客户端
@@ -39,7 +41,8 @@ public class UserJavaxWebSocketServerEndpoint extends JavaxWebSocketServerEndpoi
 
     @Override
     public void onOpen() {
-      log.info("onOpen, session id: {}", getId());
+      SOCKETS.put(getId(), this);
+      log.info("onOpen, session id: {}, size[{}]", getId(), SOCKETS.size());
     }
 
     @Override
@@ -53,14 +56,15 @@ public class UserJavaxWebSocketServerEndpoint extends JavaxWebSocketServerEndpoi
     }
 
     @Override
-    public void onClose(String reason, int code) {
-      log.info("onClose, session id: {}, reason: {}, code: {}", getId(), reason, code);
-    }
-
-    @Override
     public void onError(Throwable e) {
       log.info("onError, session id: {}, error: {}", getId(), e.getMessage());
       e.printStackTrace();
+    }
+
+    @Override
+    public void onClose(String reason, int code) {
+      SOCKETS.remove(getId());
+      log.info("onClose, session id: {}, reason: {}, code: {}, size[{}]", getId(), reason, code, SOCKETS.size());
     }
   }
 

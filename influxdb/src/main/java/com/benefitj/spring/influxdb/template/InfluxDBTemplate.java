@@ -462,6 +462,17 @@ public interface InfluxDBTemplate<I extends BasicInfluxDB, Q> extends ConverterF
   }
 
   /**
+   * 
+   *
+   * @param db
+   * @param measurement
+   * @param tagName
+   */
+  default void deleteTagValues(String db, String measurement, String tagName) {
+    // ~
+  }
+
+  /**
    * obtain measurements
    *
    * @return return measurement list

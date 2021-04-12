@@ -28,21 +28,28 @@ public class EventBusListenerAnnotationBeanPostProcessor extends SingleAnnotatio
    */
   @Override
   protected void doFinalProcessAnnotations(AnnotationTypeMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
+    if (metadata.getTargetClass().isAnnotationPresent(SubscriberIgnore.class)) {
+      // ignore
+      return;
+    }
+
     Object bean = metadata.getBean();
     for (AnnotationTypeMetadata.MethodElement element : metadata.getMethodElements()) {
       Method method = element.getMethod();
-      if (method.getParameterCount() != 1) {
-        throw new IllegalArgumentException("EventBus仅支持单个参数的订阅！");
+      if (!method.isAnnotationPresent(SubscriberIgnore.class)) {
+        if (method.getParameterCount() != 1) {
+          throw new IllegalArgumentException("EventBus仅支持单个参数的订阅！");
+        }
+        EventBusAdapterFactory factory;
+        if (method.isAnnotationPresent(AdapterDefinition.class)) {
+          AdapterDefinition definition = method.getAnnotation(AdapterDefinition.class);
+          factory = beanFactory.getBean(definition.value());
+        } else {
+          factory = beanFactory.getBean(DefaultEventBusAdapterFactory.class);
+        }
+        EventBusAdapter adapter = factory.create(bean, method, method.getParameterTypes()[0]);
+        register(beanFactory, adapter);
       }
-      EventBusAdapterFactory factory;
-      if (method.isAnnotationPresent(AdapterDefinition.class)) {
-        AdapterDefinition definition = method.getAnnotation(AdapterDefinition.class);
-        factory = beanFactory.getBean(definition.value());
-      } else {
-        factory = beanFactory.getBean(DefaultEventBusAdapterFactory.class);
-      }
-      EventBusAdapter adapter = factory.create(bean, method, method.getParameterTypes()[0]);
-      register(beanFactory, adapter);
     }
   }
 

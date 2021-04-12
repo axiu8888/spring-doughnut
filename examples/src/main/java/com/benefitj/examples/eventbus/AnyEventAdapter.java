@@ -5,9 +5,11 @@ import com.benefitj.event.BaseEventAdapter;
 import com.benefitj.event.Event;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.spring.eventbus.PosterDefinition;
+import com.benefitj.spring.eventbus.SubscriberIgnore;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.stereotype.Component;
 
+//@SubscriberIgnore  // 忽略全部
 @Component
 public class AnyEventAdapter extends BaseEventAdapter<Event> {
 
@@ -20,6 +22,14 @@ public class AnyEventAdapter extends BaseEventAdapter<Event> {
   @Subscribe
   public void onEvent2(Event event) {
     logger.info("接收到事件2: {}", JSON.toJSONString(event));
+  }
+
+  @SubscriberIgnore
+  @PosterDefinition(type = EventBusPoster.class)
+  @Subscribe
+  public void onEventIgnore(Event event) {
+    // 不可达
+    logger.info("接收到事件3: {}", JSON.toJSONString(event));
   }
 
 }

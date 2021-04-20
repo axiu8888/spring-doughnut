@@ -12,7 +12,7 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.*;
 @ConfigurationProperties(prefix = "spring.mqtt")
 public class MqttOptionsProperty {
   /**
-   * 客户端数量
+   * 客户端数量，默认1个
    */
   private Integer clientCount = 1;
   /**

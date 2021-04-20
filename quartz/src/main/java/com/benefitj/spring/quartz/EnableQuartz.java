@@ -1,4 +1,4 @@
-package com.benefitj.spring.quartz.enbale;
+package com.benefitj.spring.quartz;
 
 import org.springframework.context.annotation.Import;
 

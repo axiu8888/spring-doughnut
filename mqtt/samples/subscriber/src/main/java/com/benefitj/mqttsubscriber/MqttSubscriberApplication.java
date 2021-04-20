@@ -6,7 +6,7 @@ import com.benefitj.spring.mqtt.IMqttCallback;
 import com.benefitj.spring.mqtt.MqttHeaders;
 import com.benefitj.spring.mqtt.MqttMessageListener;
 import com.benefitj.spring.mqtt.SingleMqttClient;
-import com.benefitj.spring.mqtt.configuration.EnableMqttSubscriber;
+import com.benefitj.spring.mqtt.EnableMqttSubscriber;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttMessage;

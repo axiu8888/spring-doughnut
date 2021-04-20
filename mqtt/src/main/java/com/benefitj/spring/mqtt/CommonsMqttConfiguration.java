@@ -1,6 +1,5 @@
-package com.benefitj.spring.mqtt.configuration;
+package com.benefitj.spring.mqtt;
 
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

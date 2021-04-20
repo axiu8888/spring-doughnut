@@ -4,7 +4,6 @@ import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
-import com.benefitj.spring.quartz.enbale.EnableQuartz;
 import com.benefitj.spring.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

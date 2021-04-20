@@ -1,7 +1,6 @@
-package com.benefitj.spring.quartz.enbale;
+package com.benefitj.spring.quartz;
 
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
-import com.benefitj.spring.quartz.QuartzSchedulerFactory;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeanInstantiationException;

@@ -1,4 +1,4 @@
-package com.benefitj.spring.mqtt.configuration;
+package com.benefitj.spring.mqtt;
 
 
 import org.springframework.context.annotation.Import;

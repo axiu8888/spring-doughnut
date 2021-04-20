@@ -1,8 +1,5 @@
-package com.benefitj.spring.mqtt.configuration;
+package com.benefitj.spring.mqtt;
 
-import com.benefitj.spring.mqtt.MqttMessageListener;
-import com.benefitj.spring.mqtt.MqttMessageMetadataRegistrar;
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

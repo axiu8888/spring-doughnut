@@ -3,6 +3,7 @@ package com.benefitj.athenapdfservice.controller;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
+import com.benefitj.core.concurrent.CanceableScheduledFuture;
 import com.benefitj.spring.BreakPointTransmissionHelper;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.athenapdf.AthenapdfCall;
@@ -24,7 +25,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 生成报告的接口
@@ -133,11 +136,11 @@ public class AthenapdfController {
     if (!pdf.exists()) {
       return;
     }
-    DeleteTimer<?> timer = DeleteTimer.wrap(
-        EventLoop.single().schedule(() -> {
-          IOUtils.deleteFile(pdf);
-          deleteTimers.remove(url);
-        }, delay, TimeUnit.SECONDS));
+    ScheduledFuture<?> original = EventLoop.single().schedule(() -> {
+      IOUtils.deleteFile(pdf);
+      deleteTimers.remove(url);
+    }, delay, TimeUnit.SECONDS);
+    DeleteTimer<?> timer = new DeleteTimer<>(original);
     timer.setUrl(url);
     timer.setPdf(pdf);
     deleteTimers.put(url, timer);
@@ -155,79 +158,26 @@ public class AthenapdfController {
   }
 
 
-  static class DeleteTimer<V> implements ScheduledFuture<V> {
-
-    public static <V> DeleteTimer<V> wrap(ScheduledFuture<V> timer) {
-      return new DeleteTimer<>(timer);
-    }
-
-    private final ScheduledFuture<V> original;
-    /**
-     * URL
-     */
-    private String url;
-    /**
-     * PDF文件
-     */
-    private File pdf;
+  static class DeleteTimer<V> extends CanceableScheduledFuture<V> {
 
     public DeleteTimer(ScheduledFuture<V> original) {
-      this.original = original;
-    }
-
-    @Override
-    public long getDelay(TimeUnit unit) {
-      return original.getDelay(unit);
-    }
-
-    @Override
-    public int compareTo(Delayed o) {
-      return original.compareTo(o);
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-      return original.cancel(mayInterruptIfRunning);
-    }
-
-    @Override
-    public boolean isCancelled() {
-      return original.isDone();
-    }
-
-    @Override
-    public boolean isDone() {
-      return original.isDone();
-    }
-
-    @Override
-    public V get() throws InterruptedException, ExecutionException {
-      return original.get();
-    }
-
-    @Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-      return original.get(timeout, unit);
-    }
-
-    public ScheduledFuture<V> getOriginal() {
-      return original;
+      super(original);
     }
 
     public String getUrl() {
-      return url;
+      return getAttribute("url");
     }
 
     public void setUrl(String url) {
-      this.url = url;
+      this.setAttribute("url", url);
     }
 
     public File getPdf() {
-      return pdf;
+      return getAttribute("pdf");
     }
 
     public void setPdf(File pdf) {
-      this.pdf = pdf;
+      this.setAttribute("pdf", pdf);
     }
   }
 

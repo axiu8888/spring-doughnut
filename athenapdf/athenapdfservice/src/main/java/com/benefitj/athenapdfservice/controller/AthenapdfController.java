@@ -1,6 +1,7 @@
 package com.benefitj.athenapdfservice.controller;
 
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.concurrent.CanceableScheduledFuture;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -57,18 +59,29 @@ public class AthenapdfController {
   /**
    * 生成PDF
    *
-   * @param response HTTP响应
-   * @param url      HTML的路径
-   * @param filename 文件名，可选
+   * @param request    HTTP请求
+   * @param response   HTTP响应
+   * @param url        HTML的路径
+   * @param filename   文件名，可选
+   * @param encodeType 编码格式
+   * @param force      是否强制生成
    */
   @GetMapping("/create")
   public void create(HttpServletRequest request,
                      HttpServletResponse response,
                      String url,
                      String filename,
+                     String encodeType,
                      Boolean force) throws IOException {
     url = url != null ? url.trim() : "";
     long start = System.currentTimeMillis();
+    if (StringUtils.isNoneBlank(encodeType) && !url.startsWith("http")) {
+      if ("base64".equalsIgnoreCase(encodeType)) {
+        url = new String(Base64.getDecoder().decode(url));
+      } else if ("hex".equalsIgnoreCase(encodeType)) {
+        url = new String(HexUtils.hexToBytes(url));
+      }
+    }
     try {
       if (StringUtils.isBlank(url)) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -113,7 +126,8 @@ public class AthenapdfController {
       callAthenaPdf = true;
       AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(cacheDir), url, pdf.getName(), null);
       if (!call.isSuccessful()) {
-        log.info("生成PDF失败, filename: {}, destFile: {}, url: {}", filename, pdf.getAbsolutePath(), url);
+        log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
+            , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());
         return;
       }
       pdf = call.getPdf();

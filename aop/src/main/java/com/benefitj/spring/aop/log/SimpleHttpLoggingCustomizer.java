@@ -33,6 +33,9 @@ public class SimpleHttpLoggingCustomizer implements HttpLoggingCustomizer {
 
   @Override
   public void customize(HttpLoggingHandler handler, Map<String, Object> args) {
+    if (!printable()) {
+      return;
+    }
     final StringBuilder sb = new StringBuilder();
     sb.append(isMultiLine() ? "\n" : "");
     String separator = separator();

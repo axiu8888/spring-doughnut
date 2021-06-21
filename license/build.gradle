@@ -1,0 +1,15 @@
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+description = "证书"
+
+dependencies {
+
+	compile project(":commons")
+
+	compile 'org.apache.commons:commons-math3:3.6.1'
+	compile 'commons-codec:commons-codec:1.14'
+	compile  'de.schlichtherle.truelicense:truelicense-core:1.33'
+	compile 'org.slf4j:slf4j-log4j12:1.7.30'
+}
+

@@ -37,10 +37,5 @@ include ":athenapdf", ":athenapdf:athenapdfservice"
  */
 include ":quartz"
 
-/**
- * 证书
- */
-include ":license"
-
 
 include ":examples"

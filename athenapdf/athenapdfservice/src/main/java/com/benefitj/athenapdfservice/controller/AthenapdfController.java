@@ -46,6 +46,11 @@ public class AthenapdfController {
   @Value("#{ @environment['spring.athenapdf.cache-dir'] ?: '/tmp/athenapdf-pdf/' }")
   private String cacheDir;
   /**
+   * 容器映射的目录，对应到外部的目录
+   */
+  @Value("#{ @environment['spring.athenapdf.volume-dir'] ?: '/tmp/athenapdf-pdf/' }")
+  private String volumeDir;
+  /**
    * 延迟删除的时间，默认60秒
    */
   @Value("#{ @environment['spring.athenapdf.delay'] ?: 60 }")
@@ -124,7 +129,7 @@ public class AthenapdfController {
 
     if (!pdf.exists()) {
       callAthenaPdf = true;
-      AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(cacheDir), url, pdf.getName(), null);
+      AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(volumeDir), url, pdf.getName(), null);
       if (!call.isSuccessful()) {
         log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
             , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());

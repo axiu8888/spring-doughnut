@@ -46,7 +46,7 @@ public class AthenapdfController {
   @Value("#{ @environment['spring.athenapdf.cache-dir'] ?: '/tmp/athenapdf-pdf/' }")
   private String cacheDir;
   /**
-   * 容器映射的目录，对应到外部的目录
+   * Athenapdf映射的外部磁盘目录
    */
   @Value("#{ @environment['spring.athenapdf.volume-dir'] ?: '/tmp/athenapdf-pdf/' }")
   private String volumeDir;
@@ -91,7 +91,7 @@ public class AthenapdfController {
       if (StringUtils.isBlank(url)) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.getWriter().write("缺少url参数");
+        response.getOutputStream().write("缺少url参数".getBytes(StandardCharsets.UTF_8));
         return;
       }
       URL ignore = new URL(url);
@@ -99,12 +99,13 @@ public class AthenapdfController {
       if (!athenapdfHelper.supportDocker()) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.getWriter().write("不支持docker环境!");
+        response.getOutputStream().write("不支持docker环境!".getBytes(StandardCharsets.UTF_8));
+        return;
       }
     } catch (MalformedURLException e) {
       response.setCharacterEncoding(StandardCharsets.UTF_8.name());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
-      response.getWriter().write("错误的url参数");
+      response.getOutputStream().write("错误的url参数".getBytes(StandardCharsets.UTF_8));
       return;
     }
 
@@ -129,7 +130,7 @@ public class AthenapdfController {
 
     if (!pdf.exists()) {
       callAthenaPdf = true;
-      AthenapdfCall call = athenapdfHelper.execute(IOUtils.mkDirs(volumeDir), url, pdf.getName(), null);
+      AthenapdfCall call = athenapdfHelper.execute(volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
       if (!call.isSuccessful()) {
         log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
             , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());

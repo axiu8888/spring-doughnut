@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class SimpleHttpLoggingCustomizer implements HttpLoggingCustomizer {
 
-  protected static final Logger log = LoggerFactory.getLogger(HttpLoggingCustomizer.class);
+  protected static final Logger log = LoggerFactory.getLogger(SimpleHttpLoggingCustomizer.class);
 
   /**
    * 是否分多行打印

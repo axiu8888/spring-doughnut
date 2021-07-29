@@ -1,6 +1,5 @@
 package com.benefitj.spring.aop;
 
-import com.benefitj.spring.aop.web.WebRequestAspect;
 import org.aspectj.lang.JoinPoint;
 
 import java.lang.reflect.Method;
@@ -22,7 +21,16 @@ public interface PointCutHandler {
   default void doAfterReturning(JoinPoint joinPoint, Object returnValue) {
   }
 
-  default Method checkProxy(Method methodArg, Object bean) {
-    return WebRequestAspect.checkProxy(methodArg, bean);
+  default Method getMethod(JoinPoint jp) {
+    return AopUtils.getMethod(jp);
   }
+
+  default Class<?> getDeclaringType(JoinPoint jp) {
+    return AopUtils.getDeclaringType(jp);
+  }
+
+  default Method checkProxy(Method methodArg, Object bean) {
+    return AopUtils.checkProxy(methodArg, bean);
+  }
+
 }

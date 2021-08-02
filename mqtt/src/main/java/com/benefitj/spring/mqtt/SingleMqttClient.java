@@ -121,7 +121,11 @@ public class SingleMqttClient implements IMqttClient {
         if (now - getLastReconnectTime() > delay) {
           try {
             if (!c.isConnected()) {
-              c.reconnect();
+              try {
+                c.reconnect();
+              } catch (NoSuchMethodError nse) {
+                c.connect();
+              }
             }
           } catch (MqttException ignore) {
             /* ~ */

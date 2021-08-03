@@ -71,17 +71,16 @@ public abstract class AbstractAspect<T extends PointCutHandler> {
       return onEmptyHandlerProcess(pjp);
     }
 
-    Object returnValue = null;
     try {
       doBefore(pjp, handlers);
-      returnValue = pjp.proceed(pjp.getArgs());
+      Object returnValue = pjp.proceed(pjp.getArgs());
       setReturnValue(returnValue);
-      doAfter(pjp, handlers);
+      doAfterReturning(pjp, returnValue, handlers);
     } catch (Throwable e) {
       doAfterThrowing(pjp, e, handlers);
       throw e;
     } finally {
-      doAfterReturning(pjp, returnValue, handlers);
+      doAfter(pjp, handlers);
     }
     return getReturnValue();
   }
@@ -100,7 +99,7 @@ public abstract class AbstractAspect<T extends PointCutHandler> {
    * @param handlers 处理器
    */
   public void doBefore(ProceedingJoinPoint point, List<T> handlers) {
-    handlers.forEach(h -> h.doBefore(point));
+    handlers.forEach(h -> h.doBefore(this, point));
   }
 
   /**
@@ -110,7 +109,7 @@ public abstract class AbstractAspect<T extends PointCutHandler> {
    * @param handlers 处理器
    */
   public void doAfter(ProceedingJoinPoint point, List<T> handlers) {
-    handlers.forEach(h -> h.doAfter(point));
+    handlers.forEach(h -> h.doAfter(this, point));
   }
 
   /**
@@ -121,7 +120,7 @@ public abstract class AbstractAspect<T extends PointCutHandler> {
    * @param handlers 处理器
    */
   public void doAfterThrowing(ProceedingJoinPoint point, Throwable e, List<T> handlers) {
-    handlers.forEach(h -> h.doAfterThrowing(point, e));
+    handlers.forEach(h -> h.doAfterThrowing(this, point, e));
   }
 
   /**
@@ -132,7 +131,7 @@ public abstract class AbstractAspect<T extends PointCutHandler> {
    * @param handlers    处理器
    */
   public void doAfterReturning(ProceedingJoinPoint point, Object returnValue, List<T> handlers) {
-    handlers.forEach(h -> h.doAfterReturning(point, returnValue));
+    handlers.forEach(h -> h.doAfterReturning(this, point, returnValue));
   }
 
   public ThreadLocal<Object> getReturnValueCache() {

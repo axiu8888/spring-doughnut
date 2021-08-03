@@ -9,13 +9,29 @@ import java.lang.reflect.Method;
  */
 public interface PointCutHandler {
 
+  default void doBefore(AbstractAspect aspect, JoinPoint joinPoint) {
+    doBefore(joinPoint);
+  }
+
   default void doBefore(JoinPoint joinPoint) {
+  }
+
+  default void doAfter(AbstractAspect aspect, JoinPoint joinPoint) {
+    doAfter(joinPoint);
   }
 
   default void doAfter(JoinPoint joinPoint) {
   }
 
+  default void doAfterThrowing(AbstractAspect aspect, JoinPoint joinPoint, Throwable ex) {
+    doAfterThrowing(joinPoint, ex);
+  }
+
   default void doAfterThrowing(JoinPoint joinPoint, Throwable ex) {
+  }
+
+  default void doAfterReturning(AbstractAspect aspect, JoinPoint joinPoint, Object returnValue) {
+    doAfterReturning(joinPoint, returnValue);
   }
 
   default void doAfterReturning(JoinPoint joinPoint, Object returnValue) {

@@ -40,7 +40,7 @@ public abstract class JavaxWebSocketClient implements WebSocketClient<Session> {
     try {
       getSession().getBasicRemote().sendText(text);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new WebSocketException(e);
     }
   }
 
@@ -66,7 +66,7 @@ public abstract class JavaxWebSocketClient implements WebSocketClient<Session> {
     try {
       getSession().getBasicRemote().sendBinary(data);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new WebSocketException(e);
     }
   }
 
@@ -85,8 +85,8 @@ public abstract class JavaxWebSocketClient implements WebSocketClient<Session> {
   public void close() {
     try {
       getSession().close();
-    } catch (IOException ignore) {
-    }
+    } catch (IOException ignore)
+    { /* ~ */ }
   }
 
 }

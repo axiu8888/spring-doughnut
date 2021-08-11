@@ -4,6 +4,7 @@ import org.springframework.web.socket.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -33,26 +34,27 @@ public abstract class SpringWebSocketServerEndpoint implements SpringWebSocket {
   }
 
   @Override
-  public final void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+  public final void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
     if (message instanceof TextMessage) {
       TextMessage msg = ((TextMessage) message);
-      getClient(session).onTextMessage(msg.getPayload(), msg.isLast());
+      useClient(session, c -> c.onTextMessage(msg.getPayload(), msg.isLast()));
     } else if (message instanceof BinaryMessage) {
       BinaryMessage msg = (BinaryMessage) message;
-      getClient(session).onBinaryMessage(msg.getPayload(), msg.isLast());
+      useClient(session, c -> c.onBinaryMessage(msg.getPayload(), msg.isLast()));
     } else if (message instanceof PingMessage) {
-      getClient(session).onPingMessage((PingMessage) message);
+      useClient(session, c -> c.onPingMessage((PingMessage) message));
     }
   }
 
   @Override
-  public final void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-    getClient(session).onError(exception);
+  public final void handleTransportError(WebSocketSession session, Throwable exception) {
+    useClient(session, c -> c.onError(exception));
   }
 
   @Override
-  public final void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-    removeClient(session).onClose(closeStatus.getReason(), closeStatus.getCode());
+  public final void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
+    useClient(session, c -> c.onClose(closeStatus.getReason(), closeStatus.getCode()));
+    removeClient(session);
   }
 
   @Override
@@ -86,6 +88,14 @@ public abstract class SpringWebSocketServerEndpoint implements SpringWebSocket {
    */
   protected SpringWebSocketClient removeClient(WebSocketSession session) {
     return getSocketMap(getClass()).remove(session.getId());
+  }
+
+  protected SpringWebSocketClient useClient(WebSocketSession session, Consumer<SpringWebSocketClient> c) {
+    SpringWebSocketClient client = getClient(session);
+    if (client != null) {
+      c.accept(client);
+    }
+    return client;
   }
 
 }

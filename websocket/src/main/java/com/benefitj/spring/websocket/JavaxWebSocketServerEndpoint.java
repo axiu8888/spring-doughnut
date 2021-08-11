@@ -5,6 +5,7 @@ import javax.websocket.Session;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -46,7 +47,7 @@ public abstract class JavaxWebSocketServerEndpoint extends JavaxWebSocket {
    */
   @Override
   public final void onTextMessage(Session session, String text, boolean isLast) {
-    getClient(session).onTextMessage(text, isLast);
+    useClient(session, c -> c.onTextMessage(text, isLast));
   }
 
   /**
@@ -58,7 +59,7 @@ public abstract class JavaxWebSocketServerEndpoint extends JavaxWebSocket {
    */
   @Override
   public final void onBinaryMessage(Session session, ByteBuffer buffer, boolean isLast) {
-    getClient(session).onBinaryMessage(buffer, isLast);
+    useClient(session, c -> c.onBinaryMessage(buffer, isLast));
   }
 
   /**
@@ -69,19 +70,20 @@ public abstract class JavaxWebSocketServerEndpoint extends JavaxWebSocket {
    */
   @Override
   public final void onError(Session session, Throwable e) {
-    getClient(session).onError(e);
+    useClient(session, c -> c.onError(e));
   }
 
   /**
    * 连接关闭调用的方法
    *
    * @param session Session
-   * @param reason
+   * @param reason  原因
    */
   @Override
   public final void onClose(Session session, CloseReason reason) {
-    CloseReason.CloseCode closeCode = reason.getCloseCode();
-    removeClient(session).onClose(reason.getReasonPhrase(), closeCode != null ? closeCode.getCode() : 0);
+    final CloseReason.CloseCode closeCode = reason.getCloseCode();
+    useClient(session, c -> c.onClose(reason.getReasonPhrase(), closeCode != null ? closeCode.getCode() : 0));
+    removeClient(session);
   }
 
   /**
@@ -110,6 +112,14 @@ public abstract class JavaxWebSocketServerEndpoint extends JavaxWebSocket {
    */
   protected JavaxWebSocketClient removeClient(Session session) {
     return getSocketMap(getClass()).remove(session.getId());
+  }
+
+  protected JavaxWebSocketClient useClient(Session session, Consumer<JavaxWebSocketClient> c) {
+    JavaxWebSocketClient client = getClient(session);
+    if (client != null) {
+      c.accept(client);
+    }
+    return client;
   }
 
 }

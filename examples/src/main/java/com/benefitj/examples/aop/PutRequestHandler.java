@@ -3,7 +3,6 @@ package com.benefitj.examples.aop;
 import com.alibaba.fastjson.JSON;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -23,13 +22,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * PUT请求的处理，只处理 application/json
  */
 //@Order(10)
 //@Component
-public class PutRequestHandler implements WebPointCutHandler {
+public class PutRequestHandler implements WebPointCutHandler, Function<Method, PutRequestHandler.PutRequestMethod> {
 
   private static final Logger logger = LoggerFactory.getLogger(PutRequestHandler.class);
 
@@ -41,28 +41,19 @@ public class PutRequestHandler implements WebPointCutHandler {
   private final ThreadLocal<PutRequestMethod> putMethodCache = new ThreadLocal<>();
   private final Map<Method, PutRequestMethod> putMethodMap = new ConcurrentHashMap<>();
 
-  public boolean support(JoinPoint joinPoint) {
-    final HttpServletRequest request = getRequest();
-    if (HttpMethod.resolve(request.getMethod()) != HttpMethod.PUT) {
-      return false;
-    }
 
-    Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-    PutRequestMethod prm = putMethodMap.get(method);
-    if (prm == null) {
-      prm = new PutRequestMethod(method);
-      // 是否匹配
-      prm.setMatch(request.getContentType().contains(APPLICATION_JSON));
-      final Map<Integer, Parameter> map = new LinkedHashMap<>();
-      final Parameter[] parameters = method.getParameters();
-      for (int i = 0; i < parameters.length; i++) {
-        map.put(i, parameters[i]);
-      }
-      prm.setParameters(Collections.unmodifiableMap(map));
-      putMethodMap.put(method, prm);
+  @Override
+  public PutRequestMethod apply(Method method) {
+    PutRequestMethod prm = new PutRequestMethod(method);
+    // 是否匹配
+    prm.setMatch(getRequest().getContentType().contains(APPLICATION_JSON));
+    final Map<Integer, Parameter> map = new LinkedHashMap<>();
+    final Parameter[] parameters = method.getParameters();
+    for (int i = 0; i < parameters.length; i++) {
+      map.put(i, parameters[i]);
     }
-    putMethodCache.set(prm);
-    return prm.isMatch();
+    prm.setParameters(Collections.unmodifiableMap(map));
+    return prm;
   }
 
   @Override
@@ -96,6 +87,18 @@ public class PutRequestHandler implements WebPointCutHandler {
         }
       }
     }
+  }
+
+  public boolean support(JoinPoint joinPoint) {
+    final HttpServletRequest request = getRequest();
+    if (HttpMethod.resolve(request.getMethod()) != HttpMethod.PUT) {
+      return false;
+    }
+
+    Method method = getMethod(joinPoint);
+    PutRequestMethod prm = putMethodMap.computeIfAbsent(method, this);
+    putMethodCache.set(prm);
+    return prm.isMatch();
   }
 
   private boolean match(final Class<?> parameterType) {

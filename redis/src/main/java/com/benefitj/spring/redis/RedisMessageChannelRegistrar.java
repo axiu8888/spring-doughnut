@@ -48,7 +48,7 @@ public class RedisMessageChannelRegistrar implements AnnotationMetadataRegistrar
       RedisMessageChannel rmc = (RedisMessageChannel) element.getAnnotations()[0];
       String[] channels = rmc.value();
       if (channels.length <= 0) {
-        return;
+        continue;
       }
 
       MessageListenerAdapter adapter = createAdapter(metadata, element, channels);

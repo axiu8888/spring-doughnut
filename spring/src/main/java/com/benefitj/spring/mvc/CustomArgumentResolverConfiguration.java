@@ -18,7 +18,8 @@ public class CustomArgumentResolverConfiguration {
    */
   @ConditionalOnMissingBean(name = "customArgumentResolverWebMvcConfigurer")
   @Bean("customArgumentResolverWebMvcConfigurer")
-  public CustomArgumentResolverWebMvcConfigurer customArgumentResolverWebMvcConfigurer(@Autowired(required = false) List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
+  public CustomArgumentResolverWebMvcConfigurer customArgumentResolverWebMvcConfigurer(
+      @Autowired(required = false) List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
     return new CustomArgumentResolverWebMvcConfigurer(argumentResolvers);
   }
 

@@ -1,14 +1,14 @@
 
 ext {
 
-  springBootVersion = "2.4.3"
-  lombokVersion = "1.18.6"
-  jacksonVersion = "2.12.1"
-  aspectjVersion = "1.9.6"
+  springBootVersion = "2.5.3"
+  lombokVersion = "1.18.20"
+  jacksonVersion = "2.12.4"
+  aspectjVersion = "1.9.7"
   guavaVersion = "30.1-jre"
-  fastjsonVersion = "1.2.75"
+  fastjsonVersion = "1.2.78"
 
-  springIntegrationVersion = "5.4.4"
+  springIntegrationVersion = "5.5.2"
 
 }
 
@@ -18,7 +18,7 @@ subprojects {
   apply plugin: 'maven'
 
   group = 'com.benefitj.spring'
-  version = "1.3.4-SNAPSHOT"
+  version = "1.3.5-SNAPSHOT"
   ext.artifactId = "${project.name}"
 
   sourceCompatibility = JavaVersion.VERSION_1_8

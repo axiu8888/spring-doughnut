@@ -5,6 +5,13 @@ buildscript {
         mavenCentral()
         jcenter()
         maven { url 'https://repo.spring.io/milestone' }
+        maven {
+            url = "http://${repositoryAddress}/repository/nexus3Group/"
+            credentials {
+                username "${repositoryUserName}"
+                password "${repositoryPassword}"
+            }
+        }
     }
 }
 
@@ -14,4 +21,11 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url 'https://repo.spring.io/milestone' }
+    maven {
+        url = "http://${repositoryAddress}/repository/nexus3Group/"
+        credentials {
+            username "${repositoryUserName}"
+            password "${repositoryPassword}"
+        }
+    }
 }

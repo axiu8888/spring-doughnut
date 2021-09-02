@@ -6,3 +6,5 @@ dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
 
 }
+
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

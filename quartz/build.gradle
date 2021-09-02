@@ -15,3 +15,5 @@ dependencies {
 
 }
 
+
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

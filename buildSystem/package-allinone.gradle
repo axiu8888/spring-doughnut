@@ -70,7 +70,6 @@ uploadArchives {
             pom.groupId = "$group"
             pom.artifactId = "$artifactId"
             pom.version = "$version"
-
             if (allInOne) {
                 pom.whenConfigured { pom ->
                     def deps = pom.dependencies.stream()
@@ -95,10 +94,11 @@ uploadArchives {
                 }
             }
 
-            repository(url: "http://192.168.232.130:9001/repository/nexusCenter/") {
-                authentication(userName: "admin", password: "admin123")
+            repository(url: "http://${repositoryAddress}/repository/nexus3Hosted/") {
+                authentication(userName: "${repositoryUserName}", password: "${repositoryPassword}")
             }
         }
     }
 }
 
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

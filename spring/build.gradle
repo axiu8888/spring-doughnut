@@ -8,4 +8,4 @@ dependencies {
 
 }
 
-//apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

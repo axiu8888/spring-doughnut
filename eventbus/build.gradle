@@ -10,3 +10,5 @@ dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
 
 }
+
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.3'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id 'maven'
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'maven'
 }
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
@@ -12,13 +12,15 @@ archivesBaseName = "athenapdfservice"
 
 dependencies {
 
-	compile project(":all")
-	compile project(":commons")
+    compile(project(":all")) {
+        exclude group: '*'//, module:''
+    }
+    compile project(":commons")
 
-	compile 'ch.qos.logback:logback-classic:1.2.3'
-	compile "org.aspectj:aspectjweaver:${aspectjVersion}"
-	compile "com.alibaba:fastjson:${fastjsonVersion}"
-	compile("org.springframework.boot:spring-boot-starter-web")
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile "org.aspectj:aspectjweaver:${aspectjVersion}"
+    compile "com.alibaba:fastjson:${fastjsonVersion}"
+    compile("org.springframework.boot:spring-boot-starter-web")
 
 }
 

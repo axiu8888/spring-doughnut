@@ -1,10 +1,6 @@
 rootProject.name = 'springboot-doughnut'
 
-/**
- * 依赖包
- */
 include ":commons"
-
 /**
  * spring包
  */

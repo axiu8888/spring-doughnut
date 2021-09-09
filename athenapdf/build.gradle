@@ -5,7 +5,6 @@ dependencies {
 
 	compileOnly project(":spring")
 	compileOnly project(":aop")
-	compileOnly project(":commons")
 	compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
 }

@@ -1,15 +1,18 @@
 
 buildscript {
     repositories {
+        mavenLocal()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         mavenCentral()
         jcenter()
         maven { url 'https://repo.spring.io/milestone' }
-        maven {
-            url = "http://${repositoryAddress}/repository/nexus3Group/"
-            credentials {
-                username "${repositoryUserName}"
-                password "${repositoryPassword}"
+        if(ignoreLocalRepository) {
+            maven {
+                url = "http://${repositoryAddress}/repository/maven-public/"
+                credentials {
+                    username "${repositoryUserName}"
+                    password "${repositoryPassword}"
+                }
             }
         }
     }
@@ -17,15 +20,18 @@ buildscript {
 
 
 repositories {
+    mavenLocal()
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
     mavenCentral()
     jcenter()
     maven { url 'https://repo.spring.io/milestone' }
-    maven {
-        url = "http://${repositoryAddress}/repository/nexus3Group/"
-        credentials {
-            username "${repositoryUserName}"
-            password "${repositoryPassword}"
+    if(ignoreLocalRepository) {
+        maven {
+            url = "http://${repositoryAddress}/repository/maven-public/"
+            credentials {
+                username "${repositoryUserName}"
+                password "${repositoryPassword}"
+            }
         }
     }
 }

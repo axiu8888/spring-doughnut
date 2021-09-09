@@ -1,7 +1,6 @@
 package com.benefitj.spring.ctx;
 
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 
 import java.lang.annotation.*;
 
@@ -11,7 +10,6 @@ import java.lang.annotation.*;
  * @author DINGXIUAN
  */
 @Import({SpringCtxHolderInitializer.class})
-@Lazy
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

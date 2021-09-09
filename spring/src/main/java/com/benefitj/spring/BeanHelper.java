@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,13 @@ public class BeanHelper {
    */
   public static <T> T newInstance(Class<T> klass) {
     try {
+      Constructor<?>[] constructors = klass.getConstructors();
+      for (Constructor<?> c : constructors) {
+        if (c.getParameterCount() == 0) {
+          c.setAccessible(true);
+          return (T) c.newInstance();
+        }
+      }
       return (T) klass.newInstance();
     } catch (Exception e) {
       throw new IllegalStateException(e);

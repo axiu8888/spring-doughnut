@@ -1,3 +1,4 @@
+import java.util.concurrent.ConcurrentHashMap
 
 apply plugin: 'maven'
 
@@ -67,38 +68,28 @@ sourceJar {
 uploadArchives {
     repositories {
         mavenDeployer {
-            pom.groupId = "$group"
-            pom.artifactId = "$artifactId"
-            pom.version = "$version"
+            pom.groupId = "$groupId"
+            pom.artifactId = "${artifactPrefix}${artifactId}"
+            pom.version = "$versionId"
             if (allInOne) {
+                def allProjects = new ConcurrentHashMap<>()
+                getRootProject().subprojects.forEach({
+                    allProjects.put("${it.name}" as String, it)
+                })
                 pom.whenConfigured { pom ->
                     def deps = pom.dependencies.stream()
-                            .filter { dep ->
-                                print("\n--------------- ${dep} ---------------------\n")
-                                def match = getRootProject().getSubprojects()
-                                        .stream()
-                                        .anyMatch {
-                                            def match = it.getGroup() == dep.groupId && it.getName() == dep.artifactId && it.getVersion() == dep.version
-                                            println("${dep.groupId}-${dep.artifactId}.v${dep.version}  ==  ${it.getGroup()}-${it.getName()}.v${it.getVersion()} ==>: ${match}")
-                                            return match
-                                        }
-
-                                println("dep: ${dep}, find: ${match}")
-                                print("--------------- ${dep} ---------------------\n")
-                                return !match
-                            }
-                            .filter { dep -> true }
-                            .collect { dep -> dep }
+                            .filter {dep -> !allProjects.containsKey(dep.groupId)}
+                            .collect {dep -> dep}
                     pom.dependencies.clear()
                     pom.dependencies.addAll(deps)
                 }
             }
 
-            repository(url: "http://${repositoryAddress}/repository/nexus3Hosted/") {
+            repository(url: "http://${repositoryAddress}/repository/maven-snapshots/") {
                 authentication(userName: "${repositoryUserName}", password: "${repositoryPassword}")
             }
         }
     }
 }
 
-apply from: "${getRootDir()}/buildSystem/upload.gradle"
+//apply from: "${getRootDir()}/buildSystem/upload.gradle"

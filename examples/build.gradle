@@ -1,5 +1,5 @@
 plugins {
-  id 'org.springframework.boot' version '2.5.3'
+  id 'org.springframework.boot' version '2.5.4'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'java'
 }
@@ -12,19 +12,20 @@ dependencies {
   compile fileTree(dir: 'libs/jar', include: ['*.jar'])
   compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-  compile project(":commons")
-  compile project(":all")
+  compile(project(":all")) {
+    exclude module: "spring-boot-starter-quartz"
+  }
 
   implementation "com.google.guava:guava:${guavaVersion}"
   implementation "com.alibaba:fastjson:${fastjsonVersion}"
   implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
-  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")
 
-  //compile 'com.h2database:h2:1.4.200'
-  implementation "mysql:mysql-connector-java:8.0.23"
-  implementation "com.alibaba:druid-spring-boot-starter:1.2.5"
+//  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+//  //compile 'com.h2database:h2:1.4.200'
+//  implementation "mysql:mysql-connector-java:8.0.23"
+//  implementation "com.alibaba:druid-spring-boot-starter:1.2.5"
 
   testCompile 'org.java-websocket:Java-WebSocket:1.5.1'
 

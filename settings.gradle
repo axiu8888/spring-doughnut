@@ -33,5 +33,10 @@ include ":athenapdf", ":athenapdf:athenapdfservice"
  */
 include ":quartz"
 
+/**
+ * MQTT的权限配置
+ */
+include ":providers:mqtt-acl-redis"
+
 
 include ":examples"

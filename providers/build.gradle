@@ -1,0 +1,20 @@
+
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+    group = "com.benefitj.provider"
+
+    // 更新 groupId
+    ext.groupId = "${group}"
+
+    dependencies {
+        compile(project(":commons"))
+        compileOnly project(":all")
+    }
+
+}

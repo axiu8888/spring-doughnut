@@ -1,8 +1,10 @@
 package com.benefitj.spring;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 
@@ -57,6 +59,39 @@ public class JsonUtils {
     }
   }
 
+
+  /**
+   * 转换成对象
+   *
+   * @param json JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(byte[] json, Class<T> type) {
+    try {
+      return getMapper().readValue(json, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成对象
+   *
+   * @param json JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(byte[] json, TypeReference<T> type) {
+    try {
+      return getMapper().readValue(json, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   /**
    * 转换成对象
    *
@@ -81,7 +116,39 @@ public class JsonUtils {
    * @param <T>  类型
    * @return 返回转换后的对象
    */
-  public static <T> T fromJson(byte[] json, Class<T> type) {
+  public static <T> T fromJson(String json, TypeReference<T> type) {
+    try {
+      return getMapper().readValue(json, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成对象
+   *
+   * @param json JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(File json, Class<T> type) {
+    try {
+      return getMapper().readValue(json, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成对象
+   *
+   * @param json JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(File json, TypeReference<T> type) {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {

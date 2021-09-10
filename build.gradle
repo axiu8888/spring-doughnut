@@ -2,6 +2,7 @@
 ext {
 
   springBootVersion = "2.5.4"
+  swagger2Version = "3.0.0"
   lombokVersion = "1.18.20"
   jacksonVersion = "2.12.4"
   aspectjVersion = "1.9.7"

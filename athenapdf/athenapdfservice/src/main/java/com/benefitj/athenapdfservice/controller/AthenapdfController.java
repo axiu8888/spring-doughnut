@@ -9,6 +9,10 @@ import com.benefitj.spring.BreakPointTransmissionHelper;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.athenapdf.AthenapdfCall;
 import com.benefitj.spring.athenapdf.AthenapdfHelper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 生成报告的接口
  */
+@Api(tags = {"PDF生成"}, description = "将网页转换成PDF的接口")
 @Slf4j
 @AopWebPointCut
 @RestController
@@ -71,6 +76,13 @@ public class AthenapdfController {
    * @param encodeType 编码格式
    * @param force      是否强制生成
    */
+  @ApiOperation("生成PDF")
+  @ApiImplicitParams({
+      @ApiImplicitParam(name = "url", value = "HTML的路径", dataType = "String", paramType = "query", dataTypeClass = String.class),
+      @ApiImplicitParam(name = "filename", value = "文件名，可选", dataType = "String", paramType = "query", dataTypeClass = String.class),
+      @ApiImplicitParam(name = "encodeType", value = "编码格式, base64/hex", dataType = "String", paramType = "query", dataTypeClass = String.class),
+      @ApiImplicitParam(name = "force", value = "是否强制生成，忽略缓存", dataType = "String", paramType = "query", dataTypeClass = Boolean.class),
+  })
   @GetMapping("/create")
   public void create(HttpServletRequest request,
                      HttpServletResponse response,

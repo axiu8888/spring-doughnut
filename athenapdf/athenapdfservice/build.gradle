@@ -12,14 +12,15 @@ archivesBaseName = "athenapdfservice"
 
 dependencies {
 
-    compile(project(":all")) {
-        exclude group: '*'//, module:''
-    }
+    compile(project(":commons"))
+    compile(project(":all"))
 
     compile 'ch.qos.logback:logback-classic:1.2.3'
     compile "org.aspectj:aspectjweaver:${aspectjVersion}"
     compile "com.alibaba:fastjson:${fastjsonVersion}"
     compile("org.springframework.boot:spring-boot-starter-web")
+
+    compile "io.springfox:springfox-boot-starter:${swagger2Version}"
 
 }
 

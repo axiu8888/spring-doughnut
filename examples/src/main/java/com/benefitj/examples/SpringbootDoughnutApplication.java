@@ -1,7 +1,7 @@
 package com.benefitj.examples;
 
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
-import com.benefitj.spring.athenapdf.EnableAthenapdfConfiguration;
+import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
 import com.benefitj.spring.listener.AppStateHook;
@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //@EnableAutoAopWebHandler        // AOP
 @EnableHttpLoggingHandler       // HTTP请求日志
 @EnableEventBusPoster           // eventbus
-@EnableAthenapdfConfiguration   // PDF
+@EnableAthenapdf   // PDF
 //@EnableQuartz                   // Quartz
 @SpringBootApplication
 public class SpringbootDoughnutApplication {

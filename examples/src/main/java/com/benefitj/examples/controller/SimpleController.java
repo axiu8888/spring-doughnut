@@ -3,10 +3,12 @@ package com.benefitj.examples.controller;
 import com.alibaba.fastjson.JSON;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
+import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.examples.vo.MultipartForm;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.web.AopWebPointCut;
+import com.benefitj.spring.eventbus.event.NameEvent;
 import com.benefitj.spring.mvc.page.PageableRequest;
 import com.benefitj.spring.mvc.request.PageBody;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class SimpleController {
   @GetMapping
   public ResponseEntity<?> get(String id) {
     poster.postSync(RawEvent.of(id));
+    poster.post(new IdEvent(id));
+    poster.post(NameEvent.of("id22", id)); // 不可达消息
     System.err.println("请求信息: " + JSON.toJSONString(ServletUtils.getRequestInfo()));
     return ResponseEntity.ok("id ==>: " + id);
   }

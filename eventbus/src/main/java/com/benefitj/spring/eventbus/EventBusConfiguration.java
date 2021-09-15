@@ -1,6 +1,7 @@
 package com.benefitj.spring.eventbus;
 
 import com.benefitj.event.EventBusPoster;
+import com.benefitj.event.EventWrapper;
 import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,13 +12,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EventBusConfiguration {
 
+  @ConditionalOnMissingBean
+  @Bean
+  public NameEventWrapper eventWrapper() {
+    return new NameEventWrapper();
+  }
+
   /**
    * EventBusPoster
    */
   @ConditionalOnMissingBean
   @Bean
-  public EventBusPoster eventBusPoster() {
-    return EventBusPoster.getInstance();
+  public EventBusPoster eventBusPoster(EventWrapper eventWrapper) {
+    EventBusPoster poster = EventBusPoster.getInstance();
+    poster.setEventWrapper(eventWrapper);
+    return poster;
   }
 
   /**

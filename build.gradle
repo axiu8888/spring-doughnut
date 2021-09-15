@@ -27,7 +27,7 @@ subprojects {
   apply from: "${getRootDir()}/buildSystem/repository.gradle"
 
   group = 'com.benefitj.spring'
-  version = "1.4.0-SNAPSHOT"
+  version = "1.4.1-SNAPSHOT"
 
   ext {
     groupId = "${group}"

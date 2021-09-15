@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * EventBus监听注解注册
@@ -43,7 +44,10 @@ public class EventBusSubscriberMetadataRegistrar implements AnnotationMetadataRe
         } else {
           factory = beanFactory.getBean(DefaultEventBusAdapterFactory.class);
         }
-        EventBusAdapter adapter = factory.create(bean, method, method.getParameterTypes()[0]);
+
+        SubscriberName name = method.isAnnotationPresent(SubscriberName.class)
+            ? method.getAnnotation(SubscriberName.class) : null;
+        EventBusAdapter adapter = factory.create(bean, method, method.getParameterTypes()[0], name);
         register(beanFactory, adapter);
       }
     }

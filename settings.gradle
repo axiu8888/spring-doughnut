@@ -38,5 +38,6 @@ include ":quartz"
  */
 include ":providers:mqtt-acl-redis"
 
+include ":services:jmods-export"
 
 include ":examples"

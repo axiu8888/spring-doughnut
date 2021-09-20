@@ -1,0 +1,25 @@
+plugins {
+  id 'org.springframework.boot' version '2.5.4'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
+}
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+description("jdk模块带出")
+
+group = "jmods-export"
+version = ''
+
+jar {
+  archivesBaseName = "jmods-export"
+}
+
+dependencies {
+  compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
+
+  implementation "com.alibaba:fastjson:${fastjsonVersion}"
+  implementation("org.springframework.boot:spring-boot-starter")
+
+}

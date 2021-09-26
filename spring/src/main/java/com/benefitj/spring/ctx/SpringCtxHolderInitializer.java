@@ -4,12 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Order(0)
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@ConditionalOnMissingBean(SpringCtxHolderInitializer.class)
 @Component
 public class SpringCtxHolderInitializer implements ApplicationContextAware, DisposableBean {
 

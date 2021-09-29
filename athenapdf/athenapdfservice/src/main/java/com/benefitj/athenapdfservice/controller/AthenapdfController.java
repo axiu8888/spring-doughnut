@@ -140,6 +140,7 @@ public class AthenapdfController {
 
     boolean callAthenaPdf = false;
 
+    String cmd = null;
     if (!pdf.exists()) {
       callAthenaPdf = true;
       AthenapdfCall call = athenapdfHelper.execute(volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
@@ -149,6 +150,7 @@ public class AthenapdfController {
         return;
       }
       pdf = call.getPdf();
+      cmd = call.getCmd();
     }
     try {
       BreakPointTransmissionHelper.download(request, response, pdf, filename);
@@ -156,10 +158,14 @@ public class AthenapdfController {
       // 最终删除文件
       scheduleDeleteTimer(url, pdf);
     }
-    log.info("{}, size: {}, callAthenaPdf: {}, 使用时长: {}"
+    if (StringUtils.isBlank(cmd)) {
+      cmd = athenapdfHelper.formatCMD(volumeDir, pdf.getName(), url, null);
+    }
+    log.info("{}, size: {}, callAthenaPdf: {}, cmd: {}, 使用时长: {}"
         , pdf.getAbsolutePath()
         , pdf.length()
         , callAthenaPdf
+        , cmd
         , (System.currentTimeMillis() - start)
     );
   }

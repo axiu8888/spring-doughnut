@@ -1,4 +1,4 @@
-package com.benefitj.spring.influxdb.enable;
+package com.benefitj.spring.influxdb.spring;
 
 import com.benefitj.spring.influxdb.write.InfluxWriteManager;
 import org.springframework.beans.factory.annotation.Autowired;

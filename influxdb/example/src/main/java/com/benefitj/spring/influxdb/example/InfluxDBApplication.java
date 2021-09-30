@@ -1,6 +1,6 @@
 package com.benefitj.spring.influxdb.example;
 
-import com.benefitj.spring.influxdb.enable.EnableAutoRxJavaInfluxDBConfiguration;
+import com.benefitj.spring.influxdb.spring.EnableAutoRxJavaInfluxDBConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

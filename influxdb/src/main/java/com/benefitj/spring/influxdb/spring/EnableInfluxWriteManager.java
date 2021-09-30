@@ -1,4 +1,4 @@
-package com.benefitj.spring.influxdb.enable;
+package com.benefitj.spring.influxdb.spring;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;

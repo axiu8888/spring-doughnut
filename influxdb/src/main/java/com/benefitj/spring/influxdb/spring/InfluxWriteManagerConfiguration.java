@@ -1,4 +1,4 @@
-package com.benefitj.spring.influxdb.enable;
+package com.benefitj.spring.influxdb.spring;
 
 import com.benefitj.spring.influxdb.file.LineFileFactory;
 import com.benefitj.spring.influxdb.file.LineFileListener;

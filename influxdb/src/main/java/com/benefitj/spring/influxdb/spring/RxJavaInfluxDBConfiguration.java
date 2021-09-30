@@ -1,4 +1,4 @@
-package com.benefitj.spring.influxdb.enable;
+package com.benefitj.spring.influxdb.spring;
 
 import com.benefitj.spring.influxdb.convert.LineProtocolConverterFactory;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * InfluxDB的配置
  */
 @ConfigurationProperties(prefix = "spring.influxdb")
-public class InfluxProperty {
+public class InfluxDBProperty {
 
   /**
    * InfluxDB连接路径

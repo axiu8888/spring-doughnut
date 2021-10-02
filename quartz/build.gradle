@@ -10,7 +10,7 @@ dependencies {
 	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.12.2'
 
 	// QUARTZ
-	compile "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
+	compileOnly "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
 
 }
 

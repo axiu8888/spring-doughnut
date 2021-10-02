@@ -1,27 +1,32 @@
 package com.benefitj.spring.influxdb.write;
 
+import com.benefitj.core.EventLoop;
+import com.benefitj.core.ShutdownHook;
+import com.benefitj.core.local.LocalCache;
+import com.benefitj.core.local.LocalCacheFactory;
 import com.benefitj.spring.influxdb.file.LineFileFactory;
 import com.benefitj.spring.influxdb.file.LineFileListener;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 默认的写入实现
  */
-public class SimpleInfluxWriteManager implements InfluxWriteManager {
+public class InfluxWriteManagerImpl implements InfluxWriteManager {
 
   public static final long MB = 1024 << 10;
   /**
    * executor
    */
-  private ExecutorService executor;
+  private ExecutorService executor = EventLoop.io();
   /**
    * 缓存文件的引用
    */
@@ -50,13 +55,21 @@ public class SimpleInfluxWriteManager implements InfluxWriteManager {
   /**
    * 线程的写入统计
    */
-  private final ThreadLocal<AtomicInteger> localWriteCount = ThreadLocal.withInitial(() -> new AtomicInteger(0));
+  private final LocalCache<AtomicInteger> localWriteCount
+      = LocalCacheFactory.newCache(() -> new AtomicInteger(0));
 
-  public SimpleInfluxWriteManager() {
+  public InfluxWriteManagerImpl() {
   }
 
-  public SimpleInfluxWriteManager(InfluxWriteProperty property) {
+  public InfluxWriteManagerImpl(InfluxWriteProperty property) {
     this.property = property;
+  }
+
+  @EventListener
+  protected void onAppStart(ApplicationReadyEvent event) {
+    // 程序启动
+    EventLoop.io().scheduleAtFixedRate(
+        this::checkAndFlush, 1, 1, TimeUnit.SECONDS);
   }
 
   /**
@@ -71,21 +84,20 @@ public class SimpleInfluxWriteManager implements InfluxWriteManager {
         InfluxWriteProperty p = getProperty();
         int lineFileCount = p.getLineFileCount();
         for (int i = 0; i < lineFileCount; i++) {
-          LineFileWriter writer = newFileWriter(p);
-          getWriters().add(writer);
+          getWriters().add(newFileWriter(p));
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() ->
-            getWriters().forEach(LineFileWriter::close)));
+        ShutdownHook.register(() ->
+            getWriters().forEach(LineFileWriter::close));
         initialized = true;
       }
     }
   }
 
-  protected LineFileWriter newFileWriter(InfluxWriteProperty property) {
+  protected LineFileWriter newFileWriter(InfluxWriteProperty prop) {
     LineFileWriter writer = new LineFileWriter();
-    writer.setDelay(property.getDelay() * 1000);
-    writer.setMaxSize(property.getCacheSize() * MB);
-    writer.setCacheDir(new File(property.getCacheDir()));
+    writer.setDelay(prop.getDelay() * 1000);
+    writer.setMaxSize(prop.getCacheSize() * MB);
+    writer.setCacheDir(new File(prop.getCacheDir()));
     writer.setLineFileFactory(getLineFileFactory());
     writer.setLineFileListener(getLineFileListener());
     return writer;
@@ -155,24 +167,13 @@ public class SimpleInfluxWriteManager implements InfluxWriteManager {
    */
   @Override
   public ExecutorService getExecutor() {
-    ExecutorService e = this.executor;
-    if (e == null) {
-      synchronized (this) {
-        if ((e = this.executor) == null) {
-          InfluxWriteProperty property = getProperty();
-          ThreadFactory factory = new DefaultThreadFactory("io-", "-influxdb-");
-          this.executor = e = Executors.newScheduledThreadPool(property.getThreadCount(), factory);
-        }
-      }
-    }
-    return e;
+    return executor;
   }
 
   /**
    * 检查是否可上传数据
    */
-  @Override
-  public void checkAndFlush() {
+  protected void checkAndFlush() {
     for (LineFileWriter writer : getWriters()) {
       checkFlush(writer, false);
     }
@@ -233,41 +234,6 @@ public class SimpleInfluxWriteManager implements InfluxWriteManager {
 
   protected static boolean isNotEmpty(Collection<?> c) {
     return c != null && !c.isEmpty();
-  }
-
-  /**
-   * The default thread factory
-   */
-  public static class DefaultThreadFactory implements ThreadFactory {
-
-    private static final AtomicInteger poolNumber = new AtomicInteger(1);
-    private final ThreadGroup group;
-    private final AtomicInteger threadNumber = new AtomicInteger(1);
-    private final String namePrefix;
-
-    public DefaultThreadFactory() {
-      this("pool-", "-thread-");
-    }
-
-    public DefaultThreadFactory(String prefix, String suffix) {
-      SecurityManager s = System.getSecurityManager();
-      group = (s != null) ? s.getThreadGroup() :
-          Thread.currentThread().getThreadGroup();
-      namePrefix = prefix + poolNumber.getAndIncrement() + suffix;
-    }
-
-    @Override
-    public Thread newThread(Runnable r) {
-      Thread t = new Thread(group, r,
-          namePrefix + threadNumber.getAndIncrement(), 0);
-      if (t.isDaemon()) {
-        t.setDaemon(false);
-      }
-      if (t.getPriority() != Thread.NORM_PRIORITY) {
-        t.setPriority(Thread.NORM_PRIORITY);
-      }
-      return t;
-    }
   }
 
 }

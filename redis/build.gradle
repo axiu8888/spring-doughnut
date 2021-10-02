@@ -5,13 +5,20 @@ dependencies {
 
 	compileOnly(project(":spring"))
 
-	compile "org.apache.commons:commons-pool2:2.9.0"
+	compile 'org.apache.commons:commons-pool2:2.10.0'
 	compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 	compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
 
 	// redis
 	compile "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
 
+}
+
+repositories {
+	maven {
+		url 'https://repo.maven.apache.org/maven2'
+		name 'Maven Central'
+	}
 }
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

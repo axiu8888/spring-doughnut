@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Import(RxJavaInfluxDBConfiguration.class)
-public @interface EnableAutoRxJavaInfluxDBConfiguration {
+public @interface EnableRxJavaInfluxDB {
 }

@@ -2,34 +2,31 @@ package com.benefitj.spring.influxdb.spring;
 
 import com.benefitj.spring.influxdb.convert.LineProtocolConverterFactory;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
-import com.benefitj.spring.influxdb.template.InfluxProperty;
+import com.benefitj.spring.influxdb.template.InfluxDBProperty;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * RxJava template
  */
-@Lazy
-@ConditionalOnMissingBean(RxJavaInfluxDBConfiguration.class)
 @Configuration
 public class RxJavaInfluxDBConfiguration {
 
   /**
    * 属性配置
    */
-  @ConditionalOnMissingBean(InfluxProperty.class)
+  @ConditionalOnMissingBean
   @Bean
-  public InfluxProperty influxDBProperty() {
-    return new InfluxProperty();
+  public InfluxDBProperty influxDBProperty() {
+    return new InfluxDBProperty();
   }
 
   /**
    * Point转换工厂
    */
-  @ConditionalOnMissingBean(PointConverterFactory.class)
+  @ConditionalOnMissingBean
   @Bean
   public PointConverterFactory pointConverterFactory() {
     return PointConverterFactory.INSTANCE;
@@ -38,7 +35,7 @@ public class RxJavaInfluxDBConfiguration {
   /**
    * 行协议转换工厂
    */
-  @ConditionalOnMissingBean(LineProtocolConverterFactory.class)
+  @ConditionalOnMissingBean
   @Bean
   public LineProtocolConverterFactory lineProtocolConverterFactory() {
     return LineProtocolConverterFactory.INSTANCE;
@@ -51,9 +48,9 @@ public class RxJavaInfluxDBConfiguration {
    * @param converterFactory point 转换工厂
    * @return 返回 RxJavaInfluxDBTemplate
    */
-  @ConditionalOnMissingBean(RxJavaInfluxDBTemplate.class)
+  @ConditionalOnMissingBean
   @Bean
-  public RxJavaInfluxDBTemplate rxJavaInfluxDBTemplate(InfluxProperty property,
+  public RxJavaInfluxDBTemplate rxJavaInfluxDBTemplate(InfluxDBProperty property,
                                                        PointConverterFactory converterFactory) {
     RxJavaInfluxDBTemplate template = new RxJavaInfluxDBTemplate();
     if (converterFactory != null) {

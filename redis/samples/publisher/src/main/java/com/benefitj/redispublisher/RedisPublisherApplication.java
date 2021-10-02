@@ -2,6 +2,7 @@ package com.benefitj.redispublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
+import com.benefitj.spring.listener.AppStateListener;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +26,16 @@ public class RedisPublisherApplication {
   }
 
 
+  private static final EventLoop single = EventLoop.newSingle(false);
+
+  static {
+    single.execute(() -> {});
+  }
+
+
   @Slf4j
   @Component
-  public static class RedisMessagePublishExecutor {
+  public static class RedisMessagePublishExecutor implements AppStateListener {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -36,9 +43,9 @@ public class RedisPublisherApplication {
     @Value("#{ @environment['spring.redis.publish-channel'] ?: 'channel:test' }")
     private String publishChannel;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void onApplicationReadyEvent(ApplicationReadyEvent event) {
-      EventLoop.io().scheduleAtFixedRate(() -> {
+    @Override
+    public void onAppStart(ApplicationReadyEvent event) {
+      single.scheduleAtFixedRate(() -> {
         // 发布消息
         String msg = "now: " + DateFmtter.fmtNow();
         log.info("发布消息: " + msg);
@@ -47,7 +54,6 @@ public class RedisPublisherApplication {
         }
       }, 1, 5, TimeUnit.SECONDS);
     }
-
   }
 
 }

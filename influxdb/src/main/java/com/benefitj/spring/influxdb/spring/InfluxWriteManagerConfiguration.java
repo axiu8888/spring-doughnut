@@ -7,15 +7,10 @@ import com.benefitj.spring.influxdb.write.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * InfluxDB行协议文件写入配置
  */
-@Lazy
-@ConditionalOnMissingBean(InfluxWriteManagerConfiguration.class)
-@Import(InfluxDBAutoCheckConfiguration.class)
 @Configuration
 public class InfluxWriteManagerConfiguration {
 
@@ -46,7 +41,6 @@ public class InfluxWriteManagerConfiguration {
     return new InfluxLineFileListener(influxDBTemplate);
   }
 
-
   /**
    * 保存InfluxDB数据的管理实例
    *
@@ -60,7 +54,7 @@ public class InfluxWriteManagerConfiguration {
   public InfluxWriteManager influxWriteManager(LineFileFactory lineFileFactory,
                                                LineFileListener lineFileListener,
                                                InfluxWriteProperty property) {
-    SimpleInfluxWriteManager manager = new SimpleInfluxWriteManager(property);
+    InfluxWriteManagerImpl manager = new InfluxWriteManagerImpl(property);
     manager.setLineFileFactory(lineFileFactory);
     manager.setLineFileListener(lineFileListener);
     return manager;

@@ -34,10 +34,10 @@ include ":athenapdf", ":athenapdf:athenapdfservice"
 include ":quartz"
 
 /**
- * MQTT的权限配置
+ * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
 include ":providers:mqtt-acl-redis"
 
-include ":services:jmods-export"
+include ":services:jmods-export", ":services:frontend", ":services:wkhtmltopdf"
 
 include ":examples"

@@ -69,11 +69,6 @@ public interface InfluxWriteManager {
   void flushNow();
 
   /**
-   * 检查并上传数据
-   */
-  void checkAndFlush();
-
-  /**
    * 返回当前线程的写入次数
    */
   int currentWriteCount();

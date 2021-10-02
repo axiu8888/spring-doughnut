@@ -1,12 +1,10 @@
 package com.benefitj.spring.quartz;
 
+import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public interface JobTaskCaller extends Job {
 
@@ -26,21 +24,9 @@ public interface JobTaskCaller extends Job {
    *
    * @param worker JobWorker类
    * @return 返回实例对象
-   * @throws JobExecutionException
    */
-  default Object newJobWorkerInstance(Class<?> worker) throws JobExecutionException {
-    try {
-      Constructor<?>[] constructors = worker.getConstructors();
-      for (Constructor<?> constructor : constructors) {
-        if (constructor.getParameterCount() == 0) {
-          constructor.setAccessible(true);
-          return constructor.newInstance();
-        }
-      }
-      return worker.newInstance();
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new JobExecutionException(e);
-    }
+  default Object newJobWorkerInstance(Class<?> worker) {
+    return ReflectUtils.newInstance(worker);
   }
 
   /**

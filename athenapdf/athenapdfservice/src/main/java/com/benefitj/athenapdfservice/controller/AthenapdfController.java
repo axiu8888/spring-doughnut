@@ -4,7 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
-import com.benefitj.core.concurrent.CanceableScheduledFuture;
+import com.benefitj.core.concurrent.CancelableScheduledFuture;
 import com.benefitj.spring.BreakPointTransmissionHelper;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.athenapdf.AthenapdfCall;
@@ -196,7 +196,7 @@ public class AthenapdfController {
   }
 
 
-  static class DeleteTimer<V> extends CanceableScheduledFuture<V> {
+  static class DeleteTimer<V> extends CancelableScheduledFuture<V> {
 
     public DeleteTimer(ScheduledFuture<V> original) {
       super(original);

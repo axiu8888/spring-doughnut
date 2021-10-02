@@ -54,7 +54,7 @@ public interface InfluxDBTemplate<I extends BasicInfluxDB, Q> extends ConverterF
   /**
    * InfluxDB的配置
    */
-  InfluxProperty getProperty();
+  InfluxDBProperty getProperty();
 
   /**
    * Point转换器 {@link PointConverter}

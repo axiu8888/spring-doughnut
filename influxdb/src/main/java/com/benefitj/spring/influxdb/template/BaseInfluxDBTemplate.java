@@ -33,7 +33,7 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
   /**
    * property
    */
-  private InfluxProperty property;
+  private InfluxDBProperty property;
 
   private PointConverterFactory converterFactory = PointConverterFactory.INSTANCE;
   /**
@@ -44,11 +44,11 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
   public BaseInfluxDBTemplate() {
   }
 
-  public BaseInfluxDBTemplate(InfluxProperty property) {
+  public BaseInfluxDBTemplate(InfluxDBProperty property) {
     this.property = property;
   }
 
-  public BaseInfluxDBTemplate(InfluxProperty property, PointConverterFactory converterFactory) {
+  public BaseInfluxDBTemplate(InfluxDBProperty property, PointConverterFactory converterFactory) {
     this.property = property;
     this.converterFactory = converterFactory;
   }
@@ -74,12 +74,12 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
     return getConverterFactory().convert(items);
   }
 
-  public void setProperty(InfluxProperty property) {
+  public void setProperty(InfluxDBProperty property) {
     this.property = property;
   }
 
   @Override
-  public InfluxProperty getProperty() {
+  public InfluxDBProperty getProperty() {
     return this.property;
   }
 
@@ -101,7 +101,7 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
   public I getInfluxDB() {
     I db = this.influxDB;
     if (db == null) {
-      final InfluxProperty prop = getProperty();
+      final InfluxDBProperty prop = getProperty();
       Assert.notNull(prop, "InfluxDBProperty are required");
       synchronized (this) {
         if ((db = this.influxDB) != null) {

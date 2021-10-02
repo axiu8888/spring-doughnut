@@ -47,16 +47,22 @@ public class AthenapdfHelper extends CmdExecutor {
    */
   public AthenapdfCall execute(String volumeDir, File destDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
-    String cmd = "docker run --rm --privileged=true" +
-        " -e TZ=\"Asia/Shanghai\"" + (network != null ? network : "")
-        + " -v " + volumeDir + ":/converted/ arachnysdocker/athenapdf athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
-        + url + " " + filename;
+    String cmd = formatCMD(volumeDir, filename, url, network);
     AthenapdfCall call = (AthenapdfCall) call(cmd, null, destDir, 60_000);
     File pdf = new File(destDir, filename);
     if (pdf.exists()) {
       call.setPdf(pdf);
     }
     return call;
+  }
+
+  public String formatCMD(String volumeDir, String filename, String url, @Nullable String network) {
+    filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
+    return  "docker run --rm --privileged=true" +
+        " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
+        + " -v " + volumeDir + ":/converted/ arachnysdocker/athenapdf athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
+        + url
+        + " " + filename;
   }
 
 }

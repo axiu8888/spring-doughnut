@@ -19,6 +19,12 @@ public class RedisSubscriberApplication {
     SpringApplication.run(RedisSubscriberApplication.class, args);
   }
 
+  private static final EventLoop single = EventLoop.newSingle(false);
+
+  static {
+    single.execute(() -> {});
+  }
+
 
   @Slf4j
   @Component
@@ -26,9 +32,9 @@ public class RedisSubscriberApplication {
 
     @RedisMessageChannel({" ${spring.redis.subscribe-channel}"})
     public void onMessage(Message message, byte[] pattern) {
-      EventLoop.io().execute(() -> {
+      single.execute(() -> {
         // 处理消息
-        log.info("接收到消息: {}, pattern: {}"
+        log.info("接收到消息1: {}, pattern: {}"
             , new String(message.getBody())
             , new String(pattern)
         );
@@ -37,9 +43,12 @@ public class RedisSubscriberApplication {
 
     @RedisMessageChannel({" ${spring.redis.subscribe-channel}"})
     public void onMessage2(Message message, byte[] pattern) {
-      EventLoop.io().execute(() -> {
+      single.execute(() -> {
         // 处理消息
-        log.info("接收到消息, pattern: {}", new String(message.getBody()));
+        log.info("接收到消息2, {}, pattern: {}"
+            , new String(message.getBody())
+            , new String(pattern)
+        );
       });
     }
   }

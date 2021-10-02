@@ -20,11 +20,11 @@ public class RxJavaInfluxDBTemplate extends BaseInfluxDBTemplate<RxJavaInfluxDB,
   public RxJavaInfluxDBTemplate() {
   }
 
-  public RxJavaInfluxDBTemplate(InfluxProperty property) {
+  public RxJavaInfluxDBTemplate(InfluxDBProperty property) {
     super(property);
   }
 
-  public RxJavaInfluxDBTemplate(InfluxProperty property, PointConverterFactory converterFactory) {
+  public RxJavaInfluxDBTemplate(InfluxDBProperty property, PointConverterFactory converterFactory) {
     super(property, converterFactory);
   }
 

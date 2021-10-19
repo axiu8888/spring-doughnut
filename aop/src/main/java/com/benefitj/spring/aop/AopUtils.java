@@ -3,8 +3,10 @@ package com.benefitj.spring.aop;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.framework.Advised;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public class AopUtils {
@@ -57,6 +59,10 @@ public class AopUtils {
       }
     }
     return method;
+  }
+
+  public static <A extends Annotation> A findAnnotation(Method method, Class<A> annotationType) {
+    return AnnotationUtils.findAnnotation(method, annotationType);
   }
 
 }

@@ -7,6 +7,7 @@ import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.examples.vo.MultipartForm;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.AopIgnore;
+import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
 import com.benefitj.spring.mvc.page.PageableRequest;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 @AopWebPointCut
 @RestController
 @RequestMapping("/simple")
@@ -24,6 +27,12 @@ public class SimpleController {
 
   @Autowired
   private EventBusPoster poster;
+
+  @AopRateLimiter(qps = 10, timeout = 30)
+  @GetMapping("rateLimiter")
+  public ResponseEntity<?> testRateLimiter(String id) {
+    return ResponseEntity.ok("rateLimiter ==>: " + id);
+  }
 
   @GetMapping
   public ResponseEntity<?> get(String id) {

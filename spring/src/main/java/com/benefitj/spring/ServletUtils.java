@@ -127,6 +127,11 @@ public class ServletUtils {
     if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
       ip = request.getRemoteAddr();
     }
+
+    if (StringUtils.isBlank(ip)) {
+      ip = request.getRemoteHost();
+    }
+
     return ip;
   }
 

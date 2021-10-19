@@ -22,6 +22,10 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")
 
+  // redis
+  implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
+
+
 //  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
 //  //compile 'com.h2database:h2:1.4.200'
 //  implementation "mysql:mysql-connector-java:8.0.23"

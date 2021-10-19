@@ -6,6 +6,10 @@ dependencies {
 
   compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+  // redis
+  compileOnly "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
+
+  compileOnly(project(":spring"))
 
 }
 

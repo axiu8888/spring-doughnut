@@ -21,7 +21,8 @@ configurations {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly fileTree(dir: 'libs-source', include: ['*.jar'])
+    compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
     //testImplementation 'junit:junit:4.12'
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")

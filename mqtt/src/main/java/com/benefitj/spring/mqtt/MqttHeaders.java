@@ -1,6 +1,11 @@
 package com.benefitj.spring.mqtt;
 
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * MQTT消息头
@@ -12,6 +17,16 @@ public class MqttHeaders {
   public static final String MQTT_RECEIVEDQOS = "mqtt_receivedQos";
   public static final String MQTT_RECEIVEDRETAINED = "mqtt_receivedRetained";
   public static final String MQTT_DUPLICATE = "mqtt_duplicate";
+
+  /**
+   * 获取消息的Topic
+   *
+   * @param message 消息
+   * @return 返回 topic
+   */
+  public static String getTopic(Message<?> message) {
+    return message.getHeaders().get(MQTT_RECEIVEDTOPIC, String.class);
+  }
 
   /**
    * 转换消息首部
@@ -30,6 +45,16 @@ public class MqttHeaders {
     mh.setDuplicate(Boolean.TRUE.equals(headers.get(MQTT_DUPLICATE, Boolean.class)));
     mh.setTimestamp(headers.getTimestamp());
     return mh;
+  }
+
+  public static Map<String, Object> headers(MqttMessage msg, String topic) {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put(MqttHeaders.MQTT_ID, msg.getId());
+    headers.put(MqttHeaders.MQTT_RECEIVEDTOPIC, topic);
+    headers.put(MqttHeaders.MQTT_RECEIVEDQOS, msg.getQos());
+    headers.put(MqttHeaders.MQTT_RECEIVEDRETAINED, msg.isRetained());
+    headers.put(MqttHeaders.MQTT_DUPLICATE, msg.isDuplicate());
+    return headers;
   }
 
   /**

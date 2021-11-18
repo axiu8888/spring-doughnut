@@ -3,6 +3,7 @@ package com.benefitj.spring.ctx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 import java.util.Map;
 
@@ -121,6 +122,20 @@ public class SpringCtxHolder {
                                                   boolean includeNonSingletons,
                                                   boolean allowEagerInit) {
     return getCtx().getBeansOfType(type, includeNonSingletons, allowEagerInit);
+  }
+
+  /**
+   * 获取环境参数
+   */
+  public static Environment getEnvironment() {
+    return getCtx().getEnvironment();
+  }
+
+  /**
+   * 获取App名称
+   */
+  public static String getAppName() {
+    return getEnvironment().getProperty("spring.application.name");
   }
 
 }

@@ -25,15 +25,23 @@ public class AppStateListenerWrapper implements AppStateListener {
   public void onAppStart(ApplicationReadyEvent event) {
     AppStartListener sl = this.startListener;
     if (sl != null) {
-      sl.onAppStart(event);
+      try {
+        sl.onAppStart(event);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
   @Override
-  public void onAppStop(ContextClosedEvent event) {
+  public void onAppStop(ContextClosedEvent event) throws Exception {
     AppStopListener sl = this.stopListener;
     if (sl != null) {
-      sl.onAppStop(event);
+      try {
+        sl.onAppStop(event);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 

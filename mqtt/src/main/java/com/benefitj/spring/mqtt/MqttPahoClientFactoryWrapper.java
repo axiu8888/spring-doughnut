@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
 
-  private final Map<String, IMqttClient> mqttClientCache = new ConcurrentHashMap<>();
-  private final Map<String, IMqttAsyncClient> mqttAsyncClientCache = new ConcurrentHashMap<>();
+  private final Map<String, IMqttClient> syncClients = new ConcurrentHashMap<>();
+  private final Map<String, IMqttAsyncClient> asyncClients = new ConcurrentHashMap<>();
 
   private MqttPahoClientFactory factory;
 
@@ -22,11 +22,15 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
   }
 
   @Override
-  public IMqttClient getClientInstance(String url, String clientId) throws MqttException {
+  public IMqttClient getClientInstance(String url, String clientId) throws MqttPahoClientException {
     if (this.factory instanceof MqttPahoClientFactoryWrapper) {
-      return this.factory.getClientInstance(url, clientId);
+      try {
+        return this.factory.getClientInstance(url, clientId);
+      } catch (MqttException e) {
+        throw new MqttPahoClientException(e);
+      }
     }
-    IMqttClient client = mqttClientCache.get(clientId);
+    IMqttClient client = syncClients.get(clientId);
     if (client != null && !client.isConnected()) {
       try {
         try {
@@ -35,12 +39,12 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
           client.connect();
         }
       } catch (Exception e) {
-        mqttClientCache.remove(clientId);
+        syncClients.remove(clientId);
         client = null;
       }
     }
     if (client == null) {
-      client = mqttClientCache.computeIfAbsent(clientId, s -> {
+      client = syncClients.computeIfAbsent(clientId, s -> {
         try {
           return getFactory().getClientInstance(url, clientId);
         } catch (MqttException e) {
@@ -52,11 +56,15 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
   }
 
   @Override
-  public IMqttAsyncClient getAsyncClientInstance(String url, String clientId) throws MqttException {
+  public IMqttAsyncClient getAsyncClientInstance(String url, String clientId) throws MqttPahoClientException {
     if (this.factory instanceof MqttPahoClientFactoryWrapper) {
-      return this.factory.getAsyncClientInstance(url, clientId);
+      try {
+        return this.factory.getAsyncClientInstance(url, clientId);
+      } catch (MqttException e) {
+        throw new MqttPahoClientException(e);
+      }
     }
-    IMqttAsyncClient client = mqttAsyncClientCache.get(clientId);
+    IMqttAsyncClient client = asyncClients.get(clientId);
     if (client != null && !client.isConnected()) {
       try {
         try {
@@ -65,12 +73,12 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
           client.connect();
         }
       } catch (Exception e) {
-        mqttAsyncClientCache.remove(clientId);
+        asyncClients.remove(clientId);
         client = null;
       }
     }
     if (client == null) {
-      client = mqttAsyncClientCache.computeIfAbsent(clientId, s -> {
+      client = asyncClients.computeIfAbsent(clientId, s -> {
         try {
           return getFactory().getAsyncClientInstance(url, clientId);
         } catch (MqttException e) {
@@ -99,11 +107,11 @@ public class MqttPahoClientFactoryWrapper implements MqttPahoClientFactory {
     this.factory = factory;
   }
 
-  public Map<String, IMqttClient> getMqttClientCache() {
-    return mqttClientCache;
+  public Map<String, IMqttClient> getSyncClients() {
+    return syncClients;
   }
 
-  public Map<String, IMqttAsyncClient> getMqttAsyncClientCache() {
-    return mqttAsyncClientCache;
+  public Map<String, IMqttAsyncClient> getAsyncClients() {
+    return asyncClients;
   }
 }

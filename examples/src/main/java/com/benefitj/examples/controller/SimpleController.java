@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.TimeUnit;
-
 @AopWebPointCut
 @RestController
 @RequestMapping("/simple")
@@ -28,16 +26,17 @@ public class SimpleController {
   @Autowired
   private EventBusPoster poster;
 
-  @AopRateLimiter(qps = 10, timeout = 30)
+  @AopRateLimiter(qps = 5)
   @GetMapping("rateLimiter")
   public ResponseEntity<?> testRateLimiter(String id) {
-    return ResponseEntity.ok("rateLimiter ==>: " + id);
+    return ResponseEntity.ok("rateLimiter ==>: " + id + "\r\n" + "ip: " + ServletUtils.getIp() +"\n" + JSON.toJSONString(ServletUtils.getHeaderMap()));
   }
 
   @GetMapping
   public ResponseEntity<?> get(String id) {
     poster.postSync(RawEvent.of(id));
     poster.post(new IdEvent(id));
+    poster.post(NameEvent.of("id", id +" by name"));
     poster.post(NameEvent.of("id22", id)); // 不可达消息
     System.err.println("请求信息: " + JSON.toJSONString(ServletUtils.getRequestInfo()));
     return ResponseEntity.ok("id ==>: " + id);

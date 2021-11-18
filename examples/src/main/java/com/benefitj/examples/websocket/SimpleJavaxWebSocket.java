@@ -1,5 +1,6 @@
 package com.benefitj.examples.websocket;
 
+import com.benefitj.core.StackLogger;
 import com.benefitj.spring.websocket.JavaxWebSocket;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ public class SimpleJavaxWebSocket extends JavaxWebSocket {
 
   private static final Map<String, Session> SOCKETS = new ConcurrentHashMap<>();
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = StackLogger.getLogger();
 
   @Override
   public void onOpen(Session session) {

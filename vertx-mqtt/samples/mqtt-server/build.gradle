@@ -1,0 +1,17 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+dependencies {
+
+	compile(project(":spring"))
+	compile(project(":vertx-mqtt"))
+
+	implementation 'org.springframework.boot:spring-boot-starter'
+
+}
+

@@ -26,9 +26,10 @@ public class SpringbootDoughnutApplication {
 
   static {
     // app start: do something...
-    AppStateHook.registerStart(event -> System.err.println("app started ..."));
-    // app stop: do something...
-    AppStateHook.registerStop(event -> System.err.println("app stopped ..."));
+    AppStateHook.register(
+        e -> System.err.println("app started ..."),
+        e -> System.err.println("app stopped ...")
+    );
   }
 
 }

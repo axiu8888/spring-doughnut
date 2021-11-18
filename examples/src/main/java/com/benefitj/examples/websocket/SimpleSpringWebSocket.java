@@ -1,8 +1,10 @@
 package com.benefitj.examples.websocket;
 
 import com.alibaba.fastjson.JSON;
+import com.benefitj.core.StackLogger;
 import com.benefitj.spring.websocket.SpringServerEndpoint;
 import com.benefitj.spring.websocket.SpringWebSocket;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,7 @@ public class SimpleSpringWebSocket implements SpringWebSocket {
 
   private static final Map<String, WebSocketSession> SOCKETS = new ConcurrentHashMap<>();
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = StackLogger.getLogger();
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {

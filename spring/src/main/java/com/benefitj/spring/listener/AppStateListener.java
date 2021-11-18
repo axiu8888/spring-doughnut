@@ -3,6 +3,9 @@ package com.benefitj.spring.listener;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextClosedEvent;
 
+/**
+ * APP启动和停止的监听
+ */
 public interface AppStateListener {
 
   /**
@@ -10,7 +13,7 @@ public interface AppStateListener {
    *
    * @param event
    */
-  default void onAppStart(ApplicationReadyEvent event) {
+  default void onAppStart(ApplicationReadyEvent event) throws Exception {
     // ~
   }
 
@@ -19,7 +22,7 @@ public interface AppStateListener {
    *
    * @param event
    */
-  default void onAppStop(ContextClosedEvent event) {
+  default void onAppStop(ContextClosedEvent event) throws Exception {
     // ~
   }
 

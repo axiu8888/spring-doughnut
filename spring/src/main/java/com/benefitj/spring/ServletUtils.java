@@ -125,13 +125,14 @@ public class ServletUtils {
       ip = request.getHeader("HTTP_X_FORWARDED_FOR");
     }
     if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("host").split(":")[0];
+    }
+    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
       ip = request.getRemoteAddr();
     }
-
     if (StringUtils.isBlank(ip)) {
       ip = request.getRemoteHost();
     }
-
     return ip;
   }
 

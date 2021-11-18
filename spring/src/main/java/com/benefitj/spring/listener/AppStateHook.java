@@ -24,6 +24,16 @@ public final class AppStateHook {
   /**
    * 注册监听
    *
+   * @param start 启动监听
+   * @param stop  停止监听
+   */
+  public static void register(AppStartListener start, AppStopListener stop) {
+    register(new AppStateListenerWrapper(start, stop));
+  }
+
+  /**
+   * 注册监听
+   *
    * @param listener 监听
    */
   public static void registerStart(AppStartListener listener) {
@@ -50,6 +60,7 @@ public final class AppStateHook {
 
   static class Holder {
     private static final AppStateHook INSTANCE;
+
     static {
       INSTANCE = new AppStateHook();
     }

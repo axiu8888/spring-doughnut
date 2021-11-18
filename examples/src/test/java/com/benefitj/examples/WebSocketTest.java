@@ -2,6 +2,7 @@ package com.benefitj.examples;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +15,8 @@ public class WebSocketTest {
   public void setup() {
   }
 
+
+  @Test
   public void testWebSocketClient() {
     final CountDownLatch latch = new CountDownLatch(1);
 

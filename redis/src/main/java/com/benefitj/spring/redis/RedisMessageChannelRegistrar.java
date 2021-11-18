@@ -1,70 +1,68 @@
 package com.benefitj.spring.redis;
 
-import com.benefitj.spring.registrar.AnnotationMetadataRegistrar;
-import com.benefitj.spring.registrar.AnnotationMetadata;
-import com.benefitj.spring.registrar.MethodElement;
+import com.benefitj.core.executable.SimpleMethodInvoker;
+import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
+import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
+import com.benefitj.spring.annotationprcoessor.MetadataHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
+import java.util.List;
+
 /**
  * Redis注册器
  */
-public class RedisMessageChannelRegistrar implements AnnotationMetadataRegistrar, ApplicationContextAware {
+public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
+    implements MetadataHandler, ApplicationContextAware {
 
   private RedisMessageListenerContainer container;
 
-  private ApplicationContext applicationContext;
+  private ApplicationContext context;
 
   public RedisMessageChannelRegistrar(RedisMessageListenerContainer container) {
     this.container = container;
+    this.setAnnotationType(RedisMessageChannel.class);
+    this.setMetadataHandler(this);
   }
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
+    this.context = applicationContext;
   }
 
-  public ApplicationContext getApplicationContext() {
-    return applicationContext;
+  public ApplicationContext getContext() {
+    return context;
   }
 
-  /**
-   * 注册
-   *
-   * @param metadata    注解类的信息
-   * @param beanFactory bean工厂
-   */
   @Override
-  public void register(AnnotationMetadata metadata, ConfigurableListableBeanFactory beanFactory) {
-    Object bean = metadata.getBean();
-    ApplicationContext ctx = getApplicationContext();
-    for (MethodElement element : metadata.getMethodElements()) {
-      RedisMessageChannel rmc = (RedisMessageChannel) element.getAnnotations()[0];
+  public void handle(List<AnnotationMetadata> metadatas) {
+    for (AnnotationMetadata metadata : metadatas) {
+      RedisMessageChannel rmc = (RedisMessageChannel) metadata.getAnnotation();
       String[] channels = rmc.value();
       if (channels.length <= 0) {
         continue;
       }
 
-      MessageListenerAdapter adapter = createAdapter(metadata, element, channels);
+      MessageListenerAdapter adapter = createAdapter(metadata);
       for (String channel : channels) {
         if (StringUtils.isBlank(channel)) {
           throw new IllegalArgumentException(
-              "redis channel不能为空: " + bean.getClass() + "." + element.getMethod().getName());
+              "redis channel不能为空: " + metadata.getBean().getClass() + "." + metadata.getMethod().getName());
         }
         channel = channel.trim();
         if ((channel.startsWith("${") || channel.startsWith("#{")) && channel.endsWith("}")) {
           StringBuilder sb = new StringBuilder(channel);
           sb.delete(0, 2);
           sb.delete(sb.length() - 1, sb.length());
-          channel = ctx.getEnvironment().getProperty(sb.toString());
+          channel = getContext().getEnvironment().getProperty(sb.toString());
           if (StringUtils.isBlank(channel)) {
-            throw new IllegalStateException("redis channel不能为空: " + sb.toString());
+            throw new IllegalStateException("redis channel不能为空: " + sb);
           }
           String[] split = channel.split(",");
           for (String ch : split) {
@@ -73,8 +71,7 @@ public class RedisMessageChannelRegistrar implements AnnotationMetadataRegistrar
             }
           }
         } else {
-          PatternTopic topic = new PatternTopic(channel);
-          getContainer().addMessageListener(adapter, topic);
+          getContainer().addMessageListener(adapter, new PatternTopic(channel));
         }
       }
     }
@@ -84,17 +81,14 @@ public class RedisMessageChannelRegistrar implements AnnotationMetadataRegistrar
    * 创建代理监听的适配器
    *
    * @param metadata 注解的信息
-   * @param channels 通道
    * @return 返回适配器
    */
-  protected MessageListenerAdapter createAdapter(AnnotationMetadata metadata,
-                                                 MethodElement element,
-                                                 String[] channels) {
-    RedisMessageListenerAdapter delegate = new RedisMessageListenerAdapter(
-        metadata.getBean(), element.getMethod(), channels);
-    MessageListenerAdapter adapter = new MessageListenerAdapter(delegate);
+  protected MessageListenerAdapter createAdapter(AnnotationMetadata metadata) {
+    SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
+    MessageListenerAdapter adapter = new MessageListenerAdapter();
     // 代理对象
-    adapter.setDelegate(delegate);
+    adapter.setDelegate((MessageListener) (message, pattern)
+        -> invoker.invoke(message, pattern, new String(pattern)));
     // 代理方法
     adapter.setDefaultListenerMethod("onMessage");
     return adapter;

@@ -2,16 +2,14 @@ package com.benefitj.redispublisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.listener.AppStateListener;
+import com.benefitj.spring.ctx.SpringCtxHolder;
+import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,35 +23,21 @@ public class RedisPublisherApplication {
     SpringApplication.run(RedisPublisherApplication.class, args);
   }
 
-
-  private static final EventLoop single = EventLoop.newSingle(false);
-
   static {
-    single.execute(() -> {});
-  }
+    AppStateHook.registerStart(e -> {
+      final Logger log = LoggerFactory.getLogger(RedisPublisherApplication.class);
+      // 启动主线程，防止程序自动自动退出
+      EventLoop.main().execute(() -> log.info("{} start...", SpringCtxHolder.getAppName()));
 
-
-  @Slf4j
-  @Component
-  public static class RedisMessagePublishExecutor implements AppStateListener {
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    @Value("#{ @environment['spring.redis.publish-channel'] ?: 'channel:test' }")
-    private String publishChannel;
-
-    @Override
-    public void onAppStart(ApplicationReadyEvent event) {
-      single.scheduleAtFixedRate(() -> {
+      // 发送
+      StringRedisTemplate redisTemplate = SpringCtxHolder.getBean(StringRedisTemplate.class);
+      EventLoop.io().scheduleAtFixedRate(() -> {
         // 发布消息
         String msg = "now: " + DateFmtter.fmtNow();
         log.info("发布消息: " + msg);
-        for (int i = 0; i < 1; i++) {
-          redisTemplate.convertAndSend(publishChannel, msg + "___" + i);
-        }
+        redisTemplate.convertAndSend("channel:test", msg);
       }, 1, 5, TimeUnit.SECONDS);
-    }
+    });
   }
 
 }

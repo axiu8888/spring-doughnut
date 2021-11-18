@@ -1,9 +1,9 @@
 package com.benefitj.spring.eventbus;
 
+import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.spring.eventbus.event.NameEvent;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -11,15 +11,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class EventBusAdapter {
-
-  /**
-   * bean对象
-   */
-  private Object bean;
-  /**
-   * Method
-   */
-  private Method method;
   /**
    * 事件类型
    */
@@ -37,15 +28,11 @@ public class EventBusAdapter {
    */
   private boolean forceName = false;
 
-  public EventBusAdapter() {
-  }
+  private SimpleMethodInvoker methodInvoker;
 
-  public EventBusAdapter(Object bean,
-                         Method method,
-                         Class<Object> eventType) {
-    this.bean = bean;
-    this.method = method;
+  public EventBusAdapter(Object bean, Method method, Class<?> eventType) {
     this.eventType = eventType;
+    this.methodInvoker = new SimpleMethodInvoker(bean, method);
   }
 
   public boolean support(Object o) {
@@ -86,7 +73,6 @@ public class EventBusAdapter {
     }
   }
 
-
   /**
    * 接收事件
    *
@@ -96,29 +82,13 @@ public class EventBusAdapter {
   public void onEvent(Object event) {
     if (support(event)) {
       if (event instanceof NameEvent) {
-        ReflectionUtils.invokeMethod(getMethod(), getBean(), ((NameEvent) event).getMessage());
+        getMethodInvoker().invoke(((NameEvent) event).getMessage());
       } else {
         if (!isForceName()) {
-          ReflectionUtils.invokeMethod(getMethod(), getBean(), event);
+          getMethodInvoker().invoke(event);
         }
       }
     }
-  }
-
-  public Object getBean() {
-    return bean;
-  }
-
-  public void setBean(Object bean) {
-    this.bean = bean;
-  }
-
-  public Method getMethod() {
-    return method;
-  }
-
-  public void setMethod(Method method) {
-    this.method = method;
   }
 
   public Class<?> getEventType() {
@@ -127,6 +97,14 @@ public class EventBusAdapter {
 
   public void setEventType(Class<?> eventType) {
     this.eventType = eventType;
+  }
+
+  public SimpleMethodInvoker getMethodInvoker() {
+    return methodInvoker;
+  }
+
+  public void setMethodInvoker(SimpleMethodInvoker methodInvoker) {
+    this.methodInvoker = methodInvoker;
   }
 
   public Set<String> getNames() {

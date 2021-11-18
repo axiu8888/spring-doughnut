@@ -1,7 +1,5 @@
 package com.benefitj.spring.redis;
 
-import com.benefitj.spring.registrar.MethodAnnotationBeanPostProcessor;
-import com.benefitj.spring.registrar.RegistrarMethodAnnotationBeanPostProcessor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,15 +56,6 @@ public class RedisMessageChannelConfiguration {
   @Bean
   public RedisMessageChannelRegistrar redisMessageChannelRegistrar(RedisMessageListenerContainer container) {
     return new RedisMessageChannelRegistrar(container);
-  }
-
-  /**
-   * Redis方法注解的后置处理器
-   */
-  @ConditionalOnMissingBean(name = "redisMessageChannelAnnotationBeanPostProcessor")
-  @Bean("redisMessageChannelAnnotationBeanPostProcessor")
-  public MethodAnnotationBeanPostProcessor redisMessageChannelAnnotationBeanPostProcessor(RedisMessageChannelRegistrar registrar) {
-    return new RegistrarMethodAnnotationBeanPostProcessor(registrar, RedisMessageChannel.class);
   }
 
 }

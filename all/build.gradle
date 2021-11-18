@@ -19,6 +19,7 @@ dependencies {
   compile project(":quartz")
   compile project(":influxdb")
   compile project(":athenapdf")
+  compile project(":vertx-mqtt")
 
 }
 

@@ -2,6 +2,9 @@ package com.benefitj.spring.listener;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
+/**
+ * App启动完成的监听
+ */
 public interface AppStartListener {
 
   /**
@@ -9,6 +12,6 @@ public interface AppStartListener {
    *
    * @param event
    */
-  void onAppStart(ApplicationReadyEvent event);
+  void onAppStart(ApplicationReadyEvent event) throws Exception;
 
 }

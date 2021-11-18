@@ -53,7 +53,7 @@ public class RedisRateLimiterCustomizer implements RateLimiterCustomizer {
         break;
     }
     return String.format("%s:%s:%s:%s"
-        , ServletUtils.getIp(getRequest())
+        , ServletUtils.getIp(getRequest()).replace(".", "_")
         , method.getDeclaringClass().getSimpleName()
         , method.getName()
         , timeoutKey

@@ -1,13 +1,20 @@
 package com.benefitj.spring.influxdb.example;
 
 import com.alibaba.fastjson.JSON;
+import com.benefitj.core.EventLoop;
+import com.benefitj.spring.JsonUtils;
+import com.benefitj.spring.influxdb.template.DefaultSubscriber;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
+import com.benefitj.spring.influxdb.write.InfluxWriterManager;
 import org.influxdb.dto.QueryResult;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 public class InfluxDBApplicationTest {
@@ -17,25 +24,42 @@ public class InfluxDBApplicationTest {
   @Autowired
   private RxJavaInfluxDBTemplate template;
 
+  @Autowired
+  private InfluxWriterManager writerManager;
+
+  private Random random = new Random();
+
   @Test
   public void testWrite() {
-    AllRates allRates = new AllRates();
-    allRates.setDeviceId("2333");
-    allRates.setTime(System.currentTimeMillis() / 1000);
-    allRates.setHeartRate((short)60);
-    allRates.setSpo2((byte)94);
-    allRates.setRespRate((short)16);
-    allRates.setGesture(1);
-    allRates.setEnergy(1.0);
-    String line = template.convert(allRates).lineProtocol();
+    String line = generateLine();
     System.err.println(line);
+    template.write(line);
+  }
 
-    template.write(allRates);
-    //template.write(line);
+  private String generateLine() {
+    TrendRates trendRates = new TrendRates();
+    trendRates.setDeviceId("2333");
+    trendRates.setTime(System.currentTimeMillis() / 1000);
+    trendRates.setHeartRate((short) (50 + random.nextInt(90)));
+    trendRates.setSpo2((byte) (90 + random.nextInt(10)));
+    trendRates.setRespRate((short) random.nextInt(30));
+    trendRates.setGesture(random.nextInt(20));
+    trendRates.setEnergy(random.nextDouble());
+    trendRates.setType("1");
+    trendRates.setStep((short) random.nextInt(1000));
+    return template.convert(trendRates).lineProtocol();
   }
 
   @Test
-  public void testQueryForExcel() {
+  public void testQuery() {
+    template.query("SELECT * FROM sys_trend_rates WHERE time > now() - 1d")
+        .subscribe(new DefaultSubscriber<>() {
+          @Override
+          public void onNext(QueryResult queryResult) {
+            List<TrendRates> trendRates = template.mapperTo(queryResult, TrendRates.class);
+            System.err.println("data: " + JsonUtils.toJson(trendRates));
+          }
+        });
   }
 
   /**
@@ -43,8 +67,7 @@ public class InfluxDBApplicationTest {
    */
   @Test
   public void testDropMeasurements() {
-    String database = template.getDatabase();
-    QueryResult result = template.postQuery(database, "DROP MEASUREMENT sys_all_rates");
+    QueryResult result = template.dropMeasurement("sys_trend_rates");
     System.err.println(JSON.toJSONString(result));
   }
 
@@ -53,9 +76,18 @@ public class InfluxDBApplicationTest {
    */
   @Test
   public void testDropDB() {
-    String database = template.getDatabase();
-    QueryResult result = template.postQuery(database, "DROP DATABASE " + database);
+    QueryResult result = template.dropDatabase();
     System.err.println(JSON.toJSONString(result));
+  }
+
+  @Test
+  public void testWriter() {
+    for (int i = 0; i < 50; i++) {
+      writerManager.write(generateLine(), "\n");
+      EventLoop.sleepSecond(1);
+    }
+    EventLoop.io().execute(() -> writerManager.flush());
+    EventLoop.sleepSecond(1);
   }
 
 }

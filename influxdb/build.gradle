@@ -3,8 +3,8 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 
 ext {
-    rxJavaVersion = '2.2.20'
-    okHttpVersion = '4.9.0'
+    rxJavaVersion = '2.2.21'
+    okHttpVersion = '4.9.2'
     retrofitVersion = '2.9.0'
 
     artifactName = "influxdb"
@@ -20,11 +20,13 @@ sourceSets {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    compileOnly(project(":commons"))
+
     compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
 
-    compile "org.msgpack:msgpack-core:0.8.21"
-    compile("org.influxdb:influxdb-java:2.20") {
+    compile 'org.msgpack:msgpack-core:0.9.0'
+    compile('org.influxdb:influxdb-java:2.21') {
         exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
         exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
         exclude group: 'org.msgpack'//, module: 'msgpack-core'
@@ -39,10 +41,11 @@ dependencies {
     compile "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
 
-    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.4.20'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
 
     // 网络库
-    testCompile("com.google.code.gson:gson:2.8.5")
+    testCompile('com.google.code.gson:gson:2.8.9')
+    testCompile(project(":commons"))
 
 }
 

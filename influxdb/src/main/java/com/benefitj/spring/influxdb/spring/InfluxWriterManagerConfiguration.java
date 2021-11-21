@@ -1,18 +1,20 @@
 package com.benefitj.spring.influxdb.spring;
 
-import com.benefitj.spring.influxdb.file.LineFileFactory;
-import com.benefitj.spring.influxdb.file.LineFileListener;
-import com.benefitj.spring.influxdb.template.InfluxDBTemplate;
+import com.benefitj.core.Unit;
+import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
 import com.benefitj.spring.influxdb.write.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
+
 /**
  * InfluxDB行协议文件写入配置
  */
+@EnableRxJavaInfluxDB
 @Configuration
-public class InfluxWriteManagerConfiguration {
+public class InfluxWriterManagerConfiguration {
 
   /**
    * 配置属性
@@ -29,7 +31,7 @@ public class InfluxWriteManagerConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public LineFileFactory lineFileFactory() {
-    return LineFileFactory.INSTANCE;
+    return LineFileFactory.newFactory();
   }
 
   /**
@@ -37,8 +39,8 @@ public class InfluxWriteManagerConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
-  public LineFileListener lineFileListener(InfluxDBTemplate influxDBTemplate) {
-    return new InfluxLineFileListener(influxDBTemplate);
+  public LineFileListener lineFileListener(RxJavaInfluxDBTemplate template) {
+    return LineFileListener.newLineFileListener(template);
   }
 
   /**
@@ -51,27 +53,30 @@ public class InfluxWriteManagerConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
-  public InfluxWriteManager influxWriteManager(LineFileFactory lineFileFactory,
-                                               LineFileListener lineFileListener,
-                                               InfluxWriteProperty property) {
-    InfluxWriteManagerImpl manager = new InfluxWriteManagerImpl(property);
-    manager.setLineFileFactory(lineFileFactory);
-    manager.setLineFileListener(lineFileListener);
+  public InfluxWriterManager influxWriterManager(LineFileFactory lineFileFactory,
+                                                LineFileListener lineFileListener,
+                                                InfluxWriteProperty property) {
+    File cacheDir = new File(property.getCacheDir());
+    InfluxWriterManager manager = new InfluxWriterManager(cacheDir);
+    manager.setDelay(property.getDelay() * 1000);
+    manager.setMaxSize(property.getCacheSize() * Unit.MB);
+    manager.setFileFactory(lineFileFactory);
+    manager.setFileListener(lineFileListener);
     return manager;
   }
 
   /**
    * 程序启动时自动写入的监听
    *
-   * @param influxDBTemplate rxjava influxDBTemplate
+   * @param template rxjava template
    * @param property         配置属性
    * @return 监听实例
    */
   @ConditionalOnMissingBean
   @Bean
-  public InfluxAutoWriteStarter influxAutoWriteListener(InfluxDBTemplate influxDBTemplate,
+  public InfluxAutoWriteStarter influxAutoWriteListener(RxJavaInfluxDBTemplate template,
                                                         InfluxWriteProperty property) {
-    return new InfluxAutoWriteStarter(influxDBTemplate, property);
+    return new InfluxAutoWriteStarter(template, property);
   }
 
 }

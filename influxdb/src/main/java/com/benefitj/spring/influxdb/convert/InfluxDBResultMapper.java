@@ -1,7 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
 
-import com.benefitj.spring.influxdb.ReflectUtils;
+import com.benefitj.core.ReflectUtils;
 import org.influxdb.InfluxDBMapperException;
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
@@ -119,7 +119,7 @@ public class InfluxDBResultMapper {
         continue;
       }
 
-      final Map<String, Field> fields = ReflectUtils.getFields(clazz, f -> !ReflectUtils.isStaticOrFinal(f.getModifiers()));
+      final Map<String, Field> fields = ReflectUtils.getFieldMap(clazz, f -> !ReflectUtils.isStaticOrFinal(f.getModifiers()));
       final Map<String, Field> columnFieldMap = new ConcurrentHashMap<>(fields.size());
       fields.forEach((fieldName, field) -> {
         if (field.isAnnotationPresent(Column.class)) {
@@ -217,7 +217,8 @@ public class InfluxDBResultMapper {
 
       // 泛型字段
       if (field.getGenericType() instanceof TypeVariable) {
-        fieldType = ReflectUtils.getGenericSuperclassBounds(object.getClass());
+        // TODO: 2021/11/20 待验证
+        fieldType = (Class<?>) ((TypeVariable) field.getGenericType()).getBounds()[0];
       }
 
       if (fieldValueModified(fieldType, field, object, value)

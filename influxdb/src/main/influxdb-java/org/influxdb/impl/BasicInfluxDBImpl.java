@@ -1,6 +1,6 @@
 package org.influxdb.impl;
 
-import com.benefitj.spring.influxdb.ReflectUtils;
+import com.benefitj.core.ReflectUtils;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import okhttp3.OkHttpClient;
@@ -107,13 +107,13 @@ public class BasicInfluxDBImpl extends InfluxDBImpl implements BasicInfluxDB {
     if (field == null) {
       Class<?> currentClass = getClass();
       final AtomicReference<Field> fieldRef = new AtomicReference<>();
-      ReflectUtils.foreachField(InfluxDBImpl.class
+      ReflectUtils.findFields(InfluxDBImpl.class
           , f -> f.getType().isAssignableFrom(requiredType) && f.getDeclaringClass() != currentClass
           , fieldRef::set
           , f -> fieldRef.get() == null);
       field = fieldRef.get();
     }
-    return ReflectUtils.getFieldValue(field, this, null);
+    return ReflectUtils.getFieldValue(field, this);
   }
 
   public ChunkProcessor<QueryResult> getChunkProcessor() {

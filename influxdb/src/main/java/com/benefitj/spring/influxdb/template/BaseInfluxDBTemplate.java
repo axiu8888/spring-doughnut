@@ -372,6 +372,46 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
   }
 
   /**
+   * 删除数据库
+   *
+   * @param measurement 表名
+   * @return 返回结果
+   */
+  public QueryResult dropMeasurement(String measurement) {
+    return dropMeasurement(getDatabase(), measurement);
+  }
+
+  /**
+   * 删除数据库
+   *
+   * @param database    数据库名
+   * @param measurement 表名
+   * @return 返回结果
+   */
+  public QueryResult dropMeasurement(String database, String measurement) {
+    return postQuery(database, "DROP MEASUREMENT " + measurement);
+  }
+
+  /**
+   * 删除数据库
+   *
+   * @return 返回结果
+   */
+  public QueryResult dropDatabase() {
+    return dropDatabase(getDatabase());
+  }
+
+  /**
+   * 删除数据库
+   *
+   * @param database 数据库名
+   * @return 返回结果
+   */
+  public QueryResult dropDatabase(String database) {
+    return postQuery(database, "DROP DATABASE " + database);
+  }
+
+  /**
    * 统计
    *
    * @param measurement 表

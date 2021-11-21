@@ -6,15 +6,15 @@ import org.springframework.context.annotation.Lazy;
 import java.lang.annotation.*;
 
 /**
- * 引用 InfluxWriteManagerConfiguration
+ * influxdb自动缓存道文件并上传
  *
  * @author DINGXIUAN
  */
 @Lazy
-@Import(InfluxWriteManagerConfiguration.class)
+@Import(InfluxWriterManagerConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableInfluxWriteManager {
+public @interface EnableInfluxWriterManager {
 }

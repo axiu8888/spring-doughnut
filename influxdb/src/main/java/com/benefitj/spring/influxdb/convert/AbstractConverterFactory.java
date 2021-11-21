@@ -1,7 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
+import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.influxdb.InfluxDBUtils;
-import com.benefitj.spring.influxdb.ReflectUtils;
 import com.benefitj.spring.influxdb.dto.ColumnIgnore;
 import com.benefitj.spring.influxdb.dto.TagNullable;
 import org.influxdb.annotation.Column;
@@ -10,10 +10,7 @@ import org.influxdb.annotation.TimeColumn;
 import org.influxdb.dto.QueryResult;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,17 +75,22 @@ public abstract class AbstractConverterFactory<U> implements ConverterFactory<U>
         ? measurement.name() : type.getSimpleName());
 
     // 忽略被static和final修饰的字段、忽略InfluxIgnore注解的字段
-    Map<String, Field> fieldMap = ReflectUtils.getFields(type, f ->
-        !(ReflectUtils.isStaticOrFinal(f.getModifiers()) || f.isAnnotationPresent(ColumnIgnore.class)));
+    final Map<String, Field> fields = new LinkedHashMap<>();
+    ReflectUtils.findFields(type
+        // 不是static/final，没有被ColumnIgnore注释
+        , f -> !(ReflectUtils.isStaticOrFinal(f) || f.isAnnotationPresent(ColumnIgnore.class))
+        , f -> fields.putIfAbsent(f.getName(), f)
+        , f -> false
+    );
 
-    if (fieldMap.isEmpty()) {
+    if (fields.isEmpty()) {
       throw new IllegalArgumentException("The columns is empty!");
     }
 
     // 时间戳单位
     converter.setTimestampUnit(measurement.timeUnit());
     // 解析字段
-    for (Field field : fieldMap.values()) {
+    for (Field field : fields.values()) {
       final ColumnField columnField = parseColumn(field);
       if (isTimestamp(field)) {
         converter.setTimestamp(columnField);

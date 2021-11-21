@@ -1,6 +1,6 @@
 package com.benefitj.spring.influxdb.convert;
 
-import com.benefitj.spring.influxdb.ReflectUtils;
+import com.benefitj.core.ReflectUtils;
 import org.influxdb.dto.Point;
 
 import java.lang.reflect.InvocationTargetException;
@@ -168,7 +168,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
     // TAG
     final Map<String, ColumnField> tags = converter.getTags();
     tags.forEach((tag, columnField) -> {
-      Object value = ReflectUtils.getFieldValue(columnField.getField(), item, null);
+      Object value = ReflectUtils.getFieldValue(columnField.getField(), item);
       // 检查是否允许tag为null，默认不允许
       if (value == null && !columnField.isTagNullable()) {
         throw new NullPointerException("tag is null.");
@@ -182,7 +182,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
     // column
     final Map<String, ColumnField> columns = converter.getColumns();
     columns.forEach((name, columnField) -> {
-      Object value = ReflectUtils.getFieldValue(columnField.getField(), item, null);
+      Object value = ReflectUtils.getFieldValue(columnField.getField(), item);
       if (value instanceof Number) {
         builder.addField(name, (Number) value);
       } else if (value instanceof Boolean) {
@@ -204,7 +204,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
    */
   protected static long getTimestamp(ColumnField columnField, Object item) {
     // 设置时间戳
-    Object value = ReflectUtils.getFieldValue(columnField.getField(), item, null);
+    Object value = ReflectUtils.getFieldValue(columnField.getField(), item);
     if (value instanceof Long) {
       return (Long) value;
     } else if (value instanceof Date) {

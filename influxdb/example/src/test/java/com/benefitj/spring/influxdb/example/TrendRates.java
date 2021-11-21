@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  */
-@Measurement(name = "sys_all_rates", timeUnit = TimeUnit.SECONDS)
-public class AllRates {
+@Measurement(name = "sys_trend_rates", timeUnit = TimeUnit.SECONDS)
+public class TrendRates {
   /**
    * 时间戳
    */

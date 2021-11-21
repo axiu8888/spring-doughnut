@@ -1,6 +1,6 @@
 package com.benefitj.spring.influxdb.convert;
 
-import com.benefitj.spring.influxdb.ReflectUtils;
+import com.benefitj.core.ReflectUtils;
 
 import java.lang.reflect.Field;
 
@@ -77,7 +77,7 @@ public class ColumnField {
    * @return 返回对象字段的值
    */
   public Object getValue(Object o) {
-    return ReflectUtils.getFieldValue(getField(), o, null);
+    return ReflectUtils.getFieldValue(getField(), o);
   }
 
 }

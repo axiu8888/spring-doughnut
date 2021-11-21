@@ -2,34 +2,24 @@ package com.benefitj.spring.influxdb.write;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.io.File;
-
 /**
  * 行协议文件写入配置
  */
-@ConfigurationProperties(prefix = "spring.influxdb.write")
+@ConfigurationProperties(prefix = "spring.influxdb.writer")
 public class InfluxWriteProperty {
 
   /**
-   * 缓存大小(MB)，默认20MB
+   * 缓存大小(MB)，默认30MB
    */
-  private Integer cacheSize = 20;
+  private Integer cacheSize = 30;
   /**
-   * 延迟时长(秒)，默认60秒
+   * 延迟时长(秒)，默认5分钟
    */
-  private Integer delay = 60;
+  private Integer delay = 5 * 60;
   /**
    * 缓存目录
    */
   private String cacheDir;
-  /**
-   * 同时写入的文件数，默认为 1
-   */
-  private Integer lineFileCount = 1;
-  /**
-   * 线程数量，默认为 4
-   */
-  private int threadCount = 4;
   /**
    * 是否自动上传，默认false
    */
@@ -63,22 +53,6 @@ public class InfluxWriteProperty {
     this.cacheDir = cacheDir;
   }
 
-  public Integer getLineFileCount() {
-    return lineFileCount;
-  }
-
-  public void setLineFileCount(Integer lineFileCount) {
-    this.lineFileCount = lineFileCount;
-  }
-
-  public int getThreadCount() {
-    return threadCount;
-  }
-
-  public void setThreadCount(int threadCount) {
-    this.threadCount = threadCount;
-  }
-
   public boolean isAutoUpload() {
     return autoUpload;
   }
@@ -93,22 +67,6 @@ public class InfluxWriteProperty {
 
   public void setSuffix(String suffix) {
     this.suffix = suffix;
-  }
-
-
-  /**
-   * 默认配置
-   */
-  public static InfluxWriteProperty defaultProperty() {
-    InfluxWriteProperty p = new InfluxWriteProperty();
-    String tmpDir = System.getProperties().getProperty("java.io.tmpdir");
-    File lineFile = new File(tmpDir, "/influxdb/lines");
-    p.setCacheDir(lineFile.getAbsolutePath());
-    p.setCacheSize(20);
-    p.setDelay(30);
-    p.setLineFileCount(1);
-    p.setThreadCount(4);
-    return p;
   }
 
 }

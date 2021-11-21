@@ -4,7 +4,6 @@ import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.ShutdownHook;
 import com.benefitj.spring.listener.AppStateListener;
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
 import com.benefitj.spring.mqtt.publisher.EnableMqttPublisher;
 import com.benefitj.spring.mqtt.publisher.MqttPublisher;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +36,6 @@ public class MqttPublisherApplication {
 
     @Autowired
     private MqttPublisher publisher;
-    @Autowired
-    private MqttOptionsProperty property;
 
     @Override
     public void onAppStart(ApplicationReadyEvent event) {
@@ -47,10 +44,7 @@ public class MqttPublisherApplication {
       single.scheduleAtFixedRate(() -> {
         try {
           log.info("发布消息...");
-          String[] topics = property.getPublishTopics().split(",");
-          for (String topic : topics) {
-            publisher.send((topic.endsWith("/") ? topic : (topic + "/")) + "010003b8", DateFmtter.fmtNowS());
-          }
+          publisher.send("/device/010003b8", DateFmtter.fmtNowS());
         } catch (Exception e) {
           log.info("throw: {}", e.getMessage());
         }

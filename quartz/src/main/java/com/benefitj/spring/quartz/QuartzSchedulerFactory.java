@@ -129,7 +129,7 @@ public class QuartzSchedulerFactory implements SchedulerFactory, InitializingBea
     private void modifyListenerManager(Object scheduler) {
       if (scheduler instanceof org.quartz.core.QuartzScheduler) {
         final AtomicReference<Field> ref = new AtomicReference<>();
-        ReflectUtils.foreachField(scheduler.getClass(),
+        ReflectUtils.findFields(scheduler.getClass(),
             f -> f.getType().isAssignableFrom(ListenerManager.class), // 过滤不匹配的类型
             ref::set,
             f -> ref.get() != null); // 找到字段后就停止查找
@@ -159,7 +159,7 @@ public class QuartzSchedulerFactory implements SchedulerFactory, InitializingBea
       } else {
         if (scheduler instanceof Scheduler) {
           final AtomicReference<org.quartz.core.QuartzScheduler> ref = new AtomicReference<>();
-          ReflectUtils.foreachField(scheduler.getClass(),
+          ReflectUtils.findFields(scheduler.getClass(),
               f -> f.getType().isAssignableFrom(org.quartz.core.QuartzScheduler.class),
               f -> ref.set(ReflectUtils.getFieldValue(f, scheduler)),
               f -> ref.get() != null);

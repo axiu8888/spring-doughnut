@@ -5,6 +5,7 @@ import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.stereotype.Controller;
@@ -23,11 +24,14 @@ import java.util.stream.Stream;
  *
  * @author DINGXIUAN
  */
-public class AnnotationUrlRegistryConfigurerCustomizer extends AnnotationBeanProcessor implements UrlRegistryConfigurerCustomizer {
+public class AnnotationUrlRegistryConfigurerCustomizer implements BeanPostProcessor, UrlRegistryConfigurerCustomizer {
 
   protected static final Class<? extends Annotation>[] CONTROLLERS = new Class[]{Controller.class, RestController.class};
 
   private final List<UrlRegistryMetadata> allMetadata = Collections.synchronizedList(new LinkedList<>());
+
+  public AnnotationUrlRegistryConfigurerCustomizer() {
+  }
 
   public List<UrlRegistryMetadata> getAllMetadata() {
     return allMetadata;
@@ -79,11 +83,11 @@ public class AnnotationUrlRegistryConfigurerCustomizer extends AnnotationBeanPro
   }
 
   @Override
-  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     Class<?> targetClass = AopUtils.getTargetClass(bean);
     if (ReflectUtils.isAnnotationPresent(targetClass, CONTROLLERS, false)) {
       final boolean controllerPresent = targetClass.isAnnotationPresent(UrlPermitted.class);
-      Collection<Method> methods = findMethods(targetClass, method -> {
+      Collection<Method> methods = AnnotationBeanProcessor.findMethods(targetClass, method -> {
         if (isHttpService(method)) {
           return controllerPresent
               ? !method.isAnnotationPresent(UrlAuthenticated.class)

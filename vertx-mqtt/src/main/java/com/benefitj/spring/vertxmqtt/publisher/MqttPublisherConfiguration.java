@@ -38,11 +38,11 @@ public class MqttPublisherConfiguration {
   /**
    * MQTT发布客户端
    */
-  @ConditionalOnMissingBean(name = "mqttPublisherClient")
-  @Bean("mqttPublisherClient")
-  public MqttPublisherClient mqttPublisherClient(MqttClientProperty property) {
-    VertxClientFactory factory = VertxClientFactory.newFactory(MqttPublisherClient.class);
-    return (MqttPublisherClient) factory.create(property);
+  @ConditionalOnMissingBean(name = "mqttPublisher")
+  @Bean("mqttPublisher")
+  public MqttPublisher mqttPublisher(MqttClientProperty property) {
+    VertxClientFactory factory = VertxClientFactory.newFactory(MqttPublisher.class);
+    return (MqttPublisher) factory.create(property);
   }
 
   /**
@@ -51,8 +51,8 @@ public class MqttPublisherConfiguration {
   @ConditionalOnMissingBean(name = "mqttSubscribeSwitcher")
   @Bean("mqttSubscribeSwitcher")
   public AppStateListener mqttSubscribeSwitcher(@Qualifier("vertx") Vertx vertx,
-                                                @Qualifier("mqttPublisherClient") MqttPublisherClient client) {
-    return new AppStateListenerWrapper(e -> vertx.deployVerticle(client), e -> vertx.undeploy(client.deploymentID()));
+                                                @Qualifier("mqttPublisher") MqttPublisher publisher) {
+    return new AppStateListenerWrapper(e -> vertx.deployVerticle(publisher), e -> publisher.stop());
   }
 
 }

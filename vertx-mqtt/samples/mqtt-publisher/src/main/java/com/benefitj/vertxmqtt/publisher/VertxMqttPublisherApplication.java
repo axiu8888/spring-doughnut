@@ -6,7 +6,7 @@ import com.benefitj.core.StackLogger;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.vertxmqtt.publisher.EnableMqttPublisher;
-import com.benefitj.spring.vertxmqtt.publisher.MqttPublisherClient;
+import com.benefitj.spring.vertxmqtt.publisher.MqttPublisher;
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,7 +28,7 @@ public class VertxMqttPublisherApplication {
     final Logger log = StackLogger.getLogger();
     final EventLoop single = EventLoop.newSingle(false);
     final String[] topics = {"/device/", "/collector/device"};
-    MqttPublisherClient publisher = SpringCtxHolder.getBean(MqttPublisherClient.class);
+    MqttPublisher publisher = SpringCtxHolder.getBean(MqttPublisher.class);
     single.scheduleAtFixedRate(() -> {
       try {
         log.info("发布消息...");

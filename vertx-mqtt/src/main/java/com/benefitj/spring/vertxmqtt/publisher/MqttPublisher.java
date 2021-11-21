@@ -5,9 +5,9 @@ import com.benefitj.mqtt.client.VertxMqttClient;
 /**
  * MQTT发布客户端
  */
-public class MqttPublisherClient extends VertxMqttClient {
+public class MqttPublisher extends VertxMqttClient {
 
-  public MqttPublisherClient() {
+  public MqttPublisher() {
     super();
   }
 

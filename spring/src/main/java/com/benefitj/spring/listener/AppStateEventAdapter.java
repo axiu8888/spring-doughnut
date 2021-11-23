@@ -4,16 +4,12 @@ package com.benefitj.spring.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@ConditionalOnMissingBean(AppStateEventAdapter.class)
-@Component
 public class AppStateEventAdapter {
 
   private static final Logger log = LoggerFactory.getLogger(AppStateEventAdapter.class);

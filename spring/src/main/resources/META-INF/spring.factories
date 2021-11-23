@@ -1,5 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.benefitj.spring.ctx.SpringCtxHolderInitializer,\
-  com.benefitj.spring.listener.AppStateEventAdapter
+  com.benefitj.spring.listener.AutoAppStateConfiguration
 
 #org.springframework.context.ApplicationListener=\

@@ -5,6 +5,7 @@ dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+  compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
 
   compileOnly "io.springfox:springfox-boot-starter:${swagger2Version}"
 

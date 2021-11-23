@@ -6,6 +6,7 @@ import com.benefitj.event.Event;
 import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.spring.eventbus.SubscriberIgnore;
 import com.benefitj.spring.eventbus.SubscriberName;
+import com.benefitj.spring.listener.OnAppStart;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.stereotype.Component;
 

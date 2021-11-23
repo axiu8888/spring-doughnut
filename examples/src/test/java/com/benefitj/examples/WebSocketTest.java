@@ -8,20 +8,15 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 public class WebSocketTest {
-  public static void main(String[] args) {
-    new WebSocketTest().testWebSocketClient();
-  }
 
   public void setup() {
   }
-
 
   @Test
   public void testWebSocketClient() {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    URI uri = URI.create("http://localhost:8080/api/sockets/spring");
-//    URI uri = URI.create("http://localhost:8080/api/sockets/javax");
+    URI uri = URI.create("http://localhost:80/api/sockets/simple");
     WebSocketClient client = new WebSocketClient(uri) {
       @Override
       public void onOpen(ServerHandshake handshakedata) {

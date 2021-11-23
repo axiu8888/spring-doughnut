@@ -1,22 +1,16 @@
 package com.benefitj.spring.websocket;
 
+
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 
-/**
- * Spring WebSocket注解
- *
- * @author DINGXIUAN
- */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface SpringServerEndpoint {
-
+@Inherited
+public @interface WebSocketEndpoint {
   /**
    * URI or URI-template that the annotated class should be mapped to.
    *
@@ -34,5 +28,15 @@ public @interface SpringServerEndpoint {
    * 拦截器
    */
   Class<? extends HandshakeInterceptor>[] handshakeInterceptors() default {};
+
+  /**
+   * WebSocketManager
+   */
+  Class<? extends WebSocketManager> socketManager() default WebSocketManager.class;
+
+  /**
+   * WebSocketFactory
+   */
+  Class<? extends WebSocketFactory> socketFactory() default WebSocketFactory.class;
 
 }

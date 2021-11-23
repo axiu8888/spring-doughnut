@@ -2,8 +2,11 @@ package com.benefitj.spring.listener;
 
 
 import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * APP状态注解配置
@@ -12,8 +15,9 @@ import org.springframework.context.annotation.Configuration;
 public class AutoAppStateConfiguration {
 
   @Bean
-  public AppStateEventAdapter appStateEventAdapter() {
-    return new AppStateEventAdapter();
+  public AppStateEventAdapter appStateEventAdapter(@Autowired(required = false)
+                                                       List<AppStateListener> listeners) {
+    return new AppStateEventAdapter(listeners);
   }
 
   /**

@@ -13,7 +13,6 @@ dependencies {
   compile project(":spring")
   compile project(":aop")
   compile project(":eventbus")
-  compile project(":websocket")
   compile project(":redis")
   compile project(":mqtt")
   compile project(":quartz")

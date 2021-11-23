@@ -6,12 +6,10 @@ import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
-import com.benefitj.spring.websocket.EnableSpringWebSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableRedisMessageChannel
-@EnableSpringWebSocket          // 自定义WebSocket注册
 @EnableHttpLoggingHandler       // HTTP请求日志
 @EnableRedisRateLimiter         // redis RateLimiter
 @EnableEventBusPoster           // eventbus

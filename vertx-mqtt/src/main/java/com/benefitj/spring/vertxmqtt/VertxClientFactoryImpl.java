@@ -2,8 +2,8 @@ package com.benefitj.spring.vertxmqtt;
 
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.ReflectUtils;
-import com.benefitj.mqtt.client.AutoConnectTimer;
-import com.benefitj.mqtt.client.VertxMqttClient;
+import com.benefitj.mqtt.vertx.client.AutoConnectTimer;
+import com.benefitj.mqtt.vertx.client.VertxMqttClient;
 
 /**
  * 客户端工厂实现

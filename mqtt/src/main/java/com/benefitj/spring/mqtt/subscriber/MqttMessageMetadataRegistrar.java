@@ -3,16 +3,14 @@ package com.benefitj.spring.mqtt.subscriber;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
+import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
+import com.benefitj.mqtt.paho.PahoMqttClient;
 import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
 import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
 import com.benefitj.spring.annotationprcoessor.MetadataHandler;
-import com.benefitj.spring.mqtt.MqttCallbackDispatcher;
-import com.benefitj.spring.mqtt.MqttOptionsProperty;
-import com.benefitj.spring.mqtt.MqttPahoClientFactoryWrapper;
-import com.benefitj.spring.mqtt.SimpleMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 import org.springframework.messaging.Message;
@@ -25,13 +23,9 @@ import java.util.List;
 public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implements MetadataHandler {
 
   /**
-   * 属性配置
-   */
-  private MqttOptionsProperty property;
-  /**
    * 代理
    */
-  private MqttPahoClientFactoryWrapper clientFactory;
+  private MqttConnectOptions options;
   /**
    * 默认的订阅客户端
    */
@@ -43,8 +37,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   private MqttMessageConverter messageConverter = new DefaultPahoMessageConverter();
 
-  public MqttMessageMetadataRegistrar(MqttPahoClientFactory clientFactory) {
-    this.clientFactory = new MqttPahoClientFactoryWrapper(clientFactory);
+  public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
+    this.options = options;
     this.setAnnotationType(MqttMessageListener.class);
     this.setMetadataHandler(this);
   }
@@ -56,7 +50,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
       if (listener.singleClient()) {
         // 单独的客户端
         String id = IdUtils.nextLowerLetterId(listener.clientIdPrefix(), null, 16);
-        SimpleMqttClient client = new SimpleMqttClient(getClientFactory(), id);
+        PahoMqttClient client = new PahoMqttClient(getOptions(), id);
         client.setExecutor(EventLoop.newSingle(false));
         // 自动重连
         client.setAutoReconnect(true);
@@ -78,32 +72,25 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
                            MqttCallbackDispatcher dispatcher,
                            MqttMessageListener listener) {
     final SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
-    dispatcher.subscribe(listener.topics(), (topic, mqttMessage) -> {
-      Message<?> message = getMessageConverter().toMessage(topic, mqttMessage);
-      invoker.invoke(topic, mqttMessage, message, message.getHeaders());
+    dispatcher.subscribe(listener.topics(), (topic, msg) -> {
+      Message<?> message = getMessageConverter().toMessage(topic, msg);
+      invoker.invoke(topic, msg.getPayload(), msg, message, message.getHeaders());
     });
     try {
       if (!client.isConnected()) {
         // 连接客户端
         client.connect();
       }
-      if (client.isConnected()) {
-        // 订阅
-        client.subscribe(listener.topics());
-      }
     } catch (MqttException ignore) {/* ~  */ }
   }
 
-  public MqttPahoClientFactoryWrapper getClientFactory() {
-    return clientFactory;
+
+  public MqttConnectOptions getOptions() {
+    return options;
   }
 
-  public MqttOptionsProperty getProperty() {
-    return property;
-  }
-
-  public void setProperty(MqttOptionsProperty property) {
-    this.property = property;
+  public void setOptions(MqttConnectOptions options) {
+    this.options = options;
   }
 
   public MqttMessageConverter getMessageConverter() {

@@ -1,10 +1,10 @@
 package com.benefitj.spring.vertxmqtt.server;
 
-import com.benefitj.mqtt.VertxHolder;
-import com.benefitj.mqtt.server.MqttEndpointHandler;
-import com.benefitj.mqtt.server.MqttEndpointHandlerImpl;
-import com.benefitj.mqtt.server.MqttServerProperty;
-import com.benefitj.mqtt.server.VertxMqttServer;
+import com.benefitj.mqtt.vertx.VertxHolder;
+import com.benefitj.mqtt.vertx.server.MqttEndpointHandler;
+import com.benefitj.mqtt.vertx.server.MqttEndpointHandlerImpl;
+import com.benefitj.mqtt.vertx.server.MqttServerProperty;
+import com.benefitj.mqtt.vertx.server.VertxMqttServer;
 import com.benefitj.spring.listener.AppStateListener;
 import com.benefitj.spring.listener.AppStateListenerWrapper;
 import io.vertx.core.Vertx;

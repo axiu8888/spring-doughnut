@@ -2,29 +2,25 @@ package com.benefitj.spring.mqtt.publisher;
 
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
-import com.benefitj.spring.mqtt.SimpleMqttClient;
+import com.benefitj.mqtt.paho.PahoMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
  * MQTT发送端
  */
-public class MqttPublisher implements IMqttSender, InitializingBean, DisposableBean {
+public class MqttPublisher implements IMqttPublisher, InitializingBean, DisposableBean {
 
-  /**
-   * 客户端
-   */
-  private MqttPahoClientFactory clientFactory;
+  private MqttConnectOptions options;
   /**
    * 前缀
    */
@@ -36,41 +32,36 @@ public class MqttPublisher implements IMqttSender, InitializingBean, DisposableB
   /**
    * 客户端
    */
-  private List<SimpleMqttClient> clients;
+  private List<PahoMqttClient> clients;
   /**
    * 调度器
    */
-  private ExecutorService executor = EventLoop.io();
+  private EventLoop executor = EventLoop.io();
 
   private final AtomicInteger dispatcher = new AtomicInteger();
 
-  public MqttPublisher(MqttPahoClientFactory clientFactory) {
-    this(clientFactory, "mqtt-publisher-");
+  public MqttPublisher(MqttConnectOptions options) {
+    this(options, "mqtt-publisher-");
   }
 
-  public MqttPublisher(MqttPahoClientFactory clientFactory, String prefix) {
-    this(clientFactory, prefix, 1);
+  public MqttPublisher(MqttConnectOptions options, String prefix) {
+    this(options, prefix, 1);
   }
 
-  public MqttPublisher(MqttPahoClientFactory clientFactory, String prefix, int count) {
-    this.clientFactory = clientFactory;
+  public MqttPublisher(MqttConnectOptions options, String prefix, int count) {
+    this.options = options;
     this.prefix = prefix;
     this.count = count;
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    String id = IdUtils.nextLowerLetterId(getPrefix(), null, 4);
-    int count = this.getCount();
-    // 设置自动连接
-    MqttPahoClientFactory factory = this.clientFactory;
-    factory.getConnectionOptions().setAutomaticReconnect(true);
-
-    EventLoop executor = EventLoop.newSingle(false);
-    List<SimpleMqttClient> clients = new ArrayList<>(count);
+    String id = IdUtils.nextLowerLetterId(getPrefix(), null, 6);
+    int count = getCount();
+    List<PahoMqttClient> clients = new ArrayList<>(count);
     for (int i = 1; i <= count; i++) {
-      SimpleMqttClient client = new SimpleMqttClient(factory, id + i);
-      client.setExecutor(executor);
+      PahoMqttClient client = new PahoMqttClient(options, id + "-" + i);
+      client.setExecutor(getExecutor());
       clients.add(client);
     }
     this.setClients(Collections.unmodifiableList(clients));
@@ -78,7 +69,7 @@ public class MqttPublisher implements IMqttSender, InitializingBean, DisposableB
 
   @Override
   public void destroy() throws Exception {
-    for (SimpleMqttClient client : getClients()) {
+    for (PahoMqttClient client : getClients()) {
       client.disconnect();
     }
   }
@@ -89,7 +80,7 @@ public class MqttPublisher implements IMqttSender, InitializingBean, DisposableB
   @Override
   public IMqttClient getClient() {
     int index = dispatcher.incrementAndGet();
-    SimpleMqttClient client = this.clients.get(index % this.clients.size());
+    PahoMqttClient client = this.clients.get(index % this.clients.size());
     if (index > 10000) {
       dispatcher.set(this.clients.size());
     }
@@ -97,7 +88,7 @@ public class MqttPublisher implements IMqttSender, InitializingBean, DisposableB
   }
 
   @Override
-  public Executor getExecutor() {
+  public ScheduledExecutorService getExecutor() {
     return this.executor;
   }
 
@@ -110,11 +101,11 @@ public class MqttPublisher implements IMqttSender, InitializingBean, DisposableB
     getExecutor().execute(() -> consumer.accept(getClient()));
   }
 
-  public List<SimpleMqttClient> getClients() {
+  public List<PahoMqttClient> getClients() {
     return clients;
   }
 
-  public void setClients(List<SimpleMqttClient> clients) {
+  public void setClients(List<PahoMqttClient> clients) {
     this.clients = clients;
   }
 

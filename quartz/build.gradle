@@ -6,8 +6,8 @@ dependencies {
 	compileOnly(project(":spring"))
 //	compileOnly(project(":eventbus"))
 
-	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.12.2'
+	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.13.0'
 
 	// QUARTZ
 	compileOnly "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"

@@ -19,7 +19,7 @@ import java.util.Random;
 @SpringBootTest
 public class InfluxDBApplicationTest {
 
-  private static final Logger log = LoggerFactory.getLogger(InfluxDBApplicationTest.class);
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   @Autowired
   private RxJavaInfluxDBTemplate template;

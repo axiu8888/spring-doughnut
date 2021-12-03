@@ -10,23 +10,15 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.*;
  * @author DINGXIUAN
  */
 @ConfigurationProperties(prefix = "spring.mqtt")
-public class MqttOptionsProperty {
-  /**
-   * 客户端数量，默认1个
-   */
-  private Integer clientCount = 1;
-  /**
-   * 客户端ID的前缀
-   */
-  private String clientIdPrefix = "mqtt-";
+public class MqttProperty {
   /**
    * 保持连接数
    */
-  private Integer keepalive = KEEP_ALIVE_INTERVAL_DEFAULT;
+  private int keepalive = KEEP_ALIVE_INTERVAL_DEFAULT;
   /**
    * 如果断开，最多保留消息的数量
    */
-  private Integer maxInflight = MAX_INFLIGHT_DEFAULT;
+  private int maxInflight = MAX_INFLIGHT_DEFAULT;
   /**
    * 用户名
    */
@@ -38,11 +30,11 @@ public class MqttOptionsProperty {
   /**
    * 清理会话
    */
-  private Boolean cleanSession = CLEAN_SESSION_DEFAULT;
+  private boolean cleanSession = CLEAN_SESSION_DEFAULT;
   /**
    * 清理会话超时时长
    */
-  private Integer connectionTimeout = CONNECTION_TIMEOUT_DEFAULT;
+  private int connectionTimeout = CONNECTION_TIMEOUT_DEFAULT;
   /**
    * 服务端连接地址，如果有多个，使用逗号分割
    */
@@ -50,15 +42,7 @@ public class MqttOptionsProperty {
   /**
    * 是否自动重连，默认自动重连
    */
-  private Boolean automaticReconnect = true;
-  /**
-   * 接收端订阅的topic，以逗号(",")分割
-   */
-  private String subscribeTopics;
-  /**
-   * 发送端订阅的topic，以逗号(",")分割
-   */
-  private String publishTopics;
+  private boolean automaticReconnect = true;
   /**
    * 发送完成超时，默认3秒
    */
@@ -71,36 +55,24 @@ public class MqttOptionsProperty {
    * 服务质量，默认 0
    */
   private int qos = 0;
+  /**
+   * 主题
+   */
+  private Will will = new Will();
 
-  public Integer getClientCount() {
-    return clientCount;
-  }
-
-  public void setClientCount(Integer clientCount) {
-    this.clientCount = clientCount;
-  }
-
-  public String getClientIdPrefix() {
-    return clientIdPrefix;
-  }
-
-  public void setClientIdPrefix(String clientIdPrefix) {
-    this.clientIdPrefix = clientIdPrefix;
-  }
-
-  public Integer getKeepalive() {
+  public int getKeepalive() {
     return keepalive;
   }
 
-  public void setKeepalive(Integer keepalive) {
+  public void setKeepalive(int keepalive) {
     this.keepalive = keepalive;
   }
 
-  public Integer getMaxInflight() {
+  public int getMaxInflight() {
     return maxInflight;
   }
 
-  public void setMaxInflight(Integer maxInflight) {
+  public void setMaxInflight(int maxInflight) {
     this.maxInflight = maxInflight;
   }
 
@@ -120,19 +92,19 @@ public class MqttOptionsProperty {
     this.password = password;
   }
 
-  public Boolean getCleanSession() {
+  public boolean isCleanSession() {
     return cleanSession;
   }
 
-  public void setCleanSession(Boolean cleanSession) {
+  public void setCleanSession(boolean cleanSession) {
     this.cleanSession = cleanSession;
   }
 
-  public Integer getConnectionTimeout() {
+  public int getConnectionTimeout() {
     return connectionTimeout;
   }
 
-  public void setConnectionTimeout(Integer connectionTimeout) {
+  public void setConnectionTimeout(int connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
   }
 
@@ -144,28 +116,12 @@ public class MqttOptionsProperty {
     this.serverURIs = serverURIs;
   }
 
-  public Boolean getAutomaticReconnect() {
+  public boolean isAutomaticReconnect() {
     return automaticReconnect;
   }
 
-  public void setAutomaticReconnect(Boolean automaticReconnect) {
+  public void setAutomaticReconnect(boolean automaticReconnect) {
     this.automaticReconnect = automaticReconnect;
-  }
-
-  public String getSubscribeTopics() {
-    return subscribeTopics;
-  }
-
-  public void setSubscribeTopics(String subscribeTopics) {
-    this.subscribeTopics = subscribeTopics;
-  }
-
-  public String getPublishTopics() {
-    return publishTopics;
-  }
-
-  public void setPublishTopics(String publishTopics) {
-    this.publishTopics = publishTopics;
   }
 
   public long getCompletionTimeout() {
@@ -190,5 +146,53 @@ public class MqttOptionsProperty {
 
   public void setQos(int qos) {
     this.qos = qos;
+  }
+
+  public Will getWill() {
+    return will;
+  }
+
+  public void setWill(Will will) {
+    this.will = will;
+  }
+
+  public static class Will {
+
+    private String topic;
+    private String payload;
+    private int qos;
+    private boolean retained;
+
+    public String getTopic() {
+      return topic;
+    }
+
+    public void setTopic(String topic) {
+      this.topic = topic;
+    }
+
+    public String getPayload() {
+      return payload;
+    }
+
+    public void setPayload(String payload) {
+      this.payload = payload;
+    }
+
+    public int getQos() {
+      return qos;
+    }
+
+    public void setQos(int qos) {
+      this.qos = qos;
+    }
+
+    public boolean isRetained() {
+      return retained;
+    }
+
+    public void setRetained(boolean retained) {
+      this.retained = retained;
+    }
   }
 }

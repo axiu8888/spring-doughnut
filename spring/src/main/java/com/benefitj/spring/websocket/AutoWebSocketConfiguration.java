@@ -58,12 +58,14 @@ public class AutoWebSocketConfiguration extends DelegatingWebSocketConfiguration
       WebSocketEndpoint endpoint = type.getAnnotation(WebSocketEndpoint.class);
       WebSocketHandlerAdapter adapter = new WebSocketHandlerAdapter();
       if (endpoint.socketManager() == WebSocketManager.class) {
-        adapter.setSocketManager(newManager(endpoint.socketManager()));
+        adapter.setSocketManager(WebSocketManager.newInstance());
       } else {
         adapter.setSocketManager(beanFactory.getBean(endpoint.socketManager()));
       }
       adapter.setSocketFactory(beanFactory.getBean(endpoint.socketFactory()));
       adapter.setSocketListener(socketListener);
+      // 初始化 SocketManager
+      socketListener.onWebSocketManager(adapter.getSocketManager());
       // 注册handler
       WebSocketHandlerRegistration registration = registry.addHandler(adapter, endpoint.value());
       // 允许的域

@@ -11,6 +11,15 @@ import org.springframework.web.socket.TextMessage;
 public interface WebSocketListener {
 
   /**
+   * 接收到WebSocketManager
+   *
+   * @param manager WebSocket管理器
+   */
+  default void onWebSocketManager(WebSocketManager manager) {
+    // ignore
+  }
+
+  /**
    * WebSocket Open
    *
    * @param socket WebSocket

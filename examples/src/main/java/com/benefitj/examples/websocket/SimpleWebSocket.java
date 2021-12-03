@@ -1,7 +1,6 @@
 package com.benefitj.examples.websocket;
 
 import com.benefitj.core.StackLogger;
-import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.websocket.WebSocket;
 import com.benefitj.spring.websocket.WebSocketEndpoint;
 import com.benefitj.spring.websocket.WebSocketListener;
@@ -14,23 +13,21 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 
 @Component
-@WebSocketEndpoint(
-    value = "/sockets/simple",
-    socketManager = SimpleWebSocket.SimpleWebSocketManager.class
-)
+@WebSocketEndpoint("/sockets/simple")
 public class SimpleWebSocket implements WebSocketListener {
-
-  @Component
-  public static class SimpleWebSocketManager extends WebSocketManager.WebSocketManagerImpl {
-  }
 
   private final Logger logger = StackLogger.getLogger();
 
-  private SimpleWebSocketManager manager;
+  private WebSocketManager manager;
+
+  @Override
+  public void onWebSocketManager(WebSocketManager manager) {
+    this.manager = manager;
+    logger.info("onWebSocketManager: {}", manager.getClass());
+  }
 
   @Override
   public void onOpen(WebSocket socket) {
-    this.manager = SpringCtxHolder.getBean(SimpleWebSocketManager.class);
     logger.info("WebSocket上线, id: {}, 数量: {}", socket.getId(), manager.size());
   }
 
@@ -38,11 +35,13 @@ public class SimpleWebSocket implements WebSocketListener {
   public void onTextMessage(WebSocket socket, TextMessage message) {
     logger.info("WebSocket消息(Text), id: {}, 数量: {}, msg: {}",
         socket.getId(), manager.size(), message.getPayload());
+
+    socket.send("接收到消息[" + message.getPayload() + "]");
   }
 
   @Override
   public void onBinaryMessage(WebSocket socket, BinaryMessage message) {
-    logger.info("WebSocket消息(Binary), id: {}, 数量: {}, msg: {}",
+    logger.info("WebSocket消息(Binary), id: {}, 数量3: {}, msg: {}",
         socket.getId(), manager.size(), HexUtils.toHexString(message.getPayload().array()));
   }
 

@@ -2,6 +2,7 @@ package com.benefitj.spring.aop.ratelimiter;
 
 import com.benefitj.core.local.LocalCacheFactory;
 import com.benefitj.core.local.LocalMapCache;
+import com.benefitj.spring.aop.AopAdvice;
 import com.benefitj.spring.aop.AopUtils;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
@@ -27,7 +28,7 @@ public class RateLimiterHandler implements WebPointCutHandler {
   }
 
   @Override
-  public void doBefore(JoinPoint joinPoint) {
+  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
     Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
     AopRateLimiter rateLimiter = cache.computeIfAbsent(method);
     if (rateLimiter != null) {

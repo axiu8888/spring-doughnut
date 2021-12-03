@@ -1,6 +1,7 @@
 package com.benefitj.examples.aop;
 
 import com.alibaba.fastjson.JSON;
+import com.benefitj.spring.aop.AopAdvice;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class PutRequestHandler implements WebPointCutHandler, Function<Method, P
   }
 
   @Override
-  public void doBefore(JoinPoint joinPoint) {
+  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
     if (support(joinPoint)) {
       final Object[] args = joinPoint.getArgs();
       if (args != null && args.length > 0) {

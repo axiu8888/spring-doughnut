@@ -1,5 +1,6 @@
 package com.benefitj.spring.aop.log;
 
+import com.benefitj.spring.aop.AopAdvice;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -53,7 +54,7 @@ public class HttpLoggingHandler implements WebPointCutHandler {
   }
 
   @Override
-  public void doBefore(JoinPoint joinPoint) {
+  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
     HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
     if (hlc.printable()) {
       ServletRequestAttributes attrs = getRequestAttributes();

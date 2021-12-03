@@ -1,6 +1,7 @@
 package com.benefitj.spring.aop.web;
 
-import com.benefitj.spring.aop.AbstractAspect;
+import com.benefitj.spring.aop.AdviceImpl;
+import com.benefitj.spring.aop.PointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,17 +14,16 @@ import java.util.List;
 /**
  * Web请求的切入点
  */
-@ConditionalOnMissingBean(WebRequestAspect.class)
+@ConditionalOnMissingBean(WebRequestAdvice.class)
 @Aspect
-public class WebRequestAspect extends AbstractAspect<WebPointCutHandler> {
+public class WebRequestAdvice extends AdviceImpl<WebPointCutHandler> {
 
   /**
    * 注册 Handler
    */
   @Autowired(required = false)
-  @Override
   public void register(List<WebPointCutHandler> list) {
-    super.register(list);
+    super.register(list.toArray(new PointCutHandler[0]));
   }
 
   /**

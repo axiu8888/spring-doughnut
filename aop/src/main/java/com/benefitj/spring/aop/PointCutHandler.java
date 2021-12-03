@@ -3,38 +3,48 @@ package com.benefitj.spring.aop;
 import org.aspectj.lang.JoinPoint;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * AOP切入点处理：前置/后置/异常/返回
  */
 public interface PointCutHandler {
-
-  default void doBefore(AbstractAspect aspect, JoinPoint joinPoint) {
-    doBefore(joinPoint);
+  /**
+   * 调用方法前
+   *
+   * @param advice    通知
+   * @param joinPoint 切入点
+   */
+  default void doBefore(AopAdvice advice, JoinPoint joinPoint) {
   }
 
-  default void doBefore(JoinPoint joinPoint) {
+  /**
+   * 调用方法后
+   *
+   * @param advice      通知
+   * @param joinPoint   切入点
+   * @param returnValue 返回值的引用
+   */
+  default void doAfter(AopAdvice advice, JoinPoint joinPoint, AtomicReference<Object> returnValue) {
   }
 
-  default void doAfter(AbstractAspect aspect, JoinPoint joinPoint) {
-    doAfter(joinPoint);
+  /**
+   * 调用方法时抛出异常
+   *
+   * @param advice    通知
+   * @param joinPoint 切入点
+   * @param ex        异常
+   */
+  default void doAfterThrowing(AopAdvice advice, JoinPoint joinPoint, Throwable ex) {
   }
 
-  default void doAfter(JoinPoint joinPoint) {
-  }
-
-  default void doAfterThrowing(AbstractAspect aspect, JoinPoint joinPoint, Throwable ex) {
-    doAfterThrowing(joinPoint, ex);
-  }
-
-  default void doAfterThrowing(JoinPoint joinPoint, Throwable ex) {
-  }
-
-  default void doAfterReturning(AbstractAspect aspect, JoinPoint joinPoint, Object returnValue) {
-    doAfterReturning(joinPoint, returnValue);
-  }
-
-  default void doAfterReturning(JoinPoint joinPoint, Object returnValue) {
+  /**
+   * 最终返回结果
+   *
+   * @param advice    通知
+   * @param joinPoint 切入点
+   */
+  default void doAfterReturning(AopAdvice advice, JoinPoint joinPoint) {
   }
 
   default Method getMethod(JoinPoint jp) {

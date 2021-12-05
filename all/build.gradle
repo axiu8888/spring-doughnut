@@ -2,11 +2,11 @@
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 group = "spring-doughnut"
+
 archivesBaseName = "${group}"
 
 dependencies {
 
-  compileOnly "com.google.guava:guava:${guavaVersion}"
   compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 

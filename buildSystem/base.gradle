@@ -1,15 +1,13 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-//apply plugin: 'io.spring.dependency-management'
-
 apply from: "${getRootDir()}/buildSystem/repository.gradle"
 
 //archivesBaseName = "${group}"
 archivesBaseName = "${getProject().name}"
 
-//sourceCompatibility = JavaVersion.VERSION_11
-//targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
@@ -36,27 +34,43 @@ configurations {
     }
 }
 
+ext {
+    lombokVersion = "1.18.22"
+    jacksonVersion = "2.13.0"
+    guavaVersion = '31.0.1-jre'
+    fastjsonVersion = '1.2.78'
+    commonsIOVersion = "2.11.0"
+    commonsLang3Version = "3.12.0"
+    slf4jVersion = '1.7.32'
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs/jar', include: ['*.jar'])
     compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-    implementation "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    implementation 'javax.inject:javax.inject:1'
-    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    def deps = [
+            "javax.inject:javax.inject:1",
+            "com.google.code.findbugs:jsr305:3.0.2",
+            "org.projectlombok:lombok:${lombokVersion}",
+            "commons-io:commons-io:${commonsIOVersion}",
+            "org.apache.commons:commons-lang3:${commonsLang3Version}",
+            "com.google.guava:guava:${guavaVersion}",
+            "com.alibaba:fastjson:${fastjsonVersion}",
+            "org.slf4j:slf4j-log4j12:${slf4jVersion}",
 
-    implementation 'org.apache.commons:commons-lang3:3.9'
-    implementation 'commons-io:commons-io:2.6'
-    //compileOnly "org.apache.commons:commons-pool2:2.9.0"
+            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+            "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
 
-    compileOnly "com.google.guava:guava:${guavaVersion}"
-    compileOnly "com.alibaba:fastjson:${fastjsonVersion}"
+    ]
 
-    compileOnly 'ch.qos.logback:logback-classic:1.2.3'
-    testCompileOnly 'ch.qos.logback:logback-classic:1.2.3'
-    //compileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
-    //testCompileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
+    deps.forEach {
+        implementation it
+        testImplementation it
+    }
+
+    testCompile 'junit:junit:4.13.2'
 
 }

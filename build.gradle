@@ -10,8 +10,7 @@ ext {
   aspectjVersion = "1.9.7"
   vertxVersion = "4.1.5"
 
-  repositoryAddress = '192.168.159.133:9001'
-//  repositoryAddress = '192.168.19.129:9001'
+  repositoryAddress = '192.168.19.129:9001'
   repositoryUserName = 'admin'
   repositoryPassword = 'admin123'
   useRepository = false
@@ -34,14 +33,14 @@ allprojects {
     versionId = "${version}"
   }
 
-//  sourceCompatibility = JavaVersion.VERSION_15
-//  targetCompatibility = JavaVersion.VERSION_15
+  //sourceCompatibility = JavaVersion.VERSION_11
+  //targetCompatibility = JavaVersion.VERSION_11
 
   dependencies {
 
     def commons = project(":commons");
-    if (!project.equals(commons)) {
-      compileOnly(commons)
+    if (!getProject().equals(commons)) {
+      compile(commons)
     }
   }
 

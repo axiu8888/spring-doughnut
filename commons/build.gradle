@@ -2,5 +2,7 @@
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
 dependencies {
+    compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 }
 

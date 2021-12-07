@@ -27,14 +27,11 @@ public class VertxMqttPublisherApplication {
   static void appStart() {
     final Logger log = StackLogger.getLogger();
     final EventLoop single = EventLoop.newSingle(false);
-    final String[] topics = {"/device/", "/collector/device"};
     MqttPublisher publisher = SpringCtxHolder.getBean(MqttPublisher.class);
     single.scheduleAtFixedRate(() -> {
       try {
         log.info("发布消息...");
-        for (String topic : topics) {
-          publisher.publish((topic.endsWith("/") ? topic : (topic + "/")) + "010003b8", DateFmtter.fmtNowS());
-        }
+        publisher.publish("/device/collector/" + "010003b8", DateFmtter.fmtNowS());
       } catch (Exception e) {
         log.info("throw: {}", e.getMessage());
       }

@@ -40,7 +40,8 @@ allprojects {
 
     def commons = project(":commons");
     if (!getProject().equals(commons)) {
-      compile(commons)
+      compileOnly(commons)
+      testCompile(commons)
     }
   }
 

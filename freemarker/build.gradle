@@ -1,0 +1,12 @@
+
+apply from: "${getRootDir()}/buildSystem/springboot.gradle"
+
+dependencies {
+
+	compileOnly(project(":spring"))
+
+	compile 'org.freemarker:freemarker:2.3.31'
+
+}
+
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

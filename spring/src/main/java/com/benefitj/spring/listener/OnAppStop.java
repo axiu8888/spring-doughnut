@@ -3,7 +3,7 @@ package com.benefitj.spring.listener;
 import java.lang.annotation.*;
 
 /**
- * APP停止时, {@link org.springframework.boot.context.event.ApplicationReadyEvent}
+ * APP停止时, {@link org.springframework.context.event.ContextClosedEvent}
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

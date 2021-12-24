@@ -3,8 +3,10 @@ package com.benefitj.spring.listener;
 
 import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @Configuration
 public class AutoAppStateConfiguration {
 
+  @ConditionalOnMissingBean
   @Bean
   public AppStateEventAdapter appStateEventAdapter(@Autowired(required = false)
                                                        List<AppStateListener> listeners) {
@@ -23,6 +26,7 @@ public class AutoAppStateConfiguration {
   /**
    * 注解元信息处理器
    */
+  @ConditionalOnMissingBean
   @Bean
   public AppStateMetadataHandler appStateMetadataHandler() {
     return new AppStateMetadataHandler();
@@ -31,7 +35,9 @@ public class AutoAppStateConfiguration {
   /**
    * OnAppStart
    */
-  @Bean
+  @Lazy(value = false)
+  @ConditionalOnMissingBean(name = "onAppStartProcessor")
+  @Bean("onAppStartProcessor")
   public AnnotationBeanProcessor onAppStartProcessor(AppStateMetadataHandler handler) {
     AnnotationBeanProcessor processor = new AnnotationBeanProcessor();
     processor.setAnnotationType(OnAppStart.class);
@@ -42,7 +48,9 @@ public class AutoAppStateConfiguration {
   /**
    * OnAppStop
    */
-  @Bean
+  @Lazy(value = false)
+  @ConditionalOnMissingBean(name = "onAppStopProcessor")
+  @Bean("onAppStopProcessor")
   public AnnotationBeanProcessor onAppStopProcessor(AppStateMetadataHandler handler) {
     AnnotationBeanProcessor processor = new AnnotationBeanProcessor();
     processor.setAnnotationType(OnAppStop.class);

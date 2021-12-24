@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
 
-@Import({AppStateEventAdapter.class})
+@Import({AutoAppStateConfiguration.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

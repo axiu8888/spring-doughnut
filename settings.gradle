@@ -39,6 +39,11 @@ include ":athenapdf", ":athenapdf:athenapdfservice"
 include ":quartz"
 
 /**
+ * freemarker
+ */
+include ":freemarker"
+
+/**
  * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
 include ":providers:mqtt-acl-redis"

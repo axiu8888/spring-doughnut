@@ -1,7 +1,5 @@
 package com.benefitj.spring.aop;
 
-import com.benefitj.pipeline.DefaultPipeline;
-import com.benefitj.pipeline.Pipeline;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 
@@ -30,7 +28,6 @@ public class AdviceImpl<T extends PointCutHandler> implements AopAdvice {
    * 处理器
    */
   private final List<PointCutHandler> handlers = new CopyOnWriteArrayList<>();
-  private final Pipeline pipeline = new DefaultPipeline();
 
   public AdviceImpl() {
   }

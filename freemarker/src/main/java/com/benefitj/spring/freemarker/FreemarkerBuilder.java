@@ -22,9 +22,7 @@ import java.util.*;
 
 public class FreemarkerBuilder {
 
-
-  private Configuration configuration = new Configuration(Configuration.getVersion());
-
+  private Configuration configuration = new Configuration(Configuration.VERSION_2_3_31);
 
   public Configuration getConfiguration() {
     return configuration;
@@ -197,23 +195,23 @@ public class FreemarkerBuilder {
     return this;
   }
 
-  /**
-   * Sets the time in seconds that must elapse before checking whether there is a newer version of a template "file"
-   * than the cached one.
-   *
-   * <p>
-   * Historical note: Despite what the API documentation said earlier, this method is <em>not</em> thread-safe. While
-   * it works well on most hardware, it's not guaranteed that FreeMarker will see the update in all threads, and
-   * theoretically it's also possible that it will see a value that's a binary mixture of the new and the old one.
-   *
-   * @param seconds
-   * @deprecated Use {@link #setTemplateUpdateDelayMilliseconds(long)} instead, because the time granularity of this method
-   * is often misunderstood to be milliseconds.
-   */
-  public FreemarkerBuilder setTemplateUpdateDelay(int seconds) {
-    getConfiguration().setTemplateUpdateDelay(seconds);
-    return this;
-  }
+//  /**
+//   * Sets the time in seconds that must elapse before checking whether there is a newer version of a template "file"
+//   * than the cached one.
+//   *
+//   * <p>
+//   * Historical note: Despite what the API documentation said earlier, this method is <em>not</em> thread-safe. While
+//   * it works well on most hardware, it's not guaranteed that FreeMarker will see the update in all threads, and
+//   * theoretically it's also possible that it will see a value that's a binary mixture of the new and the old one.
+//   *
+//   * @param seconds
+//   * @deprecated Use {@link #setTemplateUpdateDelayMilliseconds(long)} instead, because the time granularity of this method
+//   * is often misunderstood to be milliseconds.
+//   */
+//  public FreemarkerBuilder setTemplateUpdateDelay(int seconds) {
+//    getConfiguration().setTemplateUpdateDelay(seconds);
+//    return this;
+//  }
 
   /**
    * Sets the time in milliseconds that must elapse before checking whether there is a newer version of a template
@@ -235,23 +233,23 @@ public class FreemarkerBuilder {
     return this;
   }
 
-  /**
-   * Sets whether directives such as {@code if}, {@code else}, etc must be written as {@code #if}, {@code #else}, etc.
-   * Defaults to {@code true}.
-   *
-   * <p>When this is {@code true},
-   * any tag not starting with &lt;# or &lt;/# or &lt;@ or &lt;/@ is considered as plain text
-   * and will go to the output as is. Tag starting with &lt;# or &lt;/# must
-   * be valid FTL tag, or else the template is invalid (i.e. &lt;#noSuchDirective&gt;
-   * is an error).
-   *
-   * @param b
-   * @deprecated Only {@code true} (the default) value will be supported sometimes in the future.
-   */
-  public FreemarkerBuilder setStrictSyntaxMode(boolean b) {
-    getConfiguration().setStrictSyntaxMode(b);
-    return this;
-  }
+//  /**
+//   * Sets whether directives such as {@code if}, {@code else}, etc must be written as {@code #if}, {@code #else}, etc.
+//   * Defaults to {@code true}.
+//   *
+//   * <p>When this is {@code true},
+//   * any tag not starting with &lt;# or &lt;/# or &lt;@ or &lt;/@ is considered as plain text
+//   * and will go to the output as is. Tag starting with &lt;# or &lt;/# must
+//   * be valid FTL tag, or else the template is invalid (i.e. &lt;#noSuchDirective&gt;
+//   * is an error).
+//   *
+//   * @param b
+//   * @deprecated Only {@code true} (the default) value will be supported sometimes in the future.
+//   */
+//  public FreemarkerBuilder setStrictSyntaxMode(boolean b) {
+//    getConfiguration().setStrictSyntaxMode(b);
+//    return this;
+//  }
 
   public FreemarkerBuilder setObjectWrapper(ObjectWrapper objectWrapper) {
     getConfiguration().setObjectWrapper(objectWrapper);
@@ -324,15 +322,15 @@ public class FreemarkerBuilder {
     return this;
   }
 
-  /**
-   * @param version
-   * @deprecated Use {@link Configuration#Configuration(Version)}, or
-   * as last chance, {@link #setIncompatibleImprovements(Version)} instead.
-   */
-  public FreemarkerBuilder setIncompatibleEnhancements(String version) {
-    getConfiguration().setIncompatibleEnhancements(version);
-    return this;
-  }
+//  /**
+//   * @param version
+//   * @deprecated Use {@link Configuration#Configuration(Version)}, or
+//   * as last chance, {@link #setIncompatibleImprovements(Version)} instead.
+//   */
+//  public FreemarkerBuilder setIncompatibleEnhancements(String version) {
+//    getConfiguration().setIncompatibleEnhancements(version);
+//    return this;
+//  }
 
   /**
    * Sets whether the FTL parser will try to remove
@@ -735,17 +733,17 @@ public class FreemarkerBuilder {
     return this;
   }
 
-  /**
-   * Same as {@link #setSharedVariables(Map)}, but with typo in the name.
-   *
-   * @param map
-   * @since 2.3.21
-   * @deprecated Use {@link #setSharedVariables(Map)} instead.
-   */
-  public FreemarkerBuilder setSharedVaribles(Map map) {
-    IOUtils.tryThrow(() -> getConfiguration().setSharedVaribles(map));
-    return this;
-  }
+//  /**
+//   * Same as {@link #setSharedVariables(Map)}, but with typo in the name.
+//   *
+//   * @param map
+//   * @since 2.3.21
+//   * @deprecated Use {@link #setSharedVariables(Map)} instead.
+//   */
+//  public FreemarkerBuilder setSharedVaribles(Map map) {
+//    IOUtils.tryThrow(() -> getConfiguration().setSharedVaribles(map));
+//    return this;
+//  }
 
   /**
    * Adds all object in the hash as shared variable to the configuration; it's like doing several
@@ -1301,14 +1299,14 @@ public class FreemarkerBuilder {
     return this;
   }
 
-  /**
-   * @param strict
-   * @deprecated Set this on the {@link ObjectWrapper} itself.
-   */
-  public FreemarkerBuilder setStrictBeanModels(boolean strict) {
-    getConfiguration().setStrictBeanModels(strict);
-    return this;
-  }
+//  /**
+//   * @param strict
+//   * @deprecated Set this on the {@link ObjectWrapper} itself.
+//   */
+//  public FreemarkerBuilder setStrictBeanModels(boolean strict) {
+//    getConfiguration().setStrictBeanModels(strict);
+//    return this;
+//  }
 
   /**
    * Set the settings stored in a <code>Properties</code> object.

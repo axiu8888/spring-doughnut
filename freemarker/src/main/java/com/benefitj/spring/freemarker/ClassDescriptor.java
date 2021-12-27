@@ -20,7 +20,7 @@ public class ClassDescriptor {
   /**
    * 包名
    */
-  private String packageName;
+  private String basePackage;
   /**
    * 类名
    */
@@ -54,12 +54,12 @@ public class ClassDescriptor {
     return this;
   }
 
-  public String getPackageName() {
-    return packageName;
+  public String getBasePackage() {
+    return basePackage;
   }
 
-  public ClassDescriptor setPackageName(String packageName) {
-    this.packageName = packageName;
+  public ClassDescriptor setBasePackage(String basePackage) {
+    this.basePackage = basePackage;
     return this;
   }
 

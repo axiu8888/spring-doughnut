@@ -1,9 +1,9 @@
 <#if copyright??>${copyright}</#if>
 <#-- 包名 -->
-package ${packageName}.mapper;
+package ${basePackage}.mapper;
 
 import com.benefitj.scaffold.mapper.SuperMapper;
-import ${packageName}.entity.${className}Entity;
+import ${basePackage}.entity.${className}Entity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;

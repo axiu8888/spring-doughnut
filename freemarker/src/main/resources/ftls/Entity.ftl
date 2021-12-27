@@ -1,6 +1,6 @@
 <#if copyright??>${copyright}</#if>
 <#-- 包名 -->
-package ${packageName}.entity;
+package ${basePackage}.entity;
 
 <#-- 全类名 -->
 <#list getFullNames() as name>

@@ -7,6 +7,9 @@ dependencies {
 
 	compile 'org.freemarker:freemarker:2.3.31'
 
+	// OGNL
+	compile 'ognl:ognl:3.3.0'
+
 }
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

@@ -2,6 +2,7 @@ package com.benefitj.spring.influxdb.template;
 
 import org.influxdb.dto.QueryResult;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,8 @@ public class DefaultValueConverter implements ValueConverter {
    */
   @Override
   public Map<String, String> getTags() {
-    return getSeries().getTags();
+    Map<String, String> tags = getSeries().getTags();
+    return tags != null ? tags : Collections.emptyMap();
   }
 
   /**
@@ -70,7 +72,7 @@ public class DefaultValueConverter implements ValueConverter {
   @Override
   public String getTag(String name) {
     Map<String, String> tags = getTags();
-    return tags != null ? tags.get(name) : null;
+    return !tags.isEmpty() ? tags.get(name) : null;
   }
 
   /**

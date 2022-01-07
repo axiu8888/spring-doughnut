@@ -32,13 +32,13 @@ public class AthenapdfApplication {
     try {
       CmdCall call = CmdExecutorHolder.getInstance().call("docker -v");
       //Docker version 20.10.10, build b485636
-      if (StringUtils.isBlank(call.getMessage())) {
+      if (StringUtils.isNotBlank(call.getMessage())) {
         log.info(call.getMessage());
       } else {
-        log.info("不支持【docker -v】命令, error: " + call.getError());
+        log.info("不支持【docker -v】命令\nmessage: {}\nerror: {}", call.getMessage(), call.getError());
       }
     } catch (Exception e) {
-      log.info("不支持【docker -v】命令, error: " + e.getMessage());
+      log.error("不支持【docker -v】命令, error: " + e.getMessage(), e);
     }
   }
 }

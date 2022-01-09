@@ -1,8 +1,8 @@
 package com.benefitj.examples.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.benefitj.core.DUtils;
 import com.benefitj.core.IOUtils;
-import com.benefitj.core.Unit;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
 import com.benefitj.examples.vo.IdEvent;
@@ -74,7 +74,7 @@ public class SimpleController {
   @PostMapping("/upload")
   public ResponseEntity<?> uploadFile(@RequestParam("files") MultipartFile[] files) throws IOException {
     for (MultipartFile file : files) {
-      log.info("上传文件: {}, {}MB", file.getOriginalFilename(), Unit.ofMB(file.getSize(), 2));
+      log.info("上传文件: {}, {}MB", file.getOriginalFilename(), DUtils.ofMB(file.getSize(), 2));
       file.transferTo(IOUtils.createFile("D:/opt/tmp/", file.getOriginalFilename()));
     }
     return ResponseEntity.ok("上传成功");

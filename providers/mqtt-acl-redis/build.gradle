@@ -11,7 +11,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
 	// redis
 	implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
-	implementation "org.apache.commons:commons-pool2:2.9.0"
+	implementation 'org.apache.commons:commons-pool2:2.10.0'
 
 }
 

@@ -1,7 +1,6 @@
 package com.benefitj.spring.aop.web;
 
 import com.benefitj.spring.aop.AdviceImpl;
-import com.benefitj.spring.aop.PointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,7 +22,9 @@ public class WebRequestAdvice extends AdviceImpl<WebPointCutHandler> {
    */
   @Autowired(required = false)
   public void register(List<WebPointCutHandler> list) {
-    super.register(list.toArray(new PointCutHandler[0]));
+    for (WebPointCutHandler handler : list) {
+      register(handler);
+    }
   }
 
   /**

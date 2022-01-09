@@ -1,7 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.6'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 	id 'java'
+	id 'org.springframework.experimental.aot' version "${aotVersion}"
 }
 
 apply from: "${getRootDir()}/buildSystem/springboot.gradle"

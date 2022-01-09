@@ -1,8 +1,8 @@
 package com.benefitj.spring.influxdb.write;
 
 
+import com.benefitj.core.DUtils;
 import com.benefitj.core.EventLoop;
-import com.benefitj.core.Unit;
 import com.benefitj.core.file.slicer.FileSlicer;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -20,7 +20,7 @@ public class InfluxWriterManager extends FileSlicer<LineFileWriter> implements I
   private long delay = 5 * 60_000;
 
   public InfluxWriterManager(File cacheDir) {
-    this(cacheDir, 20 * Unit.MB);
+    this(cacheDir, 20 * DUtils.MB);
   }
 
   public InfluxWriterManager(File cacheDir, long maxSize) {

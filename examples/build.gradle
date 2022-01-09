@@ -10,21 +10,17 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 description("examples")
 
 dependencies {
-  compile fileTree(dir: 'libs/jar', include: ['*.jar'])
-  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
   compile(project(":all")) {
     exclude module: "spring-boot-starter-quartz"
   }
 
-  implementation "com.google.guava:guava:${guavaVersion}"
-  implementation "com.alibaba:fastjson:${fastjsonVersion}"
   implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")
 
   // redis
-  implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
 //  // QUARTZ
 //  implementation "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"

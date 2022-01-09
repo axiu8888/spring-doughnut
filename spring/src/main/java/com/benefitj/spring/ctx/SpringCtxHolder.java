@@ -131,11 +131,29 @@ public class SpringCtxHolder {
     return getCtx().getEnvironment();
   }
 
+  public static String getEnvProperty(String key) {
+    return getEnvironment().getProperty(key);
+  }
+
   /**
    * 获取App名称
    */
   public static String getAppName() {
-    return getEnvironment().getProperty("spring.application.name");
+    return getEnvProperty("spring.application.name");
+  }
+
+  /**
+   * 获取服务器端口
+   */
+  public static String getServerPort() {
+    return getEnvProperty("server.port");
+  }
+
+  /**
+   * 获取服务器上下文地址
+   */
+  public static String getServerContextPath() {
+    return getEnvProperty("server.servlet.context-path");
   }
 
 }

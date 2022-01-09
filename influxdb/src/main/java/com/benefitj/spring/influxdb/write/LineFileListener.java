@@ -1,8 +1,9 @@
 package com.benefitj.spring.influxdb.write;
 
-import com.benefitj.core.Unit;
+import com.benefitj.core.DUtils;
 import com.benefitj.core.file.slicer.FileListener;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
+import kotlin.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +39,9 @@ public interface LineFileListener extends FileListener<LineFileWriter> {
         if (file.length() > 0) {
           try {
             getTemplate().write(file);
-            log.info("上传行协议文件, {}, {}MB", file.getAbsolutePath(), Unit.ofMB(file.length(), 4));
+            log.info("上传行协议文件, {}, {}MB", file.getAbsolutePath(), DUtils.ofMB(file.length(), 4));
           } catch (Exception e) {
-            log.warn("上传行协议文件出错, {}, {}, {}MB", e.getMessage(), file.getAbsolutePath(), Unit.ofMB(file.length(), 4));
+            log.warn("上传行协议文件出错, {}, {}, {}MB", e.getMessage(), file.getAbsolutePath(), DUtils.ofMB(file.length(), 4));
             //e.printStackTrace();
           }
         }

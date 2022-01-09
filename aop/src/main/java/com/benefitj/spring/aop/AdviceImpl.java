@@ -1,5 +1,6 @@
 package com.benefitj.spring.aop;
 
+import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 
@@ -33,11 +34,9 @@ public class AdviceImpl<T extends PointCutHandler> implements AopAdvice {
   }
 
   @Override
-  public void register(PointCutHandler... handlers) {
-    for (PointCutHandler handler : handlers) {
-      if (!this.handlers.contains(handler)) {
-        this.handlers.add(handler);
-      }
+  public void register(PointCutHandler handler) {
+    if (!this.handlers.contains(handler)) {
+      this.handlers.add(handler);
     }
   }
 

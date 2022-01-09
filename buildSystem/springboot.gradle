@@ -1,7 +1,7 @@
 //plugins {
+//    id 'java'
 //    id 'org.springframework.boot' version "${springBootVersion}"
 //    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-//    id 'java'
 //    id 'org.springframework.experimental.aot' version "${aotVersion}"
 //}
 
@@ -18,9 +18,9 @@ configurations {
 }
 
 ext {
-    //springBootVersion = "2.6.1"
+    //springBootVersion = "2.6.2"
     //springDependencyManagementVersion = "1.0.11.RELEASE"
-    //aotVersion = "0.11.0-RC1"
+    //aotVersion = "0.11.1"
     set('springCloudVersion', "2021.0.0")
 }
 
@@ -39,6 +39,7 @@ dependencies {
 
 }
 
+
 //dependencyManagement {
 //    imports {
 //        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
@@ -53,3 +54,4 @@ test {
 //    builder = 'paketobuildpacks/builder:tiny'
 //    environment = ['BP_NATIVE_IMAGE': 'true']
 //}
+

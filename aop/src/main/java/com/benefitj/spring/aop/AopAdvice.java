@@ -54,6 +54,6 @@ public interface AopAdvice {
   /**
    * 注册 Handler
    */
-  void register(PointCutHandler... handlers);
+  void register(PointCutHandler handlers);
 
 }

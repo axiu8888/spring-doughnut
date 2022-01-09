@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableRedisRateLimiter         // redis RateLimiter
 @EnableEventBusPoster           // eventbus
 @EnableAthenapdf                // PDF
-//@EnableQuartz                   // Quartz
 @SpringBootApplication
 public class SpringbootDoughnutApplication {
   public static void main(String[] args) {

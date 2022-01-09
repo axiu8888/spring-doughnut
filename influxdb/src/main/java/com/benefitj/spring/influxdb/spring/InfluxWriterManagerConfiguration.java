@@ -1,6 +1,6 @@
 package com.benefitj.spring.influxdb.spring;
 
-import com.benefitj.core.Unit;
+import com.benefitj.core.DUtils;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
 import com.benefitj.spring.influxdb.write.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -59,7 +59,7 @@ public class InfluxWriterManagerConfiguration {
     File cacheDir = new File(property.getCacheDir());
     InfluxWriterManager manager = new InfluxWriterManager(cacheDir);
     manager.setDelay(property.getDelay() * 1000);
-    manager.setMaxSize(property.getCacheSize() * Unit.MB);
+    manager.setMaxSize(property.getCacheSize() * DUtils.MB);
     manager.setFileFactory(lineFileFactory);
     manager.setFileListener(lineFileListener);
     return manager;

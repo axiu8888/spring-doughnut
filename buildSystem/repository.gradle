@@ -1,11 +1,16 @@
 
 buildscript {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        mavenLocal()
+        maven {url("https://maven.aliyun.com/repository/public")}
+        maven {url("https://maven.aliyun.com/repository/google")}
+        maven {url("https://maven.aliyun.com/repository/central")}
+        maven {url("https://maven.aliyun.com/repository/gradle-plugin")}
+        maven {url("https://maven.aliyun.com/repository/jcenter")}
         mavenCentral()
         maven { url 'https://repo.spring.io/milestone' }
-        mavenLocal()
-        jcenter()
+        maven { url 'https://repo.spring.io/release' }
+        gradlePluginPortal()
         if(useRepository) {
             maven {
                 url = "http://${repositoryAddress}/repository/maven-public/"
@@ -20,11 +25,16 @@ buildscript {
 
 
 repositories {
-    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    mavenLocal()
+    maven {url("https://maven.aliyun.com/repository/public")}
+    maven {url("https://maven.aliyun.com/repository/google")}
+    maven {url("https://maven.aliyun.com/repository/central")}
+    maven {url("https://maven.aliyun.com/repository/gradle-plugin")}
+    maven {url("https://maven.aliyun.com/repository/jcenter")}
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
-    mavenLocal()
-    jcenter()
+    maven { url 'https://repo.spring.io/release' }
+    gradlePluginPortal()
     if(useRepository) {
         maven {
             url = "http://${repositoryAddress}/repository/maven-public/"

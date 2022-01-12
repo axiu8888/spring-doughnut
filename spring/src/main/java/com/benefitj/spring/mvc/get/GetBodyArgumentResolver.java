@@ -1,4 +1,4 @@
-package com.benefitj.spring.mvc.request;
+package com.benefitj.spring.mvc.get;
 
 import com.alibaba.fastjson.JSONObject;
 import com.benefitj.spring.mvc.CustomHandlerMethodArgumentResolver;

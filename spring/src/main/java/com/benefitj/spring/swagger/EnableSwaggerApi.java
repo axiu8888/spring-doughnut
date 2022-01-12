@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 /**
  * swagger api
  */
-@Import({SwaggerConfiguration.class})
+@Import({SwaggerConfiguration.class, SecurityConfiguration.class})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

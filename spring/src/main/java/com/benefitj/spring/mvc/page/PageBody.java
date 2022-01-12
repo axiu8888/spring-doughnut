@@ -1,4 +1,4 @@
-package com.benefitj.spring.mvc.request;
+package com.benefitj.spring.mvc.page;
 
 import java.lang.annotation.*;
 

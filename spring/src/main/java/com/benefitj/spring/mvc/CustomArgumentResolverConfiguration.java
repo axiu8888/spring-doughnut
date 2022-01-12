@@ -1,7 +1,7 @@
 package com.benefitj.spring.mvc;
 
-import com.benefitj.spring.mvc.request.GetBodyArgumentResolver;
-import com.benefitj.spring.mvc.request.PageBodyArgumentResolver;
+import com.benefitj.spring.mvc.get.GetBodyArgumentResolver;
+import com.benefitj.spring.mvc.page.PageBodyArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@ConditionalOnMissingBean(CustomArgumentResolverConfiguration.class)
 @Configuration
 public class CustomArgumentResolverConfiguration {
 

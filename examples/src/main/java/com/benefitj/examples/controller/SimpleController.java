@@ -14,7 +14,7 @@ import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
 import com.benefitj.spring.mvc.page.PageableRequest;
-import com.benefitj.spring.mvc.request.PageBody;
+import com.benefitj.spring.mvc.page.PageBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

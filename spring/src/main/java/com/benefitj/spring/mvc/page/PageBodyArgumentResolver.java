@@ -1,8 +1,7 @@
-package com.benefitj.spring.mvc.request;
+package com.benefitj.spring.mvc.page;
 
 import com.alibaba.fastjson.JSONObject;
 import com.benefitj.spring.mvc.CustomHandlerMethodArgumentResolver;
-import com.benefitj.spring.mvc.page.PageableRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;

@@ -11,6 +11,23 @@ import java.util.concurrent.atomic.AtomicReference;
 public interface AopAdvice {
 
   /**
+   * 判断是否拦截，如果返回false表示不拦截，否则拦截
+   *
+   * @param point          切入点
+   * @param handlers       处理器
+   * @param returnValueRef 返回值引用
+   * @return 返回判断结果
+   */
+  default boolean isInterceptor(ProceedingJoinPoint point, List<PointCutHandler> handlers, AtomicReference<Object> returnValueRef) {
+    for (PointCutHandler handler : handlers) {
+      if (handler.isInterceptor(this, point, returnValueRef)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * 执行之前
    *
    * @param point    连接点
@@ -37,8 +54,8 @@ public interface AopAdvice {
    * @param e        异常
    * @param handlers 处理器
    */
-  default void doAfterThrowing(ProceedingJoinPoint point, Throwable e, List<PointCutHandler> handlers) {
-    handlers.forEach(h -> h.doAfterThrowing(this, point, e));
+  default void doThrowing(ProceedingJoinPoint point, Throwable e, List<PointCutHandler> handlers) {
+    handlers.forEach(h -> h.doThrowing(this, point, e));
   }
 
   /**

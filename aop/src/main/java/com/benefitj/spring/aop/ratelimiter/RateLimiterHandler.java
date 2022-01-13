@@ -28,11 +28,11 @@ public class RateLimiterHandler implements WebPointCutHandler {
   }
 
   @Override
-  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
-    Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
+  public void doBefore(AopAdvice advice, JoinPoint point) {
+    Method method = getMethod(point);
     AopRateLimiter rateLimiter = cache.computeIfAbsent(method);
     if (rateLimiter != null) {
-      getCustomizer().customize(joinPoint, method, rateLimiter);
+      getCustomizer().customize(point, method, rateLimiter);
     }
   }
 

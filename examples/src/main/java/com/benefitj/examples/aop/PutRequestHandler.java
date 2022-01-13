@@ -58,9 +58,9 @@ public class PutRequestHandler implements WebPointCutHandler, Function<Method, P
   }
 
   @Override
-  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
-    if (support(joinPoint)) {
-      final Object[] args = joinPoint.getArgs();
+  public void doBefore(AopAdvice advice, JoinPoint point) {
+    if (support(point)) {
+      final Object[] args = point.getArgs();
       if (args != null && args.length > 0) {
         final PutRequestMethod prm = putMethodCache.get();
         HttpServletRequest request = getRequest();

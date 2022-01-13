@@ -28,9 +28,8 @@ public class AopUtils {
    * @return 返回方法
    */
   public static Method getMethod(JoinPoint jp) {
-    return ((MethodSignature) jp.getSignature()).getMethod();
+    return checkProxy(((MethodSignature) jp.getSignature()).getMethod(), jp.getTarget());
   }
-
 
   public static Method checkProxy(Method methodArg, Object bean) {
     Method method = methodArg;

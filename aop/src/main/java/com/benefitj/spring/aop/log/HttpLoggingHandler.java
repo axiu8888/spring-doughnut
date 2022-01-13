@@ -54,15 +54,15 @@ public class HttpLoggingHandler implements WebPointCutHandler {
   }
 
   @Override
-  public void doBefore(AopAdvice advice, JoinPoint joinPoint) {
+  public void doBefore(AopAdvice advice, JoinPoint point) {
     HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
     if (hlc.printable()) {
       ServletRequestAttributes attrs = getRequestAttributes();
       if (attrs != null) {
         try {
           Map<String, Object> args = getPrintArgs();
-          Method method = checkProxy(((MethodSignature) joinPoint.getSignature()).getMethod(), joinPoint.getTarget());
-          fillPrintArgs(joinPoint, method, attrs, args);
+          Method method = checkProxy(((MethodSignature) point.getSignature()).getMethod(), point.getTarget());
+          fillPrintArgs(point, method, attrs, args);
           hlc.customize(this, args);
         } finally {
           getPrintArgsLocal().remove();

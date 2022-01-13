@@ -1,7 +1,7 @@
 package com.benefitj.spring.security.url;
 
 import com.benefitj.core.ReflectUtils;
-import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -26,7 +26,8 @@ import java.util.stream.Stream;
  */
 public class AnnotationUrlRegistryConfigurerCustomizer implements BeanPostProcessor, UrlRegistryConfigurerCustomizer {
 
-  protected static final Class<? extends Annotation>[] CONTROLLERS = new Class[]{Controller.class, RestController.class};
+  protected static final List<Class<? extends Annotation>>
+      CONTROLLERS = Arrays.asList(Controller.class, RestController.class);
 
   private final List<UrlRegistryMetadata> allMetadata = Collections.synchronizedList(new LinkedList<>());
 
@@ -85,9 +86,9 @@ public class AnnotationUrlRegistryConfigurerCustomizer implements BeanPostProces
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     Class<?> targetClass = AopUtils.getTargetClass(bean);
-    if (ReflectUtils.isAnnotationPresent(targetClass, CONTROLLERS, false)) {
+    if (ReflectUtils.isAnyAnnotationPresent(targetClass, CONTROLLERS)) {
       final boolean controllerPresent = targetClass.isAnnotationPresent(UrlPermitted.class);
-      Collection<Method> methods = AnnotationBeanProcessor.findMethods(targetClass, method -> {
+      Collection<Method> methods = ReflectUtils.getMethods(targetClass, method -> {
         if (isHttpService(method)) {
           return controllerPresent
               ? !method.isAnnotationPresent(UrlAuthenticated.class)

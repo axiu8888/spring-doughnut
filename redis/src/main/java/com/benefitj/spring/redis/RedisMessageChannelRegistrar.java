@@ -1,9 +1,9 @@
 package com.benefitj.spring.redis;
 
 import com.benefitj.core.executable.SimpleMethodInvoker;
-import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
-import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
-import com.benefitj.spring.annotationprcoessor.MetadataHandler;
+import com.benefitj.spring.annotation.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.MetadataHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -27,7 +27,7 @@ public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
 
   public RedisMessageChannelRegistrar(RedisMessageListenerContainer container) {
     this.container = container;
-    this.setAnnotationType(RedisMessageChannel.class);
+    this.register(RedisMessageChannel.class);
     this.setMetadataHandler(this);
   }
 
@@ -43,7 +43,7 @@ public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
   @Override
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
-      RedisMessageChannel rmc = (RedisMessageChannel) metadata.getAnnotation();
+      RedisMessageChannel rmc = metadata.getFirstAnnotation(RedisMessageChannel.class);
       String[] channels = rmc.value();
       if (channels.length <= 0) {
         continue;

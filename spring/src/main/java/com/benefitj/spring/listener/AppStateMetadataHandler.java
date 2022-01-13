@@ -1,8 +1,8 @@
 package com.benefitj.spring.listener;
 
 import com.benefitj.core.executable.SimpleMethodInvoker;
-import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
-import com.benefitj.spring.annotationprcoessor.MetadataHandler;
+import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.MetadataHandler;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -15,11 +15,14 @@ public class AppStateMetadataHandler implements MetadataHandler {
   @Override
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
-      Annotation annotation = metadata.getAnnotation();
-      final SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
-      if (annotation instanceof OnAppStart) {
+      Annotation onAppStart = metadata.getFirstAnnotation(OnAppStart.class);
+      if (onAppStart != null) {
+        SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
         AppStateHook.registerStart(invoker::invoke);
-      } else if (annotation instanceof OnAppStop) {
+      }
+      Annotation onAppStop = metadata.getFirstAnnotation(OnAppStop.class);
+      if (onAppStop != null) {
+        SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
         AppStateHook.registerStop(invoker::invoke);
       }
     }

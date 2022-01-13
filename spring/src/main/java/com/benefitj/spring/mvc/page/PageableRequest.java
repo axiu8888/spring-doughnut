@@ -1,6 +1,8 @@
 package com.benefitj.spring.mvc.page;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Collections;
@@ -12,6 +14,7 @@ import java.util.List;
  *
  * @param <T>
  */
+@ApiModel("分页请求")
 public class PageableRequest<T> {
 
   public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -19,36 +22,44 @@ public class PageableRequest<T> {
   /**
    * 页码，默认第一页
    */
+  @ApiModelProperty("页码，默认第一页")
   private Integer pageNum = 1;
   /**
    * 分页大小，默认10条
    */
+  @ApiModelProperty("分页大小，默认10条")
   private Integer pageSize = 10;
   /**
    * 排序
    */
+  @ApiModelProperty("排序")
   private List<String> orderBy = Collections.emptyList();
   /**
    * 是否为多层级
    */
+  @ApiModelProperty("是否为多层级")
   private Boolean multiLevel = null;
   /**
    * active是否起作用
    */
+  @ApiModelProperty("active是否起作用")
   private Boolean active = null;
   /**
    * 条件
    */
+  @ApiModelProperty("条件")
   private T condition;
   /**
    * 开始时间
    */
+  @ApiModelProperty(value = "开始时间: " + DATE_PATTERN, dataType = "String")
   @JsonFormat(pattern = DATE_PATTERN)
   @DateTimeFormat(pattern = DATE_PATTERN)
   private Date startTime;
   /**
    * 结束时间
    */
+  @ApiModelProperty(value = "结束时间: " + DATE_PATTERN, dataType = "String")
   @JsonFormat(pattern = DATE_PATTERN)
   @DateTimeFormat(pattern = DATE_PATTERN)
   private Date endTime;

@@ -2,9 +2,9 @@ package com.benefitj.spring.vertxmqtt.subscriber;
 
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.vertx.client.VertxMqttMessageDispatcher;
-import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
-import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
-import com.benefitj.spring.annotationprcoessor.MetadataHandler;
+import com.benefitj.spring.annotation.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.MetadataHandler;
 
 import java.util.List;
 
@@ -16,14 +16,14 @@ public class MqttSubscriberRegistrar extends AnnotationBeanProcessor implements 
   private VertxMqttMessageDispatcher dispatcher;
 
   public MqttSubscriberRegistrar() {
-    this.setAnnotationType(MqttSubscriber.class);
+    this.register(MqttSubscriber.class);
     this.setMetadataHandler(this);
   }
 
   @Override
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
-      MqttSubscriber subscriber = (MqttSubscriber) metadata.getAnnotation();
+      MqttSubscriber subscriber = metadata.getFirstAnnotation(MqttSubscriber.class);
       SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
       getDispatcher().subscribe(subscriber.value(), invoker::invoke);
     }

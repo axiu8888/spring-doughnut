@@ -1,6 +1,5 @@
 package com.benefitj.spring.aop;
 
-import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 
@@ -11,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 抽象的切入点
  */
-public class AdviceImpl<T extends PointCutHandler> implements AopAdvice {
+public class AdviceImpl implements AopAdvice {
 
   //   execution：用于匹配方法执行的连接点；
   //   within：用于匹配指定类型内的方法执行；
@@ -35,8 +34,8 @@ public class AdviceImpl<T extends PointCutHandler> implements AopAdvice {
 
   @Override
   public void register(PointCutHandler handler) {
-    if (!this.handlers.contains(handler)) {
-      this.handlers.add(handler);
+    if (!getHandlers().contains(handler)) {
+      this.getHandlers().add(handler);
     }
   }
 
@@ -55,22 +54,23 @@ public class AdviceImpl<T extends PointCutHandler> implements AopAdvice {
     final ProceedingJoinPoint pjp = (ProceedingJoinPoint) joinPoint;
 
     final List<PointCutHandler> handlers = getHandlers();
-
     if (handlers.isEmpty()) {
-      return pjp.proceed(pjp.getArgs());
+      return pjp.proceed(joinPoint.getArgs());
     }
 
     final AtomicReference<Object> returnValueRef = new AtomicReference<>();
-    try {
-      doBefore(pjp, handlers);
-      Object returnValue = pjp.proceed(pjp.getArgs());
-      returnValueRef.set(returnValue);
-      doAfter(pjp, returnValueRef, handlers);
-    } catch (Throwable e) {
-      doAfterThrowing(pjp, e, handlers);
-      throw e;
-    } finally {
-      doAfterReturning(pjp, handlers);
+    if (!isInterceptor(pjp, handlers, returnValueRef)) {
+      try {
+        doBefore(pjp, handlers);
+        Object returnValue = pjp.proceed(pjp.getArgs());
+        returnValueRef.set(returnValue);
+        doAfter(pjp, returnValueRef, handlers);
+      } catch (Throwable e) {
+        doThrowing(pjp, e, handlers);
+        throw e;
+      } finally {
+        doAfterReturning(pjp, handlers);
+      }
     }
     return returnValueRef.get();
   }

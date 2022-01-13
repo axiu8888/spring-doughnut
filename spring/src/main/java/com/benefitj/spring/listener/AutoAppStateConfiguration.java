@@ -1,13 +1,14 @@
 package com.benefitj.spring.listener;
 
 
-import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,27 +34,14 @@ public class AutoAppStateConfiguration {
   }
 
   /**
-   * OnAppStart
+   * OnAppStart 、 OnAppStop
    */
   @Lazy(value = false)
-  @ConditionalOnMissingBean(name = "onAppStartProcessor")
-  @Bean("onAppStartProcessor")
-  public AnnotationBeanProcessor onAppStartProcessor(AppStateMetadataHandler handler) {
+  @ConditionalOnMissingBean(name = "appStateProcessor")
+  @Bean("appStateProcessor")
+  public AnnotationBeanProcessor appStateProcessor(AppStateMetadataHandler handler) {
     AnnotationBeanProcessor processor = new AnnotationBeanProcessor();
-    processor.setAnnotationType(OnAppStart.class);
-    processor.setMetadataHandler(handler);
-    return processor;
-  }
-
-  /**
-   * OnAppStop
-   */
-  @Lazy(value = false)
-  @ConditionalOnMissingBean(name = "onAppStopProcessor")
-  @Bean("onAppStopProcessor")
-  public AnnotationBeanProcessor onAppStopProcessor(AppStateMetadataHandler handler) {
-    AnnotationBeanProcessor processor = new AnnotationBeanProcessor();
-    processor.setAnnotationType(OnAppStop.class);
+    processor.register(Arrays.asList(OnAppStart.class, OnAppStop.class));
     processor.setMetadataHandler(handler);
     return processor;
   }

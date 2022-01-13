@@ -15,15 +15,15 @@ import java.util.List;
  */
 @ConditionalOnMissingBean(WebRequestAdvice.class)
 @Aspect
-public class WebRequestAdvice extends AdviceImpl<WebPointCutHandler> {
+public class WebRequestAdvice extends AdviceImpl {
 
   /**
    * 注册 Handler
    */
   @Autowired(required = false)
-  public void register(List<WebPointCutHandler> list) {
-    for (WebPointCutHandler handler : list) {
-      register(handler);
+  public void register(List<WebPointCutHandler> handlers) {
+    for (WebPointCutHandler handler : handlers) {
+      super.register(handler);
     }
   }
 

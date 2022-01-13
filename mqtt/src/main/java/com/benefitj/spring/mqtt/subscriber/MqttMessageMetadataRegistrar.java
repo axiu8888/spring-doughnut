@@ -5,9 +5,9 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
-import com.benefitj.spring.annotationprcoessor.AnnotationBeanProcessor;
-import com.benefitj.spring.annotationprcoessor.AnnotationMetadata;
-import com.benefitj.spring.annotationprcoessor.MetadataHandler;
+import com.benefitj.spring.annotation.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.MetadataHandler;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -39,14 +39,14 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
     this.options = options;
-    this.setAnnotationType(MqttMessageListener.class);
+    this.register(MqttMessageListener.class);
     this.setMetadataHandler(this);
   }
 
   @Override
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
-      MqttMessageListener listener = (MqttMessageListener) metadata.getAnnotation();
+      MqttMessageListener listener = metadata.getFirstAnnotation(MqttMessageListener.class);
       if (listener.singleClient()) {
         // 单独的客户端
         String id = IdUtils.nextLowerLetterId(listener.clientIdPrefix(), null, 16);

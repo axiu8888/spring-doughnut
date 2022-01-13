@@ -1,4 +1,4 @@
-package com.benefitj.spring.annotationprcoessor;
+package com.benefitj.spring.annotation;
 
 import java.util.List;
 

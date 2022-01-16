@@ -9,6 +9,15 @@ ext {
   swagger2Version = "3.0.0"
   aspectjVersion = "1.9.7"
   vertxVersion = "4.1.5"
+  jjwtVersion = "0.11.2"
+  nettyAllVersion = '4.1.70.Final'
+
+
+  mysqlVersion = "8.0.27"
+  druidVersion = "1.2.8"
+  mybatisVersion = "2.2.0"
+  mapperVersion = "2.1.5"
+  pagehelperVersion = "1.4.1"
 
   repositoryAddress = '192.168.19.129:9001'
   repositoryUserName = 'admin'

@@ -1,7 +1,6 @@
 package com.benefitj.spring.security.url;
 
 import com.benefitj.core.ReflectUtils;
-import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;

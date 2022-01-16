@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.ref.SoftReference;
 
 /**
@@ -59,6 +58,31 @@ public class JsonUtils {
     }
   }
 
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   */
+  public static void toJson(Writer w, Object o) {
+    try {
+      getMapper().writeValue(w, o);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   */
+  public static void toJson(OutputStream out, Object o) {
+    try {
+      getMapper().writeValue(out, o);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 
   /**
    * 转换成对象
@@ -151,6 +175,38 @@ public class JsonUtils {
   public static <T> T fromJson(File json, TypeReference<T> type) {
     try {
       return getMapper().readValue(json, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成对象
+   *
+   * @param r    JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(Reader r, Class<T> type) {
+    try {
+      return getMapper().readValue(r, type);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 转换成对象
+   *
+   * @param in   JSON数据
+   * @param type 对象类型
+   * @param <T>  类型
+   * @return 返回转换后的对象
+   */
+  public static <T> T fromJson(InputStream in, Class<T> type) {
+    try {
+      return getMapper().readValue(in, type);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }

@@ -18,7 +18,7 @@ public class QuartzUtils {
    * @return 返回调度任务
    */
   public static QuartzJobTask setup(QuartzJobTask task, String jobName) {
-    TriggerType triggerType = TriggerType.of(task.getTriggerType());
+    TriggerType triggerType = task.getTriggerType();
     if (triggerType == null) {
       throw new QuartzException("请指定正确的触发器类型");
     }
@@ -93,9 +93,9 @@ public class QuartzUtils {
     }
 
     // job类型
-    JobType jobType = JobType.of(task.getJobType());
+    JobType jobType = task.getJobType() != null ? task.getJobType() : JobType.DEFAULT;
     // 任务类型
-    task.setJobType(jobType.name());
+    task.setJobType(jobType);
     // 是否持久化
     task.setPersistent(jobType.isPersistent());
     // 不允许并发执行
@@ -110,7 +110,7 @@ public class QuartzUtils {
    * @param task
    */
   public static void checkWorker(QuartzJobTask task) {
-    WorkerType workerType = WorkerType.of(task.getWorkerType());
+    WorkerType workerType = task.getWorkerType();
     if (workerType == null) {
       throw new QuartzException("WorkerType错误!");
     }
@@ -144,7 +144,7 @@ public class QuartzUtils {
     checkWorker(task);
     // 创建 JobDetails
     JobBuilder jb = JobBuilder.newJob();
-    jb.ofType(JobType.ofJobClass(task.getJobType()));
+    jb.ofType(task.getJobType().getJobClass());
     jb.withIdentity(task.getJobName(), task.getJobGroup());
     jb.withDescription(task.getDescription());
     jb.requestRecovery(task.getRecovery());
@@ -153,7 +153,7 @@ public class QuartzUtils {
     jb.usingJobData(JobWorker.KEY_ID, task.getId());
     jb.usingJobData(JobWorker.KEY_JOB_DATA, task.getJobData());
     jb.usingJobData(JobWorker.KEY_WORKER, task.getWorker());
-    jb.usingJobData(JobWorker.KEY_WORKER_TYPE, task.getWorkerType());
+    jb.usingJobData(JobWorker.KEY_WORKER_TYPE, task.getWorkerType().name());
     return jb;
   }
 
@@ -164,7 +164,7 @@ public class QuartzUtils {
    * @return 返回TriggerBuilder
    */
   public static TriggerBuilder<Trigger> trigger(QuartzJobTask task) {
-    TriggerType triggerType = TriggerType.of(task.getTriggerType());
+    TriggerType triggerType = task.getTriggerType();
     if (triggerType == null) {
       throw new QuartzException("触发器类型错误");
     }

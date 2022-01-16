@@ -5,6 +5,7 @@ import com.benefitj.core.concurrent.ConcurrentHashSet;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -34,7 +35,8 @@ public class AnnotationSearcher implements BeanPostProcessor {
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     Class<?> targetClass = AopUtils.getTargetClass(bean);
-    List<AnnotationMetadata> list = ReflectUtils.getMethods(targetClass, m -> support(bean, m))
+    List<Method> methods = ReflectUtils.getMethods(targetClass, m -> support(bean, m));
+    List<AnnotationMetadata> list = methods
         .stream()
         .map(method -> resolveMetadata(bean, method))
         .filter(Objects::nonNull)
@@ -51,7 +53,7 @@ public class AnnotationSearcher implements BeanPostProcessor {
    * @return 返回判断结果
    */
   protected boolean support(Object bean, Method method) {
-    return getAnnotationTypes().stream().anyMatch(method::isAnnotationPresent);
+    return ReflectUtils.isAnyAnnotationPresent(method, getAnnotationTypes());
   }
 
   /**
@@ -62,7 +64,13 @@ public class AnnotationSearcher implements BeanPostProcessor {
    * @return 返回注解元信息
    */
   protected AnnotationMetadata resolveMetadata(Object bean, Method method) {
-    return new AnnotationMetadata(bean, method, resolveAnnotations(method));
+    List<? extends Annotation> annotations = resolveAnnotations(method);
+    AnnotationMetadata metadata = new AnnotationMetadata();
+    metadata.setBean(bean);
+    metadata.setTargetClass(AopUtils.getTargetClass(bean));
+    metadata.setMethod(method);
+    metadata.addAnnotations(annotations);
+    return metadata;
   }
 
   /**
@@ -72,9 +80,10 @@ public class AnnotationSearcher implements BeanPostProcessor {
    * @return 返回注解对象
    */
   protected List<? extends Annotation> resolveAnnotations(Method method) {
-    return this.getAnnotationTypes().stream()
+    return this.getAnnotationTypes()
+        .stream()
         .filter(method::isAnnotationPresent)
-        .map(method::getAnnotation)
+        .map(annotationType -> AnnotationUtils.getAnnotation(method, annotationType))
         .collect(Collectors.toList());
   }
 

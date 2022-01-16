@@ -54,7 +54,9 @@ include ":freemarker"
  * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
 include ":providers:mqtt-acl-redis"
+include ":providers:scaffold"
 
 include ":services:jmods-export"
+include ":services:system"
 
 include ":examples"

@@ -117,14 +117,14 @@ public interface QuartzJobTask {
   /**
    * 获取 Job 类型
    */
-  String getJobType();
+  JobType getJobType();
 
   /**
    * 设置 Job 类型
    *
    * @param jobType Job 类型
    */
-  void setJobType(String jobType);
+  void setJobType(JobType jobType);
 
   /**
    * 获取 JobWorker 的实现
@@ -141,14 +141,14 @@ public interface QuartzJobTask {
   /**
    * 获取Worker类型, 参考 {@link WorkerType}
    */
-  String getWorkerType();
+  WorkerType getWorkerType();
 
   /**
    * 设置 Worker 类型, 参考 {@link WorkerType}
    *
    * @param workerType  Worker 类型
    */
-  void setWorkerType(String workerType);
+  void setWorkerType(WorkerType workerType);
 
   /**
    * 获取Job数据
@@ -249,14 +249,14 @@ public interface QuartzJobTask {
   /**
    * 获取调度器类型
    */
-  String getTriggerType();
+  TriggerType getTriggerType();
 
   /**
    * 设置触发器类型
    *
    * @param triggerType 触发器类型(SIMPLE/CRON)
    */
-  void setTriggerType(String triggerType);
+  void setTriggerType(TriggerType triggerType);
 
   /**
    * 获取简单调度的时间间隔

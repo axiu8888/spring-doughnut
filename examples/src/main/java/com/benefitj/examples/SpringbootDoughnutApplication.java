@@ -4,10 +4,13 @@ import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.aop.ratelimiter.EnableRedisRateLimiter;
 import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
-import com.benefitj.spring.listener.AppStateHook;
+import com.benefitj.spring.listener.OnAppStart;
+import com.benefitj.spring.listener.OnAppStop;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 @EnableRedisMessageChannel
 @EnableHttpLoggingHandler       // HTTP请求日志
@@ -20,13 +23,18 @@ public class SpringbootDoughnutApplication {
     SpringApplication.run(SpringbootDoughnutApplication.class, args);
   }
 
+  @EventListener(ApplicationReadyEvent.class)
+  public void onAppState() {
+  }
 
-  static {
-    // app start: do something...
-    AppStateHook.register(
-        e -> System.err.println("app started ..."),
-        e -> System.err.println("app stopped ...")
-    );
+  @OnAppStart
+  public void onAppStart() {
+    System.err.println("app started ...");
+  }
+
+  @OnAppStop
+  public void onAppStop() {
+    System.err.println("app stopped ...");
   }
 
 }

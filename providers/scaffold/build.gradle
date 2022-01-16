@@ -1,0 +1,30 @@
+
+
+dependencies {
+    //compile fileTree(dir: 'libs/jar', include: ['*.jar'])
+    //compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
+
+    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+
+    //compile 'com.h2database:h2:1.4.200'
+    compile "mysql:mysql-connector-java:${mysqlVersion}"
+    compile "com.alibaba:druid-spring-boot-starter:${druidVersion}"
+    compile 'com.github.jsqlparser:jsqlparser:4.3'
+    compile 'com.github.pagehelper:pagehelper:5.3.0'
+    compile 'com.baomidou:mybatis-plus-boot-starter:3.5.0'
+    compile "com.github.pagehelper:pagehelper-spring-boot-starter:${pagehelperVersion}"
+
+    // QUARTZ
+    compile "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
+
+    compile "io.springfox:springfox-boot-starter:${swagger2Version}"
+    //compile 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
+
+    compile "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    compile "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    compile "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+}
+

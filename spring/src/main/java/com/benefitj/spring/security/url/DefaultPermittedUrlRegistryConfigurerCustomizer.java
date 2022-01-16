@@ -46,6 +46,9 @@ public class DefaultPermittedUrlRegistryConfigurerCustomizer implements UrlRegis
       "/**/*.css",
       "/**/*.js",
       "/**/*.html",
+      "/**/swagger-resources/**",
+      "/**/api-docs/**",
+      "/**/swagger-ui/**",
       "/**/actuator/**",
       "/**/favicon.ico"
   };

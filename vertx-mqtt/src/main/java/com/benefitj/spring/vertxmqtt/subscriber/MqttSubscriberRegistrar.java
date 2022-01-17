@@ -4,6 +4,7 @@ import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.vertx.client.VertxMqttMessageDispatcher;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class MqttSubscriberRegistrar extends AnnotationBeanProcessor implements 
   private VertxMqttMessageDispatcher dispatcher;
 
   public MqttSubscriberRegistrar() {
-    this.register(MqttSubscriber.class);
     this.setMetadataHandler(this);
+    this.setResolver(new AnnotationResolverImpl(MqttSubscriber.class));
   }
 
   @Override

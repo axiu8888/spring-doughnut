@@ -3,6 +3,7 @@ package com.benefitj.spring.eventbus;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang3.StringUtils;
@@ -24,8 +25,8 @@ public class EventBusSubscriberRegistrar extends AnnotationBeanProcessor impleme
   private EventBusPoster poster;
 
   public EventBusSubscriberRegistrar() {
-    this.register(Subscribe.class);
     this.setMetadataHandler(this);
+    this.setResolver(new AnnotationResolverImpl(Subscribe.class));
   }
 
   public EventBusSubscriberRegistrar(EventBusPoster poster) {

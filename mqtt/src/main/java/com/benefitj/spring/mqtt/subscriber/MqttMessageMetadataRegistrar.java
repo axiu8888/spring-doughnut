@@ -7,6 +7,7 @@ import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -39,8 +40,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
     this.options = options;
-    this.register(MqttMessageListener.class);
     this.setMetadataHandler(this);
+    this.setResolver(new AnnotationResolverImpl(MqttMessageListener.class));
   }
 
   @Override

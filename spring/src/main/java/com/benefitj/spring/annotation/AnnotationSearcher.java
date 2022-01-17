@@ -1,25 +1,22 @@
 package com.benefitj.spring.annotation;
 
-import com.benefitj.core.ReflectUtils;
-import com.benefitj.core.concurrent.ConcurrentHashSet;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * 注解搜索器
  */
 public class AnnotationSearcher implements BeanPostProcessor {
+
   /**
-   * 查找的注解类型
+   * 注解解析器
    */
-  private final Set<Class<? extends Annotation>> annotationTypes = new ConcurrentHashSet<>();
+  private AnnotationResolver resolver;
   /**
    * 注解信息
    */
@@ -28,97 +25,22 @@ public class AnnotationSearcher implements BeanPostProcessor {
   public AnnotationSearcher() {
   }
 
-  public AnnotationSearcher(List<Class<Annotation>> annotationTypes) {
-    this.annotationTypes.addAll(annotationTypes);
+  public AnnotationSearcher(AnnotationResolver resolver) {
+    this.resolver = resolver;
   }
 
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-    Class<?> targetClass = AopUtils.getTargetClass(bean);
-    List<Method> methods = ReflectUtils.getMethods(targetClass, m -> support(bean, m));
-    List<AnnotationMetadata> list = methods
-        .stream()
-        .map(method -> resolveMetadata(bean, method))
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-    getMetadatas().addAll(list);
+    getMetadatas().addAll(getResolver().resolve(bean, beanName));
     return bean;
   }
 
-  /**
-   * 判断方法是否支持
-   *
-   * @param bean   Bean对象
-   * @param method 方法
-   * @return 返回判断结果
-   */
-  protected boolean support(Object bean, Method method) {
-    return ReflectUtils.isAnyAnnotationPresent(method, getAnnotationTypes());
+  public AnnotationResolver getResolver() {
+    return resolver;
   }
 
-  /**
-   * 解析元信息
-   *
-   * @param bean   bean对象
-   * @param method 方法
-   * @return 返回注解元信息
-   */
-  protected AnnotationMetadata resolveMetadata(Object bean, Method method) {
-    List<? extends Annotation> annotations = resolveAnnotations(method);
-    AnnotationMetadata metadata = new AnnotationMetadata();
-    metadata.setBean(bean);
-    metadata.setTargetClass(AopUtils.getTargetClass(bean));
-    metadata.setMethod(method);
-    metadata.addAnnotations(annotations);
-    return metadata;
-  }
-
-  /**
-   * 获取注解对象
-   *
-   * @param method 方法
-   * @return 返回注解对象
-   */
-  protected List<? extends Annotation> resolveAnnotations(Method method) {
-    return this.getAnnotationTypes()
-        .stream()
-        .filter(method::isAnnotationPresent)
-        .map(annotationType -> AnnotationUtils.getAnnotation(method, annotationType))
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * 注册注解类型
-   *
-   * @param annotation 注解类型
-   */
-  public void register(Class<? extends Annotation> annotation) {
-    register(Collections.singletonList(annotation));
-  }
-
-  /**
-   * 注册注解类型
-   *
-   * @param annotations 注解类型
-   */
-  public void register(List<Class<? extends Annotation>> annotations) {
-    this.annotationTypes.addAll(annotations);
-  }
-
-  /**
-   * 取消注解类型注册
-   *
-   * @param annotations 注解类型
-   */
-  public void unregister(List<Class<? extends Annotation>> annotations) {
-    this.annotationTypes.removeAll(annotations);
-  }
-
-  /**
-   * 注解类型
-   */
-  public Set<Class<? extends Annotation>> getAnnotationTypes() {
-    return annotationTypes;
+  public void setResolver(AnnotationResolver resolver) {
+    this.resolver = resolver;
   }
 
   /**

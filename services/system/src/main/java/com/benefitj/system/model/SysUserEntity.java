@@ -59,6 +59,18 @@ public class SysUserEntity extends BaseEntity {
   @Column(name = "birthday", columnDefinition = "date comment '出生日期'")
   private Date birthday;
 
+  @ApiModelProperty("身高(cm)")
+  @Column(name = "height", columnDefinition = "integer comment '身高(cm)'")
+  private Integer height;
+
+  @ApiModelProperty("体重(kg)")
+  @Column(name = "weight", columnDefinition = "float comment '体重(kg)'")
+  private Float weight;
+
+  @ApiModelProperty("头像地址")
+  @Column(name = "avatar", columnDefinition = "varchar(200) comment '头像地址, max(200)'")
+  private String avatar;
+
   @ApiModelProperty("是否被锁住")
   @Column(name = "locked", columnDefinition = "tinyint(1) NOT NULL DEFAULT 0 comment '是否被锁住'")
   private Boolean locked;

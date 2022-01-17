@@ -2,6 +2,7 @@ package com.benefitj.system.controller;
 
 
 import com.benefitj.system.model.SysUserEntity;
+import com.benefitj.system.security.ResourceTag;
 import com.benefitj.system.service.SysUserService;
 import com.benefitj.scaffold.http.HttpResult;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
@@ -31,6 +32,7 @@ public class UserController {
   @Autowired
   private SysUserService userService;
 
+  @ResourceTag
   @ApiOperation("获取用户信息")
   @ApiImplicitParams({
       @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataType = "String", dataTypeClass = String.class),

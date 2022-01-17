@@ -34,6 +34,14 @@ public enum ResourceType {
     this.name = name;
   }
 
+  public int getValue() {
+    return value;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   /**
    * 迭代并获取资源类型
    *
@@ -119,12 +127,5 @@ public enum ResourceType {
     return true;
   }
 
-  public int getValue() {
-    return value;
-  }
-
-  public String getName() {
-    return name;
-  }
 
 }

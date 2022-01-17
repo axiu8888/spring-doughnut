@@ -2,6 +2,8 @@ package com.benefitj.spring.listener;
 
 
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
+import com.benefitj.spring.annotation.AnnotationResolver;
+import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -25,25 +27,15 @@ public class AutoAppStateConfiguration {
   }
 
   /**
-   * 注解元信息处理器
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public AppStateMetadataHandler appStateMetadataHandler() {
-    return new AppStateMetadataHandler();
-  }
-
-  /**
    * OnAppStart 、 OnAppStop
    */
   @Lazy(value = false)
   @ConditionalOnMissingBean(name = "appStateProcessor")
   @Bean("appStateProcessor")
-  public AnnotationBeanProcessor appStateProcessor(AppStateMetadataHandler handler) {
-    AnnotationBeanProcessor processor = new AnnotationBeanProcessor();
-    processor.register(Arrays.asList(OnAppStart.class, OnAppStop.class));
-    processor.setMetadataHandler(handler);
-    return processor;
+  public AnnotationBeanProcessor appStateProcessor() {
+    AnnotationResolver resolver = new AnnotationResolverImpl(
+        Arrays.asList(OnAppStart.class, OnAppStop.class), false);
+    return new AnnotationBeanProcessor(resolver, new AppStateMetadataHandler());
   }
 
 }

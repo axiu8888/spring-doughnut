@@ -9,55 +9,71 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
 
-public interface JwtToken extends Jwt<Header, Claims>, Claims, Authentication {
+public interface JwtToken extends IJwt<Claims>, Authentication {
 
   /**
    * 是否为 refresh token
    */
-  boolean isRefresh();
+  default boolean isRefresh() {
+    return Boolean.TRUE.equals(get("refresh", Boolean.class));
+  }
 
   /**
    * 设置是否为 refresh token
    *
    * @param refresh
    */
-  void setRefresh(boolean refresh);
+  default void setRefresh(boolean refresh) {
+    put("refresh", refresh);
+  }
 
   /**
    * 获取原始 token
    */
-  String getRawToken();
+  default String getRawToken() {
+    return get("rawToken", String.class);
+  }
 
   /**
    * 设置原始 token
    *
    * @param rawToken
    */
-  void setRawToken(String rawToken);
+  default void setRawToken(String rawToken) {
+    put("rawToken", rawToken);
+  }
 
   /**
    * 获取用户ID
    */
-  String getUserId();
+  default String getUserId() {
+    return get("userId", String.class);
+  }
 
   /**
    * 设置用户ID
    *
    * @param userId 用户ID
    */
-  void setUserId(String userId);
+  default void setUserId(String userId) {
+    put("userId", userId);
+  }
 
   /**
    * 获取机构ID
    */
-  String getOrgId();
+  default String getOrgId() {
+    return get("orgId", String.class);
+  }
 
   /**
    * 设置机构ID
    *
    * @param orgId 机构ID
    */
-  void setOrgId(String orgId);
+  default void setOrgId(String orgId) {
+    put("orgId", orgId);
+  }
 
   /**
    * 获取 userDetails
@@ -83,6 +99,16 @@ public interface JwtToken extends Jwt<Header, Claims>, Claims, Authentication {
    * @param authorities
    */
   void setAuthorities(List<GrantedAuthority> authorities);
+
+  @Override
+  default boolean isAuthenticated() {
+    return Boolean.TRUE.equals(get("authenticated", Boolean.class));
+  }
+
+  @Override
+  default void setAuthenticated(boolean isAuthenticated) {
+    put("authenticated", isAuthenticated);
+  }
 
   /**
    * 拷贝

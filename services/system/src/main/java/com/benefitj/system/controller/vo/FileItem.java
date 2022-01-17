@@ -1,37 +1,49 @@
 package com.benefitj.system.controller.vo;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.File;
 
-@Setter
-@Getter
+@ApiModel("文件")
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class FileItem {
 
   /**
    * 绝对路径
    */
+  @ApiModelProperty("绝对路径")
   private String path;
   /**
    * 父目录
    */
+  @ApiModelProperty("父目录")
   private String parent;
   /**
    * 文件名
    */
+  @ApiModelProperty("文件名")
   private String filename;
   /**
    * 是否为目录
    */
+  @ApiModelProperty("是否为目录")
   private boolean directory = false;
   /**
    * 文件大小
    */
+  @ApiModelProperty("文件大小")
   private long size = 0;
   /**
    * 后缀
    */
+  @ApiModelProperty("后缀")
   private String suffix;
 
 

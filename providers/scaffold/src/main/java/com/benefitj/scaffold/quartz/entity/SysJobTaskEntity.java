@@ -25,7 +25,10 @@ import javax.persistence.*;
 @Entity
 @TableName("sys_job_task")
 @Table(name = "sys_job_task", indexes = {
-    @Index(name = "idx_org_user", columnList = "org_id, owner")
+    @Index(name = "idx_org_user", columnList = "org_id, owner"),
+    @Index(name = "idx_job_group", columnList = "job_group"),
+    @Index(name = "idx_job_type", columnList = "job_type"),
+    @Index(name = "idx_worker_type", columnList = "worker_type"),
 })
 public class SysJobTaskEntity extends BaseEntity implements QuartzJobTask {
 

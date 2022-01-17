@@ -1,4 +1,4 @@
-package com.benefitj.scaffold.base.entitydescriptor;
+package com.benefitj.scaffold.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.benefitj.core.CamelCaseUtils;

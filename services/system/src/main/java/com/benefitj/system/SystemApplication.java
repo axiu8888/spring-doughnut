@@ -5,10 +5,11 @@ import com.benefitj.core.DUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.TryCatchUtils;
 import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.AnnotationSearcher;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.OnAppStart;
-import com.benefitj.spring.mvc.mapping.MappingAnnotationBeanProcessor;
 import com.benefitj.spring.mvc.mapping.MappingAnnotationMetadata;
+import com.benefitj.system.security.ResourceDescriptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -60,16 +61,21 @@ public class SystemApplication {
     }), 1, TimeUnit.SECONDS);
 
 
-    MappingAnnotationBeanProcessor searcher = SpringCtxHolder.getBean(MappingAnnotationBeanProcessor.class);
+    AnnotationSearcher mappingSearcher = SpringCtxHolder.getBean("resourceTagSearcher");
     Map<String, List<String>> map = new HashMap<>();
-    for (AnnotationMetadata metadata : searcher.getMetadatas()) {
+    for (AnnotationMetadata metadata : mappingSearcher.getMetadatas()) {
       MappingAnnotationMetadata am = (MappingAnnotationMetadata) metadata;
       map.computeIfAbsent(am.getTargetClass().getSimpleName() + "[" + String.join(", ", am.getApi().tags()) + "]", type -> new LinkedList<>())
           .addAll(am.getDescriptors()
               .stream()
               .flatMap(ad -> ad.getPaths()
                   .stream()
-                  .map(path -> path + "[(" + String.join(", ", ad.getHttpMethods()) + "), " + ad.getApiOperation().value() + "]"))
+                  .map(path -> path + "["
+                      + "(" + String.join(", ", ad.getHttpMethods()) + ")"
+                      + ", " + ad.getApiOperation().value()
+                      + ", " + String.join(", ", ((ResourceDescriptor) ad).getResourceTag().types())
+                      + "]")
+              )
               .collect(Collectors.toList()));
     }
     System.err.println(JSON.toJSONString(map));

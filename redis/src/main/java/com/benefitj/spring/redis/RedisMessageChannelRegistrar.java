@@ -3,6 +3,7 @@ package com.benefitj.spring.redis;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
+import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -27,8 +28,8 @@ public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
 
   public RedisMessageChannelRegistrar(RedisMessageListenerContainer container) {
     this.container = container;
-    this.register(RedisMessageChannel.class);
     this.setMetadataHandler(this);
+    this.setResolver(new AnnotationResolverImpl(RedisMessageChannel.class));
   }
 
   @Override

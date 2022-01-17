@@ -1,6 +1,21 @@
 package com.benefitj.scaffold.http;
 
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+/**
+ * 认证
+ *
+ * @param <T>
+ */
+@ApiModel("认证")
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class AuthTokenVo<T> {
 
   /**
@@ -16,27 +31,4 @@ public class AuthTokenVo<T> {
    */
   private T data;
 
-  public String getAccessToken() {
-    return accessToken;
-  }
-
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
-
-  public String getRefreshToken() {
-    return refreshToken;
-  }
-
-  public void setRefreshToken(String refreshToken) {
-    this.refreshToken = refreshToken;
-  }
-
-  public T getData() {
-    return data;
-  }
-
-  public void setData(T data) {
-    this.data = data;
-  }
 }

@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
-import com.benefitj.scaffold.base.entitydescriptor.EntityDescriptor;
-import com.benefitj.scaffold.base.entitydescriptor.EntityFinder;
+import com.benefitj.scaffold.base.entity.EntityDescriptor;
+import com.benefitj.scaffold.base.entity.EntityFinder;
 
 import javax.persistence.Transient;
 import java.util.Date;

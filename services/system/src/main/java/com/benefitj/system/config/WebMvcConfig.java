@@ -2,12 +2,14 @@ package com.benefitj.system.config;
 
 import com.benefitj.scaffold.quartz.EnableQuartzConfuration;
 import com.benefitj.scaffold.spring.EnableScaffoldWebSecurityConfiguration;
+import com.benefitj.spring.annotation.AnnotationSearcher;
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.aop.web.EnableAutoAopWebHandler;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
-import com.benefitj.spring.mvc.mapping.MappingAnnotationBeanProcessor;
+import com.benefitj.spring.mvc.mapping.MappingAnnotationResolver;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
+import com.benefitj.system.security.ResourceAnnotationResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,12 +25,18 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 public class WebMvcConfig {
 
-  @Bean
-  public MappingAnnotationBeanProcessor requestMappingSearcher() {
-    MappingAnnotationBeanProcessor searcher = new MappingAnnotationBeanProcessor();
-    // 扫描的包
-    searcher.addBasePackages("com.*.controller");
-    return searcher;
+  /*@Bean("mappingSearcher")
+  public AnnotationSearcher mappingSearcher() {
+    MappingAnnotationResolver resolver = new MappingAnnotationResolver();
+    resolver.addBasePackages("com.*.controller"); // 扫描的包
+    return new AnnotationSearcher(resolver);
+  }*/
+
+  @Bean("resourceTagSearcher")
+  public AnnotationSearcher resourceTagSearcher() {
+    ResourceAnnotationResolver resolver = new ResourceAnnotationResolver();
+    resolver.addBasePackages("com.*.controller"); // 扫描的包
+    return new AnnotationSearcher(resolver);
   }
 
 }

@@ -16,7 +16,9 @@ public class MappingAnnotationMetadata extends AnnotationMetadata {
    * 请求接口
    */
   private final List<ApiDescriptor> descriptors = new LinkedList<>();
-
+  /**
+   * API
+   */
   private Api api;
 
   public MappingAnnotationMetadata() {

@@ -1,4 +1,4 @@
-package com.benefitj.scaffold.base.entitydescriptor;
+package com.benefitj.scaffold.base.entity;
 
 import com.benefitj.core.executable.Instantiator;
 import lombok.AllArgsConstructor;

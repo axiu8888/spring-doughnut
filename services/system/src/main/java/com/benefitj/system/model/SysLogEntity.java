@@ -24,7 +24,10 @@ import javax.persistence.*;
 @Entity
 @TableName("sys_logs")
 @Table(name = "sys_log", indexes = {
-    @Index(name = "idx_org_user", columnList = "org_id, user_id"),
+    @Index(name = "idx_org", columnList = "org_id"),
+    @Index(name = "idx_user", columnList = "user_id"),
+    @Index(name = "idx_module", columnList = "module"),
+    @Index(name = "idx_http_method", columnList = "http_method"),
 })
 public class SysLogEntity extends BaseEntity {
 

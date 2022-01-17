@@ -3,8 +3,6 @@ package com.benefitj.spring.annotation;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 
-import java.lang.annotation.Annotation;
-
 /**
  * 注解的处理器
  */
@@ -22,10 +20,10 @@ public class AnnotationBeanProcessor extends AnnotationSearcher implements Smart
   public AnnotationBeanProcessor() {
   }
 
-  public AnnotationBeanProcessor(Class<? extends Annotation> annotationType,
+  public AnnotationBeanProcessor(AnnotationResolver resolver,
                                  MetadataHandler metadataHandler) {
+    super(resolver);
     this.metadataHandler = metadataHandler;
-    register(annotationType);
   }
 
   @Override
@@ -33,7 +31,7 @@ public class AnnotationBeanProcessor extends AnnotationSearcher implements Smart
     Object returnBean = super.postProcessAfterInitialization(bean, beanName);
     if (isInitialized()) {
       // 直接注册
-      getMetadataHandler().handle(getMetadatas());
+      onHandleMetadata();
     }
     return returnBean;
   }
@@ -41,7 +39,15 @@ public class AnnotationBeanProcessor extends AnnotationSearcher implements Smart
   @Override
   public void afterSingletonsInstantiated() {
     setInitialized(true);
-    getMetadataHandler().handle(getMetadatas());
+    onHandleMetadata();
+  }
+
+  protected void onHandleMetadata() {
+    MetadataHandler handler = getMetadataHandler();
+    if (handler == null) {
+      throw new IllegalStateException("【 "+ getResolver() +" 】未发现【 MetadataHandler 】...");
+    }
+    handler.handle(getMetadatas());
   }
 
   public MetadataHandler getMetadataHandler() {

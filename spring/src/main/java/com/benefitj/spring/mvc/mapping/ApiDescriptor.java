@@ -2,6 +2,7 @@ package com.benefitj.spring.mvc.mapping;
 
 import io.swagger.annotations.ApiOperation;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -9,6 +10,10 @@ import java.util.List;
  */
 public class ApiDescriptor {
 
+  /**
+   * 请求映射
+   */
+  private Annotation mapping;
   /**
    * API操作
    */
@@ -20,15 +25,17 @@ public class ApiDescriptor {
   /**
    * HTTP方法
    */
-  private String[] httpMethods;
+  private List<String> methods;
 
   public ApiDescriptor() {
   }
 
-  public ApiDescriptor(ApiOperation apiOperation, List<String> paths, String[] httpMethods) {
-    this.apiOperation = apiOperation;
-    this.paths = paths;
-    this.httpMethods = httpMethods;
+  public Annotation getMapping() {
+    return mapping;
+  }
+
+  public void setMapping(Annotation mapping) {
+    this.mapping = mapping;
   }
 
   public ApiOperation getApiOperation() {
@@ -47,11 +54,11 @@ public class ApiDescriptor {
     this.paths = paths;
   }
 
-  public String[] getHttpMethods() {
-    return httpMethods;
+  public List<String> getMethods() {
+    return methods;
   }
 
-  public void setHttpMethods(String[] httpMethods) {
-    this.httpMethods = httpMethods;
+  public void setMethods(List<String> methods) {
+    this.methods = methods;
   }
 }

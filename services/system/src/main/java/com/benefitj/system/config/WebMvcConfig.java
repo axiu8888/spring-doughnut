@@ -9,7 +9,6 @@ import com.benefitj.spring.eventbus.EnableEventBusPoster;
 import com.benefitj.spring.mvc.mapping.MappingAnnotationResolver;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
-import com.benefitj.system.security.ResourceAnnotationResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -25,16 +24,9 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 public class WebMvcConfig {
 
-  /*@Bean("mappingSearcher")
+  @Bean("mappingSearcher")
   public AnnotationSearcher mappingSearcher() {
     MappingAnnotationResolver resolver = new MappingAnnotationResolver();
-    resolver.addBasePackages("com.*.controller"); // 扫描的包
-    return new AnnotationSearcher(resolver);
-  }*/
-
-  @Bean("resourceTagSearcher")
-  public AnnotationSearcher resourceTagSearcher() {
-    ResourceAnnotationResolver resolver = new ResourceAnnotationResolver();
     resolver.addBasePackages("com.*.controller"); // 扫描的包
     return new AnnotationSearcher(resolver);
   }

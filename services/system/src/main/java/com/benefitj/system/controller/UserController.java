@@ -32,7 +32,6 @@ public class UserController {
   @Autowired
   private SysUserService userService;
 
-  @ResourceTag
   @ApiOperation("获取用户信息")
   @ApiImplicitParams({
       @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataType = "String", dataTypeClass = String.class),

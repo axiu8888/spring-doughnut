@@ -1,6 +1,5 @@
 package com.benefitj.system.controller.vo;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,29 +7,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/**
- * 资源
- */
-@ApiModel("资源")
+import java.util.List;
+
+@ApiModel("API模块")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ApiResourceItem {
+public class ApiModule {
+
 
   @ApiModelProperty("上下文路径")
   private String contextPath;
+
+  @ApiModelProperty("类名")
+  private String className;
 
   /**
    * API的标签 {@link io.swagger.annotations.Api#tags()}
    */
   @ApiModelProperty("API的标签")
-  private String[] apiTags;
+  private List<String> apiTags;
 
-  @ApiModelProperty("API路径")
-  private String path;
+  @ApiModelProperty("Controller上的路径")
+  private List<String> baseUrls;
 
-  @ApiModelProperty("HTTP方法")
-  private String[] httpMethods;
+  @ApiModelProperty("API详情")
+  private List<ApiDetail> apiDetails;
 
 }

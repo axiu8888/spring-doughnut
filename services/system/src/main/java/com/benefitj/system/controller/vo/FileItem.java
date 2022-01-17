@@ -34,12 +34,12 @@ public class FileItem {
    * 是否为目录
    */
   @ApiModelProperty("是否为目录")
-  private boolean directory = false;
+  private boolean directory;
   /**
    * 文件大小
    */
   @ApiModelProperty("文件大小")
-  private long size = 0;
+  private long size;
   /**
    * 后缀
    */

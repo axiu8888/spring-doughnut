@@ -9,16 +9,14 @@ import com.benefitj.spring.annotation.AnnotationSearcher;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mvc.mapping.MappingAnnotationMetadata;
-import com.benefitj.system.security.ResourceDescriptor;
+import com.benefitj.system.controller.vo.ApiDetail;
+import com.benefitj.system.controller.vo.ApiModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -61,24 +59,51 @@ public class SystemApplication {
     }), 1, TimeUnit.SECONDS);
 
 
-    AnnotationSearcher mappingSearcher = SpringCtxHolder.getBean("resourceTagSearcher");
-    Map<String, List<String>> map = new HashMap<>();
+    String contextPath = SpringCtxHolder.getServerContextPath();
+    AnnotationSearcher mappingSearcher = SpringCtxHolder.getBean("mappingSearcher");
+
+//    Map<String, List<String>> map = new HashMap<>();
+//    for (AnnotationMetadata metadata : mappingSearcher.getMetadatas()) {
+//      MappingAnnotationMetadata am = (MappingAnnotationMetadata) metadata;
+//      map.computeIfAbsent(am.getTargetClass().getSimpleName() + "[" + String.join(", ", am.getApi().tags()) + "]", type -> new LinkedList<>())
+//          .addAll(am.getApiDescriptors()
+//              .stream()
+//              .flatMap(ad -> ad.getPaths()
+//                  .stream()
+//                  .map(path -> path + "["
+//                      + "(" + String.join(", ", ad.getMethods()) + ")"
+//                      + ", " + ad.getApiOperation().value()
+//                      + "]")
+//              )
+//              .collect(Collectors.toList()));
+//    }
+//    System.err.println(JSON.toJSONString(map));
+
+
+    Map<Class<?>, ApiModule> apiModules = new LinkedHashMap<>();
     for (AnnotationMetadata metadata : mappingSearcher.getMetadatas()) {
       MappingAnnotationMetadata am = (MappingAnnotationMetadata) metadata;
-      map.computeIfAbsent(am.getTargetClass().getSimpleName() + "[" + String.join(", ", am.getApi().tags()) + "]", type -> new LinkedList<>())
-          .addAll(am.getDescriptors()
+      apiModules.computeIfAbsent(am.getTargetClass(), s -> ApiModule.builder()
+              .contextPath(contextPath)
+              .className(am.getTargetClass().getSimpleName())
+              .apiTags(Arrays.asList(am.getApi().tags()))
+              .baseUrls(List.of(am.getBaseMapping().value()))
+              .apiDetails(new LinkedList<>())
+              .build())
+          .getApiDetails()
+          .addAll(am.getApiDescriptors()
               .stream()
-              .flatMap(ad -> ad.getPaths()
-                  .stream()
-                  .map(path -> path + "["
-                      + "(" + String.join(", ", ad.getHttpMethods()) + ")"
-                      + ", " + ad.getApiOperation().value()
-                      + ", " + String.join(", ", ((ResourceDescriptor) ad).getResourceTag().types())
-                      + "]")
-              )
+              .map(ad -> ApiDetail.builder()
+                  .className(am.getTargetClass().getSimpleName())
+                  .methodName(am.getMethod().getName())
+                  .apiOperation(ad.getApiOperation().value())
+                  .paths(ad.getPaths())
+                  .methods(ad.getMethods())
+                  .baseUrls(List.of(am.getBaseMapping().value()))
+                  .build())
               .collect(Collectors.toList()));
     }
-    System.err.println(JSON.toJSONString(map));
+    System.err.println(JSON.toJSONString(apiModules.values()));
 
   }
 

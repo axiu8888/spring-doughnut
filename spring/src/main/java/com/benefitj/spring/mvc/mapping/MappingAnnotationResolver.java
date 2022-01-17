@@ -68,11 +68,11 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
     metadata.setMethod(method);
     metadata.setBaseMapping(AnnotationUtils.getAnnotation(targetClass, RequestMapping.class));
     metadata.setApi(AnnotationUtils.getAnnotation(targetClass, Api.class));
-    metadata.getAnnotations().addAll((Collection) resolveAnnotations(method));
+    metadata.setAnnotations(new ArrayList<>(resolveAnnotations(method)));
     // 解析路径
-    metadata.addDescriptors(metadata.getAnnotations()
+    metadata.setApiDescriptors(metadata.getAnnotations()
         .stream()
-        .map(annotation -> resolveApi(metadata, metadata.getBaseUrls(), annotation))
+        .map(annotation -> resolveApi(metadata, metadata.getBaseMapping().value(), annotation))
         .collect(Collectors.toList()));
     return metadata;
   }
@@ -110,8 +110,11 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
 
   protected ApiDescriptor resolveApi(MappingAnnotationMetadata metadata, String[] baseUrls, String[] paths, RequestMethod... httpMethods) {
     ApiDescriptor ad = new ApiDescriptor();
-    ad.setApiOperation(metadata.getMethod().getAnnotation(ApiOperation.class));
-    ad.setHttpMethods(Stream.of(httpMethods).map(Enum::name).toArray(String[]::new));
+    ad.setMapping(metadata.getMapping());
+    ad.setApiOperation(AnnotationUtils.getAnnotation(metadata.getMethod(), ApiOperation.class));
+    ad.setMethods(Stream.of(httpMethods)
+        .map(Enum::name)
+        .collect(Collectors.toList()));
     ad.setPaths(Stream.of(baseUrls)
         .map(this::fillVariable)
         .map(baseUrl -> DUtils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)

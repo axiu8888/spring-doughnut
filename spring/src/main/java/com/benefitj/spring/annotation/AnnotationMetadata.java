@@ -27,7 +27,7 @@ public class AnnotationMetadata {
   /**
    * 注解
    */
-  private final List<? extends Annotation> annotations = new LinkedList<>();
+  private List<? extends Annotation> annotations = new LinkedList<>();
 
   public AnnotationMetadata() {
   }
@@ -58,6 +58,10 @@ public class AnnotationMetadata {
 
   public List<? extends Annotation> getAnnotations() {
     return annotations;
+  }
+
+  public void setAnnotations(List<? extends Annotation> annotations) {
+    this.annotations = annotations;
   }
 
   /**

@@ -7,6 +7,7 @@ import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -119,7 +120,8 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
         .map(this::fillVariable)
         .map(baseUrl -> DUtils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)
         .flatMap(baseUrl -> Stream.of(paths.length > 0 ? paths : new String[]{""})
-            .map(path -> baseUrl + DUtils.startWiths(path, "/")))
+            .map(path -> baseUrl + (StringUtils.isBlank(path) ? "" : DUtils.startWiths(path, "/")))
+        )
         .collect(Collectors.toList()));
     return ad;
   }

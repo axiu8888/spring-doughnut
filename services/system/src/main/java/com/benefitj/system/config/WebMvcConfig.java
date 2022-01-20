@@ -11,10 +11,8 @@ import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 @EnableSwaggerApi
-@PropertySource(value = "classpath:swagger-api-info.properties", encoding = "UTF-8")
 @EnableAutoAopWebHandler      // AOP
 @EnableHttpLoggingHandler     // 打印请求日志
 @EnableQuartzConfuration      // quartz

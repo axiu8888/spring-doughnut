@@ -3,7 +3,7 @@ package com.benefitj.system.service;
 import com.benefitj.core.IdUtils;
 import com.benefitj.system.mapper.SysRoleMapper;
 import com.benefitj.system.model.SysRoleEntity;
-import com.benefitj.system.model.SysUserAndRoleEntity;
+import com.benefitj.system.model.SysUserRoleEntity;
 import com.benefitj.scaffold.base.BaseService;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +70,7 @@ public class SysRoleService extends BaseService<SysRoleMapper, SysRoleEntity> {
       // 检查被关联的用户
       if (uarService.countUserByRoles(Collections.singletonList(id)) > 0) {
         // 强制删除关联的角色信息
-        uarService.delete(new SysUserAndRoleEntity(null, null, (String) id));
+        uarService.delete(new SysUserRoleEntity(null, null, (String) id));
       }
       return getBaseMapper().deleteById(role.getId());
     }

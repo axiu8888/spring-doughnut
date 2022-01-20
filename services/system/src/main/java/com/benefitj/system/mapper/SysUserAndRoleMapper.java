@@ -1,7 +1,7 @@
 package com.benefitj.system.mapper;
 
 import com.benefitj.system.model.SysRoleEntity;
-import com.benefitj.system.model.SysUserAndRoleEntity;
+import com.benefitj.system.model.SysUserRoleEntity;
 import com.benefitj.scaffold.base.SuperMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,7 +16,7 @@ import java.util.List;
  * 用户和角色关联
  */
 @Mapper
-public interface SysUserAndRoleMapper extends SuperMapper<SysUserAndRoleEntity> {
+public interface SysUserAndRoleMapper extends SuperMapper<SysUserRoleEntity> {
 
   /**
    * 查询用户关联的角色
@@ -38,8 +38,8 @@ public interface SysUserAndRoleMapper extends SuperMapper<SysUserAndRoleEntity> 
   @Transient
   default long countRoleByUser(String userId, @Nullable List<? extends Serializable> roles) {
     return selectCount(lqw()
-        .eq(SysUserAndRoleEntity::getUserId, userId)
-        .in(roles != null && !roles.isEmpty(), SysUserAndRoleEntity::getRoleId, roles));
+        .eq(SysUserRoleEntity::getUserId, userId)
+        .in(roles != null && !roles.isEmpty(), SysUserRoleEntity::getRoleId, roles));
   }
 
   /**
@@ -50,7 +50,7 @@ public interface SysUserAndRoleMapper extends SuperMapper<SysUserAndRoleEntity> 
    */
   @Transient
   default long countUserByRole(List<? extends Serializable> roles) {
-    return selectCount(lqw().in(roles != null && !roles.isEmpty(), SysUserAndRoleEntity::getRoleId, roles));
+    return selectCount(lqw().in(roles != null && !roles.isEmpty(), SysUserRoleEntity::getRoleId, roles));
   }
 
   /**
@@ -62,8 +62,8 @@ public interface SysUserAndRoleMapper extends SuperMapper<SysUserAndRoleEntity> 
    */
   default int deleteAll(String userId, List<String> roles) {
     return delete(lqw()
-        .eq(SysUserAndRoleEntity::getUserId, userId)
-        .in(SysUserAndRoleEntity::getRoleId, roles));
+        .eq(SysUserRoleEntity::getUserId, userId)
+        .in(SysUserRoleEntity::getRoleId, roles));
   }
 
 }

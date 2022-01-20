@@ -22,12 +22,12 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@TableName("sys_user_and_role")
-@Table(name = "sys_user_and_role", indexes = {
+@TableName("sys_user_role")
+@Table(name = "sys_user_role", indexes = {
     @Index(name = "idx_user", columnList = "user_id"),
     @Index(name = "idx_role", columnList = "role_id"),
 })
-public class SysUserAndRoleEntity extends BaseEntity {
+public class SysUserRoleEntity extends BaseEntity {
 
   /**
    * ID

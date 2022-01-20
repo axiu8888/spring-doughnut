@@ -2,7 +2,7 @@ package com.benefitj.system.service;
 
 import com.benefitj.system.mapper.SysUserAndRoleMapper;
 import com.benefitj.system.model.SysRoleEntity;
-import com.benefitj.system.model.SysUserAndRoleEntity;
+import com.benefitj.system.model.SysUserRoleEntity;
 import com.benefitj.scaffold.base.BaseService;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * 用户和角色关联
  */
 @Service
-public class SysUserAndRoleService extends BaseService<SysUserAndRoleMapper, SysUserAndRoleEntity> {
+public class SysUserAndRoleService extends BaseService<SysUserAndRoleMapper, SysUserRoleEntity> {
 
   /**
    * 统计用户是否拥有角色
@@ -37,7 +37,7 @@ public class SysUserAndRoleService extends BaseService<SysUserAndRoleMapper, Sys
     return getBaseMapper().countUserByRole(roles);
   }
 
-  public int delete(SysUserAndRoleEntity condition) {
+  public int delete(SysUserRoleEntity condition) {
     return getBaseMapper().delete(qw(condition));
   }
 

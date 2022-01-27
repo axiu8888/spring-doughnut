@@ -2,6 +2,7 @@ package com.benefitj.system.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.benefitj.scaffold.base.BaseEntity;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 /**
  * 账号
  */
+@ApiModel("账号")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,11 +54,11 @@ public class SysAccountEntity extends BaseEntity {
   @ApiModelProperty("密码")
   @Column(name = "password", columnDefinition = "varchar(200) comment '密码'", length = 200, nullable = false)
   private String password;
-  /**
-   * 是否被锁住
-   */
-  @ApiModelProperty("是否被锁住")
-  @Column(name = "locked", columnDefinition = "tinyint(1) NOT NULL DEFAULT 0 comment '是否被锁住'")
-  private Boolean locked;
+//  /**
+//   * 是否被锁住
+//   */
+//  @ApiModelProperty("是否被锁住")
+//  @Column(name = "locked", columnDefinition = "tinyint(1) NOT NULL DEFAULT 0 comment '是否被锁住'")
+//  private Boolean locked;
 
 }

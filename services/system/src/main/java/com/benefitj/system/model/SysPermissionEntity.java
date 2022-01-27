@@ -1,5 +1,7 @@
 package com.benefitj.system.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.benefitj.scaffold.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -31,6 +33,7 @@ public class SysPermissionEntity extends BaseEntity {
    * ID
    */
   @ApiModelProperty("ID")
+  @TableId(type = IdType.ASSIGN_UUID)
   @Id
   @Column(name = "id", columnDefinition = "varchar(32) comment 'ID'", length = 32)
   private String id;

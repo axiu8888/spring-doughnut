@@ -75,7 +75,7 @@ public class SimpleJwtAccountDetails extends SysAccountEntity implements JwtUser
 
   @Override
   public boolean isAccountNonLocked() {
-    return Boolean.FALSE.equals(getLocked());
+    return Boolean.FALSE.equals(getActive());
   }
 
   @Override

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:mysql://192.168.1.203:53306/test</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">hsrg8888</property>
+        <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
+        <property name="hibernate.hbm2ddl.auto">create</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <mapping class="com.benefitj.system.model.SysRolePermissionEntity" />
+
+    </session-factory>
+</hibernate-configuration>

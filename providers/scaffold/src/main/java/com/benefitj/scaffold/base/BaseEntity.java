@@ -32,7 +32,7 @@ public abstract class BaseEntity {
    */
   @ApiModelProperty(value = "修改时间: yyyy-MM-dd HH:mm:ss", dataType = "String")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  @Column(name = "update_time", columnDefinition = "datetime comment '修改时间'")
+  @Column(name = "update_time", columnDefinition = "datetime DEFAULT NULL ON UPDATE current_timestamp() comment '修改时间'")
   private Date updateTime;
 
   /**
@@ -46,8 +46,8 @@ public abstract class BaseEntity {
   /**
    * 是否可用
    */
-  @ApiModelProperty("是否可用")
-  @Column(name = "active", columnDefinition = "tinyint(1) NOT NULL DEFAULT 1 comment '是否可用'")
+  @ApiModelProperty("是否可用，默认可用")
+  @Column(name = "active", columnDefinition = "tinyint(1) NOT NULL DEFAULT 1 comment '是否可用，默认可用'")
   private Boolean active;
 
   /**

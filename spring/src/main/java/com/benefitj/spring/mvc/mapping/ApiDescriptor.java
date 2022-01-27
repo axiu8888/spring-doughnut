@@ -11,6 +11,10 @@ import java.util.List;
 public class ApiDescriptor {
 
   /**
+   * 注解元信息
+   */
+  private MappingAnnotationMetadata metadata;
+  /**
    * 请求映射
    */
   private Annotation mapping;
@@ -27,7 +31,16 @@ public class ApiDescriptor {
    */
   private List<String> methods;
 
-  public ApiDescriptor() {
+  public ApiDescriptor(MappingAnnotationMetadata metadata) {
+    this.metadata = metadata;
+  }
+
+  public MappingAnnotationMetadata getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(MappingAnnotationMetadata metadata) {
+    this.metadata = metadata;
   }
 
   public Annotation getMapping() {

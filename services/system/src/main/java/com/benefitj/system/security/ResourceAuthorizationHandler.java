@@ -9,7 +9,11 @@ public interface ResourceAuthorizationHandler {
 
   /**
    * 是否允许访问
+   *
+   * @param descriptor API描述请求
+   * @param args       请求参数
+   * @return 返回判断结果
    */
-  boolean isPermitted(ApiDescriptor descriptor, String[] types);
+  boolean isPermitted(ApiDescriptor descriptor, Object[] args);
 
 }

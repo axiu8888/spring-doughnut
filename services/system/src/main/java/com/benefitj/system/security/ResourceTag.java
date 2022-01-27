@@ -14,14 +14,14 @@ import java.lang.annotation.*;
 @Inherited
 public @interface ResourceTag {
 
-//  /**
-//   * 资源类型: 菜单、文件、资源
-//   */
-//  String value();
-//
-//  /**
-//   * 组件名
-//   */
-//  String component() default "";
+  /**
+   * 资源类型: 菜单、文件、资源
+   */
+  String value();
+
+  /**
+   * 组件名
+   */
+  String component() default "";
 
 }

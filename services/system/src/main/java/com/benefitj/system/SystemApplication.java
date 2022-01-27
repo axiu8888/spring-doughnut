@@ -84,12 +84,12 @@ public class SystemApplication {
     for (AnnotationMetadata metadata : mappingSearcher.getMetadatas()) {
       MappingAnnotationMetadata am = (MappingAnnotationMetadata) metadata;
       apiModules.computeIfAbsent(am.getTargetClass(), s -> ApiModule.builder()
-              .contextPath(contextPath)
-              .className(am.getTargetClass().getSimpleName())
-              .apiTags(Arrays.asList(am.getApi().tags()))
-              .baseUrls(List.of(am.getBaseMapping().value()))
-              .apiDetails(new LinkedList<>())
-              .build())
+          .contextPath(contextPath)
+          .className(am.getTargetClass().getSimpleName())
+          .apiTags(Arrays.asList(am.getApi().tags()))
+          .baseUrls(List.of(am.getBaseMapping().value()))
+          .apiDetails(new LinkedList<>())
+          .build())
           .getApiDetails()
           .addAll(am.getApiDescriptors()
               .stream()

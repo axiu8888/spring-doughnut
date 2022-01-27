@@ -110,7 +110,7 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
   }
 
   protected ApiDescriptor resolveApi(MappingAnnotationMetadata metadata, String[] baseUrls, String[] paths, RequestMethod... httpMethods) {
-    ApiDescriptor ad = new ApiDescriptor();
+    ApiDescriptor ad = new ApiDescriptor(metadata);
     ad.setMapping(metadata.getMapping());
     ad.setApiOperation(AnnotationUtils.getAnnotation(metadata.getMethod(), ApiOperation.class));
     ad.setMethods(Stream.of(httpMethods)

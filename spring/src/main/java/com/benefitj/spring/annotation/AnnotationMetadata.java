@@ -109,4 +109,46 @@ public class AnnotationMetadata {
         .orElse(null);
   }
 
+  /**
+   * 获取类上的注解
+   *
+   * @param annotationType 注解类型
+   * @param <A>            注解类型
+   * @return 返回获取的注解对象
+   */
+  public <A extends Annotation> A findClassAnnotation(Class<A> annotationType) {
+    return (A) getTargetClass().getAnnotation(annotationType);
+  }
+
+  /**
+   * 判断类上是否出现某个注解
+   *
+   * @param annotationType 注解类型
+   * @return 返回判断结果
+   */
+  public boolean isClassAnnotationPresent(Class<? extends Annotation> annotationType) {
+    return getTargetClass().isAnnotationPresent(annotationType);
+  }
+
+  /**
+   * 获取方法上的注解
+   *
+   * @param annotationType 注解类型
+   * @param <A>            注解类型
+   * @return 返回获取的注解对象
+   */
+  public <A extends Annotation> A findMethodAnnotation(Class<A> annotationType) {
+    return getMethod().getAnnotation(annotationType);
+  }
+
+  /**
+   * 判断方法上是否出现某个注解
+   *
+   * @param annotationType 注解类型
+   * @return 返回判断结果
+   */
+  public boolean isMethodAnnotationPresent(Class<? extends Annotation> annotationType) {
+    return getMethod().isAnnotationPresent(annotationType);
+  }
+
 }

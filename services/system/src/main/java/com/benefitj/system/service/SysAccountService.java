@@ -136,10 +136,6 @@ public class SysAccountService extends BaseService<SysAccountMapper, SysAccountE
     if (!Boolean.TRUE.equals(account.getActive())) {
       throw new SysException("账号不可用");
     }
-
-    if (Boolean.TRUE.equals(account.getLocked())) {
-      throw new SysException("账号被锁定");
-    }
   }
 
 }

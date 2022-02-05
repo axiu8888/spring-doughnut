@@ -15,7 +15,7 @@ import java.util.List;
  * @param <T>
  */
 @ApiModel("分页请求")
-public class PageableRequest<T> {
+public class PageableRequest<T> implements IPageRequest<T> {
 
   public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
@@ -86,18 +86,22 @@ public class PageableRequest<T> {
     this.setCondition(condition);
   }
 
+  @Override
   public Integer getPageNum() {
     return pageNum;
   }
 
+  @Override
   public void setPageNum(Integer pageNum) {
     this.pageNum = (pageNum != null) ? Math.max(pageNum, 0) : 1;
   }
 
+  @Override
   public Integer getPageSize() {
     return pageSize;
   }
 
+  @Override
   public void setPageSize(Integer pageSize) {
     this.pageSize = (pageSize != null) ? Math.max(pageSize, 1) : 10;
   }
@@ -122,26 +126,32 @@ public class PageableRequest<T> {
     this.active = active;
   }
 
+  @Override
   public T getCondition() {
     return condition;
   }
 
+  @Override
   public void setCondition(T condition) {
     this.condition = condition;
   }
 
+  @Override
   public Date getStartTime() {
     return startTime;
   }
 
+  @Override
   public void setStartTime(Date startTime) {
     this.startTime = startTime;
   }
 
+  @Override
   public Date getEndTime() {
     return endTime;
   }
 
+  @Override
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
   }

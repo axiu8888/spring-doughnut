@@ -2,6 +2,7 @@ package com.benefitj.spring.mvc;
 
 import com.benefitj.spring.mvc.get.GetBodyArgumentResolver;
 import com.benefitj.spring.mvc.page.PageBodyArgumentResolver;
+import com.benefitj.spring.mvc.page.PageableRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,7 @@ public class CustomArgumentResolverConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public PageBodyArgumentResolver pageBodyArgumentResolver() {
-    return new PageBodyArgumentResolver();
+    return new PageBodyArgumentResolver(PageableRequest.class);
   }
 
 }

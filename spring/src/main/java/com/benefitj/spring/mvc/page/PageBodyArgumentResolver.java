@@ -17,11 +17,17 @@ import java.util.Comparator;
  */
 public class PageBodyArgumentResolver implements CustomHandlerMethodArgumentResolver {
 
+  private Class<? extends IPageRequest> pageTYpe;
+
+  public PageBodyArgumentResolver(Class<? extends IPageRequest> pageTYpe) {
+    this.pageTYpe = pageTYpe;
+  }
+
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
     Class<?> parameterType = parameter.getParameterType();
     return parameter.hasParameterAnnotation(PageBody.class)
-        && parameterType.isAssignableFrom(PageableRequest.class);
+        && parameterType.isAssignableFrom(getPageTYpe());
   }
 
   @Override
@@ -45,4 +51,11 @@ public class PageBodyArgumentResolver implements CustomHandlerMethodArgumentReso
     return page;
   }
 
+  public Class<? extends IPageRequest> getPageTYpe() {
+    return pageTYpe;
+  }
+
+  public void setPageTYpe(Class<? extends IPageRequest<?>> pageTYpe) {
+    this.pageTYpe = pageTYpe;
+  }
 }

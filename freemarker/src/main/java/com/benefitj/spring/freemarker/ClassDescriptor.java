@@ -1,16 +1,26 @@
 package com.benefitj.spring.freemarker;
 
 import com.benefitj.core.DateFmtter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 类描述
  *
  * @author dingxiuan
  */
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class ClassDescriptor {
 
   /**
@@ -28,93 +38,44 @@ public class ClassDescriptor {
   /**
    * 父类
    */
-  private Class<?> superClass ;
+  private Class<?> superClass;
   /**
    * 描述
    */
-  private String description = "";
+  private String description;
   /**
    * 作者
    */
-  private String author = "";
+  private String author;
   /**
-   * 字段模板
+   * 类上的注解
    */
-  private List<FieldDescriptor> fieldDescriptors = new ArrayList<>();
-
-  public ClassDescriptor() {
-  }
-
-  public String getCopyright() {
-    return copyright;
-  }
-
-  public ClassDescriptor setCopyright(String copyright) {
-    this.copyright = copyright;
-    return this;
-  }
-
-  public String getBasePackage() {
-    return basePackage;
-  }
-
-  public ClassDescriptor setBasePackage(String basePackage) {
-    this.basePackage = basePackage;
-    return this;
-  }
-
-  public String getClassName() {
-    return className;
-  }
-
-  public ClassDescriptor setClassName(String className) {
-    this.className = className;
-    return this;
-  }
-
-  public Class<?> getSuperClass() {
-    return superClass;
-  }
-
-  public ClassDescriptor setSuperClass(Class<?> superClass) {
-    this.superClass = superClass;
-    return this;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public ClassDescriptor setDescription(String description) {
-    this.description = description;
-    return this;
-  }
-
-  public String getAuthor() {
-    return author;
-  }
-
-  public ClassDescriptor setAuthor(String author) {
-    this.author = author;
-    return this;
-  }
-
-  public List<FieldDescriptor> getFieldDescriptors() {
-    return fieldDescriptors;
-  }
-
-  public ClassDescriptor setFieldDescriptors(List<FieldDescriptor> fieldDescriptors) {
-    this.fieldDescriptors = fieldDescriptors;
-    return this;
-  }
+  private List<AnnotationDescriptor> annotations;
+  /**
+   * 字段
+   */
+  private List<FieldDescriptor> fields;
+  /**
+   * 是否使用lombok
+   */
+  @Builder.Default
+  private boolean lombok = true;
 
   /**
    * 获取全类名
    */
   public List<String> getFullNames() {
-    List<String> fullNames = getFieldDescriptors()
+    List<String> fullNames = getFields()
         .stream()
-        .map(FieldDescriptor::getType)
+        .flatMap(fd -> {
+          if (fd.getAnnotations() != null) {
+            return Stream.concat(Stream.of(fd.getType())
+                , ofStream(fd.getAnnotations())
+                    .flatMap(ad -> Stream.concat(Stream.of(ad.getType()), ofStream(ad.getImports())))
+            );
+          }
+          return Stream.of(fd.getType());
+        })
         .filter(type -> !type.getPackageName().equals("java.lang"))
         .map(Class::getName)
         .distinct()
@@ -131,6 +92,10 @@ public class ClassDescriptor {
    */
   public String getCreateTime() {
     return DateFmtter.fmtNow("yyyy-MM-dd HH:mm:ss");
+  }
+
+  static <T> Stream<T> ofStream(Collection<T> c) {
+    return c != null ? c.stream() : Stream.empty();
   }
 
 }

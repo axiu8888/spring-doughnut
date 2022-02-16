@@ -26,7 +26,7 @@ public class EntityTableHelper {
     props.put("hibernate.connection.username", "root");
     props.put("hibernate.connection.password", "hsrg8888");
     props.put("hibernate.hbm2ddl.auto", "update");
-    props.put("hibernate.show_sql", "true");
+    //props.put("hibernate.show_sql", "true");
     props.put("hibernate.use_sql_comments", "true");
     props.put("hibernate.format_sql", "true");
     props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");

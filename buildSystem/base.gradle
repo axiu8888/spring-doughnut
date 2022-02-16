@@ -50,6 +50,7 @@ dependencies {
     compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     //compileOnly("org.slf4j:slf4j-log4j12:${slf4jVersion}")
     testCompileOnly("org.slf4j:slf4j-log4j12:${slf4jVersion}")

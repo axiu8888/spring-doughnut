@@ -95,8 +95,8 @@ public class CodeGenerator {
    * @return 返回保存的Java文件
    */
   public File writeModule(ClassDescriptor entity, File dir, String module) {
-    String path = dir.getAbsolutePath() + File.separator
-        + entity.getBasePackage().replace(".", File.separator) + File.separator + module.toLowerCase();
+    String pkgDir = entity.getBasePackage().replace(".", File.separator);
+    String path = dir.getAbsolutePath() + File.separator + pkgDir + File.separator + module.toLowerCase();
     File javaFile = IOUtils.createFile(path, entity.getClassName() + module + ".java");
     return writeFile(entity, javaFile, module + ".ftl");
   }

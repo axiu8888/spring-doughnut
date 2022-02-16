@@ -7,6 +7,9 @@ import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -21,8 +24,8 @@ public class FreemarkerBuilderTest extends TestCase {
   }
 
   private ClassDescriptor newUserEntity() {
-    return new ClassDescriptor()
-        .setCopyright("/*\n" +
+    return ClassDescriptor.builder()
+        .copyright("/*\n" +
             " * Licensed to the Apache Software Foundation (ASF) under one\n" +
             " * or more contributor license agreements.  See the NOTICE file\n" +
             " * distributed with this work for additional information\n" +
@@ -40,40 +43,107 @@ public class FreemarkerBuilderTest extends TestCase {
             " * specific language governing permissions and limitations\n" +
             " * under the License.\n" +
             " */\n")
-        .setBasePackage("com.benefitj")
-        .setDescription("用户")
-        .setAuthor("dingxiuan")
-        .setClassName("User")
-        .setFieldDescriptors(Arrays.asList(
-            new FieldDescriptor()
-                .setName("id")
-                .setType(String.class)
-                .setDescription("ID")
-            , new FieldDescriptor()
-                .setName("username")
-                .setType(String.class)
-                .setDescription("用户名")
-            , new FieldDescriptor()
-                .setName("gender")
-                .setType(String.class)
-                .setDescription("性别")
-            , new FieldDescriptor()
-                .setName("birthday")
-                .setType(Date.class)
-                .setDescription("出生日期")
-            , new FieldDescriptor()
-                .setName("creator")
-                .setType(String.class)
-                .setDescription("创建者")
-            , new FieldDescriptor()
-                .setName("createTime")
-                .setType(Date.class)
-                .setDescription("创建时间")
-            , new FieldDescriptor()
-                .setName("updateTime")
-                .setType(Date.class)
-                .setDescription("更新时间")
-        ));
+        .basePackage("com.benefitj")
+        .lombok(true)
+        .description("用户")
+        .author("dingxiuan")
+        .className("User")
+        .annotations(Arrays.asList(
+            AnnotationDescriptor.builder()
+                .type(Table.class)
+                .value("name=\"sys_user\"")
+                .build()
+        ))
+        .fields(Arrays.asList(
+            FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("id")
+                .type(String.class)
+                .description("ID")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Id.class)
+                        .build()
+                    , AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"id\", columnDefinition=\"varchar(32) comment '主键'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("username")
+                .type(String.class)
+                .description("用户名")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"username\", columnDefinition=\"varchar(30) comment '用户名'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("gender")
+                .type(String.class)
+                .description("性别")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"gender\", columnDefinition=\"tinyint comment '性别'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("birthday")
+                .type(Date.class)
+                .description("出生日期")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"birthday\", columnDefinition=\"date comment '出生日期'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("creator")
+                .type(String.class)
+                .description("创建者")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"creator\", columnDefinition=\"varchar(32) comment '创建者'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("createTime")
+                .type(Date.class)
+                .description("创建时间")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"create_time\", columnDefinition=\"datetime comment '创建时间'\"")
+                        .build()
+                ))
+                .build()
+            , FieldDescriptor.builder()
+                .modifier(ModiferType.PRIVATE)
+                .name("updateTime")
+                .type(Date.class)
+                .description("更新时间")
+                .annotations(Arrays.asList(
+                    AnnotationDescriptor.builder()
+                        .type(Column.class)
+                        .value("name=\"update_time\", columnDefinition=\"datetime comment '更新时间'\"")
+                        .build()
+                ))
+                .build()
+        ))
+        .build();
   }
 
   @Test
@@ -82,7 +152,6 @@ public class FreemarkerBuilderTest extends TestCase {
     File dir = ClasspathUtils.getFile("test.ftl").getParentFile();
     File userJava = CodeGenerator.getInstance().writeEntity(cd, dir);
     System.err.println(new String(IOUtils.readFileBytes(userJava), StandardCharsets.UTF_8));
-
   }
 
   @Test

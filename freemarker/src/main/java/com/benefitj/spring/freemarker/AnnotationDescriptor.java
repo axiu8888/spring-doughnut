@@ -1,41 +1,38 @@
 package com.benefitj.spring.freemarker;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.LinkedList;
 import java.util.List;
 
+
 /**
- * 属性模板
+ * 注解
  */
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class FieldDescriptor {
+public class AnnotationDescriptor {
 
-  /**
-   * 访问修饰符
-   */
-  private ModiferType modifier = ModiferType.PRIVATE;
   /**
    * 类型
    */
   private Class<?> type;
   /**
-   * 名称
+   * 注解中的值：@注解(值)
+   *
+   * 值 =>: method=params
+   *
+   * 如：@Target(value = ElementType.FIELD)
    */
-  private String name;
+  private String value;
   /**
-   * 描述
+   * 引入的类
    */
-  private String description;
-  /**
-   * 注解
-   */
-  private List<AnnotationDescriptor> annotations = new LinkedList<>();
+  private List<Class<?>> imports;
 
 }

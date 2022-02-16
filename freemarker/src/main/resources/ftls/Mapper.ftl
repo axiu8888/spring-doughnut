@@ -20,6 +20,6 @@ import java.util.List;
  * @since ${getCreateTime()}
  */
 @Mapper
-public interface ${className}Mapper extends SuperMapper<${className}Entity> {
+public interface ${className}Mapper <#if superClass??>extends SuperMapper<${className}Entity> </#if>{
 
 }

@@ -15,6 +15,8 @@ dependencies {
 	implementation "io.springfox:springfox-boot-starter:3.0.0"
 	implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
 
+	// excel
+	implementation 'com.alibaba:easyexcel:3.0.5'
 
 }
 

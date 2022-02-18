@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.File;
@@ -79,6 +80,9 @@ public class TableExcelUtils {
     @ExcelProperty("描述")
     private String comment;
 
+    @ExcelProperty("主键")
+    private String primaryKey;
+
     @ExcelProperty("是否为空")
     private String nullable;
 
@@ -96,7 +100,7 @@ public class TableExcelUtils {
   /**
    * 解析字段
    */
-  private static ColumnDescriptor parseColumn(Column column) {
+  private static ColumnDescriptor parseColumn(Column column, Id id) {
     String columnDefinition = column.columnDefinition().trim();
     String type = columnDefinition.trim().split(" ")[0];
     String comment = columnDefinition.trim().split(" comment ")[1];
@@ -108,6 +112,7 @@ public class TableExcelUtils {
         .length(type.endsWith(")") ? Integer.valueOf(type.substring(type.indexOf("(") + 1, type.lastIndexOf(")"))) : null)
         .defaultValue(StringUtils.isNotBlank(defaultValue) ? "DEFAULT " + defaultValue : "")
         .comment(comment.replace("'", ""))
+        .primaryKey(id != null ? "是" : "")
         .nullable(column.nullable() ? "" : "否")
         .unique(column.unique() ? "是" : "")
         .precision(column.precision() == 0 ? "" : String.valueOf(column.precision()))
@@ -142,7 +147,7 @@ public class TableExcelUtils {
             .indexs(parseIndex(cls.getAnnotation(Table.class)))
             .columns(ReflectUtils.getFields(cls
                 , f -> f.isAnnotationPresent(Column.class)
-                , f -> parseColumn(f.getAnnotation(Column.class))))
+                , f -> parseColumn(f.getAnnotation(Column.class), f.getAnnotation(Id.class))))
             .build())
         .collect(Collectors.toList());
   }

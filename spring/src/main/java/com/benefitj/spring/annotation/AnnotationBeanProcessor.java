@@ -3,6 +3,9 @@ package com.benefitj.spring.annotation;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 注解的处理器
  */
@@ -47,7 +50,15 @@ public class AnnotationBeanProcessor extends AnnotationSearcher implements Smart
     if (handler == null) {
       throw new IllegalStateException("【 "+ getResolver() +" 】未发现【 MetadataHandler 】...");
     }
-    handler.handle(getMetadatas());
+
+    List<AnnotationMetadata> list = getMetadatas()
+        .stream()
+        .filter(m -> !m.isInstantiated())
+        .peek(m -> m.setInstantiated(true))
+        .collect(Collectors.toList());
+    if (!list.isEmpty()) {
+      handler.handle(list);
+    }
   }
 
   public MetadataHandler getMetadataHandler() {

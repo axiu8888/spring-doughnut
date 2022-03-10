@@ -1,5 +1,7 @@
 package com.benefitj.spring.annotation;
 
+import org.springframework.beans.factory.SmartInitializingSingleton;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -28,6 +30,10 @@ public class AnnotationMetadata {
    * 注解
    */
   private List<? extends Annotation> annotations = new LinkedList<>();
+  /**
+   * 调用过 {@link SmartInitializingSingleton#afterSingletonsInstantiated()} 方法
+   */
+  private volatile boolean instantiated = false;
 
   public AnnotationMetadata() {
   }
@@ -151,4 +157,11 @@ public class AnnotationMetadata {
     return getMethod().isAnnotationPresent(annotationType);
   }
 
+  public boolean isInstantiated() {
+    return instantiated;
+  }
+
+  public void setInstantiated(boolean instantiated) {
+    this.instantiated = instantiated;
+  }
 }

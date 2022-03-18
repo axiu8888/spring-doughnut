@@ -2,7 +2,6 @@ package com.benefitj.mqttsubscriber;
 
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.spring.listener.OnAppStart;
-import com.benefitj.spring.listener.OnAppStop;
 import com.benefitj.spring.mqtt.subscriber.EnableMqttSubscriber;
 import com.benefitj.spring.mqtt.subscriber.MqttMessageListener;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +24,9 @@ public class MqttSubscriberApplication {
   @Component
   public static class Example {
 
+    @Autowired
+    private MqttCallbackDispatcher dispatcher;
+
     @MqttMessageListener(
         topics = "/device/#",
         clientIdPrefix = "mqtt-subscriber-"
@@ -32,29 +34,14 @@ public class MqttSubscriberApplication {
     public void onMessage(String topic, byte[] payload) {
       log.info("1. {}, payload: {}", topic, new String(payload));
     }
-  }
-
-
-  @Slf4j
-  @Component
-  public static class Example2 {
-
-    @Autowired
-    private MqttCallbackDispatcher dispatcher;
 
     @OnAppStart
     public void onStart() {
-      dispatcher.subscribe("/device/#", (topic, msg) -> {
+      dispatcher.subscribe("/event/+/+/+", (topic, msg) -> {
         // 接收到消息
-        log.info("2. {}, payload: {}", topic, new String(msg.getPayload()));
+        log.info("2.2 {}, payload: {}", topic, new String(msg.getPayload()));
       });
     }
-
-    @OnAppStop
-    public void onStop() {
-    }
-
   }
-
 
 }

@@ -1,4 +1,4 @@
-package com.benefitj.spring.mvc.page;
+package com.benefitj.spring.mvc.query;
 
 import org.apache.commons.lang3.StringUtils;
 

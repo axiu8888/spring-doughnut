@@ -1,23 +1,18 @@
-package com.benefitj.spring.mvc.page;
+package com.benefitj.spring.mvc.query;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 请求分页
+ * 分页请求
  *
  * @param <T>
  */
 @ApiModel("分页请求")
-public class PageableRequest<T> implements IPageRequest<T> {
-
-  public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+public class PageRequest<T> extends QueryRequest<T> {
 
   /**
    * 页码，默认第一页
@@ -30,11 +25,6 @@ public class PageableRequest<T> implements IPageRequest<T> {
   @ApiModelProperty("分页大小，默认10条")
   private Integer pageSize = 10;
   /**
-   * 排序
-   */
-  @ApiModelProperty("排序")
-  private List<String> orderBy = Collections.emptyList();
-  /**
    * 是否为多层级
    */
   @ApiModelProperty("是否为多层级")
@@ -44,74 +34,43 @@ public class PageableRequest<T> implements IPageRequest<T> {
    */
   @ApiModelProperty("active是否起作用")
   private Boolean active = null;
-  /**
-   * 条件
-   */
-  @ApiModelProperty("条件")
-  private T condition;
-  /**
-   * 开始时间
-   */
-  @ApiModelProperty(value = "开始时间: " + DATE_PATTERN, dataType = "String")
-  @JsonFormat(pattern = DATE_PATTERN)
-  @DateTimeFormat(pattern = DATE_PATTERN)
-  private Date startTime;
-  /**
-   * 结束时间
-   */
-  @ApiModelProperty(value = "结束时间: " + DATE_PATTERN, dataType = "String")
-  @JsonFormat(pattern = DATE_PATTERN)
-  @DateTimeFormat(pattern = DATE_PATTERN)
-  private Date endTime;
 
-  public PageableRequest() {
+  public PageRequest() {
   }
 
   /**
    * @param pageNum  must not be less than zero.
    * @param pageSize must not be less than one.
    */
-  public PageableRequest(Integer pageNum, Integer pageSize) {
+  public PageRequest(Integer pageNum, Integer pageSize) {
     this.setPageNum(pageNum);
     this.setPageSize(pageSize);
   }
 
-  public PageableRequest(Integer pageNum, Integer pageSize, List<String> orderBy) {
+  public PageRequest(Integer pageNum, Integer pageSize, List<String> orderBy) {
     this(pageNum, pageSize);
     this.setOrderBy(orderBy);
   }
 
-  public PageableRequest(Integer pageNum, Integer pageSize, List<String> orderBy, T condition) {
+  public PageRequest(Integer pageNum, Integer pageSize, List<String> orderBy, T condition) {
     this(pageNum, pageSize, orderBy);
     this.setCondition(condition);
   }
 
-  @Override
   public Integer getPageNum() {
     return pageNum;
   }
 
-  @Override
   public void setPageNum(Integer pageNum) {
     this.pageNum = (pageNum != null) ? Math.max(pageNum, 0) : 1;
   }
 
-  @Override
   public Integer getPageSize() {
     return pageSize;
   }
 
-  @Override
   public void setPageSize(Integer pageSize) {
     this.pageSize = (pageSize != null) ? Math.max(pageSize, 1) : 10;
-  }
-
-  public List<String> getOrderBy() {
-    return orderBy;
-  }
-
-  public void setOrderBy(List<String> orderBy) {
-    this.orderBy = orderBy != null ? orderBy : Collections.emptyList();
   }
 
   public Boolean getMultiLevel() {
@@ -126,35 +85,6 @@ public class PageableRequest<T> implements IPageRequest<T> {
     this.active = active;
   }
 
-  @Override
-  public T getCondition() {
-    return condition;
-  }
-
-  @Override
-  public void setCondition(T condition) {
-    this.condition = condition;
-  }
-
-  @Override
-  public Date getStartTime() {
-    return startTime;
-  }
-
-  @Override
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
-
-  @Override
-  public Date getEndTime() {
-    return endTime;
-  }
-
-  @Override
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
 
   public long getOffset() {
     return (long) getPageNum() * (long) getPageSize();
@@ -164,20 +94,20 @@ public class PageableRequest<T> implements IPageRequest<T> {
     return pageNum > 0;
   }
 
-  public PageableRequest<T> previousOrFirst() {
+  public PageRequest<T> previousOrFirst() {
     return hasPrevious() ? previous() : first();
   }
 
-  public PageableRequest<T> next() {
-    return new PageableRequest<>(getPageNum() + 1, getPageSize(), getOrderBy());
+  public PageRequest<T> next() {
+    return new PageRequest<>(getPageNum() + 1, getPageSize(), getOrderBy());
   }
 
-  public PageableRequest<T> previous() {
-    return getPageNum() == 0 ? this : new PageableRequest<>(getPageNum() - 1, getPageSize(), getOrderBy());
+  public PageRequest<T> previous() {
+    return getPageNum() == 0 ? this : new PageRequest<>(getPageNum() - 1, getPageSize(), getOrderBy());
   }
 
-  public PageableRequest<T> first() {
-    return new PageableRequest<>(0, getPageSize(), getOrderBy());
+  public PageRequest<T> first() {
+    return new PageRequest<>(0, getPageSize(), getOrderBy());
   }
 
   /**
@@ -192,27 +122,29 @@ public class PageableRequest<T> implements IPageRequest<T> {
   }
 
   public static final class Builder<T> {
-    private Integer pageNum;
-    private Integer pageSize;
-    private List<String> orderBy;
-    private Boolean multiLevel;
-    private Boolean active;
     private T condition;
     private Date startTime;
     private Date endTime;
+    private List<String> orderBy;
+
+    private Integer pageNum;
+    private Integer pageSize;
+    private Boolean multiLevel;
+    private Boolean active;
 
     public Builder() {
     }
 
-    public Builder(PageableRequest<T> copy) {
-      this.pageNum = copy.getPageNum();
-      this.pageSize = copy.getPageSize();
-      this.orderBy = copy.getOrderBy();
-      this.multiLevel = copy.getMultiLevel();
-      this.active = copy.getActive();
+    public Builder(PageRequest<T> copy) {
       this.condition = copy.getCondition();
       this.startTime = copy.getStartTime();
       this.endTime = copy.getEndTime();
+      this.orderBy = copy.getOrderBy();
+
+      this.pageNum = copy.getPageNum();
+      this.pageSize = copy.getPageSize();
+      this.multiLevel = copy.getMultiLevel();
+      this.active = copy.getActive();
     }
 
     public Builder<T> setPageNum(Integer pageNum) {
@@ -255,17 +187,17 @@ public class PageableRequest<T> implements IPageRequest<T> {
       return this;
     }
 
-    public PageableRequest<T> build() {
-      PageableRequest<T> page = new PageableRequest<>();
-      page.setPageNum(this.pageNum);
-      page.setPageSize(this.pageSize);
-      page.setOrderBy(this.orderBy);
-      page.setMultiLevel(this.multiLevel);
-      page.setActive(this.active);
-      page.setCondition(this.condition);
-      page.setStartTime(this.startTime);
-      page.setEndTime(this.endTime);
-      return page;
+    public PageRequest<T> build() {
+      PageRequest<T> request = new PageRequest<>();
+      request.setCondition(this.condition);
+      request.setStartTime(this.startTime);
+      request.setEndTime(this.endTime);
+      request.setOrderBy(this.orderBy);
+      request.setPageNum(this.pageNum);
+      request.setPageSize(this.pageSize);
+      request.setMultiLevel(this.multiLevel);
+      request.setActive(this.active);
+      return request;
     }
   }
 }

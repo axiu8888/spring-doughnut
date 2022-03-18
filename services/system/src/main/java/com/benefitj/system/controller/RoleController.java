@@ -1,18 +1,18 @@
 package com.benefitj.system.controller;
 
+import com.benefitj.scaffold.http.HttpResult;
+import com.benefitj.spring.aop.web.AopWebPointCut;
+import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryBody;
+import com.benefitj.spring.mvc.query.QueryRequest;
 import com.benefitj.system.model.SysRoleEntity;
 import com.benefitj.system.service.SysRoleService;
-import com.benefitj.scaffold.http.HttpResult;
-import com.benefitj.scaffold.security.token.JwtTokenManager;
-import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.mvc.get.GetBody;
-import com.benefitj.spring.mvc.page.PageBody;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.system.utils.Utils;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,17 +32,14 @@ public class RoleController {
   private SysRoleService roleService;
 
   @ApiOperation("获取角色")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "角色ID", required = true, dataType = "String", dataTypeClass = String.class),
-  })
   @GetMapping
-  public HttpResult<?> get(String id) {
+  public HttpResult<SysRoleEntity> get(@ApiParam("角色ID") String id) {
     return HttpResult.succeed(roleService.getById(id));
   }
 
   @ApiOperation("添加角色")
   @PostMapping
-  public HttpResult<?> create(SysRoleEntity role) {
+  public HttpResult<SysRoleEntity> create(SysRoleEntity role) {
     return HttpResult.succeed(roleService.create(role));
   }
 
@@ -53,49 +50,36 @@ public class RoleController {
       return HttpResult.fail("角色ID和角色名都不能为空");
     }
     roleService.updateById(role);
-    return HttpResult.succeed(role);
+    return HttpResult.succeed();
   }
 
   @ApiOperation("删除角色")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "角色ID", dataType = "String", dataTypeClass = String.class),
-  })
   @DeleteMapping
-  public HttpResult<?> delete(String id) {
-    int count = roleService.deleteById(id);
-    return HttpResult.succeed(count);
+  public HttpResult<Integer> delete(@ApiParam("角色ID") String id) {
+    return HttpResult.succeed(roleService.deleteById(id));
   }
 
   @ApiOperation("改变角色的状态")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "角色ID", dataType = "String", paramType = "form", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "active", value = "状态", dataType = "Boolean", paramType = "form", dataTypeClass = Boolean.class),
-  })
   @PatchMapping("/active")
-  public HttpResult<?> changeActive(String id, Boolean active) {
+  public HttpResult<Boolean> changeActive(@ApiParam("角色ID") String id, @ApiParam("状态") Boolean active) {
     if (StringUtils.isBlank(id)) {
       return HttpResult.fail("角色ID不能为空");
     }
-    Boolean result = roleService.changeActive(id, active);
-    return HttpResult.succeed(result);
+    return HttpResult.succeed(roleService.changeActive(id, active));
   }
 
   @ApiOperation("获取角色列表分页")
   @GetMapping("/page")
-  public HttpResult<?> getPage(@PageBody PageableRequest<SysRoleEntity> page) {
-    PageInfo<SysRoleEntity> roleList = roleService.getPage(page);
-    return HttpResult.succeed(roleList);
+  public HttpResult<PageInfo<SysRoleEntity>> getPage(@PageBody PageRequest<SysRoleEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(roleService.getPage(request));
   }
 
   @ApiOperation("获取机构的角色列表")
   @GetMapping("/list")
-  public HttpResult<?> getList(@GetBody SysRoleEntity condition) {
-    condition.setOrgId(StringUtils.isNotBlank(condition.getOrgId()) ? condition.getOrgId() : JwtTokenManager.currentOrgId());
-    if (StringUtils.isBlank(condition.getOrgId())) {
-      return HttpResult.fail("orgId为空");
-    }
-    List<SysRoleEntity> roleList = roleService.getList(condition, null, null);
-    return HttpResult.succeed(roleList);
+  public HttpResult<List<SysRoleEntity>> getList(@QueryBody QueryRequest<SysRoleEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(roleService.getList(request));
   }
 
 }

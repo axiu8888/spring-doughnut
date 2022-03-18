@@ -24,8 +24,8 @@ public interface SysUserAndRoleMapper extends SuperMapper<SysUserRoleEntity> {
    * @param userId 用户ID
    * @return 返回关联的角色
    */
-  @Select("SELECT r.* FROM sys_user_and_role AS uar" +
-      " LEFT JOIN sys_role AS r ON r.id = uar.role_id WHERE uar.user_id = #{userId}")
+  @Select("SELECT r.* FROM sys_user_role AS sur" +
+      " LEFT JOIN sys_role AS r ON r.id = sur.role_id WHERE sur.user_id = #{userId}")
   List<SysRoleEntity> findByUser(@Param("userId") String userId);
 
   /**

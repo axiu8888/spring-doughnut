@@ -6,6 +6,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.TimeUtils;
 import com.benefitj.core.local.LocalCache;
 import com.benefitj.core.local.LocalCacheFactory;
+import com.benefitj.scaffold.security.token.JwtTokenManager;
 import com.benefitj.system.model.SysLogEntity;
 import com.benefitj.system.service.SysLogService;
 import com.benefitj.scaffold.http.HttpResult;
@@ -107,10 +108,10 @@ public class SysLogHandler implements InitializingBean, WebPointCutHandler {
     // 开始记录
     SysLogEntity sle = cache.get();
     sle.setCreateTime(new Date());
+    sle.setCreateBy(JwtTokenManager.currentUserId());
     /*JwtToken token = JwtTokenManager.currentToken(true);
     if (token != null) {
       sle.setOrgId(token.getOrgId());
-      sle.setCreatorId(token.getUserId());
     }*/
 
     // 模块

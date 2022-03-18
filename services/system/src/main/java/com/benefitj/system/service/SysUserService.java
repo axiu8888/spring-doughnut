@@ -43,13 +43,11 @@ public class SysUserService extends BaseService<SysUerMapper, SysUserEntity> {
   @Override
   public boolean save(SysUserEntity user) {
     if (StringUtils.isNotBlank(user.getId())) {
-      user.setUpdateTime(new Date());
       // 缓存
       redisService.setUser(user);
       return updateById(user);
     } else {
       user.setId(IdUtils.uuid());
-      user.setCreateTime(new Date());
       user.setActive(Boolean.TRUE);
       // 缓存
       redisService.setUser(user);

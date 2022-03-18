@@ -1,23 +1,25 @@
 package com.benefitj.system.controller;
 
+import com.benefitj.scaffold.http.HttpResult;
+import com.benefitj.spring.aop.web.AopWebPointCut;
+import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryBody;
+import com.benefitj.spring.mvc.query.QueryRequest;
 import com.benefitj.system.model.SysLogEntity;
 import com.benefitj.system.service.SysLogService;
-import com.benefitj.scaffold.http.HttpResult;
-import com.benefitj.scaffold.security.token.JwtTokenManager;
-import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.mvc.get.GetBody;
-import com.benefitj.spring.mvc.page.PageBody;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.system.utils.Utils;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 角色
@@ -31,38 +33,30 @@ public class SysLogController {
   @Autowired
   private SysLogService logService;
 
-  @ApiOperation("获取操作日志")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "日志ID", required = true, dataType = "String", dataTypeClass = String.class),
-  })
+  @ApiOperation("获取")
   @GetMapping
-  public HttpResult<?> get(String id) {
+  public HttpResult<SysLogEntity> get(@ApiParam("日志ID") String id) {
     return HttpResult.succeed(logService.getById(id));
   }
 
-  @ApiOperation("删除操作日志")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "日志ID", dataType = "String"),
-  })
+  @ApiOperation("删除")
   @DeleteMapping
-  public HttpResult<?> delete(String id) {
+  public HttpResult<Integer> delete(@ApiParam("ID") String id) {
     return HttpResult.succeed(logService.deleteById(id));
   }
 
-  @ApiOperation("获取操作日志列表分页")
+  @ApiOperation("分页")
   @GetMapping("/page")
-  public HttpResult<?> getPage(@PageBody PageableRequest<SysLogEntity> page) {
-    return HttpResult.succeed(logService.getPage(page));
+  public HttpResult<PageInfo<SysLogEntity>> getPage(@PageBody PageRequest<SysLogEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(logService.getPage(request));
   }
 
-  @ApiOperation("获取机构的操作日志列表")
+  @ApiOperation("列表")
   @GetMapping("/list")
-  public HttpResult<?> getList(@GetBody SysLogEntity condition) {
-    condition.setOrgId(StringUtils.isNotBlank(condition.getOrgId()) ? condition.getOrgId() : JwtTokenManager.currentOrgId());
-    if (StringUtils.isBlank(condition.getOrgId())) {
-      return HttpResult.fail("orgId为空");
-    }
-    return HttpResult.succeed(logService.getList(condition, null, null));
+  public HttpResult<List<SysLogEntity>> getList(@QueryBody QueryRequest<SysLogEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(logService.getList(request));
   }
 
 }

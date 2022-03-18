@@ -42,7 +42,7 @@ public class WebMvcConfig {
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowCredentials(false)
-            .allowedOriginPatterns("*")
+            .allowedOrigins("*")
             .exposedHeaders("*")
             .allowedHeaders("*")
             .maxAge(36000L)

@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.benefitj.scaffold.base.entity.EntityDescriptor;
 import com.benefitj.scaffold.base.entity.EntityFinder;
 import com.benefitj.scaffold.base.entity.PropertyDescriptor;
-import com.benefitj.spring.mvc.page.OrderUtils;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.spring.mvc.query.OrderUtils;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryRequest;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -32,12 +33,14 @@ public abstract class BaseService<M extends SuperMapper<T>, T extends BaseEntity
    */
   protected QueryWrapper<T> qw(@Nullable T condition) {
     QueryWrapper<T> qw = new QueryWrapper<>(condition);
-    getEntityDescriptor()
-        .get(pd -> pd.getDeclaringClass() != BaseEntity.class)
-        .forEach(pd -> {
-          Object v = pd.getFieldValue(condition);
-          qw.eq(v != null, pd.getColumn(), v);
-        });
+    if (condition != null) {
+      getEntityDescriptor()
+          .get(pd -> pd.getDeclaringClass() != BaseEntity.class)
+          .forEach(pd -> {
+            Object v = pd.getFieldValue(condition);
+            qw.eq(v != null, pd.getColumn(), v);
+          });
+    }
     return qw;
   }
 
@@ -84,6 +87,16 @@ public abstract class BaseService<M extends SuperMapper<T>, T extends BaseEntity
   /**
    * 获取列表
    *
+   * @param request 请求参数
+   * @return 返回查询的列表
+   */
+  public List<T> getList(QueryRequest<T> request) {
+    return getList(request.getCondition(), request.getStartTime(), request.getEndTime());
+  }
+
+  /**
+   * 获取列表
+   *
    * @param condition 条件
    * @param startTime 开始时间
    * @param endTime   结束时间
@@ -103,14 +116,12 @@ public abstract class BaseService<M extends SuperMapper<T>, T extends BaseEntity
    * @param request 分页参数
    * @return 返回分页信息
    */
-  public PageInfo<T> getPage(PageableRequest<T> request) {
+  public PageInfo<T> getPage(PageRequest<T> request) {
     // ORDER BY
     String orderBy = String.join(",", getOrderByList(request.getOrderBy()));
-    Date startTime = request.getStartTime();
-    Date endTime = request.getEndTime();
     // 分页
     return PageHelper.startPage(request.getPageNum(), request.getPageSize(), orderBy)
-        .doSelectPageInfo(() -> getList(request.getCondition(), startTime, endTime));
+        .doSelectPageInfo(() -> getList(request));
   }
 
   /**

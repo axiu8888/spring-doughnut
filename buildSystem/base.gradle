@@ -60,6 +60,7 @@ dependencies {
             "com.google.code.findbugs:jsr305:3.0.2",
             "org.projectlombok:lombok:${lombokVersion}",
             "commons-io:commons-io:${commonsIOVersion}",
+            "commons-beanutils:commons-beanutils:1.9.4",
             "org.apache.commons:commons-lang3:${commonsLang3Version}",
             "com.google.guava:guava:${guavaVersion}",
             "com.alibaba:fastjson:${fastjsonVersion}",

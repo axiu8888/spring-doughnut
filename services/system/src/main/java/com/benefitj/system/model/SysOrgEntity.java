@@ -24,57 +24,52 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@TableName("sys_orgs")
 @Table(name = "sys_org", indexes = {
     @Index(name = "idx_pid_name", columnList = "pid, name"),
 })
+@TableName("sys_org")
 public class SysOrgEntity extends BaseEntity {
 
   public static final String AUTO = ":";
 
   /**
-   * 机构 ID
+   * 创建时间
    */
-  @ApiModelProperty("机构ID")
+  @ApiModelProperty("主键ID")
   @Id
-  @Column(name = "id", columnDefinition = "varchar(32) comment '机构ID'", length = 32)
+  @Column(name = "id", columnDefinition = "varchar(32) comment '主键ID'")
   private String id;
+
   /**
    * 父级机构 ID
    */
   @ApiModelProperty("父级机构ID")
-  @Column(name = "pid", columnDefinition = "varchar(32) comment '父级机构ID'", length = 32)
+  @Column(name = "pid", columnDefinition = "varchar(32) comment '父级机构ID'")
   private String pid;
   /**
    * 机构名
    */
   @ApiModelProperty("机构名")
-  @Column(name = "name", columnDefinition = "varchar(100) comment '机构名'", length = 100)
+  @Column(name = "name", columnDefinition = "varchar(100) comment '机构名'")
   private String name;
   /**
    * code或id 生成的路径，包含自身的code或id(具体取什么值根据业务决定)
    */
   @ApiModelProperty("生成的路径")
-  @Column(name = "auto_code", columnDefinition = "varchar(1024) comment '生成的路径'", length = 1024)
+  @Column(name = "auto_code", columnDefinition = "text comment '生成的路径'")
   private String autoCode;
   /**
    * 机构号
    */
   @ApiModelProperty("机构号")
-  @Column(name = "code", columnDefinition = "varchar(30) comment '机构号'", length = 30)
+  @Column(name = "code", columnDefinition = "varchar(30) comment '机构号'")
   private String code;
   /**
    * 机构LOGO
    */
   @ApiModelProperty("机构LOGO")
-  @Column(name = "logo", columnDefinition = "varchar(1024) comment '机构LOGO'", length = 1024)
+  @Column(name = "logo", columnDefinition = "text comment '机构LOGO'")
   private String logo;
-  /**
-   * 创建者
-   */
-  @ApiModelProperty("创建者")
-  @Column(name = "creatorId", columnDefinition = "varchar(32) comment '创建者'", length = 32)
-  private String creatorId;
 
   /**
    * 获取父节点的 autoCode

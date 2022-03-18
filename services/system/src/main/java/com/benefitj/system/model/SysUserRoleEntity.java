@@ -1,7 +1,7 @@
 package com.benefitj.system.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.benefitj.scaffold.base.BaseEntity;
+import com.benefitj.scaffold.base.BaseIdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 /**
  * 用户和角色关联表
@@ -22,20 +25,13 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@TableName("sys_user_role")
 @Table(name = "sys_user_role", indexes = {
     @Index(name = "idx_user", columnList = "user_id"),
     @Index(name = "idx_role", columnList = "role_id"),
 })
-public class SysUserRoleEntity extends BaseEntity {
+@TableName("sys_user_role")
+public class SysUserRoleEntity extends BaseIdEntity {
 
-  /**
-   * ID
-   */
-  @ApiModelProperty("ID")
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
   /**
    * 用户ID
    */

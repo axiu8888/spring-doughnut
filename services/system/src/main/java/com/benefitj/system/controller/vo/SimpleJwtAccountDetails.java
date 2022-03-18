@@ -1,8 +1,8 @@
 package com.benefitj.system.controller.vo;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.benefitj.system.model.SysAccountEntity;
 import com.benefitj.scaffold.security.user.JwtUserDetails;
+import com.benefitj.system.model.SysAccountEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -55,11 +55,6 @@ public class SimpleJwtAccountDetails extends SysAccountEntity implements JwtUser
     this.orgId = orgId;
   }
 
-  @Override
-  public void setAuthorities(List<GrantedAuthority> authorities) {
-    this.authorities = authorities;
-  }
-
   /**
    * 获取权限
    */
@@ -69,13 +64,18 @@ public class SimpleJwtAccountDetails extends SysAccountEntity implements JwtUser
   }
 
   @Override
+  public void setAuthorities(List<GrantedAuthority> authorities) {
+    this.authorities = authorities;
+  }
+
+  @Override
   public boolean isAccountNonExpired() {
     return true;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return Boolean.FALSE.equals(getActive());
+    return !Boolean.FALSE.equals(getActive());
   }
 
   @Override

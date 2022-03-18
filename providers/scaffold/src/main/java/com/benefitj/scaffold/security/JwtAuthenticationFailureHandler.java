@@ -27,16 +27,23 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
   public void onAuthenticationFailure(HttpServletRequest request,
                                       HttpServletResponse response,
                                       AuthenticationException e) throws IOException {
-    String error = e.getMessage();
-    log.info("认证失败: {}", error);
-    HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
-    response.setStatus(unauthorized.value());
-    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    HttpResult<Object> failure = HttpResult.fail(unauthorized.value(),
-        StringUtils.isNotBlank(error) ? error : "Unauthorized");
-    response.getWriter().write(JsonUtils.toJson(failure));
-    response.getWriter().flush();
+    log.info("认证失败: {}", e.getMessage());
+    respTo(response
+        , JsonUtils.toJson(HttpResult.fail(400, StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : "Unauthorized"))
+        , HttpStatus.OK.value()
+    );
+  }
+
+  public static void respTo(HttpServletResponse response, String message, int status) {
+    try {
+      response.setStatus(status);
+      response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+      response.getWriter().write(message);
+      response.getWriter().flush();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
 }

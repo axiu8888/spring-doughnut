@@ -1,15 +1,15 @@
 package com.benefitj.system.controller;
 
-import com.benefitj.system.service.UserAuthenticationService;
 import com.benefitj.scaffold.http.AuthTokenVo;
 import com.benefitj.scaffold.http.HttpResult;
 import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.security.url.UrlPermitted;
+import com.benefitj.system.model.SysAccountEntity;
+import com.benefitj.system.service.UserAuthenticationService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,53 +31,40 @@ public class AuthController {
    * 注册
    */
   @AopIgnore
-  @ApiOperation("注册")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "username", value = "用户名", required = true, dataType = "String", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "password", value = "密码", required = true, dataType = "String", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "orgId", value = "机构ID", required = true, dataType = "String", dataTypeClass = String.class)
-  })
+  @ApiOperation(value = "注册", notes = "注册新用户")
   @PostMapping("/register")
-  public HttpResult<?> register(String username, String password, String orgId) {
+  public HttpResult<AuthTokenVo<SysAccountEntity>> register(@ApiParam("用户名") String username,
+                                                            @ApiParam("密码") String password,
+                                                            @ApiParam("机构ID") String orgId) {
     if (StringUtils.isAnyBlank(username, password)) {
       return HttpResult.fail("用户名或密码不能为空");
     }
-    AuthTokenVo vo = service.register(username, password, orgId);
-    return HttpResult.succeed(vo);
+    return HttpResult.succeed(service.register(username, password, orgId));
   }
 
   /**
    * 登录
    */
   @AopIgnore
-  @ApiOperation("登录")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "username", value = "用户名", required = true, dataType = "String", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "password", value = "密码", required = true, dataType = "String", dataTypeClass = String.class)
-  })
+  @ApiOperation(value = "登录", notes = "用户登录")
   @PostMapping("/login")
-  public HttpResult<?> login(String username, String password) {
+  public HttpResult<AuthTokenVo> login(@ApiParam("用户名") String username, @ApiParam("密码") String password) {
     if (StringUtils.isAnyBlank(username, password)) {
       return HttpResult.fail("用户名或密码错误");
     }
-    AuthTokenVo vo = service.login(username, password);
-    return HttpResult.succeed(vo);
+    return HttpResult.succeed(service.login(username, password));
   }
 
   /**
    * 获取 token
    */
-  @ApiOperation("刷新token")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "refresh", value = "刷新的token", required = true, dataType = "String", dataTypeClass = String.class),
-  })
+  @ApiOperation(value = "刷新token", notes = "通过refreshToken获取新的token")
   @GetMapping("/token")
-  public HttpResult<?> refreshToken(@RequestHeader("refresh") String refreshToken) {
+  public HttpResult<AuthTokenVo> refreshToken(@ApiParam("刷新的token") @RequestHeader("refresh") String refreshToken) {
     if (StringUtils.isBlank(refreshToken)) {
       return HttpResult.fail("token错误");
     }
-    AuthTokenVo vo = service.getAccessToken(refreshToken);
-    return HttpResult.succeed(vo);
+    return HttpResult.succeed(service.getAccessToken(refreshToken));
   }
 
 

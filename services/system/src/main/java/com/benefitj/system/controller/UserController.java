@@ -1,19 +1,19 @@
 package com.benefitj.system.controller;
 
 
-import com.benefitj.system.model.SysUserEntity;
-import com.benefitj.system.security.ResourceTag;
-import com.benefitj.system.service.SysUserService;
 import com.benefitj.scaffold.http.HttpResult;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
 import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.mvc.get.GetBody;
-import com.benefitj.spring.mvc.page.PageBody;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryBody;
+import com.benefitj.spring.mvc.query.QueryRequest;
+import com.benefitj.system.model.SysUserEntity;
+import com.benefitj.system.service.SysUserService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,16 +33,12 @@ public class UserController {
   private SysUserService userService;
 
   @ApiOperation("获取用户信息")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataType = "String", dataTypeClass = String.class),
-  })
   @GetMapping
-  public HttpResult<?> get(String id) {
+  public HttpResult<SysUserEntity> get(@ApiParam("用户ID") String id) {
     if (StringUtils.isBlank(id)) {
-      id = JwtTokenManager.currentUserId();
+      return HttpResult.succeed();
     }
-    SysUserEntity userInfo = userService.getById(id);
-    return HttpResult.succeed(userInfo);
+    return HttpResult.succeed(userService.getById(id));
   }
 
   @ApiOperation("更新用户信息")
@@ -52,32 +48,22 @@ public class UserController {
       return HttpResult.fail("用户ID不能为空");
     }
     userService.save(user);
-    return HttpResult.succeed(user);
+    return HttpResult.succeed();
   }
 
   @ApiOperation("获取用户列表")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "orgId", value = "机构ID", dataType = "String", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "active", value = "是否可用", dataType = "Boolean", dataTypeClass = Boolean.class),
-      @ApiImplicitParam(name = "gender", value = "性别", dataType = "Boolean", dataTypeClass = Boolean.class),
-      @ApiImplicitParam(name = "multiLevel", value = "是否返回多级机构的数据", dataType = "Boolean", dataTypeClass = Boolean.class),
-  })
   @GetMapping("/list")
-  public HttpResult<?> getList(@GetBody SysUserEntity condition, Boolean multiLevel) {
-    if (StringUtils.isNotBlank(condition.getOrgId())) {
-      condition.setOrgId(JwtTokenManager.currentOrgId());
-    }
-    if (StringUtils.isBlank(condition.getOrgId())) {
-      return HttpResult.fail("orgId为空");
-    }
-    List<SysUserEntity> users = userService.getList(condition, null, null);
-    return HttpResult.succeed(users);
+  public HttpResult<List<SysUserEntity>> getList(@QueryBody QueryRequest<SysUserEntity> request) {
+    SysUserEntity condition = request.getCondition();
+    condition.setOrgId(StringUtils.isNotBlank(condition.getOrgId())
+        ? condition.getOrgId() : JwtTokenManager.currentOrgId());
+    return HttpResult.succeed(userService.getList(request));
   }
 
   @ApiOperation("获取用户列表分页")
   @GetMapping("/page")
-  public HttpResult<?> getPage(@PageBody PageableRequest<SysUserEntity> page) {
-    return HttpResult.succeed(userService.getPage(page));
+  public HttpResult<PageInfo<SysUserEntity>> getPage(@PageBody PageRequest<SysUserEntity> request) {
+    return HttpResult.succeed(userService.getPage(request));
   }
 
 }

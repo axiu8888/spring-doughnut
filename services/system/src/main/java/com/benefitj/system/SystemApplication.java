@@ -11,10 +11,12 @@ import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mvc.mapping.MappingAnnotationMetadata;
 import com.benefitj.system.controller.vo.ApiDetail;
 import com.benefitj.system.controller.vo.ApiModule;
+import com.benefitj.system.utils.TableExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -25,12 +27,14 @@ import java.util.stream.Collectors;
 public class SystemApplication {
   public static void main(String[] args) {
     SpringApplication.run(SystemApplication.class, args);
+
+//    exportTableExcel();
   }
 
   @OnAppStart
   public void onAppStart() {
 //    SysUserService service = SpringCtxHolder.getBean(SysUserService.class);
-//    SysUserEntity user = SysUserEntity.builder()
+//    service.insert(SysUserEntity.builder()
 //        .id(IdUtils.uuid())
 //        .orgId("123456")
 //        .name("张三")
@@ -38,8 +42,7 @@ public class SystemApplication {
 //        .gender(GenderEnum.MALE)
 //        .locked(Boolean.FALSE)
 //        .active(Boolean.TRUE)
-//        .build();
-//    service.insert(user);
+//        .build());
 
 
     EventLoop.io().schedule(() -> TryCatchUtils.tryThrow(() -> {
@@ -105,6 +108,11 @@ public class SystemApplication {
     }
     System.err.println(JSON.toJSONString(apiModules.values()));
 
+  }
+
+  public static void exportTableExcel() {
+    // 导出excel
+    TableExcelUtils.export(new File("D:/system.xlsx"), "com.benefitj.system.model");
   }
 
 }

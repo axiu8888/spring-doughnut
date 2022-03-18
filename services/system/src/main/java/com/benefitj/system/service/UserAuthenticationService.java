@@ -64,14 +64,16 @@ public class UserAuthenticationService implements JwtUserDetailsService {
       throw new SysException("此账号已存在");
     }
 
-    SysUserEntity user = new SysUserEntity();
-    user.setOrgId(orgId);
+    SysUserEntity user = SysUserEntity.builder()
+        .orgId(orgId)
+        .build();
     userService.save(user);
 
-    SysAccountEntity account = new SysAccountEntity();
-    account.setUsername(username);
-    account.setPassword(password);
-    account.setUserId(user.getId());
+    SysAccountEntity account = SysAccountEntity.builder()
+        .username(username)
+        .password(password)
+        .userId(user.getId())
+        .build();
     // 保存用户
     accountService.save(account);
 

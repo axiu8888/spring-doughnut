@@ -1,10 +1,8 @@
 package com.benefitj.system.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.benefitj.core.TimeUtils;
-import com.benefitj.scaffold.base.BaseEntity;
+import com.benefitj.scaffold.base.BaseIdEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,31 +13,25 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import java.util.Date;
 
 @ApiModel(value = "用户")
 @SuperBuilder
-//@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@TableName(value = "sys_user")
 @Table(name = "sys_user", indexes = {
     @Index(name = "idx_org_id", columnList = "org_id")
 })
-public class SysUserEntity extends BaseEntity {
+@TableName(value = "sys_user")
+public class SysUserEntity extends BaseIdEntity implements IOrgEntity {
 
-  /**
-   * 主键
-   */
-  @ApiModelProperty("用户ID")
-  @Id
-  @TableId(type = IdType.ASSIGN_UUID)
-  @Column(name = "id", columnDefinition = "varchar(32) comment '主键'", length = 32)
-  private String id;
 
   @ApiModelProperty("机构ID")
   @Column(name = "org_id", columnDefinition = "varchar(32) comment '机构ID'", length = 32)

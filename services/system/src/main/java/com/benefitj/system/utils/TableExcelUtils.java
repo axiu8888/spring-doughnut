@@ -13,10 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -37,11 +34,11 @@ public class TableExcelUtils {
     /**
      * 表名
      */
-    private String tableName;
+    private String name;
     /**
      * 索引
      */
-    private List<IndexDescriptor> indexs;
+    private List<IndexDescriptor> indexes;
     /**
      * 字段
      */
@@ -77,11 +74,11 @@ public class TableExcelUtils {
     @ExcelProperty("长度")
     private Integer length;
 
-    @ExcelProperty("描述")
+    @ExcelProperty("备注")
     private String comment;
 
-    @ExcelProperty("主键")
-    private String primaryKey;
+    @ExcelProperty("主键/外键")
+    private String keyType;
 
     @ExcelProperty("是否为空")
     private String nullable;
@@ -100,23 +97,48 @@ public class TableExcelUtils {
   /**
    * 解析字段
    */
-  private static ColumnDescriptor parseColumn(Column column, Id id) {
-    String columnDefinition = column.columnDefinition().trim();
+  private static ColumnDescriptor parseColumn(String name, String columnDefinition, boolean nullable, boolean unique, int precision, boolean primaryKey, boolean foreignKey) {
     String type = columnDefinition.trim().split(" ")[0];
     String comment = columnDefinition.trim().split(" comment ")[1];
     String[] defaultSplit = columnDefinition.trim().split(" DEFAULT ");
     String defaultValue = defaultSplit.length > 1 ? defaultSplit[1].split(" comment ")[0] : "";
     return ColumnDescriptor.builder()
-        .name(column.name())
+        .name(name)
         .type(type)
         .length(type.endsWith(")") ? Integer.valueOf(type.substring(type.indexOf("(") + 1, type.lastIndexOf(")"))) : null)
         .defaultValue(StringUtils.isNotBlank(defaultValue) ? "DEFAULT " + defaultValue : "")
         .comment(comment.replace("'", ""))
-        .primaryKey(id != null ? "是" : "")
-        .nullable(column.nullable() ? "" : "否")
-        .unique(column.unique() ? "是" : "")
-        .precision(column.precision() == 0 ? "" : String.valueOf(column.precision()))
+        .keyType(primaryKey ? "主键" : (foreignKey ? "外键" : ""))
+        .nullable(nullable ? "" : "否")
+        .unique(unique ? "是" : "")
+        .precision(precision == 0 ? "" : String.valueOf(precision))
         .build();
+  }
+
+  /**
+   * 解析字段
+   */
+  private static ColumnDescriptor parseColumn(Column column, boolean primaryKey, boolean foreignKey) {
+    return parseColumn(column.name()
+        , column.columnDefinition().trim()
+        , column.nullable()
+        , column.unique()
+        , column.precision()
+        , primaryKey
+        , foreignKey);
+  }
+
+  /**
+   * 解析字段
+   */
+  private static ColumnDescriptor parseColumn(JoinColumn column, boolean primaryKey, boolean foreignKey) {
+    return parseColumn(column.name()
+        , column.columnDefinition().trim()
+        , column.nullable()
+        , column.unique()
+        , 0
+        , primaryKey
+        , foreignKey);
   }
 
   /**
@@ -143,11 +165,17 @@ public class TableExcelUtils {
         .stream()
         .filter(klass -> klass.isAnnotationPresent(Table.class))
         .map(cls -> TableDescriptor.builder()
-            .tableName(cls.getAnnotation(Table.class).name())
-            .indexs(parseIndex(cls.getAnnotation(Table.class)))
+            .name(cls.getAnnotation(Table.class).name())
+            .indexes(parseIndex(cls.getAnnotation(Table.class)))
             .columns(ReflectUtils.getFields(cls
-                , f -> f.isAnnotationPresent(Column.class)
-                , f -> parseColumn(f.getAnnotation(Column.class), f.getAnnotation(Id.class))))
+                , f -> f.isAnnotationPresent(Column.class) || f.isAnnotationPresent(JoinColumn.class)
+                , f -> {
+                  boolean jc = f.isAnnotationPresent(JoinColumn.class);
+                  return jc
+                      ? parseColumn(f.getAnnotation(JoinColumn.class), f.isAnnotationPresent(Id.class), jc)
+                      : parseColumn(f.getAnnotation(Column.class), f.isAnnotationPresent(Id.class), jc);
+                })
+            )
             .build())
         .collect(Collectors.toList());
   }
@@ -178,7 +206,7 @@ public class TableExcelUtils {
     try {
       final AtomicInteger index = new AtomicInteger(1);
       tables.forEach(tableDescriptor ->
-          writer.write(tableDescriptor.getColumns(), EasyExcel.writerSheet(index.getAndIncrement(), tableDescriptor.getTableName())
+          writer.write(tableDescriptor.getColumns(), EasyExcel.writerSheet(index.getAndIncrement(), tableDescriptor.getName())
               .head(ColumnDescriptor.class)
               .build())
       );

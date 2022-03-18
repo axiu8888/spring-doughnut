@@ -58,7 +58,6 @@ public class SysAccountService extends BaseService<SysAccountMapper, SysAccountE
     // 对密码加密
     String hex = HexUtils.bytesToHex(account.getPassword().getBytes());
     account.setPassword(passwordEncoder.encode(hex));
-    account.setCreateTime(new Date());
     account.setActive(Boolean.TRUE);
     // 缓存
     redisService.setAccount(account);
@@ -76,7 +75,6 @@ public class SysAccountService extends BaseService<SysAccountMapper, SysAccountE
     SysAccountEntity account = getById(id);
     if (account != null) {
       account.setActive(active == null ? account.getActive() : active);
-      account.setUpdateTime(new Date());
       if (Boolean.FALSE.equals(active)) {
         redisService.deleteAccount(account.getUsername());
       }
@@ -120,7 +118,6 @@ public class SysAccountService extends BaseService<SysAccountMapper, SysAccountE
       // 对密码加密
       String hex = HexUtils.bytesToHex(newPassword.getBytes(StandardCharsets.UTF_8));
       account.setPassword(passwordEncoder.encode(hex));
-      account.setUpdateTime(new Date());
       redisService.deleteAccount(account.getUsername());
       return updateById(account);
     }

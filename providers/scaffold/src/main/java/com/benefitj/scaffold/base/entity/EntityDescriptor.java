@@ -28,10 +28,6 @@ public class EntityDescriptor {
    * 表名
    */
   private String tableName;
-  /**
-   * 主键列
-   */
-  private final List<PropertyDescriptor> primaryKeys = new ArrayList<>();
 
   /**
    * 获取属性
@@ -85,14 +81,7 @@ public class EntityDescriptor {
    * 获取ID列
    */
   public PropertyDescriptor getId() {
-    if (getPrimaryKeys().size() != 1) {
-      String pkColumns = getPrimaryKeys()
-          .stream()
-          .map(PropertyDescriptor::getName)
-          .collect(Collectors.joining(", "));
-      throw new IllegalStateException("主键列不唯一： " + pkColumns);
-    }
-    return getPrimaryKeys().get(0);
+    return getFirst(PropertyDescriptor::isPrimaryKey);
   }
 
   public <T> T newEntity() {

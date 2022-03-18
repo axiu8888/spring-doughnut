@@ -130,4 +130,8 @@ public class HttpLoggingHandler implements WebPointCutHandler {
     getPrintArgs().putAll(args);
   }
 
+  public static void clearArgs() {
+    getPrintArgs().clear();
+  }
+
 }

@@ -2,20 +2,23 @@ package com.benefitj.system.service;
 
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.SortedTree;
-import com.benefitj.system.controller.vo.OrgTreeVo;
-import com.benefitj.system.mapper.SysOrgMapper;
-import com.benefitj.system.model.SysOrgEntity;
 import com.benefitj.scaffold.base.BaseService;
 import com.benefitj.scaffold.security.CurrentUserService;
 import com.benefitj.spring.BeanHelper;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.system.controller.vo.OrgTreeVo;
+import com.benefitj.system.mapper.SysOrgMapper;
+import com.benefitj.system.model.SysOrgEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -56,13 +59,13 @@ public class SysOrgService extends BaseService<SysOrgMapper, SysOrgEntity> imple
   /**
    * 获取 autoCode
    *
-   * @param parentId   父机构
+   * @param pid        父机构
    * @param id         机构ID
    * @param allowThrow 如果父机构不存在，是否抛出异常
    * @return 返回新的 autoCode
    */
-  private String getAutoCode(String parentId, String id, boolean allowThrow) {
-    SysOrgEntity parent = getById(parentId);
+  private String getAutoCode(String pid, String id, boolean allowThrow) {
+    SysOrgEntity parent = getById(pid);
     if (parent == null && allowThrow) {
       throw new IllegalStateException("父级机构不存在");
     }
@@ -107,8 +110,6 @@ public class SysOrgService extends BaseService<SysOrgMapper, SysOrgEntity> imple
     }
 
     org.setAutoCode(autoCode);
-    org.setCreatorId(currentUserId());
-    org.setCreateTime(new Date());
     org.setActive(true);
     getBaseMapper().insert(org);
     return org;
@@ -143,7 +144,6 @@ public class SysOrgService extends BaseService<SysOrgMapper, SysOrgEntity> imple
     SysOrgEntity org = get(id);
     if (org != null) {
       org.setActive(active != null ? org.getActive() : null);
-      org.setUpdateTime(new Date());
       return updateById(org);
     }
     return false;
@@ -157,21 +157,16 @@ public class SysOrgService extends BaseService<SysOrgMapper, SysOrgEntity> imple
    * @param m    之多匹配的次数
    * @return 返回符合的机构
    */
-  protected PageInfo<SysOrgEntity> getByAutoCodeRegex(PageableRequest<SysOrgEntity> page, int n, int m) {
+  protected PageInfo<SysOrgEntity> getByAutoCodeRegex(PageRequest<SysOrgEntity> page, int n, int m) {
     SysOrgEntity c = page.getCondition();
     // 重置autoCode
     c.setAutoCode(getAutoCodeById(c.getPid()));
     // ORDER BY
     String orderBy = String.join(",", getOrderByList(page.getOrderBy()));
     // 查询分页
-    n = Math.max(0, n);
-    m = Math.max(n, m);
-    Date startTime = page.getStartTime();
-    Date endTime = page.getEndTime();
-    // 分页
-    PageHelper.startPage(page.getPageNum(), page.getPageSize(), orderBy);
-    List<SysOrgEntity> list = getBaseMapper().selectByAutoCodeRegex(c, startTime, endTime, n, m);
-    return PageInfo.of(list);
+    return PageHelper.startPage(page.getPageNum(), page.getPageSize(), orderBy).doSelectPageInfo(()
+        -> getBaseMapper().selectByAutoCodeRegex(
+        c, page.getStartTime(), page.getEndTime(), Math.max(0, n), Math.max(n, m)));
   }
 
   /**

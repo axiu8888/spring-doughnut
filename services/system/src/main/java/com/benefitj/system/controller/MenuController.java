@@ -1,17 +1,18 @@
 package com.benefitj.system.controller;
 
+import com.benefitj.scaffold.http.HttpResult;
+import com.benefitj.spring.aop.web.AopWebPointCut;
+import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryBody;
+import com.benefitj.spring.mvc.query.QueryRequest;
 import com.benefitj.system.model.SysMenuEntity;
 import com.benefitj.system.service.SysMenuService;
-import com.benefitj.scaffold.http.HttpResult;
-import com.benefitj.scaffold.security.token.JwtTokenManager;
-import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.mvc.get.GetBody;
-import com.benefitj.spring.mvc.page.PageBody;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.system.utils.Utils;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,20 +32,16 @@ public class MenuController {
   private SysMenuService menuService;
 
   @ApiOperation("获取菜单")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "菜单ID", required = true, dataType = "String", dataTypeClass = String.class),
-  })
   @GetMapping
-  public HttpResult<?> get(String id) {
+  public HttpResult<SysMenuEntity> get(@ApiParam("菜单ID") String id) {
     SysMenuEntity menu = menuService.getById(id);
     return HttpResult.succeed(menu);
   }
 
   @ApiOperation("添加菜单")
   @PostMapping
-  public HttpResult<?> create(SysMenuEntity menu) {
-    menu = menuService.create(menu);
-    return HttpResult.succeed(menu);
+  public HttpResult<SysMenuEntity> create(SysMenuEntity menu) {
+    return HttpResult.succeed(menuService.create(menu));
   }
 
   @ApiOperation("更新菜单")
@@ -53,26 +50,19 @@ public class MenuController {
     if (StringUtils.isAnyBlank(menu.getId(), menu.getName())) {
       return HttpResult.fail("菜单ID和菜单名都不能为空");
     }
-    menu = menuService.update(menu);
-    return HttpResult.succeed(menu);
+    menuService.update(menu);
+    return HttpResult.succeed();
   }
 
   @ApiOperation("删除菜单")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "菜单ID", dataType = "String", dataTypeClass = String.class),
-  })
   @DeleteMapping
-  public HttpResult<?> delete(String id) {
+  public HttpResult<?> delete(@ApiParam("菜单ID") String id) {
     return HttpResult.succeed(menuService.delete(id));
   }
 
   @ApiOperation("改变菜单的状态")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "菜单ID", dataType = "String", paramType = "form", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "active", value = "状态", dataType = "Boolean", paramType = "form", dataTypeClass = Boolean.class),
-  })
   @PatchMapping("/active")
-  public HttpResult<?> changeActive(String id, Boolean active) {
+  public HttpResult<?> changeActive(@ApiParam("菜单ID") String id, @ApiParam("状态") Boolean active) {
     if (StringUtils.isBlank(id)) {
       return HttpResult.fail("菜单ID不能为空");
     }
@@ -81,19 +71,16 @@ public class MenuController {
 
   @ApiOperation("获取菜单列表分页")
   @GetMapping("/page")
-  public HttpResult<?> getPage(@PageBody PageableRequest<SysMenuEntity> page) {
-    return HttpResult.succeed(menuService.getPage(page));
+  public HttpResult<PageInfo<SysMenuEntity>> getPage(@PageBody PageRequest<SysMenuEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(menuService.getPage(request));
   }
 
   @ApiOperation("获取机构的菜单列表")
   @GetMapping("/list")
-  public HttpResult<?> getList(@GetBody SysMenuEntity condition) {
-    condition.setOrgId(StringUtils.isNotBlank(condition.getOrgId()) ? condition.getOrgId() : JwtTokenManager.currentOrgId());
-    if (StringUtils.isBlank(condition.getOrgId())) {
-      return HttpResult.fail("orgId为空");
-    }
-    List<SysMenuEntity> menuList = menuService.getList(condition, null, null);
-    return HttpResult.succeed(menuList);
+  public HttpResult<List<SysMenuEntity>> getList(@QueryBody QueryRequest<SysMenuEntity> request) {
+    Utils.setOrgId(request.getCondition());
+    return HttpResult.succeed(menuService.getList(request));
   }
 
 }

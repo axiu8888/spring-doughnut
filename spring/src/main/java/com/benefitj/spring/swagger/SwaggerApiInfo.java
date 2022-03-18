@@ -1,6 +1,5 @@
 package com.benefitj.spring.swagger;
 
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;

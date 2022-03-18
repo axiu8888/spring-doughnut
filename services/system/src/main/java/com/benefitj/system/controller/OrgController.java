@@ -1,19 +1,19 @@
 package com.benefitj.system.controller;
 
 
-import com.benefitj.system.model.SysOrgEntity;
-import com.benefitj.system.service.SysOrgService;
 import com.benefitj.scaffold.http.HttpResult;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
 import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.mvc.get.GetBody;
-import com.benefitj.spring.mvc.page.PageBody;
-import com.benefitj.spring.mvc.page.PageableRequest;
+import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.QueryBody;
+import com.benefitj.spring.mvc.query.QueryRequest;
+import com.benefitj.system.model.SysOrgEntity;
+import com.benefitj.system.service.SysOrgService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,20 +33,15 @@ public class OrgController {
   private SysOrgService orgService;
 
   @ApiOperation("获取机构")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "机构ID", required = true, dataType = "String", dataTypeClass = String.class),
-  })
   @GetMapping
-  public HttpResult<?> get(String id) {
-    SysOrgEntity org = orgService.get(id);
-    return HttpResult.succeed(org);
+  public HttpResult<SysOrgEntity> get(@ApiParam("机构ID") String id) {
+    return HttpResult.succeed(orgService.get(id));
   }
 
   @ApiOperation("添加机构")
   @PostMapping
-  public HttpResult<?> create(SysOrgEntity org) {
-    org = orgService.create(org);
-    return HttpResult.succeed(org);
+  public HttpResult<SysOrgEntity> create(SysOrgEntity org) {
+    return HttpResult.succeed(orgService.create(org));
   }
 
   @ApiOperation("更新机构")
@@ -55,70 +50,59 @@ public class OrgController {
     if (StringUtils.isAnyBlank(org.getId(), org.getName())) {
       return HttpResult.fail("机构ID和机构名不能为空");
     }
-    org = orgService.update(org);
-    return HttpResult.succeed(org);
+    orgService.update(org);
+    return HttpResult.succeed();
   }
 
   @ApiOperation("删除机构")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "机构ID", dataType = "String", dataTypeClass = String.class),
-  })
   @DeleteMapping
-  public HttpResult<?> delete(String id) {
-    int count = orgService.deleteById(id);
-    return HttpResult.succeed(count);
+  public HttpResult<Integer> delete(@ApiParam("机构ID") String id) {
+    return HttpResult.succeed(orgService.deleteById(id));
   }
 
   @ApiOperation("改变机构的状态")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "机构ID", dataType = "String", paramType = "form", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "active", value = "状态", dataType = "Boolean", paramType = "form", dataTypeClass = Boolean.class),
-  })
   @PatchMapping("/active")
-  public HttpResult<?> changeActive(String id, Boolean active) {
+  public HttpResult<Boolean> changeActive(@ApiParam("机构ID") String id, @ApiParam("状态") Boolean active) {
     if (StringUtils.isBlank(id)) {
       return HttpResult.succeed();
     }
-    Boolean result = orgService.changeActive(id, active);
-    return HttpResult.succeed(result);
+    return HttpResult.succeed(orgService.changeActive(id, active));
   }
 
   @ApiOperation("获取子机构列表分页")
   @GetMapping("/page")
-  public HttpResult<?> getPage(@PageBody PageableRequest<SysOrgEntity> page) {
-    PageInfo<SysOrgEntity> orgList = orgService.getPage(page);
-    return HttpResult.succeed(orgList);
+  public HttpResult<PageInfo<SysOrgEntity>> getPage(@PageBody PageRequest<SysOrgEntity> request) {
+    setOrgId(request.getCondition());
+    return HttpResult.succeed(orgService.getPage(request));
   }
 
   @ApiOperation("获取机构列表")
   @GetMapping("/list")
-  public HttpResult<?> getList(@GetBody SysOrgEntity condition) {
-    condition.setId(StringUtils.isNotBlank(condition.getId()) ? condition.getId() : JwtTokenManager.currentOrgId());
-    List<SysOrgEntity> organizations = orgService.getList(condition, null, null);
-    return HttpResult.succeed(organizations);
+  public HttpResult<List<SysOrgEntity>> getList(@QueryBody QueryRequest<SysOrgEntity> request) {
+    setOrgId(request.getCondition());
+    return HttpResult.succeed(orgService.getList(request));
   }
 
   @ApiOperation("获取子机构")
   @GetMapping("/children")
-  public HttpResult<?> getChildren(@GetBody SysOrgEntity condition) {
-    condition.setId(StringUtils.isNotBlank(condition.getId()) ? condition.getId() : JwtTokenManager.currentOrgId());
-    condition.setId(null);
-    List<SysOrgEntity> organizations = orgService.getList(condition, null, null);
-    return HttpResult.succeed(organizations);
+  public HttpResult<List<SysOrgEntity>> getChildren(@QueryBody QueryRequest<SysOrgEntity> request) {
+    setOrgId(request.getCondition());
+    return HttpResult.succeed(orgService.getList(request));
   }
 
   @ApiOperation("获取组织机构树")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "id", value = "机构ID", dataType = "String", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "active", value = "是否可用", dataType = "Boolean", dataTypeClass = Boolean.class),
-  })
   @GetMapping("/tree")
-  public HttpResult<?> getOrgTree(String id, Boolean active) {
+  public HttpResult<List<SysOrgEntity>> getOrgTree(@ApiParam("机构ID") String id, @ApiParam("是否可用") Boolean active) {
     if (StringUtils.isBlank(id)) {
       return HttpResult.fail("机构id不能为空");
     }
     List<SysOrgEntity> list = orgService.getOrgTreeList(id, active);
     return HttpResult.succeed(list);
+  }
+
+  private void setOrgId(SysOrgEntity condition) {
+    condition.setPid(StringUtils.isNotBlank(condition.getPid())
+        ? condition.getPid() : JwtTokenManager.currentOrgId());
   }
 
 }

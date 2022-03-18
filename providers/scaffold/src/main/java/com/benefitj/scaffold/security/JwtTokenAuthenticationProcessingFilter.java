@@ -1,13 +1,17 @@
 package com.benefitj.scaffold.security;
 
 import com.benefitj.core.EnumHelper;
+import com.benefitj.scaffold.http.HttpResult;
 import com.benefitj.scaffold.security.token.JwtToken;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
+import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.aop.log.HttpLoggingHandler;
+import io.jsonwebtoken.JwtException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -84,11 +88,16 @@ public class JwtTokenAuthenticationProcessingFilter extends OncePerRequestFilter
         HttpLoggingHandler.putArg("orgId", token.getOrgId());
       }
       chain.doFilter(request, response);
+    } catch (JwtException e) {
+      JwtAuthenticationFailureHandler.respTo(response
+          , JsonUtils.toJson(HttpResult.fail(401, "token认证失败: " + e.getMessage()))
+          , HttpStatus.OK.value());
     } catch (Exception e) {
-      BadCredentialsException bce = new BadCredentialsException(e.getMessage());
-      getFailureHandler().onAuthenticationFailure(request, response, bce);
+      getFailureHandler().onAuthenticationFailure(
+          request, response, new BadCredentialsException(e.getMessage()));
     } finally {
       SecurityContextHolder.clearContext();
+      HttpLoggingHandler.clearArgs();
     }
   }
 

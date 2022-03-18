@@ -1,9 +1,7 @@
 package com.benefitj.system.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.benefitj.scaffold.base.BaseEntity;
+import com.benefitj.scaffold.base.BaseUuidEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +10,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 /**
  * 系统权限
@@ -24,19 +25,11 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@TableName("sys_permission")
 @Table(name = "sys_permission", indexes = {
     @Index(name = "idx_org_name", columnList = "org_id, name"),
 })
-public class SysPermissionEntity extends BaseEntity {
-  /**
-   * ID
-   */
-  @ApiModelProperty("ID")
-  @TableId(type = IdType.ASSIGN_UUID)
-  @Id
-  @Column(name = "id", columnDefinition = "varchar(32) comment 'ID'", length = 32)
-  private String id;
+@TableName("sys_permission")
+public class SysPermissionEntity extends BaseUuidEntity implements IOrgEntity {
 
   /**
    * 所属机构ID
@@ -58,13 +51,6 @@ public class SysPermissionEntity extends BaseEntity {
   @ApiModelProperty("资源类型")
   @Column(name = "resource_type", columnDefinition = "varchar(30) comment '资源类型'")
   private ResourceType resourceType;
-
-  /**
-   * 创建者
-   */
-  @ApiModelProperty("创建者")
-  @Column(name = "creator", columnDefinition = "varchar(32) comment '创建者' ", length = 32)
-  private String creator;
 
   /**
    * 备注

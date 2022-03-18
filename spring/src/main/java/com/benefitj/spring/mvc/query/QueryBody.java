@@ -1,10 +1,9 @@
-package com.benefitj.spring.mvc.get;
-
+package com.benefitj.spring.mvc.query;
 
 import java.lang.annotation.*;
 
 /**
- * get请求
+ * 查询请求
  *
  * @author DINGXIUAN
  */
@@ -12,11 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
 @Inherited
-public @interface GetBody {
-
-  /**
-   * 请求参数类型
-   */
-  Class<?> type() default Object.class;
-
+public @interface QueryBody {
 }

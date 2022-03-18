@@ -41,23 +41,23 @@ public class DefaultWebSecurityConfigurerAdapter extends AbstractWebSecurityConf
     return new BCryptPasswordEncoder();
   }
 
-  /**
-   * 跨域
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public CorsFilter corsFilter() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowCredentials(true);
-    //config.addAllowedOrigin("*");
-    config.addAllowedOriginPattern("*");
-    config.addAllowedHeader("*");
-    config.setMaxAge(36000L);
-    config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return new CorsFilter(source);
-  }
+//  /**
+//   * 跨域
+//   */
+//  @ConditionalOnMissingBean
+//  @Bean
+//  public CorsFilter corsFilter() {
+//    CorsConfiguration config = new CorsConfiguration();
+//    config.setAllowCredentials(true);
+//    config.addAllowedOrigin("*");
+//    //config.addAllowedOriginPattern("*");
+//    config.addAllowedHeader("*");
+//    config.setMaxAge(36000L);
+//    config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//    source.registerCorsConfiguration("/**", config);
+//    return new CorsFilter(source);
+//  }
 
   @ConditionalOnMissingBean
   @Bean
@@ -141,7 +141,7 @@ public class DefaultWebSecurityConfigurerAdapter extends AbstractWebSecurityConf
    */
   public void loadFilters(HttpSecurity httpSecurity) {
     httpSecurity.addFilterBefore(jwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
-    httpSecurity.addFilterBefore(corsFilter(), JwtTokenAuthenticationProcessingFilter.class);
+    //httpSecurity.addFilterBefore(corsFilter(), JwtTokenAuthenticationProcessingFilter.class);
   }
 
 }

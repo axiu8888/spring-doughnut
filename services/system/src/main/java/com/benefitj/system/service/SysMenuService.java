@@ -28,8 +28,6 @@ public class SysMenuService extends BaseService<SysMenuMapper, SysMenuEntity> {
     if (StringUtils.isBlank(menu.getOrgId())) {
       menu.setOrgId(currentOrgId());
     }
-    menu.setCreator(JwtTokenManager.currentUserId());
-    menu.setCreateTime(new Date());
     menu.setActive(Boolean.TRUE);
     getBaseMapper().insert(menu);
     return menu;
@@ -48,7 +46,6 @@ public class SysMenuService extends BaseService<SysMenuMapper, SysMenuEntity> {
     }
     existMenu.setName(menu.getName());
     existMenu.setRemarks(menu.getRemarks());
-    existMenu.setUpdateTime(new Date());
     getBaseMapper().updateById(existMenu);
     return existMenu;
   }
@@ -78,7 +75,6 @@ public class SysMenuService extends BaseService<SysMenuMapper, SysMenuEntity> {
     SysMenuEntity menu = getById(id);
     if (menu != null) {
       menu.setActive(active != null ? active : menu.getActive());
-      menu.setUpdateTime(new Date());
       return updateById(menu);
     }
     return false;

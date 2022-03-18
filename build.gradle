@@ -1,7 +1,8 @@
 
 ext {
 
-  springBootVersion = "2.6.2"
+  //springBootVersion = "2.6.2"
+  springBootVersion = '2.3.5.RELEASE'
   springDependencyManagementVersion = "1.0.11.RELEASE"
   aotVersion = "0.11.1"
   springIntegrationVersion = "5.5.6"

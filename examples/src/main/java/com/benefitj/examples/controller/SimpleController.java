@@ -13,8 +13,8 @@ import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
-import com.benefitj.spring.mvc.page.PageableRequest;
-import com.benefitj.spring.mvc.page.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
+import com.benefitj.spring.mvc.query.PageBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +65,7 @@ public class SimpleController {
   }
 
   @GetMapping("/page")
-  public ResponseEntity<?> page(String id1, @PageBody PageableRequest<MultipartForm> form, String id2) {
+  public ResponseEntity<?> page(String id1, @PageBody PageRequest<MultipartForm> form, String id2) {
     System.err.println("id1 ==>: " + id1);
     System.err.println("id2 ==>: " + id2);
     return ResponseEntity.ok("form ==>: " + JSON.toJSONString(form));

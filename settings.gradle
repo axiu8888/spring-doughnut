@@ -12,7 +12,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'springboot-doughnut'
+rootProject.name = 'spring-doughnut'
 
 include ":commons"
 /**
@@ -25,13 +25,20 @@ include ":eventbus"
 /**
  * MQTT
  */
-include ":mqtt", ":mqtt:samples:publisher", ":mqtt:samples:subscriber"
-include ":vertx-mqtt", ":vertx-mqtt:samples:mqtt-server", ":vertx-mqtt:samples:mqtt-subscriber", ":vertx-mqtt:samples:mqtt-publisher"
+include ":mqtt",
+        ":mqtt:samples:publisher",
+        ":mqtt:samples:subscriber"
+include ":vertx-mqtt",
+        ":vertx-mqtt:samples:mqtt-server",
+        ":vertx-mqtt:samples:mqtt-subscriber",
+        ":vertx-mqtt:samples:mqtt-publisher"
 
 /**
  * redis
  */
-include ":redis", ":redis:samples:publisher", ":redis:samples:subscriber"
+include ":redis",
+        ":redis:samples:publisher",
+        ":redis:samples:subscriber"
 
 include ":influxdb", ":influxdb:example"
 
@@ -53,10 +60,10 @@ include ":freemarker"
 /**
  * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
-include ":providers:mqtt-acl-redis"
-include ":providers:scaffold"
+include ":providers:mqtt-acl-redis",
+        ":providers:scaffold"
 
-include ":services:jmods-export"
-include ":services:system"
+include ":services:jmods-export", // 导出执行环境
+        ":services:system" // system
 
 include ":examples"

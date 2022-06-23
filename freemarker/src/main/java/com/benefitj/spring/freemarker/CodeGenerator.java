@@ -1,5 +1,6 @@
 package com.benefitj.spring.freemarker;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.ClasspathUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.SingletonSupplier;
@@ -69,7 +70,7 @@ public class CodeGenerator {
    */
   public String write(Template template, Object dataModel) {
     StringWriter writer = new StringWriter();
-    IOUtils.tryThrow(() -> template.process(dataModel, writer));
+    CatchUtils.tryThrow(() -> template.process(dataModel, writer));
     return writer.toString();
   }
 

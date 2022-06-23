@@ -1,5 +1,6 @@
 package com.benefitj.spring.freemarker;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.IOUtils;
 import freemarker.cache.*;
 import freemarker.core.*;
@@ -142,7 +143,7 @@ public class FreemarkerBuilder {
    * @param dir
    */
   public FreemarkerBuilder setDirectoryForTemplateLoading(File dir) {
-    IOUtils.tryThrow(() -> getConfiguration().setDirectoryForTemplateLoading(dir));
+    CatchUtils.tryThrow(() -> getConfiguration().setDirectoryForTemplateLoading(dir));
     return this;
   }
 
@@ -702,7 +703,7 @@ public class FreemarkerBuilder {
    * @see #setAllSharedVariables(TemplateHashModelEx)
    */
   public FreemarkerBuilder setSharedVariable(String name, Object value) {
-    IOUtils.tryThrow(() -> getConfiguration().setSharedVariable(name, value));
+    CatchUtils.tryThrow(() -> getConfiguration().setSharedVariable(name, value));
     return this;
   }
 
@@ -729,7 +730,7 @@ public class FreemarkerBuilder {
    * @since 2.3.29
    */
   public FreemarkerBuilder setSharedVariables(Map<String, ?> map) {
-    IOUtils.tryThrow(() -> getConfiguration().setSharedVariables(map));
+    CatchUtils.tryThrow(() -> getConfiguration().setSharedVariables(map));
     return this;
   }
 
@@ -741,7 +742,7 @@ public class FreemarkerBuilder {
 //   * @deprecated Use {@link #setSharedVariables(Map)} instead.
 //   */
 //  public FreemarkerBuilder setSharedVaribles(Map map) {
-//    IOUtils.tryThrow(() -> getConfiguration().setSharedVaribles(map));
+//    CatchUtils.tryThrow(() -> getConfiguration().setSharedVaribles(map));
 //    return this;
 //  }
 
@@ -764,7 +765,7 @@ public class FreemarkerBuilder {
    * @see #setSharedVariable(String, TemplateModel)
    */
   public FreemarkerBuilder setAllSharedVariables(TemplateHashModelEx hash) {
-    IOUtils.tryThrow(() -> getConfiguration().setAllSharedVariables(hash));
+    CatchUtils.tryThrow(() -> getConfiguration().setAllSharedVariables(hash));
     return this;
   }
 
@@ -796,7 +797,7 @@ public class FreemarkerBuilder {
   }
 
   public FreemarkerBuilder setSetting(String name, String value) {
-    IOUtils.tryThrow(() -> getConfiguration().setSetting(name, value));
+    CatchUtils.tryThrow(() -> getConfiguration().setSetting(name, value));
     return this;
   }
 
@@ -1317,7 +1318,7 @@ public class FreemarkerBuilder {
    *                           while changing the settings.
    */
   public FreemarkerBuilder setSettings(Properties props) {
-    IOUtils.tryThrow(() -> getConfiguration().setSettings(props));
+    CatchUtils.tryThrow(() -> getConfiguration().setSettings(props));
     return this;
   }
 
@@ -1332,7 +1333,7 @@ public class FreemarkerBuilder {
    * @throws IOException       if an error occurred when reading from the input stream.
    */
   public FreemarkerBuilder setSettings(InputStream propsIn) {
-    IOUtils.tryThrow(() -> getConfiguration().setSettings(propsIn));
+    CatchUtils.tryThrow(() -> getConfiguration().setSettings(propsIn));
     return this;
   }
 

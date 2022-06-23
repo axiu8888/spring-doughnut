@@ -28,6 +28,14 @@ public class ClassDescriptor {
    */
   private String copyright;
   /**
+   * 描述
+   */
+  private String description;
+  /**
+   * 作者
+   */
+  private String author;
+  /**
    * 包名
    */
   private String basePackage;
@@ -40,13 +48,9 @@ public class ClassDescriptor {
    */
   private Class<?> superClass;
   /**
-   * 描述
+   * 接口
    */
-  private String description;
-  /**
-   * 作者
-   */
-  private String author;
+  private List<Class<?>> interfaces;
   /**
    * 类上的注解
    */

@@ -1,3 +1,4 @@
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version "${springBootVersion}"
@@ -9,6 +10,7 @@ apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
+	compile(project(":all"))
 	compile(project(":providers:scaffold"))
 
 	// swagger-ui
@@ -20,3 +22,5 @@ dependencies {
 
 }
 
+
+apply from: "${getRootDir()}/buildSystem/bootJar.gradle"

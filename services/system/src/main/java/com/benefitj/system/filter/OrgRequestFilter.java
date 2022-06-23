@@ -29,13 +29,13 @@ public class OrgRequestFilter extends OncePerRequestFilter {
     JwtToken token = JwtTokenManager.currentToken();
     try {
       if (token != null && StringUtils.isNotBlank(token.getOrgId())) {
-        token.put(Const.ORGANIZATION, orgService.get(token.getOrgId()));
+        token.put(Const.ORG, orgService.get(token.getOrgId()));
       }
     } catch (Exception ignore) { /* ~ */ }
      finally {
       filterChain.doFilter(request, response);
       if (token != null) {
-        token.remove(Const.ORGANIZATION);
+        token.remove(Const.ORG);
       }
     }
   }

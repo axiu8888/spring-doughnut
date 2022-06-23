@@ -5,7 +5,9 @@ package com.benefitj.system.utils;
  */
 public class Const {
 
-  public static final String ORGANIZATION = "organization";
+  public static final String AUTHORIZATION = "Authorization";
+
+  public static final String ORG = "org";
 
   public static String keyAccount(String username) {
     return "users:account:" + username;

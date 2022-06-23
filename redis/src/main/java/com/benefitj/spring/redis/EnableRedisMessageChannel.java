@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 
 /**
  * redis消息通道监听
+ *
+ * @author dingxiaun
  */
 @Lazy
 @Import(RedisMessageChannelConfiguration.class)

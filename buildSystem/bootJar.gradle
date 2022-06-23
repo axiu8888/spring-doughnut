@@ -1,0 +1,141 @@
+import java.nio.file.Files
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
+// 配置bootJar进行打包
+// 清除现有的lib目录
+task clearJar(type: Delete) {
+    delete "$buildDir\\libs\\lib"
+}
+
+// 将依赖包复制到lib目录
+task copyJar(type: Copy, dependsOn: 'clearJar') {
+    // 存放jar依赖的位置
+    into "$buildDir\\libs\\lib"
+    // 拷贝的位置
+    //from configurations.runtime
+    from compileFiles(false)
+}
+
+task copyModuleClasses(type: Copy) {
+    compileFiles(true)
+            .collect {
+                println("name ====>:  ${it.name}")
+                if (it.name.endsWith(".jar")) {
+                    def path = it.getAbsolutePath().substring(0, it.getAbsolutePath().lastIndexOf("libs"));
+                    def buildDirPath = getBuildDir().getAbsolutePath()
+                    // 列出 java 和 resources 下的所有文件和目录
+                    Stream.concat(
+                            listFiles(new File(path, "classes/java/main"))
+                            , listFiles(new File(path, "classes/resources/main"))
+                    ).each {
+                        // 拷贝到本地编译 build 目录下
+                        def dest = new File(buildDirPath, it.getAbsolutePath().substring(path.length()))
+                        try {
+                            if (it.isDirectory()) {
+                                // 创建目录
+                                dest.mkdirs()
+                                return
+                            }
+                            if (!dest.getParentFile().exists()) {
+                                // 创建目录
+                                dest.getParentFile().mkdirs()
+                            }
+                            dest.createNewFile()
+                            // 拷贝文件
+                            Files.copy(java.nio.file.Path.of(it.getAbsolutePath()), new FileOutputStream(dest.getAbsolutePath()))
+                        } catch (IOException e) {
+                            dest.delete()
+                            e.printStackTrace()
+                        }
+                    }
+                    return null
+                }
+            }
+}
+
+
+def versionName = "v$version.${new Date().format('yyMMdd-HHmm')}"
+def file = new File(findResourcePath() + '/version.properties')
+file.text = "version=${versionName}"
+
+// 是否分离打包
+//def isolate = false
+def isolate = true
+
+bootJar {
+
+    baseName = "${archivesBaseName}"
+    version = versionName
+
+    if (isolate) {
+        // 例外所有的jar
+        excludes = ["*.jar"]
+        // lib目录的清除和复制任务
+        dependsOn clearJar
+        dependsOn copyModuleClasses
+        dependsOn copyJar
+
+        // 指定依赖包的路径
+        def classpath = compileFiles(false)
+                .collect { "lib/$it.name" }
+                .join(' ')
+        manifest {
+            attributes "Manifest-Version": 1.0, 'Class-Path': classpath
+        }
+        version = ''
+    }
+
+    println("===============================================================")
+    println(configurations.compile.files
+            .stream()
+            .map{it.name}
+            .sorted()
+            .collect(Collectors.joining("\n")))
+    println("===============================================================")
+
+//    def runScript = new File("$buildDir)/libs/run.bat")
+//    runScript.getParentFile().mkdirs()
+//    runScript.createNewFile()
+//    runScript.write("./java -jar $baseName-$version.jar")
+
+}
+
+/**
+ * 过滤出项目下的子模块依赖，或过滤子摸快
+ */
+List<File> compileFiles(boolean local) {
+    return configurations.compile.files
+            .stream()
+            .filter { local ? it.getAbsolutePath().startsWith(getRootDir().getAbsolutePath()) : !it.getAbsolutePath().startsWith(getRootDir().getAbsolutePath()) }
+            .collect(Collectors.toList())
+}
+
+/**
+ *
+ * @param srcDirs
+ * @return
+ */
+String findResourcePath() {
+    return sourceSets.main.resources.srcDirs
+            .stream()
+            .filter({ it -> it.getName().equalsIgnoreCase("resources") })
+            .findFirst()
+            .orElse(sourceSets.main.resources.srcDirs.getAt(0))
+            .getAbsolutePath()
+}
+
+/**
+ * 罗列出所有的子文件和目录
+ */
+Stream<File> listFiles(File src) {
+    if (!src.exists()) {
+        return Stream.empty()
+    }
+    if (src.isDirectory()) {
+        return Stream.of(src.listFiles()).flatMap {
+            listFiles(it)
+        }
+    }
+    return Stream.of(src)
+}

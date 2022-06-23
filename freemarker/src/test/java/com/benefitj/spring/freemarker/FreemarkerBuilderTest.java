@@ -151,7 +151,7 @@ public class FreemarkerBuilderTest extends TestCase {
     ClassDescriptor cd = newUserEntity();
     File dir = ClasspathUtils.getFile("test.ftl").getParentFile();
     File userJava = CodeGenerator.getInstance().writeEntity(cd, dir);
-    System.err.println(new String(IOUtils.readFileBytes(userJava), StandardCharsets.UTF_8));
+    System.err.println(IOUtils.readFileAsString(userJava, StandardCharsets.UTF_8));
   }
 
   @Test
@@ -159,7 +159,7 @@ public class FreemarkerBuilderTest extends TestCase {
     ClassDescriptor cd = newUserEntity();
     File dir = ClasspathUtils.getFile("test.ftl").getParentFile();
     File userJava = CodeGenerator.getInstance().writeMapper(cd, dir);
-    System.err.println(new String(IOUtils.readFileBytes(userJava), StandardCharsets.UTF_8));
+    System.err.println(IOUtils.readFileAsString(userJava, StandardCharsets.UTF_8));
   }
 
   @Test
@@ -169,7 +169,7 @@ public class FreemarkerBuilderTest extends TestCase {
     Map<String, File> userJava = CodeGenerator.getInstance().writeBusiness(cd, dir);
     userJava.forEach((key, file) -> {
       System.err.println("\n-------------------------- " + key + " -----------------------------\n");
-      System.err.println(new String(IOUtils.readFileBytes(file), StandardCharsets.UTF_8));
+      System.err.println(IOUtils.readFileAsString(file, StandardCharsets.UTF_8));
       System.err.println("\n-------------------------- " + key + " -----------------------------\n");
     });
   }

@@ -19,7 +19,7 @@ public interface InterceptorHandler {
    * @param invocation 调用器
    * @param statement  语句
    * @param type       类型
-   * @param parameter       参数
+   * @param parameter  参数
    * @return 返回结果，如果不为空，直接返回此对象，否则继续调用
    * @throws Throwable
    */
@@ -60,4 +60,27 @@ public interface InterceptorHandler {
     ReflectUtils.findFields(type, filter, fields::add, interceptor);
     return fields;
   }
+
+  /**
+   * 获取字段的值
+   *
+   * @param field  字段
+   * @param source 对象
+   * @return 返回字段的值
+   */
+  default Object getFieldValue(Field field, Object source) {
+    return ReflectUtils.getFieldValue(field, source);
+  }
+
+  /**
+   * 设置字段的值
+   *
+   * @param field  字段
+   * @param source 对象
+   * @param value  字段的值
+   */
+  default void setFieldValue(Field field, Object source, Object value) {
+    ReflectUtils.setFieldValue(field, source, value);
+  }
+
 }

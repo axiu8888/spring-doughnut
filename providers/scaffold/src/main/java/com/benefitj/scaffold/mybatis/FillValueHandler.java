@@ -1,6 +1,5 @@
 package com.benefitj.scaffold.mybatis;
 
-import com.benefitj.core.ReflectUtils;
 import com.benefitj.scaffold.security.token.JwtTokenManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -11,17 +10,20 @@ import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 填充值处理
+ */
 public class FillValueHandler implements InterceptorHandler {
 
   @Override
   public Object intercept(Invocation invocation, MappedStatement statement, SqlCommandType type, Object parameter) throws Throwable {
     if (parameter != null) {
       if (type == SqlCommandType.INSERT) {
-        handleInsert(invocation, statement, parameter, getFields(parameter.getClass(), f -> hasType(f, SqlCommandType.INSERT)));
+        handleInsert(invocation, statement, parameter, getFields(parameter, SqlCommandType.INSERT));
       } else if (type == SqlCommandType.UPDATE) {
-        handleUpdate(invocation, statement, parameter, getFields(parameter.getClass(), f -> hasType(f, SqlCommandType.UPDATE)));
+        handleUpdate(invocation, statement, parameter, getFields(parameter, SqlCommandType.UPDATE));
       } else if (type == SqlCommandType.DELETE) {
-        handleDelete(invocation, statement, parameter, getFields(parameter.getClass(), f -> hasType(f, SqlCommandType.DELETE)));
+        handleDelete(invocation, statement, parameter, getFields(parameter, SqlCommandType.DELETE));
       }
     }
     return null;
@@ -29,16 +31,16 @@ public class FillValueHandler implements InterceptorHandler {
 
   public void handleInsert(Invocation invocation, MappedStatement statement, Object parameter, List<Field> fields) {
     for (Field field : fields) {
-      Object value = ReflectUtils.getFieldValue(field, parameter);
+      Object value = getFieldValue(field, parameter);
       if (value != null && !(value instanceof CharSequence && StringUtils.isBlank(((CharSequence) value)))) {
         return;
       }
       switch (field.getName()) {
         case "createBy":
-          ReflectUtils.setFieldValue(field, parameter, JwtTokenManager.currentUserId());
+          setFieldValue(field, parameter, JwtTokenManager.currentUserId());
           break;
         case "createTime":
-          ReflectUtils.setFieldValue(field, parameter, new Date());
+          setFieldValue(field, parameter, new Date());
           break;
       }
     }
@@ -46,16 +48,16 @@ public class FillValueHandler implements InterceptorHandler {
 
   public void handleUpdate(Invocation invocation, MappedStatement statement, Object parameter, List<Field> fields) {
     for (Field field : fields) {
-      Object value = ReflectUtils.getFieldValue(field, parameter);
+      Object value = getFieldValue(field, parameter);
       if (value != null && !(value instanceof CharSequence && StringUtils.isBlank(((CharSequence) value)))) {
         return;
       }
       switch (field.getName()) {
         case "updateBy":
-          ReflectUtils.setFieldValue(field, parameter, JwtTokenManager.currentUserId());
+          setFieldValue(field, parameter, JwtTokenManager.currentUserId());
           break;
         case "updateTime":
-          ReflectUtils.setFieldValue(field, parameter, new Date());
+          setFieldValue(field, parameter, new Date());
           break;
       }
     }
@@ -64,7 +66,7 @@ public class FillValueHandler implements InterceptorHandler {
   public void handleDelete(Invocation invocation, MappedStatement statement, Object parameter, List<Field> fields) {
   }
 
-  private boolean hasType(Field f, SqlCommandType type) {
+  protected boolean hasType(Field f, SqlCommandType type) {
     if (f.isAnnotationPresent(FillValue.class)) {
       FillValue fv = f.getAnnotation(FillValue.class);
       for (SqlCommandType sct : fv.types()) {
@@ -76,5 +78,8 @@ public class FillValueHandler implements InterceptorHandler {
     return false;
   }
 
+  protected List<Field> getFields(Object parameter, SqlCommandType type) {
+    return getFields(parameter.getClass(), f -> hasType(f, type));
+  }
 
 }

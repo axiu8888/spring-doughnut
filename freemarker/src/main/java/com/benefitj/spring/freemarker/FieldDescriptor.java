@@ -1,6 +1,7 @@
 package com.benefitj.spring.freemarker;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -20,6 +21,7 @@ public class FieldDescriptor {
   /**
    * 访问修饰符
    */
+  @Builder.Default
   private ModiferType modifier = ModiferType.PRIVATE;
   /**
    * 类型
@@ -36,6 +38,7 @@ public class FieldDescriptor {
   /**
    * 注解
    */
+  @Builder.Default
   private List<AnnotationDescriptor> annotations = new LinkedList<>();
 
 }

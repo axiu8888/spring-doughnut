@@ -1,5 +1,6 @@
 package com.benefitj.spring.websocket;
 
+import com.benefitj.core.IOUtils;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
@@ -22,7 +23,6 @@ public interface WebSocket {
    * 发送文本数据
    *
    * @param text 数据
-   * @return 返回发送的结果
    */
   default void send(String text) {
     send(new TextMessage(text));
@@ -32,7 +32,6 @@ public interface WebSocket {
    * 发送字节数据
    *
    * @param data 数据
-   * @return 返回发送的结果
    */
   default void send(byte[] data) {
     send(new BinaryMessage(data));
@@ -42,7 +41,6 @@ public interface WebSocket {
    * 发送字节数据
    *
    * @param data 数据
-   * @return 返回发送的结果
    */
   default void send(WebSocketMessage<?> data) {
     try {
@@ -63,9 +61,7 @@ public interface WebSocket {
    * 关闭当前会话
    */
   default void close() {
-    try {
-      getSession().close();
-    } catch (IOException ignore) { /* ~ */ }
+    IOUtils.closeQuietly(getSession());
   }
 
 }

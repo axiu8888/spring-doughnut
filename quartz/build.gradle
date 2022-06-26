@@ -1,18 +1,7 @@
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
 dependencies {
-
-	compileOnly(project(":spring"))
-//	compileOnly(project(":eventbus"))
-
-	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.13.0'
-
-	// QUARTZ
-	compileOnly "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
-
+  api(project(":spring"))
+  // QUARTZ
+	api "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
 }
-
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

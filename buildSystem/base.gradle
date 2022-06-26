@@ -1,82 +1,157 @@
+//plugins {
+//  id 'org.springframework.boot' version "$springbootVersion"
+//  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+//  id 'java'
+//  id 'org.springframework.experimental.aot' version "$springExperimentalAot"
+//}
+
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'java-library'
 
-apply from: "${getRootDir()}/buildSystem/repository.gradle"
+ext {
+  springEnv = false
+}
+tryIgnore({
+  ext.springEnv = plugins.stream().anyMatch { it.class.simpleName.contains("SpringBootPlugin") }
+})
 
-//archivesBaseName = "${group}"
+println("[ ${project.name} ], springEnv: ${springEnv}, plugins ===>: $plugins")
+
 archivesBaseName = "${getProject().name}"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+  options.encoding = "UTF-8"
 }
 
 tasks.withType(Javadoc) {
-    options.encoding = "UTF-8"
+  options.encoding = "UTF-8"
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
 }
 
-artifacts.archives sourceJar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+task copyJars(type: Copy) {
+  from configurations.runtimeClasspath
+  into "${buildDir}/libs/lib" // 目标位置
+}
+
+artifacts {
+  archives sourcesJar
+//    archives javadocJar
+}
 
 configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
+  developmentOnly
+  runtimeClasspath {
+    extendsFrom developmentOnly
+  }
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  maven { url("https://maven.aliyun.com/repository/google") }
+  maven { url("https://maven.aliyun.com/repository/central") }
+  maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
+  maven { url("https://maven.aliyun.com/repository/public") }
+  maven { url("https://maven.aliyun.com/repository/jcenter") }
+  maven { url 'https://repo.spring.io/milestone' }
+  maven { url 'https://repo.spring.io/release' }
+
+  try {
+    maven {
+      url = "${repoUrl}"
+      credentials {
+        username "${repoUsername}"
+        password "${repoPassword}"
+      }
     }
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+  } catch (ignore) {/*~*/
+  }
 }
 
 ext {
-    lombokVersion = "1.18.22"
-    jacksonVersion = "2.13.1"
-    guavaVersion = '31.0.1-jre'
-    fastjsonVersion = '1.2.79'
-    commonsIOVersion = "2.11.0"
-    commonsLang3Version = "3.12.0"
-    slf4jVersion = '1.7.32'
+  lombokVersion = "1.18.24"
+  jacksonVersion = "2.13.3"
+  guavaVersion = '31.1-jre'
+  fastjsonVersion = '2.0.7'
+  commonsIOVersion = "2.11.0"
+  commonsLang3Version = "3.12.0"
+  slf4jVersion = '1.7.36'
+
+  if (springEnv) {
+    set('springCloudVersion', "2021.0.0")
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation fileTree(dir: 'libs/jar', include: ['*.jar'])
-    compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
+  api fileTree(dir: 'libs', include: ['*.jar'])
+  api fileTree(dir: 'libs/jar', include: ['*.jar'])
+  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  def deps = [
+      //"javax.inject:javax.inject:1",
+      //"com.google.code.findbugs:jsr305:3.0.2",
+      "org.projectlombok:lombok:${lombokVersion}",
+      "commons-io:commons-io:${commonsIOVersion}",
+      "org.apache.commons:commons-lang3:${commonsLang3Version}",
+      "com.google.guava:guava:${guavaVersion}",
+      "com.alibaba:fastjson:${fastjsonVersion}",
+      //"org.slf4j:slf4j-log4j12:${slf4jVersion}",
 
-    //compileOnly("org.slf4j:slf4j-log4j12:${slf4jVersion}")
-    testCompileOnly("org.slf4j:slf4j-log4j12:${slf4jVersion}")
+      "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
+      "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+  ]
 
-    def deps = [
-            "javax.inject:javax.inject:1",
-            "com.google.code.findbugs:jsr305:3.0.2",
-            "org.projectlombok:lombok:${lombokVersion}",
-            "commons-io:commons-io:${commonsIOVersion}",
-            "commons-beanutils:commons-beanutils:1.9.4",
-            "org.apache.commons:commons-lang3:${commonsLang3Version}",
-            "com.google.guava:guava:${guavaVersion}",
-            "com.alibaba:fastjson:${fastjsonVersion}",
-            //"org.slf4j:slf4j-log4j12:${slf4jVersion}",
+  deps.forEach {
+    compileOnly it
+    testImplementation it
+  }
+  annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-            "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
-            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-            "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+  if (springEnv) {
+    compileOnly "org.springframework.boot:spring-boot-starter"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    //implementation 'ch.qos.logback:logback-classic:1.2.11'
 
-    ]
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-    deps.forEach {
-        implementation it
-        testImplementation it
-    }
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.6.2"
+  }
 
-    testCompile 'junit:junit:4.13.2'
+  testImplementation 'junit:junit:4.13.2'
 
 }
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+if (springEnv) {
+  tasks.named('bootBuildImage') {
+    builder = 'paketobuildpacks/builder:tiny'
+    environment = ['BP_NATIVE_IMAGE': 'true']
+  }
+}
+
+
+static def tryIgnore(java.util.concurrent.Callable<?> r) {
+  try {
+    return r.call()
+  } catch (ignore) { /* ~ */ }
+}
+

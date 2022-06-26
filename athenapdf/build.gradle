@@ -1,12 +1,9 @@
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
-
 	compileOnly project(":spring")
 	compileOnly project(":aop")
-	compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-
+	compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 }
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

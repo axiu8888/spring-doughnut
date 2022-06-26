@@ -1,10 +1,47 @@
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Callable
 
-apply plugin: 'maven'
+ext {
+  pkgAllInOne = false
+}
+
+def rootDirPath = getRootDir().getAbsolutePath()
 
 // 配置是否将代码打包到一个jar中
-def allInOne = true
-def rootDirPath = getRootDir().getAbsolutePath()
+tryIgnore({ pkgAllInOne = Boolean.parseBoolean("$allInOne") })
+// 配置是否将代码打包到一个jar中
+tryIgnore({ println("allInOne ==>: $allInOne") })
+
+jar {
+  from {
+    // compileClasspath、runtimeClasspath、testCompileClasspath、testRuntimeClasspath
+    configurations.compileClasspath.collect {
+      if (it.getAbsolutePath().startsWith(rootDirPath)) {
+        println("jar ===>: ${it.getAbsolutePath().substring(rootDirPath.length())}, ${it.exists()}")
+        if (it.exists()) {
+          it.isDirectory() ? it : zipTree(it)
+        }
+      }
+    }
+  }
+}
+
+sourcesJar {
+  // compileClasspath、runtimeClasspath、testCompileClasspath、testRuntimeClasspath
+  configurations.compileClasspath.collect {
+    if (it.getAbsolutePath().startsWith(rootDirPath)) {
+      def path = it.getAbsolutePath()
+      def project = findProject(getRootProject(), path)
+      if (project != null) {
+        println("jar ===>: ${it.getAbsolutePath().substring(rootDirPath.length())}, ${it.exists()}")
+        from project.sourceSets.main.allSource
+      }
+    }
+  }
+}
+
+artifacts {
+  archives sourcesJar
+}
 
 /**
  * 查找项目
@@ -14,82 +51,25 @@ def rootDirPath = getRootDir().getAbsolutePath()
  * @return 返回查找到的项目
  */
 static Project findProject(Project root, String path) {
-    for (Project p : root.subprojects) {
-        if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
-            return p
-        } else {
-            if (!p.subprojects.isEmpty()) {
-                def project = findProject(p, path)
-                if (project != null) {
-                    return project
-                }
-            }
+  for (def p : root.subprojects) {
+    if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
+      return p
+    } else {
+      if (!p.subprojects.isEmpty()) {
+        def project = findProject(p, path)
+        if (project != null) {
+          return project
         }
+      }
     }
-    return null
-}
-
-jar {
-    from {
-        if (allInOne) {
-            return configurations.compile.collect {
-                if (it.getAbsolutePath().startsWith(rootDirPath)) {
-                    it.isDirectory() ? it : zipTree(it)
-                }
-            }
-        } else {
-            return it
-        }
-    }
-}
-
-sourceJar {
-    from {
-        if (allInOne) {
-            return configurations.compile.collect {
-                if (it.getAbsolutePath().startsWith(rootDirPath)) {
-                    def path = it.getAbsolutePath();
-                    def project = findProject(getRootProject(), path)
-                    if (project == null) {
-                        throw new IllegalStateException(
-                                "Not found project for path: ${path}, compile project: ${getProject().name}")
-                    }
-                    project.sourceSets.main.allSource
-                }
-            }
-        } else {
-            return sourceSets.main.allSource
-        }
-    }
+  }
+  return null
 }
 
 
-//上传到nexus
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            pom.groupId = "$groupId"
-            pom.artifactId = "${artifactPrefix}${artifactId}"
-            pom.version = "$versionId"
-            if (allInOne) {
-                def allProjects = new ConcurrentHashMap<>()
-                getRootProject().subprojects.forEach({
-                    allProjects.put("${it.name}" as String, it)
-                })
-                pom.whenConfigured { pom ->
-                    def deps = pom.dependencies.stream()
-                            .filter {dep -> !allProjects.containsKey(dep.groupId)}
-                            .collect {dep -> dep}
-                    pom.dependencies.clear()
-                    pom.dependencies.addAll(deps)
-                }
-            }
-
-            repository(url: "http://${repositoryAddress}/repository/maven-snapshots/") {
-                authentication(userName: "${repositoryUserName}", password: "${repositoryPassword}")
-            }
-        }
-    }
+static def tryIgnore(Callable<?> r) {
+  try {
+    return r.call()
+  } catch (ignore) { /* ~ */
+  }
 }
-
-//apply from: "${getRootDir()}/buildSystem/upload.gradle"

@@ -1,23 +1,19 @@
 plugins {
-  id 'org.springframework.boot' version "${springBootVersion}"
+  id 'org.springframework.boot' version "${springbootVersion}"
   id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
   id 'java'
-//  id 'org.springframework.experimental.aot' version "${aotVersion}"
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 description("jdk模块带出")
 
 group = "jmods-export"
 version = ''
 
-jar {
-  archivesBaseName = "jmods-export"
-}
+//jar {
+//  archivesBaseName = "jmods-export"
+//}
 
 dependencies {
-
   implementation("org.springframework.boot:spring-boot-starter")
-
 }

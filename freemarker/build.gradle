@@ -1,16 +1,15 @@
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-	compileOnly(project(":spring"))
+	api(project(":spring"))
 
-	compile 'org.freemarker:freemarker:2.3.31'
-
+	api 'org.freemarker:freemarker:2.3.31'
 	// OGNL
-	compile 'ognl:ognl:3.3.0'
+	api 'ognl:ognl:3.3.0'
+	compileOnly "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
-	compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
 }
 

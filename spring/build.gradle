@@ -1,11 +1,10 @@
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-  compileOnly "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
-  compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-  compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
+  compileOnly "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
+  compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}")
 
   compileOnly "io.springfox:springfox-boot-starter:${swagger2Version}"
 

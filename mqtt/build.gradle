@@ -1,13 +1,11 @@
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
 dependencies {
 
-	compileOnly(project(":spring"))
+	api(project(":spring"))
 
-	compile "org.springframework.boot:spring-boot-starter-integration:${springBootVersion}"
-	compile "org.springframework.integration:spring-integration-stream:${springIntegrationVersion}"
-	compile "org.springframework.integration:spring-integration-mqtt:${springIntegrationVersion}"
+	api "org.springframework.boot:spring-boot-starter-integration:${springbootVersion}"
+	api "org.springframework.integration:spring-integration-stream:${springIntegrationVersion}"
+	api "org.springframework.integration:spring-integration-mqtt:${springIntegrationVersion}"
 
 }
 

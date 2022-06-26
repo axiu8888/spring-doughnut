@@ -1,17 +1,15 @@
 
-//apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
 dependencies {
 
-	compile(project(":commons"))
-	compile(project(":all")) {
-		exclude group: "org.springframework.boot", module: "spring-boot-starter-quartz"
-	}
+  implementation(project(":commons"))
+  implementation(project(":all")) {
+    exclude group: "org.springframework.boot", module: "spring-boot-starter-quartz"
+  }
 
-	implementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-	// redis
-	implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
-	implementation 'org.apache.commons:commons-pool2:2.10.0'
+  implementation "org.springframework.boot:spring-boot-starter:${springbootVersion}"
+  // redis
+  implementation "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
+  implementation 'org.apache.commons:commons-pool2:2.10.0'
 
 }
 

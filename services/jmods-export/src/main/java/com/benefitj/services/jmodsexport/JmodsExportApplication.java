@@ -5,7 +5,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.SystemProperty;
 import com.benefitj.core.cmd.CmdCall;
-import com.benefitj.core.cmd.CmdExecutorHolder;
+import com.benefitj.core.cmd.CmdExecutor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -96,7 +96,7 @@ public class JmodsExportApplication {
     );
     File exportFile = new File(exportDir, exportName);
     IOUtils.deleteFile(exportFile);
-    CmdCall call = CmdExecutorHolder.getInstance().call(cmd, null, exportDir);
+    CmdCall call = CmdExecutor.get().call(cmd, null, exportDir);
     call.setProcess(null);
     System.err.println(JSON.toJSON(call));
     System.err.println("----------------------------------------------");
@@ -116,9 +116,9 @@ public class JmodsExportApplication {
 
   private boolean checkJava() {
     CmdCall call;
-    call = CmdExecutorHolder.getInstance().call("java -version");
+    call = CmdExecutor.get().call("java -version");
     if (!call.isSuccessful()) {
-      call = CmdExecutorHolder.getInstance().call("java --version");
+      call = CmdExecutor.get().call("java --version");
       return call.isSuccessful();
     }
     return true;

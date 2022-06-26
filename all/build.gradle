@@ -1,25 +1,20 @@
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
 group = "spring-doughnut"
 
-archivesBaseName = "${group}"
-
 dependencies {
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
-  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
-  compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-
-  compile project(":spring")
-  compile project(":aop")
-  compile project(":eventbus")
-  compile project(":redis")
-  compile project(":mqtt")
-  compile project(":quartz")
-  compile project(":influxdb")
-  compile project(":athenapdf")
-  compile project(":vertx-mqtt")
-
+  api project(":spring")
+  api project(":aop")
+  api project(":eventbus")
+  api project(":redis")
+  api project(":mqtt")
+  api project(":quartz")
+  api project(":influxdb")
+  api project(":athenapdf")
+  api project(":vertx-mqtt")
 }
 
+// 打包到一个项目
+ext.allInOne = true
 apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"
+apply from: "${getRootDir()}/buildSystem/upload.gradle"

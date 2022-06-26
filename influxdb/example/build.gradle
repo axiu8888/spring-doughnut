@@ -1,22 +1,18 @@
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'java'
-//    id 'org.springframework.experimental.aot' version "${aotVersion}"
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-    compile project(":all")
-    compile(project(":commons"))
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+  implementation project(":all")
 
-    compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+  implementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}"
 
-    compile 'com.alibaba:easyexcel:3.0.5'
+  implementation 'com.alibaba:easyexcel:3.0.5'
 
 }
 

@@ -1,12 +1,9 @@
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
-
-	compileOnly(project(":spring"))
-
-	compile "io.vertx:vertx-mqtt:${vertxVersion}"
-
+	api "io.vertx:vertx-mqtt:${vertxVersion}"
+	api(project(":spring"))
+	compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
 }
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

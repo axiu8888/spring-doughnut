@@ -1,34 +1,29 @@
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'java'
-//    id 'org.springframework.experimental.aot' version "${aotVersion}"
+  id 'org.springframework.boot' version "$springbootVersion"
+  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
 }
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
-description("examples")
+description = "examples"
 
 dependencies {
-
-  compile(project(":all")) {
+  implementation(project(":all")) {
     exclude module: "spring-boot-starter-quartz"
   }
 
-  implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-websocket")
-
   // redis
   implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
 //  // QUARTZ
 //  implementation "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
 //  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
-//  //compile 'com.h2database:h2:1.4.200'
+//  //implementation 'com.h2database:h2:1.4.200'
 //  implementation "mysql:mysql-connector-java:8.0.23"
 //  implementation "com.alibaba:druid-spring-boot-starter:1.2.5"
 
-  testCompile 'org.java-websocket:Java-WebSocket:1.5.2'
+  testImplementation 'org.java-websocket:Java-WebSocket:1.5.2'
 
 }

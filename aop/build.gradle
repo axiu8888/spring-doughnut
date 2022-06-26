@@ -1,14 +1,10 @@
 
 
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
 dependencies {
-
-  compileOnly "org.aspectj:aspectjweaver:${aspectjVersion}"
-  compileOnly("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+  api "org.aspectj:aspectjweaver:${aspectjVersion}"
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
   // redis
-  compileOnly "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
-
+  compileOnly "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
   compileOnly(project(":spring"))
 
 }

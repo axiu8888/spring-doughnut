@@ -1,40 +1,37 @@
 
 ext {
 
-  springBootVersion = "2.7.0"
-//  springBootVersion = '2.3.5.RELEASE'
+  springbootVersion = "2.7.1"
   springDependencyManagementVersion = "1.0.11.RELEASE"
-  aotVersion = "'0.12.0"
-  springIntegrationVersion = "5.5.6"
+  springExperimentalAotVersion = "0.12.0"
+  springIntegrationVersion = "5.5.13"
 
+  aspectjVersion = "1.9.9.1"
   swagger2Version = "3.0.0"
-  aspectjVersion = "1.9.7"
-  vertxVersion = "4.1.5"
-  jjwtVersion = "0.11.2"
+  jjwtVersion = "0.11.5"
   nettyAllVersion = '4.1.78.Final'
+  vertxVersion = "4.3.1"
 
+  rxJavaVersion = '2.2.21'
+  okHttpVersion = '4.10.0'
+  retrofitVersion = '2.9.0'
 
-  mysqlVersion = "8.0.27"
-  druidVersion = "1.2.8"
-  mybatisVersion = "2.2.0"
-  mapperVersion = "2.1.5"
-  pagehelperVersion = "1.4.1"
-
-  repositoryAddress = '192.168.19.129:9001'
-  repositoryUserName = 'admin'
-  repositoryPassword = 'admin123'
-  useRepository = false
+  mysqlVersion = "8.0.29"
+  druidVersion = "1.2.11"
+  mybatisVersion = "2.2.2"
+  mapperVersion = "4.2.1"
+  pagehelperVersion = "1.4.3"
 }
 
 allprojects {
 
   apply plugin: 'java'
-  apply plugin: 'maven'
 
-  apply from: "${getRootDir()}/buildSystem/repository.gradle"
+  apply from: "${getRootDir()}/buildSystem/base.gradle"
 
   group = 'com.benefitj.spring'
-  version = "1.6.2-SNAPSHOT"
+  version = "2.0.0-SNAPSHOT"
+  //version = "2.0.0-RELEASE"
 
   ext {
     groupId = "${group}"
@@ -43,8 +40,8 @@ allprojects {
     versionId = "${version}"
   }
 
-  //sourceCompatibility = JavaVersion.VERSION_11
-  //targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 
   jar {
     archivesBaseName = "doughnut-${getProject().getName()}"
@@ -55,7 +52,7 @@ allprojects {
     def commons = project(":commons");
     if (!getProject().equals(commons)) {
       compileOnly(commons)
-      testCompile(commons)
+      testImplementation(commons)
     }
   }
 

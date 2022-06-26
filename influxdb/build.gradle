@@ -1,53 +1,41 @@
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
-
-
 ext {
-    rxJavaVersion = '2.2.21'
-    okHttpVersion = '4.9.2'
-    retrofitVersion = '2.9.0'
-
-    artifactName = "influxdb"
+  artifactName = "influxdb"
 }
 
 sourceSets {
-    main {
-        java.srcDirs = ["src/main/java", "src/main/influxdb-java"]
-    }
+  main {
+    java.srcDirs = ["src/main/java", "src/main/influxdb-java"]
+  }
 }
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compileOnly(project(":commons"))
+  api(project(":commons"))
 
-    compileOnly("org.springframework.boot:spring-boot-starter:${springBootVersion}")
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+  compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
 
-    compile 'org.msgpack:msgpack-core:0.9.0'
-    compile('org.influxdb:influxdb-java:2.21') {
-        exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
-        exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
-        exclude group: 'org.msgpack'//, module: 'msgpack-core'
-    }
+  api 'org.msgpack:msgpack-core:0.9.2'
+  api('org.influxdb:influxdb-java:2.21') {
+    exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
+    exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
+    exclude group: 'org.msgpack'//, module: 'msgpack-core'
+  }
 
-    // OkHttp + RxJava + Retrofit
-    compile "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
-    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-    compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
-    compile "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
-    compile "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
-    compile "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
+  // OkHttp + RxJava + Retrofit
+  api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
+  api "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+  api "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+  api "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+  api "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
 
-    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+  api 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
 
-    // 网络库
-    testCompile('com.google.code.gson:gson:2.8.9')
-    testCompile(project(":commons"))
+  // 网络库
+  testImplementation(project(":commons"))
 
 }
-
 
 apply from: "${getRootDir()}/buildSystem/upload.gradle"

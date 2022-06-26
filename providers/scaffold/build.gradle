@@ -1,30 +1,26 @@
-
-
 dependencies {
-    //compile fileTree(dir: 'libs/jar', include: ['*.jar'])
-    //compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
-    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
-    //compile 'com.h2database:h2:1.4.200'
-    compile "mysql:mysql-connector-java:${mysqlVersion}"
-    compile "com.alibaba:druid-spring-boot-starter:${druidVersion}"
-    compile 'com.github.jsqlparser:jsqlparser:4.3'
-    compile 'com.github.pagehelper:pagehelper:5.3.0'
-    compile 'com.baomidou:mybatis-plus-boot-starter:3.5.0'
-    compile "com.github.pagehelper:pagehelper-spring-boot-starter:${pagehelperVersion}"
+  //implementation 'com.h2database:h2:1.4.200'
+  implementation "mysql:mysql-connector-java:${mysqlVersion}"
+  implementation "com.alibaba:druid-spring-boot-starter:${druidVersion}"
+  implementation 'com.github.jsqlparser:jsqlparser:4.3'
+  implementation 'com.github.pagehelper:pagehelper:5.3.0'
+  implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.0'
+  implementation "com.github.pagehelper:pagehelper-spring-boot-starter:${pagehelperVersion}"
 
-    // QUARTZ
-    compile "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
+  // QUARTZ
+  implementation "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
 
-    compile "io.springfox:springfox-boot-starter:${swagger2Version}"
-    //compile 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
+  implementation "io.springfox:springfox-boot-starter:${swagger2Version}"
+  //implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
 
-    compile "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    compile "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    compile "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+  implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+  implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+  implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
 }
 

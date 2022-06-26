@@ -1,18 +1,16 @@
 plugins {
-	id 'org.springframework.boot' version "${springBootVersion}"
-	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-	id 'java'
-//	id 'org.springframework.experimental.aot' version "${aotVersion}"
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-	compile(project(":spring"))
-	compile(project(":mqtt"))
+  implementation(project(":spring"))
+  implementation(project(":mqtt"))
 
-	implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.springframework.boot:spring-boot-starter'
 
 }
 

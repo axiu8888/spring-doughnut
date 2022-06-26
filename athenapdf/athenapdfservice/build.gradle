@@ -1,28 +1,21 @@
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'java'
-//    id 'org.springframework.experimental.aot' version "${aotVersion}"
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 version = ''
 archivesBaseName = "athenapdfservice"
 
 dependencies {
+  implementation(project(":commons"))
+  implementation(project(":aop"))
+  implementation(project(":spring"))
+  implementation(project(":athenapdf"))
 
-    compile(project(":commons"))
-    //compile(project(":all"))
-    compile(project(":aop"))
-    compile(project(":spring"))
-    compile(project(":athenapdf"))
-
-    compile 'ch.qos.logback:logback-classic:1.2.10'
-    compile "org.aspectj:aspectjweaver:${aspectjVersion}"
-    compile("org.springframework.boot:spring-boot-starter-web")
-
-    compile "io.springfox:springfox-boot-starter:${swagger2Version}"
+  implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation "io.springfox:springfox-boot-starter:${swagger2Version}"
 
 }
 

@@ -1,26 +1,20 @@
-
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version "${springBootVersion}"
-	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-//	id 'org.springframework.experimental.aot' version "${aotVersion}"
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
-
-apply from: "${getRootDir()}/buildSystem/springboot.gradle"
 
 dependencies {
 
-	compile(project(":all"))
-	compile(project(":providers:scaffold"))
+  implementation(project(":all"))
+  implementation(project(":providers:scaffold"))
 
-	// swagger-ui
-	implementation "io.springfox:springfox-boot-starter:3.0.0"
-	implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
+  // swagger-ui
+  implementation "io.springfox:springfox-boot-starter:3.0.0"
+  implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
 
-	// excel
-	implementation 'com.alibaba:easyexcel:3.0.5'
+  // excel
+  implementation 'com.alibaba:easyexcel:3.0.5'
 
 }
-
-
-apply from: "${getRootDir()}/buildSystem/bootJar.gradle"

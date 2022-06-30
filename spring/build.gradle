@@ -1,6 +1,10 @@
 
+// 上传到nexus/maven仓库
+ext.upload = true
 
 dependencies {
+
+  compileOnly(project(":commons"))
 
   compileOnly "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
@@ -9,5 +13,3 @@ dependencies {
   compileOnly "io.springfox:springfox-boot-starter:${swagger2Version}"
 
 }
-
-apply from: "${getRootDir()}/buildSystem/upload.gradle"

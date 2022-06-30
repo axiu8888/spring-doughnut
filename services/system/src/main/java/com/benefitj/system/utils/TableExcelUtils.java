@@ -4,9 +4,9 @@ package com.benefitj.system.utils;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.ClasspathUtils;
 import com.benefitj.core.ReflectUtils;
-import com.benefitj.core.TryCatchUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -189,7 +189,7 @@ public class TableExcelUtils {
   public static List<TableDescriptor> parse(String... basePackages) {
     List<Class<?>> classes = Stream.of(basePackages)
         .flatMap(basePackage -> ClasspathUtils.findClasses(basePackage).stream())
-        .map(cls -> TryCatchUtils.tryThrow(() -> Class.forName(cls)))
+        .map(cls -> CatchUtils.tryThrow(() -> Class.forName(cls)))
         .collect(Collectors.toList());
     return parse(classes);
   }

@@ -1,15 +1,12 @@
 
+// 上传到nexus/maven仓库
+ext.upload = true
+
 dependencies {
 
-  implementation(project(":commons"))
-  implementation(project(":all")) {
+  api(project(":all")) {
     exclude group: "org.springframework.boot", module: "spring-boot-starter-quartz"
   }
-
-  implementation "org.springframework.boot:spring-boot-starter:${springbootVersion}"
-  // redis
-  implementation "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
-  implementation 'org.apache.commons:commons-pool2:2.10.0'
 
 }
 

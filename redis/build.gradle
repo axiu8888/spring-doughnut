@@ -1,21 +1,12 @@
 
+// 上传到nexus/maven仓库
+ext.upload = true
+
 dependencies {
-
-	compileOnly(project(":spring"))
-
+	api(project(":spring"))
 	api 'org.apache.commons:commons-pool2:2.10.0'
 	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 	api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
 	// redis
 	api "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
-
 }
-
-repositories {
-	maven {
-		url 'https://repo.maven.apache.org/maven2'
-		name 'Maven Central'
-	}
-}
-
-apply from: "${getRootDir()}/buildSystem/upload.gradle"

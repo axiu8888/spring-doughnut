@@ -1,16 +1,13 @@
 
+// 上传到nexus/maven仓库
+ext.upload = false
 
 dependencies {
-
 	api(project(":spring"))
 
 	api 'org.freemarker:freemarker:2.3.31'
-	// OGNL
-	api 'ognl:ognl:3.3.0'
+	api 'ognl:ognl:3.3.0'  // OGNL
 	compileOnly "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
 	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
-
 }
-
-apply from: "${getRootDir()}/buildSystem/upload.gradle"

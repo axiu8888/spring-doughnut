@@ -9,7 +9,6 @@ version = ''
 archivesBaseName = "athenapdfservice"
 
 dependencies {
-  implementation(project(":commons"))
   implementation(project(":aop"))
   implementation(project(":spring"))
   implementation(project(":athenapdf"))

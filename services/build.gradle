@@ -8,7 +8,9 @@ subprojects {
 
   dependencies {
     implementation(project(":commons"))
-    compileOnly project(":all")
+    implementation(project(":all")) {
+      exclude(module: "quartz")
+    }
   }
 
 }

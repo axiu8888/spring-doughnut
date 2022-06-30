@@ -1,20 +1,13 @@
 plugins {
-  id 'org.springframework.boot' version "${springbootVersion}"
-  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'org.springframework.boot' version "$springbootVersion"
+  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
   id 'java'
-//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+//  id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
 }
 
 dependencies {
-
-  implementation(project(":all"))
   implementation(project(":providers:scaffold"))
-
-  // swagger-ui
-  implementation "io.springfox:springfox-boot-starter:3.0.0"
-  implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
-
+  implementation("org.springframework.boot:spring-boot-starter-web")
   // excel
   implementation 'com.alibaba:easyexcel:3.0.5'
-
 }

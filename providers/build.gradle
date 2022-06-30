@@ -1,13 +1,10 @@
 subprojects {
 
-  apply plugin: 'java'
-
   group = "com.benefitj.provider"
   // 更新 groupId
   ext.groupId = "${group}"
 
   dependencies {
-    api(project(":commons"))
     compileOnly project(":all")
   }
 

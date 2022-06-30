@@ -10,7 +10,6 @@ dependencies {
   implementation project(":all")
 
   implementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
-  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}"
 
   implementation 'com.alibaba:easyexcel:3.0.5'
 

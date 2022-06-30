@@ -1,20 +1,31 @@
-group = "spring-doughnut"
+jar {
+  archivesBaseName = "spring-doughnut"
+}
+
+// 打包到一个项目
+ext.allInOne = false
+// 上传到nexus/maven仓库
+ext.upload = true
 
 dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
-  api project(":spring")
-  api project(":aop")
-  api project(":eventbus")
-  api project(":redis")
-  api project(":mqtt")
-  api project(":quartz")
-  api project(":influxdb")
-  api project(":athenapdf")
-  api project(":vertx-mqtt")
+  def deps = [
+      ":spring",
+      ":aop",
+      ":eventbus",
+      ":redis",
+      ":mqtt",
+      ":quartz",
+      ":influxdb",
+      ":athenapdf",
+      ":vertx-mqtt",
+  ]
+  if (allInOne) {
+    deps.forEach{compileOnly(project(it)) }
+  } else {
+    deps.forEach{api(project(it)) }
+  }
 }
 
-// 打包到一个项目
-ext.allInOne = true
-apply from: "${getRootDir()}/buildSystem/package-allinone.gradle"
-apply from: "${getRootDir()}/buildSystem/upload.gradle"
+

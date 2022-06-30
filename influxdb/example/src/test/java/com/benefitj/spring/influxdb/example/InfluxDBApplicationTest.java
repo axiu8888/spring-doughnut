@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 @SpringBootTest
-public class InfluxDBApplicationTest {
+class InfluxDBApplicationTest {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -30,7 +30,7 @@ public class InfluxDBApplicationTest {
   private Random random = new Random();
 
   @Test
-  public void testWrite() {
+  void testWrite() {
     String line = generateLine();
     System.err.println(line);
     template.write(line);
@@ -51,7 +51,7 @@ public class InfluxDBApplicationTest {
   }
 
   @Test
-  public void testQuery() {
+  void testQuery() {
     template.query("SELECT * FROM sys_trend_rates WHERE time > now() - 1d")
         .subscribe(new DefaultSubscriber<>() {
           @Override
@@ -66,7 +66,7 @@ public class InfluxDBApplicationTest {
    * 删除数据表
    */
   @Test
-  public void testDropMeasurements() {
+  void testDropMeasurements() {
     QueryResult result = template.dropMeasurement("sys_trend_rates");
     System.err.println(JSON.toJSONString(result));
   }
@@ -75,19 +75,24 @@ public class InfluxDBApplicationTest {
    * 删除数据库
    */
   @Test
-  public void testDropDB() {
+  void testDropDB() {
     QueryResult result = template.dropDatabase();
     System.err.println(JSON.toJSONString(result));
   }
 
   @Test
-  public void testWriter() {
+  void testWriter() {
     for (int i = 0; i < 50; i++) {
       writerManager.write(generateLine(), "\n");
       EventLoop.sleepSecond(1);
     }
     EventLoop.io().execute(() -> writerManager.flush());
     EventLoop.sleepSecond(1);
+  }
+
+  @Test
+  void testExport() {
+    System.err.println("----------->:");
   }
 
 }

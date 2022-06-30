@@ -19,9 +19,9 @@ afterEvaluate {
 
                 from components.java
                 // 配置上传源码
-                artifact sourcesJar {
+                artifact sourcesJar/* {
                     classifier "sources"
-                }
+                }*/
             }
         }
         repositories {

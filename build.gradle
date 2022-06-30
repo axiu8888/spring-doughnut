@@ -1,4 +1,3 @@
-
 ext {
 
   springbootVersion = "2.7.1"
@@ -26,35 +25,44 @@ ext {
 allprojects {
 
   apply plugin: 'java'
-
   apply from: "${getRootDir()}/buildSystem/base.gradle"
 
-  group = 'com.benefitj.spring'
+  group = "com.benefitj.spring"
   version = "2.0.0-SNAPSHOT"
   //version = "2.0.0-RELEASE"
 
   ext {
-    groupId = "${group}"
-    artifactPrefix = "doughnut-"
+    groupId = "$group"
+    artifactPrefix = ""
     artifactId = "${getProject().name}"
     versionId = "${version}"
+
+    // 默认是spring环境
+    springEnv = true
+
+    manifestAttributes = [
+        "version"   : "$version",
+        "build-date": "${new Date().format('yyyy-MM-dd')}",
+        "author"    : "axiu8888",
+        "home"      : "https://github/com/axiu8888",
+    ]
   }
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
-
-  jar {
-    archivesBaseName = "doughnut-${getProject().getName()}"
-  }
+//  jar {
+//    archivesBaseName = "${group()}"
+//  }
 
   dependencies {
 
     def commons = project(":commons");
-    if (!getProject().equals(commons)) {
+    if (!project.equals(commons)) {
       compileOnly(commons)
       testImplementation(commons)
     }
   }
+
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 
 }
 

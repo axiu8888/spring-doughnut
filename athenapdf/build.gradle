@@ -1,9 +1,9 @@
 
+// 上传到nexus/maven仓库
+ext.upload = true
 
 dependencies {
-	compileOnly project(":spring")
-	compileOnly project(":aop")
+	api project(":spring")
+	api project(":aop")
 	compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 }
-
-apply from: "${getRootDir()}/buildSystem/upload.gradle"

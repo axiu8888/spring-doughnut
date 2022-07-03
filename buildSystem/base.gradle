@@ -65,6 +65,9 @@ tasks.withType(Javadoc) {
 }
 
 tryIgnore({
+
+  jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
   task sourcesJar(type: Jar, dependsOn: classes) {
     tryIgnore({ manifest.attributes(manifestAttributes) })
     classifier = 'sources'

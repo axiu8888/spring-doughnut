@@ -1,6 +1,6 @@
 
 // 上传到nexus/maven仓库
-ext.upload = true
+ext.upload = false
 
 dependencies {
   api "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"

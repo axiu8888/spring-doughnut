@@ -21,10 +21,10 @@ dependencies {
       ":athenapdf",
       ":vertx-mqtt",
   ]
-  if (allInOne) {
-    deps.forEach{compileOnly(project(it)) }
-  } else {
-    deps.forEach{api(project(it)) }
+  deps.forEach {
+    api(project(it)) {
+      exclude module: "spring-boot-starter-quartz"
+    }
   }
 }
 

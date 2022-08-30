@@ -1,6 +1,7 @@
 package com.benefitj.spring.mqtt.publisher;
 
 import com.benefitj.spring.mqtt.CommonsMqttConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,6 +14,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
 
+  /**
+   * 发布的客户端地址
+   */
+  @Value("#{@environment['spring.mqtt.publisher.serverURIs'] ?: null}")
+  private String serverURIs;
   /**
    * 客户端ID前缀
    */
@@ -31,7 +37,8 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public MqttPublisher mqttPublisher(MqttConnectOptions options) {
-    return new MqttPublisher(options, clientIdPrefix, clientCount);
+    String[] URIs = StringUtils.isBlank(serverURIs) ? options.getServerURIs() : serverURIs.split(",");
+    return new MqttPublisher(URIs, options, clientIdPrefix, clientCount);
   }
 
 }

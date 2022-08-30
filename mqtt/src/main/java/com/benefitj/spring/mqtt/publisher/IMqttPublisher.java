@@ -1,27 +1,13 @@
 package com.benefitj.spring.mqtt.publisher;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Executor;
 
 /**
  * MQTT发送
  */
 public interface IMqttPublisher {
-
-  /**
-   * MQTT客户端
-   */
-  IMqttClient getClient();
-
-  /**
-   * 调度器
-   */
-  Executor getExecutor();
-
   /**
    * 发送
    *
@@ -302,41 +288,6 @@ public interface IMqttPublisher {
     publishAsync(topics, msg);
   }
 
-  /**
-   * 发送
-   *
-   * @param topic 主题
-   * @param msg   消息
-   */
-  default void publish(String topic, MqttMessage msg) throws MqttPublishException {
-    IMqttClient c = getClient();
-    if (c != null) {
-      try {
-        c.publish(topic, msg);
-      } catch (MqttException e) {
-        throw new MqttPublishException(e);
-      }
-    }
-  }
-
-  /**
-   * 发送
-   *
-   * @param topic 主题
-   * @param msg   消息
-   */
-  default void publishAsync(String topic, MqttMessage msg) {
-    final IMqttClient c = getClient();
-    if (c != null) {
-      getExecutor().execute(() -> {
-        try {
-          c.publish(topic, msg);
-        } catch (MqttException e) {
-          throw new MqttPublishException(e);
-        }
-      });
-    }
-  }
 
   /**
    * 发送
@@ -345,15 +296,8 @@ public interface IMqttPublisher {
    * @param msg    消息
    */
   default void publish(String[] topics, MqttMessage msg) throws MqttPublishException {
-    IMqttClient c = getClient();
-    if (c != null) {
-      try {
-        for (String topic : topics) {
-          c.publish(topic, msg);
-        }
-      } catch (MqttException e) {
-        throw new MqttPublishException(e);
-      }
+    for (String topic : topics) {
+      publish(topic, msg);
     }
   }
 
@@ -364,18 +308,25 @@ public interface IMqttPublisher {
    * @param msg    消息
    */
   default void publishAsync(String[] topics, MqttMessage msg) {
-    final IMqttClient c = getClient();
-    if (c != null) {
-      getExecutor().execute(() -> {
-        try {
-          for (String topic : topics) {
-            c.publish(topic, msg);
-          }
-        } catch (MqttException e) {
-          e.printStackTrace();
-        }
-      });
+    for (String topic : topics) {
+      publishAsync(topic, msg);
     }
   }
+
+  /**
+   * 发送
+   *
+   * @param topic 主题
+   * @param msg   消息
+   */
+  void publish(String topic, MqttMessage msg) throws MqttPublishException;
+
+  /**
+   * 发送
+   *
+   * @param topic 主题
+   * @param msg   消息
+   */
+  void publishAsync(String topic, MqttMessage msg);
 
 }

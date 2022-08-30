@@ -1,5 +1,6 @@
 package com.benefitj.spring.mqtt.subscriber;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
@@ -12,16 +13,18 @@ import com.benefitj.spring.annotation.MetadataHandler;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 import org.springframework.messaging.Message;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * MQTT注册器
  */
-public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implements MetadataHandler {
+public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implements MetadataHandler, DisposableBean {
 
   /**
    * 代理
@@ -38,10 +41,18 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   private MqttMessageConverter messageConverter = new DefaultPahoMessageConverter();
 
+  private final List<PahoMqttClient> singleClients = new CopyOnWriteArrayList<>();
+
   public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
     this.options = options;
     this.setMetadataHandler(this);
     this.setResolver(new AnnotationResolverImpl(MqttMessageListener.class));
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    singleClients.forEach(c -> CatchUtils.tryThrow(c::disconnect, Exception::printStackTrace));
+    CatchUtils.tryThrow(getClient()::disconnect, Exception::printStackTrace);
   }
 
   @Override
@@ -62,6 +73,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         client.setCallback(dispatcher);
         // 订阅
         subscribe(metadata, client, dispatcher, listener);
+        singleClients.add(client);
       } else {
         subscribe(metadata, getClient(), getDispatcher(), listener);
       }
@@ -117,4 +129,5 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   public void setDispatcher(MqttCallbackDispatcher dispatcher) {
     this.dispatcher = dispatcher;
   }
+
 }

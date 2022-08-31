@@ -10,6 +10,7 @@ import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -38,6 +39,10 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
    * 消息分发器
    */
   private MqttCallbackDispatcher dispatcher;
+  /**
+   * 客户端ID前缀
+   */
+  private String prefix;
 
   private MqttMessageConverter messageConverter = new DefaultPahoMessageConverter();
 
@@ -61,7 +66,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
       MqttMessageListener listener = metadata.getFirstAnnotation(MqttMessageListener.class);
       if (listener.singleClient()) {
         // 单独的客户端
-        String id = IdUtils.nextLowerLetterId(listener.clientIdPrefix(), null, 16);
+        String prefix = StringUtils.isNotBlank(listener.clientIdPrefix()) ? listener.clientIdPrefix() : getPrefix();
+        String id = IdUtils.nextLowerLetterId(prefix, null, 12);
         PahoMqttClient client = new PahoMqttClient(getOptions(), id);
         client.setExecutor(EventLoop.newSingle(false));
         // 自动重连
@@ -120,6 +126,14 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   public void setClient(IMqttClient client) {
     this.client = client;
+  }
+
+  public String getPrefix() {
+    return prefix;
+  }
+
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
   }
 
   public MqttCallbackDispatcher getDispatcher() {

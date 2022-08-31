@@ -26,7 +26,7 @@ public @interface MqttMessageListener {
   /**
    * 客户端ID的前缀
    */
-  String clientIdPrefix() default "mqtt-";
+  String clientIdPrefix() default "";
 
   /**
    * 是否为单个客户端

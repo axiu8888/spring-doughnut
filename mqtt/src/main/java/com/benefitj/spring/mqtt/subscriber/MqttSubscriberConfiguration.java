@@ -4,6 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,8 +21,13 @@ import org.springframework.integration.mqtt.support.MqttMessageConverter;
 @Configuration
 public class MqttSubscriberConfiguration {
 
-  @Value("#{@environment['spring.mqtt.subscriber.client-id-prefix'] ?: 'mqtt-subscriber-'}")
+  @Value("#{@environment['spring.mqtt.subscriber.client-id-prefix'] ?: null}")
   private String clientIdPrefix;
+  /**
+   * 程序名称
+   */
+  @Value("#{@environment['spring.application.name'] ?: 'mqtt'}")
+  private String appName;
 
   /**
    * 消息转换
@@ -41,8 +47,8 @@ public class MqttSubscriberConfiguration {
   @Bean("mqttSubscriber")
   public PahoMqttClient mqttSubscriberClient(MqttConnectOptions options,
                                              @Qualifier("mqttSubscribeDispatcher") MqttCallbackDispatcher dispatcher) {
-    String clientId = IdUtils.nextId(clientIdPrefix, null, 10);
-    PahoMqttClient client = new PahoMqttClient(options, clientId);
+    String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
+    PahoMqttClient client = new PahoMqttClient(options, IdUtils.nextId(prefix, null, 10));
     client.setCallback(dispatcher);
     client.setAutoReconnect(true);
     client.setExecutor(EventLoop.newSingle(false));
@@ -71,6 +77,7 @@ public class MqttSubscriberConfiguration {
     registrar.setClient(client);
     registrar.setDispatcher(dispatcher);
     registrar.setMessageConverter(messageConverter);
+    registrar.setPrefix(StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-");
     return registrar;
   }
 

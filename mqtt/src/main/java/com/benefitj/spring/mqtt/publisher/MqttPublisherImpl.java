@@ -1,5 +1,6 @@
 package com.benefitj.spring.mqtt.publisher;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.paho.PahoMqttClient;
@@ -71,9 +72,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
 
   @Override
   public void destroy() throws Exception {
-    for (PahoMqttClient client : getClients()) {
-      client.disconnect();
-    }
+    getClients().forEach(c -> CatchUtils.tryThrow(c::disconnectForcibly, Exception::printStackTrace));
   }
 
   @Override

@@ -30,6 +30,11 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
    */
   @Value("#{@environment['spring.mqtt.publisher.client-count'] ?: 1}")
   private int clientCount;
+  /**
+   * 程序名称
+   */
+  @Value("#{@environment['spring.application.name'] ?: 'mqtt'}")
+  private String appName;
 
   /**
    * 消息发布的客户端
@@ -38,7 +43,8 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
   @Bean
   public MqttPublisher mqttPublisher(MqttConnectOptions options) {
     String[] URIs = StringUtils.isBlank(serverURIs) ? options.getServerURIs() : serverURIs.split(",");
-    return new MqttPublisher(URIs, options, clientIdPrefix, clientCount);
+    String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
+    return new MqttPublisher(URIs, options, prefix, clientCount);
   }
 
 }

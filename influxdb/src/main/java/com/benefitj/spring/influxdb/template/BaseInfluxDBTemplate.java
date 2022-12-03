@@ -6,6 +6,7 @@ import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.InfluxCountInfo;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.influxdb.BasicInfluxDB;
 import org.influxdb.BatchOptions;
 import org.influxdb.InfluxDB;
@@ -35,6 +36,8 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
    */
   private InfluxDBProperty property;
 
+  private HttpLoggingInterceptor httpLogging = new HttpLoggingInterceptor();
+
   private PointConverterFactory converterFactory = PointConverterFactory.INSTANCE;
   /**
    * SimpleDateFormat
@@ -55,8 +58,12 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    // 创建数据库
-    createDatabase(getDatabase());
+    try {
+      // 创建数据库
+      createDatabase(getDatabase());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -112,7 +119,8 @@ public abstract class BaseInfluxDBTemplate<I extends BasicInfluxDB, Q> implement
             .connectTimeout(prop.getConnectTimeout(), TimeUnit.SECONDS)
             .writeTimeout(prop.getWriteTimeout(), TimeUnit.SECONDS)
             .readTimeout(prop.getReadTimeout(), TimeUnit.SECONDS)
-            .addInterceptor(new BasicAuthInterceptor(prop.getUsername(), prop.getPassword()));
+            .addInterceptor(new BasicAuthInterceptor(prop.getUsername(), prop.getPassword()))
+            .addNetworkInterceptor(httpLogging.setLevel(prop.getLogLevel()));
 
         db = createInfluxDB(prop.getUrl(), prop.getUsername(), prop.getPassword(), client);
         db.setDatabase(prop.getDatabase());

@@ -21,8 +21,7 @@ public class AutoAppStateConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public AppStateEventAdapter appStateEventAdapter(@Autowired(required = false)
-                                                       List<AppStateListener> listeners) {
+  public AppStateEventAdapter appStateEventAdapter(@Autowired(required = false) List<AppStateListener> listeners) {
     return new AppStateEventAdapter(listeners);
   }
 

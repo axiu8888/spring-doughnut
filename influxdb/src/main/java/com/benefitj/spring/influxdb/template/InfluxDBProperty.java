@@ -1,5 +1,6 @@
 package com.benefitj.spring.influxdb.template;
 
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.influxdb.InfluxDB;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -57,6 +58,10 @@ public class InfluxDBProperty {
    * 批处理的响应数
    */
   private int batchActions = 100000;
+  /**
+   * 日志等级
+   */
+  private HttpLoggingInterceptor.Level logLevel = HttpLoggingInterceptor.Level.NONE;
 
   public String getUrl() {
     return url;
@@ -152,5 +157,13 @@ public class InfluxDBProperty {
 
   public void setBatchActions(int batchActions) {
     this.batchActions = batchActions;
+  }
+
+  public HttpLoggingInterceptor.Level getLogLevel() {
+    return logLevel;
+  }
+
+  public void setLogLevel(HttpLoggingInterceptor.Level logLevel) {
+    this.logLevel = logLevel;
   }
 }

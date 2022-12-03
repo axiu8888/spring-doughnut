@@ -1,15 +1,15 @@
 pluginManagement {
-    repositories {
-        maven {url("https://maven.aliyun.com/repository/public")}
-        maven {url("https://maven.aliyun.com/repository/google")}
-        maven {url("https://maven.aliyun.com/repository/central")}
-        maven {url("https://maven.aliyun.com/repository/gradle-plugin")}
-        maven {url("https://maven.aliyun.com/repository/jcenter")}
-        mavenCentral()
-        maven { url 'https://repo.spring.io/milestone' }
-        maven { url 'https://repo.spring.io/release' }
-        gradlePluginPortal()
-    }
+  repositories {
+    maven { url("https://maven.aliyun.com/repository/public") }
+    maven { url("https://maven.aliyun.com/repository/google") }
+    maven { url("https://maven.aliyun.com/repository/central") }
+    maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
+    maven { url("https://maven.aliyun.com/repository/jcenter") }
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/release' }
+    gradlePluginPortal()
+  }
 }
 
 rootProject.name = 'spring-doughnut'
@@ -26,19 +26,19 @@ include ":eventbus"
  * MQTT
  */
 include ":mqtt",
-        ":mqtt:samples:publisher",
-        ":mqtt:samples:subscriber"
+    ":mqtt:samples:publisher",
+    ":mqtt:samples:subscriber"
 include ":vertx-mqtt",
-        ":vertx-mqtt:samples:mqtt-server",
-        ":vertx-mqtt:samples:mqtt-subscriber",
-        ":vertx-mqtt:samples:mqtt-publisher"
+    ":vertx-mqtt:samples:mqtt-server",
+    ":vertx-mqtt:samples:mqtt-subscriber",
+    ":vertx-mqtt:samples:mqtt-publisher"
 
 /**
  * redis
  */
 include ":redis",
-        ":redis:samples:publisher",
-        ":redis:samples:subscriber"
+    ":redis:samples:publisher",
+    ":redis:samples:subscriber"
 
 include ":influxdb", ":influxdb:example"
 
@@ -60,10 +60,12 @@ include ":freemarker"
 /**
  * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
-include ":providers:mqtt-acl-redis",
-        ":providers:scaffold"
+include(
+    ":providers:mqtt-acl-redis", // emqx 权限配置
+)
 
-include ":services:jmods-export", // 导出执行环境
-        ":services:system" // system
+include(
+    ":services:jmods-export", // 导出执行环境
+)
 
 include ":examples"

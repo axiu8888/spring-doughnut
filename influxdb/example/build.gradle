@@ -5,9 +5,12 @@ plugins {
 //  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
 
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
 dependencies {
 
   implementation project(":all")
+  implementation project(":influxdb")
 
   implementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
 

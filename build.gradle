@@ -1,35 +1,47 @@
 ext {
 
   springbootVersion = "2.7.1"
-  springDependencyManagementVersion = "1.0.11.RELEASE"
-  springExperimentalAotVersion = "0.12.0"
+  springDependencyManagementVersion = "1.0.15.RELEASE"
+  springExperimentalAotVersion = "0.12.1"
   springIntegrationVersion = "5.5.13"
 
   aspectjVersion = "1.9.9.1"
   swagger2Version = "3.0.0"
   jjwtVersion = "0.11.5"
-  nettyAllVersion = '4.1.78.Final'
+  nettyAllVersion = '4.1.85.Final'
   vertxVersion = "4.3.1"
 
   rxJavaVersion = '2.2.21'
   okHttpVersion = '4.10.0'
   retrofitVersion = '2.9.0'
 
-  mysqlVersion = "8.0.29"
+  mysqlVersion = "8.0.31"
   druidVersion = "1.2.11"
   mybatisVersion = "2.2.2"
   mapperVersion = "4.2.1"
   pagehelperVersion = "1.4.3"
+
+  try {
+    def props = new Properties()
+    props.load(new FileReader("${getRootDir()}/nexus.properties"))
+    repoUrl = props["repoUrl"]
+    repoUsername = props["repoUsername"]
+    repoPassword = props["repoPassword"]
+  } catch(e) {
+    e.printStackTrace()
+  }
 }
 
 allprojects {
 
   apply plugin: 'java'
-  apply from: "${getRootDir()}/buildSystem/base.gradle"
 
   group = "com.benefitj.spring"
   version = "2.0.0-SNAPSHOT"
   //version = "2.0.0-RELEASE"
+
+  sourceCompatibility = JavaVersion.VERSION_15
+  targetCompatibility = JavaVersion.VERSION_15
 
   ext {
     groupId = "$group"
@@ -44,25 +56,18 @@ allprojects {
         "version"   : "$version",
         "build-date": "${new Date().format('yyyy-MM-dd')}",
         "author"    : "axiu8888",
-        "home"      : "https://github/com/axiu8888/${rootProject.name}",
+        "home"      : "https://github.com/axiu8888/${rootProject.name}",
     ]
   }
 
-//  jar {
-//    archivesBaseName = "${group()}"
-//  }
-
   dependencies {
-
     def commons = project(":commons");
-    if (!project.equals(commons)) {
+    if (project != commons) {
       compileOnly(commons)
       testImplementation(commons)
     }
   }
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
 
 }
 

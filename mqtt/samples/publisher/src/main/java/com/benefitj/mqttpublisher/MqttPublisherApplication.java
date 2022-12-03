@@ -3,6 +3,7 @@ package com.benefitj.mqttpublisher;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.ShutdownHook;
+import com.benefitj.spring.listener.EnableAppStateListener;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mqtt.event.EnableEventPublisher;
 import com.benefitj.spring.mqtt.event.EventPublisher;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * MQTT消息发布
  */
+@EnableAppStateListener
 @EnableEventPublisher
 @EnableMqttPublisher
 @SpringBootApplication

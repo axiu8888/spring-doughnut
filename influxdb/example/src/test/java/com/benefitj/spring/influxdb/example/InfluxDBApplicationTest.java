@@ -53,7 +53,7 @@ class InfluxDBApplicationTest {
   @Test
   void testQuery() {
     template.query("SELECT * FROM sys_trend_rates WHERE time > now() - 1d")
-        .subscribe(new DefaultSubscriber<>() {
+        .subscribe(new DefaultSubscriber<QueryResult>() {
           @Override
           public void onNext(QueryResult queryResult) {
             List<TrendRates> trendRates = template.mapperTo(queryResult, TrendRates.class);

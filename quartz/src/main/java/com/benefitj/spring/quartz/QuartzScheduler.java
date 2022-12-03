@@ -674,8 +674,8 @@ public interface QuartzScheduler extends Scheduler {
 
   /**
    * Reset the current state of the identified <code>{@link Trigger}</code>
-   * from {@link TriggerState#ERROR} to {@link TriggerState#NORMAL} or
-   * {@link TriggerState#PAUSED} as appropriate.
+   * from {@link Trigger.TriggerState#ERROR} to {@link Trigger.TriggerState#NORMAL} or
+   * {@link Trigger.TriggerState#PAUSED} as appropriate.
    *
    * <p>Only affects triggers that are in ERROR state - if identified trigger is not
    * in that state then the result is a no-op.</p>

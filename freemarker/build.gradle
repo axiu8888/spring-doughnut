@@ -1,4 +1,6 @@
 
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
 // 上传到nexus/maven仓库
 ext.upload = false
 

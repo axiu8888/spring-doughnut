@@ -5,6 +5,8 @@ plugins {
 //  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
 
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
 dependencies {
   api(project(":spring"))
   api(project(":vertx-mqtt"))

@@ -51,6 +51,8 @@ public class CommonsMqttConfiguration {
     }
     // 自动重连
     options.setAutomaticReconnect(property.isAutomaticReconnect());
+    // 最大发送数量
+    options.setMaxInflight(property.getMaxInflight());
     return options;
   }
 

@@ -1,9 +1,10 @@
-jar {
-  archivesBaseName = "spring-doughnut"
-}
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+archivesBaseName = "spring-doughnut"
 
 // 打包到一个项目
-ext.allInOne = false
+ext.allInOne = true
 // 上传到nexus/maven仓库
 ext.upload = true
 

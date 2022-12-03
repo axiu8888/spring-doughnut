@@ -3,6 +3,8 @@
 # Compiled class file
 *.class
 
+/nexus.properties
+
 # Log file
 *.log
 

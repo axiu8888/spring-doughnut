@@ -84,6 +84,7 @@ repositories {
   maven { url("https://maven.aliyun.com/repository/jcenter") }
   maven { url 'https://repo.spring.io/milestone' }
   maven { url 'https://repo.spring.io/release' }
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
   tryCatch({
     maven {
@@ -100,12 +101,12 @@ repositories {
 
 ext {
   lombokVersion = "1.18.24"
-  jacksonVersion = "2.14.0"
+  jacksonVersion = "2.14.1"
   guavaVersion = '31.1-jre'
-  fastjsonVersion = '2.0.18'
+  fastjson2Version = '2.0.21'
   commonsIOVersion = "2.11.0"
   commonsLang3Version = "3.12.0"
-  slf4jVersion = '2.0.3'
+  slf4jVersion = '2.0.6'
 
   if (springEnv) {
     set('springCloudVersion', "2021.0.0")
@@ -128,7 +129,7 @@ dependencies {
       "commons-io:commons-io:${commonsIOVersion}",
       "org.apache.commons:commons-lang3:${commonsLang3Version}",
       "com.google.guava:guava:${guavaVersion}",
-      "com.alibaba:fastjson:${fastjsonVersion}",
+      "com.alibaba.fastjson2:fastjson2:${fastjson2Version}",
       "org.slf4j:slf4j-simple:${slf4jVersion}",
 
       "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",

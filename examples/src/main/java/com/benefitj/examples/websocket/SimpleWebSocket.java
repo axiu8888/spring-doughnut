@@ -20,8 +20,10 @@ public class SimpleWebSocket implements WebSocketListener {
 
   @Override
   public void onWebSocketManager(WebSocketManager manager) {
-    this.manager = manager;
-    log.info("onWebSocketManager: {}", manager.getClass());
+    if (this.manager == null) {
+      this.manager = manager;
+      log.info("onWebSocketManager: {}", manager.getClass());
+    }
   }
 
   @Override

@@ -1,6 +1,6 @@
 package com.benefitj.spring.mvc.query;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.spring.mvc.CustomHandlerMethodArgumentResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;

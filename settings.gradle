@@ -66,6 +66,7 @@ include(
 
 include(
     ":services:jmods-export", // 导出执行环境
+//    ":services:http-proxy", // HTTP代理
 )
 
 include ":examples"

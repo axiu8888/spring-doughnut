@@ -16,10 +16,10 @@ ext {
   retrofitVersion = '2.9.0'
 
   mysqlVersion = "8.0.31"
-  druidVersion = "1.2.11"
-  mybatisVersion = "2.2.2"
-  mapperVersion = "4.2.1"
-  pagehelperVersion = "1.4.3"
+  druidVersion = "1.2.15"
+  mybatisPlusVersion = "3.0.1"
+  mapperVersion = "4.2.2"
+  pagehelperVersion = "1.4.6"
 
   try {
     def props = new Properties()
@@ -37,8 +37,7 @@ allprojects {
   apply plugin: 'java'
 
   group = "com.benefitj.spring"
-  version = "2.0.0-SNAPSHOT"
-  //version = "2.0.0-RELEASE"
+  version = "2.1.0-SNAPSHOT"
 
   sourceCompatibility = JavaVersion.VERSION_15
   targetCompatibility = JavaVersion.VERSION_15

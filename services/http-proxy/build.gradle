@@ -1,0 +1,24 @@
+plugins {
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+}
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+description("http proxy")
+
+group = "http-proxy"
+version = ''
+
+jar {
+  archivesBaseName = "http-proxy"
+}
+
+dependencies {
+  implementation("org.springframework.boot:spring-boot-starter")
+
+  implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.0-M1'
+
+}

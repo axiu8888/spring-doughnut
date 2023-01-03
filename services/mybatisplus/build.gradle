@@ -1,0 +1,57 @@
+plugins {
+	id 'org.springframework.boot' version "$springbootVersion"
+	id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+	id 'java'
+//  id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
+}
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+
+ext {
+	mybatisPlusVersion = "3.5.3"
+}
+
+dependencies {
+
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.springframework.boot:spring-boot-starter-websocket"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+
+	implementation "com.github.jsqlparser:jsqlparser:4.5"
+	implementation "com.github.pagehelper:pagehelper:5.3.2"
+	implementation "com.baomidou:mybatis-plus-boot-starter:${mybatisPlusVersion}"
+	//implementation "com.baomidou:mybatis-plus-generator:${mybatisPlusVersion}"
+	//implementation “com.baomidou:mybatis-plus-extension:${mybatisPlusVersion}"
+	//implementation "com.baomidou:dynamic-datasource-spring-boot-starter:3.6.1"
+
+	//implementation 'com.h2database:h2:1.4.200'
+	implementation "com.mysql:mysql-connector-j:${mysqlVersion}"
+	implementation "com.alibaba:druid-spring-boot-starter:${druidVersion}"
+
+	// swagger-ui
+	implementation "io.springfox:springfox-boot-starter:3.0.0"
+	implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
+
+	// jwt
+	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+	implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+	implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+
+}
+
+def file = new File(obtainResources(sourceSets), "version.properties")
+file.text = "version=v1.0-${new Date().format('yyMMdd_HHmm')}"
+
+/**
+ * 查找 resources 目录
+ */
+static String obtainResources(def sourceSets) {
+	return sourceSets.main.resources.srcDirs
+			.stream()
+			.filter{ it -> it.getName().equalsIgnoreCase("resources") }
+			.findFirst()
+			.orElse(sourceSets.main.resources.srcDirs[0])
+			.getAbsolutePath()
+}

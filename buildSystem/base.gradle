@@ -103,7 +103,7 @@ ext {
   lombokVersion = "1.18.24"
   jacksonVersion = "2.14.1"
   guavaVersion = '31.1-jre'
-  fastjson2Version = '2.0.21'
+  fastjson2Version = '2.0.22'
   commonsIOVersion = "2.11.0"
   commonsLang3Version = "3.12.0"
   slf4jVersion = '2.0.6'

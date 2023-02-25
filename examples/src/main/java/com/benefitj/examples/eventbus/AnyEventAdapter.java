@@ -1,12 +1,11 @@
 package com.benefitj.examples.eventbus;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.benefitj.event.BaseEventAdapter;
 import com.benefitj.event.Event;
 import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.spring.eventbus.SubscriberIgnore;
 import com.benefitj.spring.eventbus.SubscriberName;
-import com.benefitj.spring.listener.OnAppStart;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.stereotype.Component;
 

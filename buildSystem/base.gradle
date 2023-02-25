@@ -5,8 +5,8 @@
 //    id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
 //}
 
-apply plugin: 'java'
 apply plugin: 'java-library'
+apply plugin: 'java'
 
 //beforeEvaluate { }
 
@@ -17,9 +17,7 @@ afterEvaluate {
   tryCatch({ javadocJar { tryCatch({ manifest.attributes(manifestAttributes) }) } })
 }
 
-ext { springEnv = false }
-tryCatch({ ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
-//println("[ ${project.name} ], springEnv: ${springEnv}, plugins ===>: $plugins")
+tryCatch({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
 
 //archivesBaseName = "${getProject().name}"
 
@@ -108,7 +106,7 @@ ext {
   commonsLang3Version = "3.12.0"
   slf4jVersion = '2.0.6'
 
-  if (springEnv) {
+  if (tryCatch({project.ext.springEnv}, false)) {
     set('springCloudVersion', "2021.0.0")
   }
 }
@@ -142,11 +140,12 @@ dependencies {
     testImplementation(it)
   }
 
-  if (springEnv) {
-    compileOnly("org.springframework.boot:spring-boot-starter")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+  if (tryCatch({project.ext.springEnv}, false) || tryCatch({project.ext.springTest}, false)) {
+    compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springbootVersion}")
 
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
@@ -157,16 +156,18 @@ dependencies {
 
 }
 
-if (springEnv) {
+if (tryCatch({project.ext.springEnv}, false) || tryCatch({project.ext.springTest}, false)) {
   tasks.named('test') {
     useJUnitPlatform()
   }
-  tryCatch({
-    tasks.named('bootBuildImage') {
-      builder = 'paketobuildpacks/builder:tiny'
-      environment = ['BP_NATIVE_IMAGE': 'true']
-    }
-  })
+  if(tryCatch({project.ext.springEnv}, false)) {
+    tryCatch({
+      tasks.named('bootBuildImage') {
+        builder = 'paketobuildpacks/builder:tiny'
+        environment = ['BP_NATIVE_IMAGE': 'true']
+      }
+    })
+  }
 }
 
 
@@ -184,7 +185,6 @@ afterEvaluate {
         configurations.compileClasspath.collect {
           def path = it.getAbsolutePath()
           if (path.startsWith(rootDirPath) && !(it.isFile() && path.endsWith(".jar"))) {
-            println("${current}  jar ===>: ${path.substring(rootDirPath.length())}, ${it.exists()}")
             if (it.exists()) {
               //zipTree(project.sourceSets.main.resources)
               from it.isDirectory() ? it : zipTree(it)
@@ -205,7 +205,6 @@ afterEvaluate {
             def path = it.getAbsolutePath()
             def project = findProject(getRootProject(), path)
             if (project != null) {
-              println("source ===>: ${it.getAbsolutePath().substring(rootDirPath.length())}, ${it.exists()}")
               from project.sourceSets.main.allSource
               from project.sourceSets.main.resources
             }
@@ -300,9 +299,6 @@ static <V> V tryCatch(java.util.concurrent.Callable<V> call, Object... args) {
   try {
     return call.call()
   } catch (Exception e) {
-    if (!(e.getMessage().contains("allInOne") || e.getMessage().contains("upload"))) {
-      System.out.println(e.getMessage())
-    }
     return args.length > 0 ? args[0] : null
   }
 }

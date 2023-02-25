@@ -41,6 +41,7 @@ include ":redis",
     ":redis:samples:subscriber"
 
 include ":influxdb", ":influxdb:example"
+include ":influxdb2"
 
 /**
  * athenapdf 调用docker生成PDF

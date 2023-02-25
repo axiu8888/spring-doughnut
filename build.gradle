@@ -1,24 +1,24 @@
 ext {
 
-  springbootVersion = "2.7.1"
+  springbootVersion = "2.7.8"
   springDependencyManagementVersion = "1.0.15.RELEASE"
   springExperimentalAotVersion = "0.12.1"
-  springIntegrationVersion = "5.5.13"
+  graalvmBuildtoolsNativeVersion = "0.9.18"
+  springIntegrationVersion = "5.5.16"
 
-  aspectjVersion = "1.9.9.1"
+  aspectjVersion = "1.9.19"
   swagger2Version = "3.0.0"
   jjwtVersion = "0.11.5"
   nettyAllVersion = '4.1.85.Final'
-  vertxVersion = "4.3.1"
+  vertxVersion = "4.3.7"
 
   rxJavaVersion = '2.2.21'
   okHttpVersion = '4.10.0'
   retrofitVersion = '2.9.0'
 
-  mysqlVersion = "8.0.31"
+  mysqlVersion = "8.0.32"
   druidVersion = "1.2.15"
-  mybatisPlusVersion = "3.0.1"
-  mapperVersion = "4.2.2"
+  mybatisPlusVersion = "3.5.3"
   pagehelperVersion = "1.4.6"
 
   try {

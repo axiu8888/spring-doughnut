@@ -4,6 +4,7 @@
 *.class
 
 /nexus.properties
+/**/version.properties
 
 # Log file
 *.log

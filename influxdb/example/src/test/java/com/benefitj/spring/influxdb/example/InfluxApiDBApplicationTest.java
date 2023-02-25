@@ -1,11 +1,12 @@
 package com.benefitj.spring.influxdb.example;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.influxdb.template.DefaultSubscriber;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
 import com.benefitj.spring.influxdb.write.InfluxWriterManager;
+import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 @SpringBootTest
-class InfluxDBApplicationTest {
+class InfluxApiDBApplicationTest {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -28,6 +29,7 @@ class InfluxDBApplicationTest {
   private InfluxWriterManager writerManager;
 
   private Random random = new Random();
+
 
   @Test
   void testWrite() {
@@ -62,6 +64,12 @@ class InfluxDBApplicationTest {
         });
   }
 
+  @Test
+  void testQueryString() {
+    template.queryString(new Query("SELECT * FROM hs_wave_package WHERE time >= 1d GROUP BY person_zid LIMIT 100;", template.getDatabase()), 10)
+        .subscribe(lines -> System.err.println(lines));
+  }
+
   /**
    * 删除数据表
    */
@@ -69,6 +77,16 @@ class InfluxDBApplicationTest {
   void testDropMeasurements() {
     QueryResult result = template.dropMeasurement("sys_trend_rates");
     System.err.println(JSON.toJSONString(result));
+  }
+
+
+  /**
+   * 查询
+   */
+  @Test
+  void testGetMeasurements() {
+    List<String> measurements = template.getMeasurements();
+    System.err.println("measurements ==>: " + measurements);
   }
 
   /**

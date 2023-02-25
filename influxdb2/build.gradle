@@ -1,0 +1,32 @@
+
+project.ext.springTest = true
+
+apply from: "${getRootDir()}/buildSystem/base.gradle"
+
+project.ext.artifactName = "influxdb2"
+// 上传到nexus/maven仓库
+project.ext.upload = true
+
+dependencies {
+  compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+
+  api 'org.msgpack:msgpack-core:0.9.3'
+  /*api('org.influxdb:influxdb-java:2.23') {
+    exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
+    exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
+    exclude group: 'org.msgpack'//, module: 'msgpack-core'
+  }*/
+  // OkHttp + RxJava + Retrofit
+  api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
+  api "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+  api "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+  api "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+  api "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-jackson:${retrofitVersion}"
+
+  api 'org.jetbrains.kotlin:kotlin-stdlib:1.7.21'
+
+}

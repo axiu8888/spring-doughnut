@@ -8,7 +8,6 @@ import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;

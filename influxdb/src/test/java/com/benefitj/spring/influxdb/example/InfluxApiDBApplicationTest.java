@@ -2,10 +2,15 @@ package com.benefitj.spring.influxdb.example;
 
 import com.alibaba.fastjson2.JSON;
 import com.benefitj.core.EventLoop;
-import com.benefitj.spring.JsonUtils;
+import com.benefitj.spring.influxdb.spring.EnableInfluxWriterManager;
+import com.benefitj.spring.influxdb.spring.EnableRxJavaInfluxDB;
 import com.benefitj.spring.influxdb.template.DefaultSubscriber;
 import com.benefitj.spring.influxdb.template.RxJavaInfluxDBTemplate;
 import com.benefitj.spring.influxdb.write.InfluxWriterManager;
+import lombok.Data;
+import org.influxdb.annotation.Column;
+import org.influxdb.annotation.Measurement;
+import org.influxdb.annotation.TimeColumn;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.junit.jupiter.api.Test;
@@ -16,7 +21,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+@EnableRxJavaInfluxDB
+@EnableInfluxWriterManager
 @SpringBootTest
 class InfluxApiDBApplicationTest {
 
@@ -59,7 +67,7 @@ class InfluxApiDBApplicationTest {
           @Override
           public void onNext(QueryResult queryResult) {
             List<TrendRates> trendRates = template.mapperTo(queryResult, TrendRates.class);
-            System.err.println("data: " + JsonUtils.toJson(trendRates));
+            System.err.println("data: " + JSON.toJSONString(trendRates));
           }
         });
   }
@@ -111,6 +119,63 @@ class InfluxApiDBApplicationTest {
   @Test
   void testExport() {
     System.err.println("----------->:");
+  }
+
+
+  /**
+   */
+  @Data
+  @Measurement(name = "sys_trend_rates", timeUnit = TimeUnit.SECONDS)
+  public class TrendRates {
+    /**
+     * 时间戳
+     */
+    @TimeColumn
+    @Column(name = "time")
+    private Long time;
+    /**
+     * 设备ID
+     *
+     * 通过重新定义字段，覆盖父类的字段，让 device_id 作为tag
+     */
+    @Column(name = "deviceId", tag = true)
+    private String deviceId;
+    /**
+     * 心率
+     */
+    @Column(name = "heartRate")
+    private Short heartRate;
+    /**
+     * 呼吸率
+     */
+    @Column(name = "respRate")
+    private Short respRate;
+    /**
+     * 血氧
+     */
+    @Column(name = "spo2")
+    private Byte spo2;
+    /**
+     * 体位
+     */
+    @Column(name = "gesture")
+    private Integer gesture;
+    /**
+     * 能耗, 卡路里
+     */
+    @Column(name = "energy")
+    private Double energy;
+    /**
+     * 步数
+     */
+    @Column(name = "step")
+    private Short step;
+    /**
+     * 默认秒；允许值：ss mm
+     */
+    @Column(name = "type")
+    private String type;
+
   }
 
 }

@@ -1,4 +1,6 @@
 
+project.ext.springTest = true
+
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
 sourceSets {
@@ -7,9 +9,9 @@ sourceSets {
   }
 }
 
-ext.artifactName = "influxdb"
+project.ext.artifactName = "influxdb"
 // 上传到nexus/maven仓库
-ext.upload = true
+project.ext.upload = true
 
 dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
@@ -39,5 +41,8 @@ dependencies {
 //  implementation "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
 //  implementation "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
 //  implementation "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
+
+  testImplementation(project(":spring"))
+  testImplementation 'com.alibaba:easyexcel:3.0.5'
 
 }

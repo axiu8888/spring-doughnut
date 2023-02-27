@@ -2,8 +2,6 @@ package com.benefitj.spring.freemarker;
 
 import com.benefitj.core.ClasspathUtils;
 import com.benefitj.core.IOUtils;
-import junit.framework.TestCase;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,10 +14,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-public class FreemarkerBuilderTest extends TestCase {
+public class FreemarkerBuilderTest {
 
   @BeforeEach
-  @Before
   public void setUp() {
   }
 

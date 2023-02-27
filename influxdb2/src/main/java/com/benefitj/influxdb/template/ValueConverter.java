@@ -1,6 +1,6 @@
 package com.benefitj.influxdb.template;
 
-import com.benefitj.influxdb.TimeUtil;
+import com.benefitj.influxdb.InfluxTimeUtil;
 import com.benefitj.influxdb.dto.QueryResult;
 
 import java.util.Date;
@@ -103,7 +103,7 @@ public interface ValueConverter {
    */
   default long getTime() {
     String time = getString(TIME);
-    return TimeUtil.fromInfluxDBTimeFormat(time);
+    return InfluxTimeUtil.fromInfluxDBTimeFormat(time);
   }
 
   /**

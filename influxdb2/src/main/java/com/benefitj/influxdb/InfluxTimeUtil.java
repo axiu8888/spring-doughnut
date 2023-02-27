@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author stefan.majer [at] gmail.com
  */
-public enum TimeUtil {
+public enum InfluxTimeUtil {
   INSTANCE;
 
   private static final ThreadLocal<SimpleDateFormat> FORMATTER_MILLIS = new ThreadLocal<SimpleDateFormat>() {

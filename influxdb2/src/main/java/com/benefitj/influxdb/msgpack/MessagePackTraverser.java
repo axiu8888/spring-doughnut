@@ -2,8 +2,6 @@ package com.benefitj.influxdb.msgpack;
 
 import com.benefitj.influxdb.InfluxException;
 import com.benefitj.influxdb.dto.QueryResult;
-import com.benefitj.influxdb.dto.QueryResult.Result;
-import com.benefitj.influxdb.dto.QueryResult.Series;
 import org.msgpack.core.ExtensionTypeHeader;
 import org.msgpack.core.MessageFormat;
 import org.msgpack.core.MessagePack;
@@ -149,24 +147,24 @@ public class MessagePackTraverser {
           if (length > 0) {
             if ("results".equals(lastStringNode)) {
               QueryResult queryResult = queryResultPath.getLastObject();
-              List<Result> results = new ArrayList<>();
+              List<QueryResult.Result> results = new ArrayList<>();
               queryResult.setResults(results);
               addedName = "results";
               addedObject = results;
             } else if ("series".equals(lastStringNode) && queryResultPath.compareEndingPath("result")) {
-              Result result = queryResultPath.getLastObject();
-              List<Series> series = new ArrayList<>();
+              QueryResult.Result result = queryResultPath.getLastObject();
+              List<QueryResult.Series> series = new ArrayList<>();
               result.setSeries(series);
               addedName = "seriesList";
               addedObject = series;
             } else if ("columns".equals(lastStringNode) && queryResultPath.compareEndingPath("series")) {
-              Series series = queryResultPath.getLastObject();
+              QueryResult.Series series = queryResultPath.getLastObject();
               List<String> columns = new ArrayList<>();
               series.setColumns(columns);
               addedName = "columns";
               addedObject = columns;
             } else if ("values".equals(lastStringNode) && queryResultPath.compareEndingPath("series")) {
-              Series series = queryResultPath.getLastObject();
+              QueryResult.Series series = queryResultPath.getLastObject();
               List<List<Object>> values = new ArrayList<>();
               series.setValues(values);
               addedName = "values";
@@ -191,19 +189,19 @@ public class MessagePackTraverser {
         case MAP:
           length = unpacker.unpackMapHeader();
           if (queryResultPath.compareEndingPath("results")) {
-            List<Result> results = queryResultPath.getLastObject();
-            Result result = new Result();
+            List<QueryResult.Result> results = queryResultPath.getLastObject();
+            QueryResult.Result result = new QueryResult.Result();
             results.add(result);
             addedName = "result";
             addedObject = result;
           } else if (queryResultPath.compareEndingPath("seriesList")) {
-            List<Series> series = queryResultPath.getLastObject();
-            Series s = new Series();
+            List<QueryResult.Series> series = queryResultPath.getLastObject();
+            QueryResult.Series s = new QueryResult.Series();
             series.add(s);
             addedName = "series";
             addedObject = s;
           } else if ("tags".equals(lastStringNode) && queryResultPath.compareEndingPath("series")) {
-            Series series = queryResultPath.getLastObject();
+            QueryResult.Series series = queryResultPath.getLastObject();
             Map<String, String> tags = new HashMap<>();
             series.setTags(tags);
             addedName = "tags";

@@ -3,7 +3,7 @@ package com.benefitj.influxdb.convert;
 
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.influxdb.InfluxException;
-import com.benefitj.influxdb.TimeUtil;
+import com.benefitj.influxdb.InfluxTimeUtil;
 import com.benefitj.influxdb.annotation.Column;
 import com.benefitj.influxdb.annotation.Measurement;
 import com.benefitj.influxdb.annotation.TimeColumn;
@@ -161,7 +161,7 @@ public class InfluxDBResultMapper {
                 long nanos = (timeColumn != null ? timeColumn.timeUnit() : measurement.timeUnit()).toNanos(1);
                 time = ((Number) value).longValue() / nanos;
               } else {
-                time = TimeUtil.fromInfluxDBTimeFormat(value.toString());
+                time = InfluxTimeUtil.fromInfluxDBTimeFormat(value.toString());
               }
               if (correspondingField.getGenericType() instanceof Date) {
                 value = new Date(time);

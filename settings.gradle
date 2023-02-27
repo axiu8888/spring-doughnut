@@ -40,13 +40,18 @@ include ":redis",
     ":redis:samples:publisher",
     ":redis:samples:subscriber"
 
-include ":influxdb", ":influxdb:example"
+include ":influxdb"
 include ":influxdb2"
 
 /**
  * athenapdf 调用docker生成PDF
  */
 include ":athenapdf", ":athenapdf:athenapdfservice"
+
+/**
+ * MinIO
+ */
+include ":minio"
 
 /**
  * quartz调度

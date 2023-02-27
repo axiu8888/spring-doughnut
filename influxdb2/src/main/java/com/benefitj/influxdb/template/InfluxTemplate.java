@@ -3,8 +3,8 @@ package com.benefitj.influxdb.template;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.influxdb.InfluxApi;
 import com.benefitj.influxdb.InfluxOptions;
+import com.benefitj.influxdb.InfluxTimeUtil;
 import com.benefitj.influxdb.InfluxUtils;
-import com.benefitj.influxdb.TimeUtil;
 import com.benefitj.influxdb.convert.PointConverter;
 import com.benefitj.influxdb.convert.PointConverterFactory;
 import com.benefitj.influxdb.dto.*;
@@ -239,7 +239,7 @@ public interface InfluxTemplate {
     precision = precision != null ? precision : TimeUnit.NANOSECONDS;
     consistency = consistency != null ? consistency : InfluxApi.ConsistencyLevel.ALL;
     getApi()
-        .writePoints(db, retentionPolicy, TimeUtil.toTimePrecision(precision), consistency.value(), batchPoints)
+        .writePoints(db, retentionPolicy, InfluxTimeUtil.toTimePrecision(precision), consistency.value(), batchPoints)
         .subscribe(new SimpleSubscriber<Response<ResponseBody>>() {
           @Override
           public void onNext(Response<ResponseBody> response) {

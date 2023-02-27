@@ -1,4 +1,6 @@
 
+project.ext.springTest = true
+
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
 // 上传到nexus/maven仓库

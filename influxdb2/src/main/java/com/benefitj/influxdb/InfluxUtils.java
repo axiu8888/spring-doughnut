@@ -172,7 +172,7 @@ public class InfluxUtils {
         if (value instanceof Number) {
           builder.time(((Number) value).longValue(), TimeUnit.NANOSECONDS);
         } else {
-          builder.time(TimeUtil.fromInfluxDBTimeFormat((String) value), TimeUnit.MILLISECONDS);
+          builder.time(InfluxTimeUtil.fromInfluxDBTimeFormat((String) value), TimeUnit.MILLISECONDS);
         }
       } else {
         if (fieldKey.isTag()) {

@@ -1,6 +1,5 @@
 package com.benefitj.minio;
 
-import com.benefitj.frameworks.cglib.CGLibProxy;
 import io.minio.*;
 import io.minio.messages.*;
 
@@ -9,11 +8,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-public interface IMinIOClient {
-
-  static IMinIOClient newProxy(MinioClient client) {
-    return CGLibProxy.newProxy(null, IMinIOClient.class, client);
-  }
+public interface IMinioClient {
 
   /**
    * Gets information of an object.
@@ -713,7 +708,7 @@ public interface IMinIOClient {
    *   System.out.println("Legal hold is off");
    *  }
    * }</pre>
-   *
+   * <p>
    * args {@link IsObjectLegalHoldEnabledArgs} object.
    *
    * @return boolean - True if legal hold is enabled.
@@ -1055,7 +1050,7 @@ public interface IMinIOClient {
    *
    * @param args {@link ListenBucketNotificationArgs} object.
    * @return {@code CloseableIterator<Result<NotificationRecords>>} - Lazy closable iterator
-   *     contains event records.
+   * contains event records.
    */
   CloseableIterator<Result<NotificationRecords>> listenBucketNotification(ListenBucketNotificationArgs args);
 
@@ -1256,8 +1251,8 @@ public interface IMinIOClient {
    * }</pre>
    *
    * @param connectTimeout HTTP connect timeout in milliseconds.
-   * @param writeTimeout HTTP write timeout in milliseconds.
-   * @param readTimeout HTTP read timeout in milliseconds.
+   * @param writeTimeout   HTTP write timeout in milliseconds.
+   * @param readTimeout    HTTP read timeout in milliseconds.
    */
   void setTimeout(long connectTimeout, long writeTimeout, long readTimeout);
 
@@ -1267,7 +1262,6 @@ public interface IMinIOClient {
    * <pre>Example:{@code
    * minioClient.ignoreCertCheck();
    * }</pre>
-   *
    */
   //@SuppressFBWarnings(value = "SIC", justification = "Should not be used in production anyways.")
   void ignoreCertCheck();
@@ -1276,7 +1270,7 @@ public interface IMinIOClient {
    * Sets application's name/version to user agent. For more information about user agent refer <a
    * href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">#rfc2616</a>.
    *
-   * @param name Your application name.
+   * @param name    Your application name.
    * @param version Your application version.
    */
   void setAppInfo(String name, String version);
@@ -1296,22 +1290,34 @@ public interface IMinIOClient {
    */
   void traceOff();
 
-  /** Enables accelerate endpoint for Amazon S3 endpoint. */
+  /**
+   * Enables accelerate endpoint for Amazon S3 endpoint.
+   */
   void enableAccelerateEndpoint();
 
-  /** Disables accelerate endpoint for Amazon S3 endpoint. */
+  /**
+   * Disables accelerate endpoint for Amazon S3 endpoint.
+   */
   void disableAccelerateEndpoint();
 
-  /** Enables dual-stack endpoint for Amazon S3 endpoint. */
+  /**
+   * Enables dual-stack endpoint for Amazon S3 endpoint.
+   */
   void enableDualStackEndpoint();
 
-  /** Disables dual-stack endpoint for Amazon S3 endpoint. */
+  /**
+   * Disables dual-stack endpoint for Amazon S3 endpoint.
+   */
   void disableDualStackEndpoint();
 
-  /** Enables virtual-style endpoint. */
+  /**
+   * Enables virtual-style endpoint.
+   */
   void enableVirtualStyleEndpoint();
 
-  /** Disables virtual-style endpoint. */
+  /**
+   * Disables virtual-style endpoint.
+   */
   void disableVirtualStyleEndpoint();
 
 }

@@ -10,12 +10,14 @@ import com.benefitj.influxdb.template.InfluxTemplateImpl;
 import com.squareup.moshi.Moshi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * InfluxTemplate
  */
+@EnableConfigurationProperties
 @Configuration
 public class InfluxConfiguration {
 

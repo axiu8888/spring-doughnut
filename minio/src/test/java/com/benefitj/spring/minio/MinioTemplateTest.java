@@ -3,6 +3,8 @@ package com.benefitj.spring.minio;
 import com.benefitj.core.IOUtils;
 import com.benefitj.minio.MinioResult;
 import com.benefitj.minio.MinioTemplate;
+import com.benefitj.minio.MinioUtils;
+import com.benefitj.minio.Pair;
 import com.benefitj.minio.spring.MinioConfiguration;
 import io.minio.*;
 import io.minio.messages.Bucket;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +94,7 @@ class MinioTemplateTest {
     String objectName = file.getName();
     MinioResult<ObjectWriteResponse> result = template.uploadObject(objectName, file.getPath(), bucketName);
     if (result.isSuccessful()) {
+      log.info("------------------------ 上传对象 ------------------------");
       ObjectWriteResponse response = result.getData();
       log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
           , response.etag()
@@ -112,6 +116,7 @@ class MinioTemplateTest {
     MinioResult<StatObjectResponse> result = template.statObject(objectName, bucketName);
     log.info("\n----------------------------------------\n");
     if (result.isSuccessful()) {
+      log.info("------------------------ 查询对象信息 ------------------------");
       StatObjectResponse response = result.getData();
       log.info("bucket: {}", response.bucket());
       log.info("object: {}", response.object());
@@ -145,6 +150,7 @@ class MinioTemplateTest {
             .length(100L)
         , objectName, bucketName);
     if (result.isSuccessful()) {
+      log.info("------------------------ 获取对象 ------------------------");
       GetObjectResponse response = result.getData();
       log.info("bytes: {}", IOUtils.readFully(response).toString(StandardCharsets.UTF_8.name()));
       log.info("bucket: {}", response.bucket());
@@ -153,6 +159,7 @@ class MinioTemplateTest {
       log.info("headers: {}", response.headers());
     } else {
       log.info("请求失败: {}", result.getMessage());
+      result.getError().printStackTrace();
     }
   }
 
@@ -161,6 +168,7 @@ class MinioTemplateTest {
    */
   @Test
   void test_downloadObject() {
+    log.info("------------------------ 下载对象 ------------------------");
     String bucketName = "test";
     String objectName = "nginx-80.conf";
     File file = IOUtils.createFile("D:/home/logs/tmp/nginx-80.conf");
@@ -176,8 +184,9 @@ class MinioTemplateTest {
    */
   @Test
   void test_removeObject() {
+    log.info("------------------------ 移除对象 ------------------------");
     String bucketName = "test";
-    String objectName = "nginx-80.conf";
+    String objectName = "copy_nginx-80.conf";
     log.info("移除对象: {}, {}, {}", bucketName, objectName, template.removeObject(objectName, bucketName));
   }
 
@@ -194,6 +203,7 @@ class MinioTemplateTest {
         .build();
     MinioResult<ObjectWriteResponse> result = template.copyObject("copy_" + objectName, source, Directive.COPY, bucketName);
     if (result.isSuccessful()) {
+      log.info("------------------------ 拷贝对象 ------------------------");
       ObjectWriteResponse response = result.getData();
       log.info("bucket: {}", response.bucket());
       log.info("object: {}", response.object());
@@ -203,6 +213,7 @@ class MinioTemplateTest {
       log.info("headers: {}", response.headers());
     } else {
       log.info("请求失败: {}", result.getMessage());
+      result.getError().printStackTrace();
     }
   }
 
@@ -211,13 +222,29 @@ class MinioTemplateTest {
    */
   @Test
   void test_composeObject() {
-    /*String bucketName = "test";
-    String objectName = "nginx-80.conf";
-    MinioResult<ObjectWriteResponse> result = template.composeObject(objectName,
-        , null, bucketName);
-    log.info("下载对象: {}, {}, {}, file.exist: {}", bucketName, objectName
-        , result.getMessage()
-    );*/
+    // 把 nginx-80.conf 和 copy_nginx-80.conf 合并到 compose_nginx-80.conf
+    String bucketName = "test";
+    String objectName = "compose_nginx-80.conf";
+    MinioResult<ObjectWriteResponse> result = template.composeObject(objectName
+        , Arrays.asList(
+            ComposeSource.builder().object("nginx-80.conf").bucket(bucketName).build(),
+            ComposeSource.builder().object("copy_nginx-80.conf").bucket(bucketName).build()
+        )
+        , MinioUtils.mapOf(Pair.of("Author", "hsrg"), Pair.of("type", "nginx"))
+        , bucketName);
+    if (result.isSuccessful()) {
+      log.info("------------------------ 合并对象 ------------------------");
+      ObjectWriteResponse response = result.getData();
+      log.info("bucket: {}", response.bucket());
+      log.info("object: {}", response.object());
+      log.info("etag: {}", response.etag());
+      log.info("region: {}", response.region());
+      log.info("versionId: {}", response.versionId());
+      log.info("headers: {}", response.headers());
+    } else {
+      log.info("请求失败: {}", result.getMessage());
+      result.getError().printStackTrace();
+    }
   }
 
 //  @Test

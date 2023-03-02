@@ -13,10 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+/**
+ * MinIO工具
+ */
 public class MinioUtils {
 
   private static final LocalCache<MinioResult> localResult = LocalCacheFactory.newCache(new InitialCallback<MinioResult>() {
@@ -62,6 +66,7 @@ public class MinioUtils {
         //throw new MinioException(e.getMessage());
         result.setCode(400);
         result.setMessage(e.getMessage());
+        result.setError(e);
         return null;
       }
     });
@@ -131,6 +136,17 @@ public class MinioUtils {
                                                                                              @Nullable Map<String, String> extraHeaders,
                                                                                              @Nullable Map<String, String> extraQueryParams) {
     return newBucketArgs(builder.object(objectName), bucketName, region, extraHeaders, extraQueryParams);
+  }
+
+  public static Map<String, String> mapOf(Pair<String, String>... pairs) {
+    return mapOf(new LinkedHashMap<>(), pairs);
+  }
+
+  public static Map<String, String> mapOf(Map<String, String> map, Pair<String, String>... pairs) {
+    for (Pair<String, String> pair : pairs) {
+      map.put(pair.getKey(), pair.getValue());
+    }
+    return map;
   }
 
 

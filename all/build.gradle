@@ -18,7 +18,8 @@ dependencies {
       ":redis",
       ":mqtt",
       ":quartz",
-      ":influxdb",
+      //":influxdb",
+      ":influxdb2",
       ":athenapdf",
       ":vertx-mqtt",
   ]

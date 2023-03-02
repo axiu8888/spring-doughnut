@@ -37,7 +37,7 @@ allprojects {
   apply plugin: 'java'
 
   group = "com.benefitj.spring"
-  version = "2.1.0-SNAPSHOT"
+  version = "2.2.1-SNAPSHOT"
 
   sourceCompatibility = JavaVersion.VERSION_15
   targetCompatibility = JavaVersion.VERSION_15

@@ -1,7 +1,5 @@
 package com.benefitj.minio;
 
-import com.alibaba.fastjson2.JSONObject;
-
 public class MinioResult<T> {
 
   public static <T> MinioResult<T> succeed(T data) {
@@ -47,9 +45,9 @@ public class MinioResult<T> {
    */
   private T data;
   /**
-   * 额外参数
+   * 异常
    */
-  private final JSONObject extras = new JSONObject();
+  private Throwable error;
 
   public int getCode() {
     return code;
@@ -75,16 +73,12 @@ public class MinioResult<T> {
     this.data = data;
   }
 
-  public JSONObject getExtras() {
-    return extras;
+  public Throwable getError() {
+    return error;
   }
 
-  public Object putExtra(String key, Object value) {
-    return getExtras().put(key, value);
-  }
-
-  public <T> T getExtra(String key, Class<T> type) {
-    return getExtras().getObject(key, type);
+  public void setError(Throwable error) {
+    this.error = error;
   }
 
   public boolean isSuccessful() {

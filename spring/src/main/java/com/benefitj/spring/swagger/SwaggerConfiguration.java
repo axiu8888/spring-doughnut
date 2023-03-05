@@ -1,10 +1,22 @@
 package com.benefitj.spring.swagger;
 
+import com.benefitj.core.CatchUtils;
+import com.benefitj.core.EventLoop;
+import com.benefitj.core.Utils;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
+import com.benefitj.spring.ctx.SpringCtxHolder;
+import com.benefitj.spring.listener.EnableAppStateListener;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -14,17 +26,26 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 接口文档配置
  */
+@EnableSpringCtxInit
+@EnableAppStateListener
 @EnableOpenApi
+@Configuration
+@Slf4j
 public class SwaggerConfiguration {
 
-  @Value("#{@environment['swagger.security.name'] ?: 'token'}")
+  @Value("#{@environment['springfox.documentation.swagger.security.name'] ?: 'token'}")
   private String name;
+
+  @Value("#{@environment['springfox.documentation.swagger.doc-type'] ?: 'SWAGGER_2'}")
+  private SwaggerDocType docType = SwaggerDocType.SWAGGER_2;
 
   @ConditionalOnMissingBean
   @Bean
@@ -55,7 +76,7 @@ public class SwaggerConfiguration {
   public Docket docket(ApiInfo apiInfo,
                        @Autowired(required = false) List<SecurityScheme> securitySchemes,
                        @Autowired(required = false) List<SecurityContext> securityContexts) {
-    return new Docket(DocumentationType.OAS_30)
+    return new Docket(docType != null ? docType.getType() : DocumentationType.SWAGGER_2)
         .useDefaultResponseMessages(false)
         .forCodeGeneration(true)
         .select()
@@ -81,6 +102,7 @@ public class SwaggerConfiguration {
    * 需要增加swagger授权回调地址
    * http://localhost:8888/webjars/springfox-swagger-ui/o2c.html
    */
+  @ConditionalOnMissingBean
   @Bean
   public SecurityScheme securityScheme() {
     return new ApiKey(name, name, "header");
@@ -89,6 +111,7 @@ public class SwaggerConfiguration {
   /**
    * 新增 securityContexts 保持登录状态
    */
+  @ConditionalOnMissingBean
   @Bean
   public SecurityContext authSecurityContext() {
     return SecurityContext.builder()
@@ -100,6 +123,25 @@ public class SwaggerConfiguration {
         )
         .forPaths(PathSelectors.regex("^(?!auth).*$"))
         .build();
+  }
+
+  @EventListener(ApplicationReadyEvent.class)
+  public void onAppStart() {
+    EventLoop.io().schedule(() -> CatchUtils.tryThrow(() -> {
+      String ip = InetAddress.getLocalHost().getHostAddress();
+      String port = SpringCtxHolder.getServerPort();
+      String path = SpringCtxHolder.getServerContextPath();
+      String swaggerBaseUrl = SpringCtxHolder.getEnvProperty("springfox.documentation.swagger-ui.base-url");
+      swaggerBaseUrl = Utils.withs(swaggerBaseUrl, "/", "/");
+      String address = ip + ":" + port + path;
+      log.info("\n---------------------------------------------------------------------------------\n\t" +
+          "[ " + SpringCtxHolder.getAppName() + " ] is running! Access URLs:\n\t" +
+          "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
+          "External: \t\thttp://" + address + "/\n\t" +
+          "Swagger文档: \thttp://" + address + swaggerBaseUrl + "swagger-ui/index.html\n\t" +
+          "knife4j文档: \thttp://" + address + "/doc.html\n" +
+          "---------------------------------------------------------------------------------");
+    }), 3, TimeUnit.SECONDS);
   }
 
 }

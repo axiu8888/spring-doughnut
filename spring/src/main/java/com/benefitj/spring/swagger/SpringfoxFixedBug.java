@@ -1,7 +1,8 @@
 package com.benefitj.spring.swagger;
 
-import com.benefitj.core.DUtils;
 import com.benefitj.core.ShutdownHook;
+import com.benefitj.core.TimeUtils;
+import com.benefitj.core.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -36,9 +37,9 @@ public class SpringfoxFixedBug implements BeanPostProcessor {
       try {
         return provider.requestHandlers();
       } catch (Exception e) {
-        final long start = DUtils.now();
+        final long start = TimeUtils.now();
         ShutdownHook.register(() -> {
-          if (DUtils.diffNow(start) <= 60_000) {
+          if (TimeUtils.diffNow(start) <= 60_000) {
             log.error("\"springboot version >= 2.6 \"，建议配置[ spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER ]");
           }
         });

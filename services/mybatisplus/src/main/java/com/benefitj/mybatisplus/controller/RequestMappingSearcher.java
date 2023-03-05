@@ -1,6 +1,6 @@
 package com.benefitj.mybatisplus.controller;
 
-import com.benefitj.core.DUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.core.Regex;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
@@ -122,8 +122,8 @@ public class RequestMappingSearcher extends AnnotationBeanProcessor implements M
               sb.append(baseUrl, Math.min(index, baseUrl.length()), baseUrl.length());
               return sb.toString();
             })
-            .map(baseUrl -> DUtils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)
-            .map(baseUrl -> new KeyValue<>(baseUrl + DUtils.startWiths(kv.getKey(), "/"), kv.getValue())))
+            .map(baseUrl -> Utils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)
+            .map(baseUrl -> new KeyValue<>(baseUrl + Utils.startWiths(kv.getKey(), "/"), kv.getValue())))
         .collect(Collectors.toList());
   }
 

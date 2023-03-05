@@ -7,8 +7,6 @@ import com.benefitj.spring.swagger.EnableSwaggerApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.SecurityScheme;
 
 @EnableSwaggerApi
 @PropertySource(value = "classpath:swagger-api-info.properties", encoding = "UTF-8")
@@ -35,16 +33,6 @@ public class WebMvcConfig {
         return "4202f249987948758fbc063855787c60";
       }
     };
-  }
-
-  /***
-   * oauth2配置
-   * 需要增加swagger授权回调地址
-   * http://localhost:80/webjars/springfox-swagger-ui/o2c.html
-   */
-  @Bean
-  public SecurityScheme securityScheme() {
-    return new ApiKey("Authorization", "Authorization", "header");
   }
 
 }

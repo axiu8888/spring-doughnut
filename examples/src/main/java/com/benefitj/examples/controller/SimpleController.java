@@ -1,13 +1,12 @@
 package com.benefitj.examples.controller;
 
 import com.alibaba.fastjson2.JSON;
-import com.benefitj.core.DUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
 import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.examples.vo.MultipartForm;
-import com.benefitj.spring.BreakPointTransmissionHelper;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
@@ -74,7 +73,7 @@ public class SimpleController {
   @PostMapping("/upload")
   public ResponseEntity<?> uploadFile(@RequestParam("files") MultipartFile[] files) throws IOException {
     for (MultipartFile file : files) {
-      log.info("上传文件: {}, {}MB", file.getOriginalFilename(), DUtils.ofMB(file.getSize(), 2));
+      log.info("上传文件: {}, {}MB", file.getOriginalFilename(), Utils.ofMB(file.getSize(), 2));
       file.transferTo(IOUtils.createFile("D:/opt/tmp/", file.getOriginalFilename()));
     }
     return ResponseEntity.ok("上传成功");
@@ -85,7 +84,7 @@ public class SimpleController {
     File file = new File("D:/opt/tmp/", filename);
     HttpServletResponse response = ServletUtils.getResponse();
     if (file.exists() && file.isFile()) {
-      BreakPointTransmissionHelper.download(ServletUtils.getRequest(), response, file, filename);
+      ServletUtils.download(ServletUtils.getRequest(), response, file, filename);
     } else {
       if (file.isDirectory()) {
         response.sendError(400, "无法下载目录");

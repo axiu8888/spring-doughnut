@@ -12,7 +12,6 @@ dependencies {
 
   api 'cglib:cglib:3.3.0'
   api 'io.minio:minio:8.5.2'
-
-  api(project(":spring"))
+  api "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
 
 }

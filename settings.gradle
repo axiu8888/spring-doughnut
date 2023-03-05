@@ -40,7 +40,7 @@ include ":redis",
     ":redis:samples:publisher",
     ":redis:samples:subscriber"
 
-include ":influxdb"
+//include ":influxdb"
 include ":influxdb2"
 
 /**
@@ -74,6 +74,7 @@ include(
     ":services:jmods-export", // 导出执行环境
     ":services:mybatisplus", // mybatis
 //    ":services:http-proxy", // HTTP代理
+    ":services:file-server", // 文件服务
 )
 
 include ":examples"

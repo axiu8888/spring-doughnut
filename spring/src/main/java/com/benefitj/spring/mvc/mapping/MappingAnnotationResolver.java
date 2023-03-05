@@ -1,6 +1,6 @@
 package com.benefitj.spring.mvc.mapping;
 
-import com.benefitj.core.DUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.core.Regex;
 import com.benefitj.spring.annotation.AnnotationMetadata;
@@ -118,9 +118,9 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
         .collect(Collectors.toList()));
     ad.setPaths(Stream.of(baseUrls)
         .map(this::fillVariable)
-        .map(baseUrl -> DUtils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)
+        .map(baseUrl -> Utils.isEndWiths(baseUrl, "/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl)
         .flatMap(baseUrl -> Stream.of(paths.length > 0 ? paths : new String[]{""})
-            .map(path -> baseUrl + (StringUtils.isBlank(path) ? "" : DUtils.startWiths(path, "/")))
+            .map(path -> baseUrl + (StringUtils.isBlank(path) ? "" : Utils.startWiths(path, "/")))
         )
         .collect(Collectors.toList()));
     return ad;

@@ -12,4 +12,10 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 @Inherited
 public @interface PageBody {
+
+  /**
+   * 前缀
+   */
+  String value() default "";
+
 }

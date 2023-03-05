@@ -5,7 +5,7 @@ import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.concurrent.CancelableScheduledFuture;
-import com.benefitj.spring.BreakPointTransmissionHelper;
+import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.athenapdf.AthenapdfCall;
 import com.benefitj.spring.athenapdf.AthenapdfHelper;
@@ -153,7 +153,7 @@ public class AthenapdfController {
       cmd = call.getCmd();
     }
     try {
-      BreakPointTransmissionHelper.download(request, response, pdf, filename);
+      ServletUtils.download(request, response, pdf, filename);
     } finally {
       // 最终删除文件
       scheduleDeleteTimer(url, pdf);

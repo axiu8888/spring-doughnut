@@ -1,10 +1,13 @@
 package com.benefitj.spring.ctx;
 
+import com.benefitj.core.NetworkUtils;
+import com.benefitj.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
+import java.net.InetAddress;
 import java.util.Map;
 
 /**
@@ -147,6 +150,16 @@ public class SpringCtxHolder {
    */
   public static String getServerPort() {
     return getEnvProperty("server.port");
+  }
+
+  /**
+   * 获取服务器端口
+   */
+  public static String getBaseUrl() {
+    String ip = NetworkUtils.getLocalHost().getHostAddress();
+    String port = SpringCtxHolder.getServerPort();
+    String path = SpringCtxHolder.getServerContextPath();
+    return "http://" + ip + ":" + port + path;
   }
 
   /**

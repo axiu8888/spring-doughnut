@@ -1,6 +1,7 @@
 package com.benefitj.spring.mvc.query;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.benefitj.core.Utils;
 import com.benefitj.spring.mvc.CustomHandlerMethodArgumentResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -8,6 +9,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
 
 /**
@@ -34,10 +36,23 @@ public class QueryBodyArgumentResolver implements CustomHandlerMethodArgumentRes
   @Override
   public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                 NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    AnnotatedElement annotatedElement = parameter.getAnnotatedElement();
+    Annotation annotation = annotatedElement.getAnnotation(getAnnotationType());
     JSONObject json = new JSONObject();
+    String prefix;
+    if (annotation instanceof QueryBody) {
+      prefix = Utils.endWiths(((QueryBody) annotation).value(), ".");
+    } else if (annotation instanceof PageBody) {
+      prefix = Utils.endWiths(((PageBody) annotation).value(), ".");
+    } else {
+      prefix = "c.";
+    }
     webRequest.getParameterMap().forEach((name, values) ->
-        json.put(name.startsWith("condition.") ? name.replaceFirst("condition.", "") : name, values.length == 1 ? values[0] : values.length != 0 ? values : null));
-    Object condition = json.toJavaObject(((ParameterizedType)parameter.getGenericParameterType()).getActualTypeArguments()[0]);
+        json.put(name.startsWith(prefix)
+                ? name.replaceFirst(prefix, "")
+                : name
+            , values.length == 1 ? values[0] : values.length != 0 ? values : null));
+    Object condition = json.toJavaObject(((ParameterizedType) parameter.getGenericParameterType()).getActualTypeArguments()[0]);
     QueryRequest request = json.toJavaObject(getBodyType());
     request.setCondition(condition);
     request.setParameters(json);

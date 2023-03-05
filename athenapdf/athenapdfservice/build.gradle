@@ -20,7 +20,7 @@ dependencies {
 
   implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
   implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation "io.springfox:springfox-boot-starter:${swagger2Version}"
+  implementation "io.springfox:springfox-boot-starter:${swaggerVersion}"
 //  implementation "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
 
 }

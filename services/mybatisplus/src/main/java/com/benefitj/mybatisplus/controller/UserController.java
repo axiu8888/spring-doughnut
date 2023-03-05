@@ -6,7 +6,6 @@ import com.benefitj.mybatisplus.service.SysUserService;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.mvc.query.PageBody;
 import com.benefitj.spring.mvc.query.PageRequest;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,13 +27,13 @@ public class UserController {
 
   @ApiOperation("用户列表分页")
   @GetMapping("/page")
-  public HttpResult<PageInfo<SysUserEntity>> page(@PageBody PageRequest<SysUserEntity> page) {
+  public HttpResult<PageInfo<SysUserEntity>> page(@PageBody("p.") PageRequest<SysUserEntity> page) {
     return HttpResult.success(userService.getPage(page));
   }
 
   @ApiOperation("获取机构的菜单列表")
   @GetMapping("/list")
-  public HttpResult<List<SysUserEntity>> list(@PageBody PageRequest<SysUserEntity> page) {
+  public HttpResult<List<SysUserEntity>> list(@PageBody("p.") PageRequest<SysUserEntity> page) {
     return HttpResult.success(userService.getList(page.getCondition(), page.getStartTime(), page.getEndTime(), page.getMultiLevel()));
   }
 

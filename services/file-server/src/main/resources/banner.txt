@@ -1,0 +1,12 @@
+${AnsiColor.BRIGHT_BLUE}
+
+ ____  ____  __    ____      ___  ____  ____  _  _  ____  ____
+( ___)(_  _)(  )  ( ___)___ / __)( ___)(  _ \( \/ )( ___)(  _ \
+ )__)  _)(_  )(__  )__)(___)\__ \ )__)  )   / \  /  )__)  )   /
+(__)  (____)(____)(____)    (___/(____)(_)\_)  \/  (____)(_)\_)
+
+${AnsiColor.BRIGHT_GREEN}
+Powered by HSRG
+Version: 3.0
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BLACK}

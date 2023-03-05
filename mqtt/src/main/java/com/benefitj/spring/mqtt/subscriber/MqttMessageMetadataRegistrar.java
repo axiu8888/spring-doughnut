@@ -21,6 +21,7 @@ import org.springframework.messaging.Message;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * MQTT注册器
@@ -56,8 +57,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   @Override
   public void destroy() throws Exception {
-    singleClients.forEach(c -> CatchUtils.tryThrow(c::disconnect, Exception::printStackTrace));
-    CatchUtils.tryThrow(getClient()::disconnect, Exception::printStackTrace);
+    singleClients.forEach(c -> CatchUtils.tryThrow(c::disconnect, (Consumer<Exception>) Exception::printStackTrace));
+    CatchUtils.tryThrow(getClient()::disconnect, (Consumer<Exception>) Exception::printStackTrace);
   }
 
   @Override

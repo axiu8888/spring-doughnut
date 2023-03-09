@@ -32,7 +32,7 @@ ext {
   }
 }
 
-allprojects {
+subprojects {
 
   apply plugin: 'java'
 
@@ -49,7 +49,7 @@ allprojects {
     versionId = "${version}"
 
     // 默认是spring环境
-    springEnv = true
+    project.ext.springEnv = true
 
     manifestAttributes = [
         "version"   : "$version",

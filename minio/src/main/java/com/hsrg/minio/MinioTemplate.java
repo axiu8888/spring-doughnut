@@ -493,7 +493,7 @@ public class MinioTemplate {
                                              @Nonnull String bucketName) {
     Iterable<Result<Item>> results = getClient().listObjects(MinioUtils.newBucketArgs(builder.recursive(recursive), bucketName));
     return MinioUtils.removeResult().handle(r -> {
-      List<Item> items = Utils.itrToList(results)
+      List<Item> items = Utils.toList(results)
           .stream()
           .map(itemResult -> CatchUtils.tryThrow(itemResult::get, e -> {
             r.setMessage(e.getMessage());

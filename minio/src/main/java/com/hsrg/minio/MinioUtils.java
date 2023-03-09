@@ -318,7 +318,7 @@ public class MinioUtils {
       if (files != null && files.length > 0) {
         //src.getParentFile().getName()
         for (File file : files) {
-          String subPath = (basePath + "/" + src.getName()).replace("\\", "/").replace("//", "/");
+          String subPath = trimObjectName(basePath + "/" + src.getName());
           listObjects(list, file, subPath, recursive, mappedFunc, filter);
         }
       }
@@ -343,6 +343,28 @@ public class MinioUtils {
     return target;
   }
 
+  /**
+   * 检查键
+   */
+  public static boolean matchKey(String key) {
+    // 1~128个长度：^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
+    // 仅允许unicode等字符串：^([\p{L}\p{Z}\p{N}_.:/=+\-]*)$
+    return key.matches("^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-]*)$");
+  }
+
+  /**
+   * 检查值
+   */
+  public static boolean matchValue(String value) {
+    return value.matches("^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$");
+  }
+
+  public static String trimObjectName(String objectName) {
+    return objectName
+        .replace("\\", "/")
+        .replace("//", "/");
+  }
+
   public static String getNotNullStr(String str) {
     return getNotNullStr(str, "");
   }
@@ -352,19 +374,41 @@ public class MinioUtils {
   }
 
   /**
-   * 检查键
+   * 转换成Map
    */
-  public static boolean matchKey(String key) {
-    // 1~128个长度：^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
-    // 仅允许unicode等字符串：^([\p{L}\p{Z}\p{N}_.:/=+\-]*)$
-    return key.matches("^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-]*)$") ;
+  public static <V, K> Map<K, V> mapOf(Pair<K, V>... pairs) {
+    return Utils.mapOf(pairs);
   }
 
   /**
-   * 检查值
+   * URL 编码
    */
-  public static boolean matchValue(String value) {
-    return value.matches("^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$");
+  public static String encodeURL(String str) {
+    return CodecUtils.encodeURL(str);
+  }
+
+  /**
+   * URL 解码
+   */
+  public static String decodeURL(String str) {
+    return CodecUtils.decodeURL(str);
+  }
+
+  /**
+   * 获取前缀
+   */
+  public static String getObjectPrefix(String objectName) {
+    String name = trimObjectName(objectName);
+    int index = name.lastIndexOf("/");
+    return index > 0 ? name.substring(0, index) : "";
+  }
+
+  /**
+   * 获取后缀
+   */
+  public static String getSuffix(String name) {
+    int index = name.lastIndexOf(".");
+    return index > 0 ? name.substring(0, index) : "";
   }
 
 }

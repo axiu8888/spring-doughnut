@@ -8,8 +8,8 @@ plugins {
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
 dependencies {
-	api(project(":spring"))
-	api(project(":redis"))
-	compileOnly 'org.springframework.boot:spring-boot-starter'
+	implementation(project(":spring"))
+	implementation(project(":redis"))
+	implementation 'org.springframework.boot:spring-boot-starter'
 }
 

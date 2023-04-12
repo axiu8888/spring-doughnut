@@ -8,7 +8,6 @@ plugins {
 apply from: "${getRootDir()}/buildSystem/base.gradle"
 
 dependencies {
-
 	implementation(project(":spring"))
 	implementation(project(":redis"))
 

@@ -1,6 +1,5 @@
 package com.benefitj.mybatisplus;
 
-import com.benefitj.spring.listener.OnAppStart;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
@@ -12,18 +11,18 @@ public class MybatisPlusApp {
     SpringApplication.run(MybatisPlusApp.class, args);
   }
 
-  @OnAppStart
-  public void onAppStart() {
+//  @OnAppStart
+//  public void onAppStart() {
 //    EventLoop.io().schedule(() -> {
 //      SysUserEntity user = SysUserEntity.builder()
 //          .orgId("123456")
-//          .name("张三")
+//          .name("张三 \uD83D\uDE04")
 //          .birthday(TimeUtils.toDate(1984, 5, 22))
 //          .gender(GenderEnum.MALE)
 //          .locked(Boolean.FALSE)
 //          .build();
 //      SpringCtxHolder.getBean(SysUserService.class).insert(user);
 //    }, 3, TimeUnit.SECONDS);
-  }
+//  }
 
 }

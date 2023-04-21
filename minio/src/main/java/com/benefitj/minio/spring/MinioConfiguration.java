@@ -1,9 +1,9 @@
-package com.hsrg.minio.spring;
+package com.benefitj.minio.spring;
 
-import com.hsrg.minio.IMinioClient;
-import com.hsrg.minio.MinioOptions;
-import com.hsrg.minio.MinioTemplate;
-import com.hsrg.minio.MinioUtils;
+import com.benefitj.minio.IMinioClient;
+import com.benefitj.minio.MinioOptions;
+import com.benefitj.minio.MinioTemplate;
+import com.benefitj.minio.MinioUtils;
 import io.minio.MinioClient;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

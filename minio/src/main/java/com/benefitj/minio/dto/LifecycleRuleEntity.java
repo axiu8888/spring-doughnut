@@ -1,9 +1,8 @@
-package com.hsrg.minio.dto;
+package com.benefitj.minio.dto;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.minio.messages.AbortIncompleteMultipartUpload;
-import io.minio.messages.AndOperator;
 import io.minio.messages.LifecycleRule;
 import io.minio.messages.Status;
 

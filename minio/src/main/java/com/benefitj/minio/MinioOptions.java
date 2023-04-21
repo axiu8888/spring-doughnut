@@ -1,4 +1,4 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 

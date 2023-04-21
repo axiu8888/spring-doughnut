@@ -1,4 +1,4 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
 import java.util.function.Consumer;
 

@@ -1,4 +1,4 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.Utils;
@@ -743,38 +743,38 @@ public class MinioTemplate {
   /**
    * 拷贝一份新的对象（服务器上会多一份新的数据）
    *
-   * @param objectName       对象名
    * @param source           拷贝的源文件
+   * @param destObjectName   目标对象名
    * @param taggingDirective 触发指令：拷贝或替换
    * @param bucketName       桶
    * @return 返回拷贝结果
    */
-  public MinioResult<ObjectWriteResponse> copyObject(@Nonnull String objectName,
-                                                     @Nonnull CopySource source,
+  public MinioResult<ObjectWriteResponse> copyObject(@Nonnull CopySource source,
+                                                     @Nonnull String destObjectName,
                                                      @Nullable Directive taggingDirective,
                                                      @Nonnull String bucketName) {
-    return copyObject(CopyObjectArgs.builder(), objectName, source, taggingDirective, bucketName);
+    return copyObject(CopyObjectArgs.builder(), source, destObjectName, taggingDirective, bucketName);
   }
 
   /**
    * 拷贝一份新的对象（服务器上会多一份新的数据）
    *
    * @param builder          Builder参数
-   * @param objectName       对象名
    * @param source           拷贝的源文件
+   * @param destObjectName   目标对象名
    * @param taggingDirective 触发指令：拷贝或替换
    * @param bucketName       桶
    * @return 返回拷贝结果
    */
   public MinioResult<ObjectWriteResponse> copyObject(CopyObjectArgs.Builder builder,
-                                                     @Nonnull String objectName,
                                                      @Nonnull CopySource source,
+                                                     @Nonnull String destObjectName,
                                                      @Nullable Directive taggingDirective,
                                                      @Nonnull String bucketName) {
     getClient().copyObject(MinioUtils.newObjectArgs(builder
             .source(source)
             .taggingDirective(taggingDirective != null ? taggingDirective : Directive.COPY)
-        , objectName, bucketName));
+        , destObjectName, bucketName));
     return MinioUtils.removeResult();
   }
 

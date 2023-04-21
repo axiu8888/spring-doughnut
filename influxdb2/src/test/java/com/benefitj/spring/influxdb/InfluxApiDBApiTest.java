@@ -101,7 +101,7 @@ public class InfluxApiDBApiTest {
 
   @Test
   void testQueryChunk() {
-    IWriter writer = IWriter.newFileWriter(IOUtils.createFile("D:/home/influx/" + IdUtils.uuid() + ".line"));
+    IWriter writer = IWriter.newFileWriter("D:/home/influx/" + IdUtils.uuid() + ".line");
     template.query("SELECT * FROM hs_wave_package WHERE time >= 1d GROUP BY person_zid LIMIT 100;", 10)
         .subscribe(new QueryObserver() {
           @Override

@@ -3,17 +3,16 @@ package com.hsrg.fileserver.controller;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.*;
 import com.benefitj.core.functions.Pair;
-import com.benefitj.core.functions.StreamBuilder;
+import com.benefitj.minio.ContentType;
+import com.benefitj.minio.MinioResult;
+import com.benefitj.minio.MinioTemplate;
+import com.benefitj.minio.MinioUtils;
 import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.hsrg.fileserver.controller.vo.FileItemVo;
 import com.hsrg.fileserver.controller.vo.HttpResult;
 import com.hsrg.fileserver.controller.vo.UploadVo;
-import com.hsrg.minio.ContentType;
-import com.hsrg.minio.MinioResult;
-import com.hsrg.minio.MinioTemplate;
-import com.hsrg.minio.MinioUtils;
 import io.minio.GetObjectResponse;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
@@ -31,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,17 +45,15 @@ public class FileController {
   private MinioTemplate template;
 
   @ApiOperation("上传文件")
-  @PostMapping(value = "upload")
+  @PostMapping(value = "upload", consumes = "multipart/form-data;charset=utf-8")
   public HttpResult<List<FileItemVo>> upload(@ApiParam("桶") @RequestParam String bucketName,
                                              @ApiParam("保存路径") @RequestParam(required = false) String path,
-                                             @ApiParam(value = "元信息") @RequestPart(required = false) JSONObject metadata,
-                                             @ApiParam("文件列表") MultipartFile[] files) {
+                                             @ApiParam("元信息") @RequestPart(required = false) JSONObject metadata,
+                                             @ApiParam("文件列表") @RequestPart MultipartFile[] files) {
     if (StringUtils.isBlank(bucketName)) {
       return HttpResult.fail("缺少bucketName参数!");
     }
-    LinkedList<MultipartFile> list = StreamBuilder.of(new LinkedList<MultipartFile>())
-        .set(l -> l.addAll(Arrays.asList(files)), files != null && files.length > 0)
-        .get();
+    List<MultipartFile> list = files != null ? Arrays.asList(files) : Collections.emptyList();
     if (list.isEmpty()) {
       return HttpResult.fail("缺少可保存的文件");
     }
@@ -107,7 +104,7 @@ public class FileController {
   }
 
   @ApiOperation("下载文件")
-  @GetMapping(value = "download")
+  @GetMapping("download")
   public void download(HttpServletRequest request,
                        HttpServletResponse response,
                        @ApiParam("桶") String bucketName,

@@ -1,6 +1,8 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
-import com.benefitj.core.*;
+import com.benefitj.core.CatchUtils;
+import com.benefitj.core.CodecUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
 import com.benefitj.core.functions.StreamBuilder;
 import com.benefitj.core.local.LocalCache;
@@ -14,10 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -189,13 +189,7 @@ public class MinioUtils {
    * 获取一个文件的md5值
    */
   public static String md5(File src) {
-    try (final FileInputStream fis = new FileInputStream(src)) {
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
-      IOUtils.read(fis, 1024 << 4, true, (buf, len) -> md5.update(buf, 0, len));
-      return HexUtils.bytesToHex(md5.digest(), true);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
-    }
+    return CodecUtils.md5(src);
   }
 
   /**
@@ -373,9 +367,6 @@ public class MinioUtils {
     return str != null ? str : defaultValue;
   }
 
-  /**
-   * 转换成Map
-   */
   public static <V, K> Map<K, V> mapOf(Pair<K, V>... pairs) {
     return Utils.mapOf(pairs);
   }
@@ -395,16 +386,16 @@ public class MinioUtils {
   }
 
   /**
-   * 获取前缀
+   * 获取前缀：文件的路径
    */
-  public static String getObjectPrefix(String objectName) {
+  public static String getPrefix(String objectName) {
     String name = trimObjectName(objectName);
     int index = name.lastIndexOf("/");
     return index > 0 ? name.substring(0, index) : "";
   }
 
   /**
-   * 获取后缀
+   * 获取后缀：文件的后缀
    */
   public static String getSuffix(String name) {
     int index = name.lastIndexOf(".");

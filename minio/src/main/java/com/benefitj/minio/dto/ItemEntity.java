@@ -1,8 +1,8 @@
-package com.hsrg.minio.dto;
+package com.benefitj.minio.dto;
 
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.benefitj.core.ReflectUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.minio.messages.*;
 
 import java.time.ZonedDateTime;

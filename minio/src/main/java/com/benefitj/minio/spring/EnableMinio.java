@@ -1,4 +1,4 @@
-package com.hsrg.minio.spring;
+package com.benefitj.minio.spring;
 
 import org.springframework.context.annotation.Import;
 

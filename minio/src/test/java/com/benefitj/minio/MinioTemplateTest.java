@@ -1,14 +1,13 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
 import com.alibaba.fastjson2.JSON;
-import com.benefitj.core.CatchUtils;
 import com.benefitj.core.CodecUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
-import com.hsrg.minio.dto.ItemEntity;
-import com.hsrg.minio.dto.LifecycleRuleEntity;
-import com.hsrg.minio.spring.MinioConfiguration;
+import com.benefitj.minio.dto.ItemEntity;
+import com.benefitj.minio.dto.LifecycleRuleEntity;
+import com.benefitj.minio.spring.MinioConfiguration;
 import io.minio.*;
 import io.minio.messages.*;
 import org.junit.jupiter.api.AfterEach;
@@ -26,12 +25,17 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @SpringBootTest(classes = {MinioConfiguration.class})
 class MinioTemplateTest {
+  public static void main(String[] args) {
+    System.err.println("------");
+  }
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -72,7 +76,8 @@ class MinioTemplateTest {
   void test_listBuckets() {
     MinioResult<List<Bucket>> result = template.listBuckets();
     if (result.isSuccessful()) {
-      log.info("listBuckets ==>: {}", result.getData().stream()
+      log.info("listBuckets ==>: {}", result.getData()
+          .stream()
           .map(bucket -> String.format("[%s]", bucket.name() + ", " + bucket.creationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
           .collect(Collectors.toList()));
     } else {
@@ -94,10 +99,10 @@ class MinioTemplateTest {
   void test_setBucketTags() {
     // 一个桶设置
     String bucketName = "test";
-    MinioResult<Boolean> r = template.setBucketTags(Utils.mapOf(
-        Pair.of("Author", "dxa")
-        //, Pair.of("Description", MinioUtils.encode("测试"))
-    ), bucketName);
+    MinioResult<Boolean> r = template.setBucketTags(
+        Utils.mapOf(Pair.of("Author", "dxa")
+            //, Pair.of("Description", CodecUtils.encodeURL("测试"))
+        ), bucketName);
     if (r.isSuccessful()) {
       log.info("------------------------ 设置桶的标签 ------------------------");
       log.info("设置结果: {}, error: {}", r.isSuccessful(), r.getMessage());
@@ -205,7 +210,8 @@ class MinioTemplateTest {
     String bucketName = "test";
     ClassPathResource resource = new ClassPathResource("nginx-80.conf");
     File file = resource.getFile();
-    String objectName = "前缀/" + file.getName();
+    String prefix = "/测试/";
+    String objectName = prefix + file.getName();
     MinioResult<ObjectWriteResponse> result = template.uploadObject(objectName, file.getPath(), bucketName);
     if (result.isSuccessful()) {
       log.info("------------------------ 上传对象 ------------------------");
@@ -227,16 +233,15 @@ class MinioTemplateTest {
   @Test
   void test_uploadObjects() {
     String bucketName = "test";
-//    File dir = new File("D:\\home\\android\\debug");
-    File dir = new File("F:\\迅雷下载");
-
-    List<SnowballObject> objects = MinioUtils.listObjects(dir, "迅雷下载", MinioUtils::snowballObject);
+    File dir = new File("D:\\home\\android\\debug");
+    String prefix = "/测试/";
+    List<SnowballObject> objects = MinioUtils.listObjects(dir, prefix, MinioUtils::snowballObject);
     MinioResult<ObjectWriteResponse> result = template.uploadObjects(UploadSnowballObjectsArgs.builder()
             .objects(objects)
-            .userMetadata(Utils.mapOf(Pair.of("Author", "dxa"),
-                Pair.of("description", CodecUtils.encodeURL("测试"))))
-            .tags(Utils.mapOf(Pair.of("type", "test")))
-            .compression(false)
+            .userMetadata(MinioUtils.mapOf(Pair.of("Author", "dxa"),
+                Pair.of("description", MinioUtils.encodeURL("测试"))))
+            .tags(MinioUtils.mapOf(Pair.of("type", "test")))
+            .compression(true)
         , bucketName);
     if (result.isSuccessful()) {
       log.info("------------------------ 上传对象 ------------------------");
@@ -260,11 +265,10 @@ class MinioTemplateTest {
     String bucketName = "test";
     ClassPathResource resource = new ClassPathResource("nginx-80.conf");
     File file = resource.getFile();
-    String objectName =  file.getName();
+    String objectName = "测试/" + file.getName();
     MinioResult<ObjectWriteResponse> result = template.putObject(PutObjectArgs.builder()
             .contentType(ContentType.get(file.getName()))
             .stream(Files.newInputStream(file.toPath()), file.length(), PutObjectArgs.MIN_MULTIPART_SIZE)
-            .tags(Utils.mapOf(Pair.of("Author", "测试者")))
             .userMetadata(MinioUtils.getFileMetadata(file))
         , objectName, bucketName);
     if (result.isSuccessful()) {
@@ -281,15 +285,15 @@ class MinioTemplateTest {
     }
   }
 
-
   /**
    * 上传对象
    */
   @Test
   void test_putObjects() {
     String bucketName = "test";
-    File dir = new File("F:\\迅雷下载");
-    List<PutObjectArgs.Builder> builders = MinioUtils.listObjects(dir, "根目录", MinioUtils::putObjectArgs);
+    File dir = new File("D:\\home\\android");
+    String prefix = "/测试/";
+    List<PutObjectArgs.Builder> builders = MinioUtils.listObjects(dir, prefix, MinioUtils::putObjectArgs);
     MinioResult<List<ObjectWriteResponse>> result = template.putObjects(builders, bucketName);
     if (result.isSuccessful()) {
       log.info("------------------------ 上传对象 ------------------------");
@@ -333,7 +337,8 @@ class MinioTemplateTest {
   @Test
   void test_statObject() {
     String bucketName = "test";
-    String objectName = "nginx-802.conf";
+    String prefix = "/测试/";
+    String objectName = prefix + "nginx-802.conf";
     MinioResult<StatObjectResponse> result = template.statObject(objectName, bucketName);
     log.info("\n----------------------------------------\n");
     if (result.isSuccessful()) {
@@ -366,7 +371,8 @@ class MinioTemplateTest {
   @Test
   void test_getObject() throws UnsupportedEncodingException {
     String bucketName = "test";
-    String objectName = "nginx-80.conf";
+    String prefix = "/测试/";
+    String objectName = prefix + "nginx-80.conf";
     MinioResult<GetObjectResponse> result = template.getObject(GetObjectArgs.builder()
             .offset(0L)
             .length(100L)
@@ -392,7 +398,8 @@ class MinioTemplateTest {
   void test_downloadObject() {
     log.info("------------------------ 下载对象 ------------------------");
     String bucketName = "test";
-    String objectName = "nginx-80.conf";
+    String prefix = "/测试/";
+    String objectName = prefix + "nginx-80.conf";
     File file = IOUtils.createFile("D:/home/logs/tmp/nginx-80.conf");
     MinioResult<File> result = template.downloadObject(objectName, file.getPath(), true, bucketName);
     log.info("下载对象: {}, {}, {}, file.exist: {}", bucketName, objectName
@@ -418,12 +425,14 @@ class MinioTemplateTest {
   @Test
   void test_copyObject() {
     String bucketName = "test";
-    String srcObjectName = "nginx-80.conf";
+    String prefix = "/测试/";
+    String srcName = prefix + "nginx-80.conf";
+    String objectName = prefix + "copy_nginx-80.conf";
     CopySource source = CopySource.builder()
-        .object(srcObjectName) // 源对象
+        .object(srcName) // 源对象
         .bucket(bucketName) // 源对象的桶
         .build();
-    MinioResult<ObjectWriteResponse> result = template.copyObject("copy_" + srcObjectName, source, Directive.COPY, bucketName);
+    MinioResult<ObjectWriteResponse> result = template.copyObject(source, objectName, Directive.COPY, bucketName);
     if (result.isSuccessful()) {
       log.info("------------------------ 拷贝对象 ------------------------");
       ObjectWriteResponse response = result.getData();
@@ -474,7 +483,7 @@ class MinioTemplateTest {
     String bucketName = "test";
     String objectName = "nginx-80.conf";
     MinioResult<Boolean> r = template.setObjectTags(objectName
-        , Utils.mapOf(Pair.of("Author", "dxa"), Pair.of("Description", CodecUtils.encodeURL("测试")))
+        , MinioUtils.mapOf(Pair.of("Author", "dxa"), Pair.of("Description", MinioUtils.encodeURL("测试")))
         , bucketName);
     if (r.isSuccessful()) {
       log.info("------------------------ 设置对象标签 ------------------------");

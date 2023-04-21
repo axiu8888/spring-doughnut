@@ -1,8 +1,7 @@
-package com.hsrg.minio;
+package com.benefitj.minio;
 
 import io.minio.*;
 import io.minio.messages.*;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 import java.io.InputStream;
 import java.io.OutputStream;

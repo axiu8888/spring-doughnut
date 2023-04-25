@@ -1,5 +1,5 @@
 
-apply from: "${getRootDir()}/buildSystem/base.gradle"
+apply from: "${scriptFile}"
 
 dependencies {
   api fileTree(dir: 'libs', include: ['*.jar'])

@@ -1,7 +1,7 @@
 
 project.ext.springTest = true
 
-apply from: "${getRootDir()}/buildSystem/base.gradle"
+apply from: "${scriptFile}"
 
 sourceSets {
   main {

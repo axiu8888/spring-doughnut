@@ -1,6 +1,6 @@
 subprojects {
 
-  apply from: "${getRootDir()}/buildSystem/base.gradle"
+  apply from: "${scriptFile}"
 
   group = "com.benefitj.provider"
   // 更新 groupId

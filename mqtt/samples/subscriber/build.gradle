@@ -5,7 +5,7 @@ plugins {
 //  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
 }
 
-apply from: "${getRootDir()}/buildSystem/base.gradle"
+apply from: "${scriptFile}"
 
 dependencies {
   implementation(project(":spring"))

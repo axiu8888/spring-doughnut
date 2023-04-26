@@ -53,8 +53,17 @@ public class HttpLoggingHandler implements WebPointCutHandler {
     this.httpLoggingCustomizer = httpLoggingCustomizer;
   }
 
+  public boolean support(JoinPoint point) {
+    Method method = getMethod(point);
+    return method.isAnnotationPresent(HttpLoggingIgnore.class)
+        || method.getDeclaringClass().isAnnotationPresent(HttpLoggingIgnore.class);
+  }
+
   @Override
   public void doBefore(AopAdvice advice, JoinPoint point) {
+    if (support(point)) {
+      return;
+    }
     HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
     if (hlc.printable()) {
       ServletRequestAttributes attrs = getRequestAttributes();

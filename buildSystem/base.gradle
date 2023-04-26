@@ -12,17 +12,20 @@ apply plugin: 'java'
 
 // build后加载
 afterEvaluate {
-  tryCatch({ jar { tryCatch({ manifest.attributes(manifestAttributes) }) } })
-  tryCatch({ sourcesJar { tryCatch({ manifest.attributes(manifestAttributes) }) } })
-  tryCatch({ javadocJar { tryCatch({ manifest.attributes(manifestAttributes) }) } })
+  trying({
+    def ma = project.ext.manifestAttributes as Map
+    jar { manifest.attributes(ma) }
+    sourcesJar { manifest.attributes(ma) }
+    javadocJar { manifest.attributes(ma) }
+  })
 }
 
-tryCatch({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
+trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
 
 //archivesBaseName = "${getProject().name}"
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = trying({project.ext.compatibilityVersion}, JavaVersion.VERSION_1_8)
+targetCompatibility = trying({project.ext.compatibilityVersion}, JavaVersion.VERSION_1_8)
 
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
@@ -34,8 +37,8 @@ tasks.withType(Javadoc) {
   options.addStringOption('charSet', 'UTF-8')
 }
 
-tryCatch({
-  tryCatch({
+trying({
+  trying({
     jar {
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE
       from project.sourceSets.main.resources
@@ -75,6 +78,17 @@ configurations {
 }
 
 repositories {
+  trying({
+    maven {
+      url = repoUrl
+      allowInsecureProtocol = true
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+    }
+  })
+
   maven { url("https://maven.aliyun.com/repository/google") }
   maven { url("https://maven.aliyun.com/repository/central") }
   maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
@@ -83,17 +97,6 @@ repositories {
   maven { url 'https://repo.spring.io/milestone' }
   maven { url 'https://repo.spring.io/release' }
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-
-  tryCatch({
-    maven {
-      url = "${repoUrl}"
-      allowInsecureProtocol = true
-      credentials {
-        username "${repoUsername}"
-        password "${repoPassword}"
-      }
-    }
-  })
 }
 
 
@@ -106,7 +109,7 @@ ext {
   commonsLang3Version = "3.12.0"
   slf4jVersion = '2.0.6'
 
-  if (tryCatch({project.ext.springEnv}, false)) {
+  if (trying({ project.ext.springEnv }, false)) {
     set('springCloudVersion', "2021.0.0")
   }
 }
@@ -132,15 +135,14 @@ dependencies {
 
       "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
       "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
-  ]
+      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",]
 
   deps.forEach {
     implementation(it)
     testImplementation(it)
   }
 
-  if (tryCatch({project.ext.springEnv}, false) || tryCatch({project.ext.springTest}, false)) {
+  if (trying({ project.ext.springEnv }, false) || trying({ project.ext.springTest }, false)) {
     compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}")
 
@@ -156,12 +158,12 @@ dependencies {
 
 }
 
-if (tryCatch({project.ext.springEnv}, false) || tryCatch({project.ext.springTest}, false)) {
+if (trying({ project.ext.springEnv }, false) || trying({ project.ext.springTest }, false)) {
   tasks.named('test') {
     useJUnitPlatform()
   }
-  if(tryCatch({project.ext.springEnv}, false)) {
-    tryCatch({
+  if (trying({ project.ext.springEnv }, false)) {
+    trying({
       tasks.named('bootBuildImage') {
         builder = 'paketobuildpacks/builder:tiny'
         environment = ['BP_NATIVE_IMAGE': 'true']
@@ -175,8 +177,8 @@ afterEvaluate {
 
   //-----------------------------------------------------------------------------
   // 打包到一个jar中
-  tryCatch({
-    if (allInOne) {
+  trying({
+    if (trying({ project.ext.allInOne }, false)) {
       def rootDirPath = getRootDir().getAbsolutePath()
       jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -222,30 +224,23 @@ afterEvaluate {
 
   //-----------------------------------------------------------------------------
   // 上传到nexus
-  tryCatch({
+  trying({
     if (upload) {
       apply plugin: 'maven-publish'
 
-      def prop = new Properties()
-      prop.load(new FileReader("${getRootDir()}/nexus.properties"))
+      def props = new Properties()
+      props.load(new FileReader("${getRootDir()}/nexus.properties"))
 
       afterEvaluate {
         publishing {
           publications {
             maven(MavenPublication) {
-              //println("prop ===>: $prop")
-              //def artifactPrefix = ""
-              try {
-                artifactPrefix = artifactPrefix.isBlank() || artifactPrefix.endsWith("-") ? artifactPrefix : artifactPrefix + "-";
-              } catch (ignore) {
-                ext.artifactPrefix = ""
-              }
 
-              groupId "$groupId"
-              artifactId "${artifactPrefix}$archivesBaseName"
+              groupId "${project.ext.groupId}"
+              artifactId "${trying({ project.ext.artifactPrefix }, '')}${trying({ archivesBaseName }, project.name, true)}"
               version "$versionId"
 
-              //afterEvaluate { artifactId = "${artifactPrefix}${archivesBaseName}" }
+              //afterEvaluate { artifactId = "${project.ext.artifactPrefix}${project.ext.archivesBaseName}" }
 
               from components.java
               // 配置上传源码
@@ -256,12 +251,12 @@ afterEvaluate {
 
           repositories {
             maven {
-              url = "$versionId".endsWith('-SNAPSHOT') ? prop['repoSnapshot'] : prop['repoRelease']
+              url = "${project.ext.versionId}".endsWith('-SNAPSHOT') ? trying({ project.ext.repoSnapshot }) : trying({ project.ext.repoRelease })
               if (!url.toString().startsWith('file:/')) {
                 allowInsecureProtocol = true
                 credentials {
-                  username prop['repoUsername'] as String
-                  password prop['repoPassword'] as String
+                  username trying({ project.ext.repoUsername })
+                  password trying({ project.ext.repoPassword })
                 }
               }
             }
@@ -279,7 +274,7 @@ afterEvaluate {
  * @param path 查找项目的路径
  * @return 返回查找到的项目
  */
-static org.gradle.api.Project findProject(org.gradle.api.Project root, String path) {
+static Project findProject(Project root, String path) {
   for (def p : root.subprojects) {
     if (path.startsWith(p.getBuildDir().getAbsolutePath())) {
       return p
@@ -295,10 +290,13 @@ static org.gradle.api.Project findProject(org.gradle.api.Project root, String pa
   return null
 }
 
-static <V> V tryCatch(java.util.concurrent.Callable<V> call, Object... args) {
+static <V> V trying(java.util.concurrent.Callable<V> call, V ops = null, def print = false) {
   try {
     return call.call()
   } catch (Exception e) {
-    return args.length > 0 ? args[0] : null
+    if (print) {
+      e.printStackTrace()
+    }
+    return ops
   }
 }

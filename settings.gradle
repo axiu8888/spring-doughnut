@@ -25,20 +25,26 @@ include ":eventbus"
 /**
  * MQTT
  */
-include ":mqtt",
+include(
+    ":mqtt",
     ":mqtt:samples:publisher",
     ":mqtt:samples:subscriber"
-include ":vertx-mqtt",
+)
+include(
+    ":vertx-mqtt",
     ":vertx-mqtt:samples:mqtt-server",
     ":vertx-mqtt:samples:mqtt-subscriber",
     ":vertx-mqtt:samples:mqtt-publisher"
+)
 
 /**
  * redis
  */
-include ":redis",
+include(
+    ":redis",
     ":redis:samples:publisher",
     ":redis:samples:subscriber"
+)
 
 //include ":influxdb"
 include ":influxdb2"
@@ -46,7 +52,10 @@ include ":influxdb2"
 /**
  * athenapdf 调用docker生成PDF
  */
-include ":athenapdf", ":athenapdf:athenapdfservice"
+include(
+    ":athenapdf",
+    ":athenapdf:athenapdfservice"
+)
 
 /**
  * MinIO

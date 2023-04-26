@@ -2,7 +2,7 @@
 apply from: "${scriptFile}"
 
 // 上传到nexus/maven仓库
-ext.upload = true
+project.ext.upload = true
 
 dependencies {
   api(project(":spring"))

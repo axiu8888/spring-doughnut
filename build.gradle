@@ -1,23 +1,21 @@
 ext {
 
-  springbootVersion = "2.7.8"
-  springDependencyManagementVersion = "1.0.15.RELEASE"
-  springExperimentalAotVersion = "0.12.1"
-  graalvmBuildtoolsNativeVersion = "0.9.18"
-  springIntegrationVersion = "5.5.16"
+  springbootVersion = "3.0.6"
+  springDependencyManagementVersion = "1.1.0"
+  springIntegrationVersion = "6.0.5"
 
   aspectjVersion = "1.9.19"
   swaggerVersion = "3.0.0"
   jjwtVersion = "0.11.5"
-  nettyAllVersion = '4.1.85.Final'
-  vertxVersion = "4.3.7"
+  nettyAllVersion = '4.1.92.Final'
+  vertxVersion = "4.4.1"
 
   rxJavaVersion = '2.2.21'
   okHttpVersion = '4.10.0'
   retrofitVersion = '2.9.0'
 
-  mysqlVersion = "8.0.32"
-  druidVersion = "1.2.15"
+  mysqlVersion = "8.0.33"
+  druidVersion = "1.2.17"
   mybatisPlusVersion = "3.5.3"
   pagehelperVersion = "1.4.6"
 
@@ -27,7 +25,7 @@ ext {
     repoUrl = props["repoUrl"]
     repoUsername = props["repoUsername"]
     repoPassword = props["repoPassword"]
-  } catch(e) {
+  } catch (e) {
     e.printStackTrace()
   }
 
@@ -37,24 +35,20 @@ subprojects {
 
   apply plugin: 'java'
 
-
-
   group = "com.benefitj.spring"
-  version = "2.2.1-SNAPSHOT"
-
-  sourceCompatibility = JavaVersion.VERSION_15
-  targetCompatibility = JavaVersion.VERSION_15
+  version = "2.3.0-SNAPSHOT"
 
   ext {
+    compatibilityVersion = JavaVersion.VERSION_17
+    // 默认是spring环境
+    springEnv = true
     scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
+    //scriptFile = "${getRootDir()}/buildSystem/base.gradle"
 
     groupId = "$group"
     artifactPrefix = ""
     artifactId = "${getProject().name}"
     versionId = "${version}"
-
-    // 默认是spring环境
-    project.ext.springEnv = true
 
     manifestAttributes = [
         "version"   : "$version",
@@ -70,28 +64,6 @@ subprojects {
       compileOnly(commons)
       testImplementation(commons)
     }
-  }
-
-  repositories {
-    maven { url("https://maven.aliyun.com/repository/google") }
-    maven { url("https://maven.aliyun.com/repository/central") }
-    maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
-    maven { url("https://maven.aliyun.com/repository/public") }
-    maven { url("https://maven.aliyun.com/repository/jcenter") }
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/release' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    mavenCentral()
-    try{
-      maven {
-        url = "${repoUrl}"
-        allowInsecureProtocol = true
-        credentials {
-          username "${repoUsername}"
-          password "${repoPassword}"
-        }
-      }
-    } catch(e) {}
   }
 
 }

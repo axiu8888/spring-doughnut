@@ -1,17 +1,18 @@
+// 上传到nexus/maven仓库
+project.ext.upload = true
 
 apply from: "${scriptFile}"
 
-// 上传到nexus/maven仓库
-ext.upload = true
-
 dependencies {
 
-  compileOnly(project(":commons"))
+  def deps = [
+      project(":commons"),
+      "org.springframework.boot:spring-boot-starter-security:${springbootVersion}",
+      "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
+      "org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+  ]
 
-  compileOnly "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
-  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
-  compileOnly("org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}")
-
-  compileOnly "io.springfox:springfox-boot-starter:${swaggerVersion}"
+  deps.forEach { compileOnly(it) }
 
 }

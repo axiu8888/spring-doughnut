@@ -1,8 +1,11 @@
 ext {
 
-  springbootVersion = "3.0.6"
-  springDependencyManagementVersion = "1.1.0"
-  springIntegrationVersion = "6.0.5"
+//  springbootVersion = "3.0.6"
+//  springDependencyManagementVersion = "1.1.0"
+//  springIntegrationVersion = "6.0.5"
+  springbootVersion = "2.7.8"
+  springDependencyManagementVersion = "1.0.15.RELEASE"
+  springIntegrationVersion = "5.5.16"
 
   aspectjVersion = "1.9.19"
   swaggerVersion = "3.0.0"
@@ -39,7 +42,7 @@ subprojects {
   version = "2.3.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_17
+    compatibilityVersion = JavaVersion.VERSION_1_8
     // 默认是spring环境
     springEnv = true
     scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"

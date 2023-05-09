@@ -63,6 +63,7 @@ subprojects {
 
   dependencies {
     def commons = project(":commons")
+    //println("project ==>: ${project.name}")
     if (project != commons) {
       compileOnly(commons)
       testImplementation(commons)

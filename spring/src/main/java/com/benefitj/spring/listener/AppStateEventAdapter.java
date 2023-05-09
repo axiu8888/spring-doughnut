@@ -24,7 +24,7 @@ public class AppStateEventAdapter {
   /**
    * 程序启动
    */
-  @EventListener
+  @EventListener(ApplicationReadyEvent.class)
   public void onAppStart(ApplicationReadyEvent event) {
     processAppStart(registrar.listeners(), event);
     processAppStart(listeners, event);
@@ -45,7 +45,7 @@ public class AppStateEventAdapter {
   /**
    * 程序结束
    */
-  @EventListener
+  @EventListener(ContextClosedEvent.class)
   public void onAppStop(ContextClosedEvent event) {
     processAppStop(registrar.listeners(), event);
     processAppStop(listeners, event);

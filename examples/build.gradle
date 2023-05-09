@@ -10,21 +10,27 @@ apply from: "${scriptFile}"
 description = "examples"
 
 dependencies {
+
+  implementation(project(":commons"))
   implementation(project(":all")) {
     exclude module: "spring-boot-starter-quartz"
   }
 
-  implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation("org.springframework.boot:spring-boot-starter-websocket")
-  // redis
-  implementation "org.springframework.boot:spring-boot-starter-data-redis"
+  def deps = [
+      "org.springframework.boot:spring-boot-starter-web",
+      "org.springframework.boot:spring-boot-starter-websocket",
+      "org.springframework.boot:spring-boot-starter-data-redis",
 
-//  // QUARTZ
-//  implementation "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
-//  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
-//  //implementation 'com.h2database:h2:1.4.200'
-//  implementation "mysql:mysql-connector-java:8.0.23"
-//  implementation "com.alibaba:druid-spring-boot-starter:1.2.5"
+//      // QUARTZ
+//      "org.springframework.boot:spring-boot-starter-quartz",
+//      "org.springframework.boot:spring-boot-starter-data-jpa",
+//      "mysql:mysql-connector-java:8.0.23",
+//      "com.alibaba:druid-spring-boot-starter:1.2.5",
+  ]
+
+  deps.forEach {
+    implementation(it)
+  }
 
   testImplementation 'org.java-websocket:Java-WebSocket:1.5.2'
 

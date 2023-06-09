@@ -20,6 +20,7 @@ dependencies {
       "org.springframework.boot:spring-boot-starter-web",
       "org.springframework.boot:spring-boot-starter-websocket",
       "org.springframework.boot:spring-boot-starter-data-redis",
+      "org.springframework.boot:spring-boot-starter-data-mongodb",
 
 //      // QUARTZ
 //      "org.springframework.boot:spring-boot-starter-quartz",

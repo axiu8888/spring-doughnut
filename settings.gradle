@@ -25,11 +25,7 @@ include ":eventbus"
 /**
  * MQTT
  */
-include(
-    ":mqtt",
-    ":mqtt:samples:publisher",
-    ":mqtt:samples:subscriber"
-)
+include ":mqtt"
 include(
     ":vertx-mqtt",
     ":vertx-mqtt:samples:mqtt-server",
@@ -40,11 +36,7 @@ include(
 /**
  * redis
  */
-include(
-    ":redis",
-    ":redis:samples:publisher",
-    ":redis:samples:subscriber"
-)
+include ":redis"
 
 //include ":influxdb"
 include ":influxdb2"

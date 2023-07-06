@@ -7,6 +7,15 @@ ext {
   springDependencyManagementVersion = "1.0.15.RELEASE"
   springIntegrationVersion = "5.5.16"
 
+  lombokVersion = "1.18.28"
+  jacksonVersion = "2.14.1"
+  guavaVersion = '31.1-jre'
+  fastjson2Version = '2.0.22'
+  commonsIOVersion = "2.11.0"
+  commonsLang3Version = "3.12.0"
+  slf4jVersion = '2.0.6'
+  hutoolVersion = '5.8.18'
+
   aspectjVersion = "1.9.19"
   swaggerVersion = "3.0.0"
   jjwtVersion = "0.11.5"
@@ -45,8 +54,8 @@ subprojects {
     compatibilityVersion = JavaVersion.VERSION_1_8
     // 默认是spring环境
     springEnv = true
-    scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
-    //scriptFile = "${getRootDir()}/buildSystem/base.gradle"
+    //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
+    scriptFile = "${getRootDir()}/buildSystem/base.gradle"
 
     groupId = "$group"
     artifactPrefix = ""
@@ -68,6 +77,7 @@ subprojects {
       compileOnly(commons)
       testImplementation(commons)
     }
+
   }
 
   repositories {

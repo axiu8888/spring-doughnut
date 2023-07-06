@@ -11,4 +11,10 @@ dependencies {
 	api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
 	// redis
 	api "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
+
+//	def lombokVersion = "1.18.28"
+//	annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+//	implementation("org.projectlombok:lombok:${lombokVersion}")
+//	testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+//	testImplementation("org.projectlombok:lombok:${lombokVersion}")
 }

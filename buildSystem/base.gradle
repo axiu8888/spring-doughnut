@@ -24,8 +24,8 @@ trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleNa
 
 //archivesBaseName = "${getProject().name}"
 
-sourceCompatibility = trying({project.ext.compatibilityVersion}, JavaVersion.VERSION_1_8)
-targetCompatibility = trying({project.ext.compatibilityVersion}, JavaVersion.VERSION_1_8)
+sourceCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
+targetCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
 
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
@@ -101,14 +101,14 @@ repositories {
 
 
 ext {
-  lombokVersion = "1.18.24"
-  jacksonVersion = "2.14.1"
-  guavaVersion = '31.1-jre'
-  fastjson2Version = '2.0.22'
-  commonsIOVersion = "2.11.0"
-  commonsLang3Version = "3.12.0"
-  slf4jVersion = '2.0.6'
-  hutoolVersion = '5.8.18'
+  lombokVersion = trying({ rootProject.lombokVersion }, "1.18.28")
+  jacksonVersion = trying({ rootProject.jacksonVersion }, "2.14.1")
+  guavaVersion = trying({ rootProject.guavaVersion }, '31.1-jre')
+  fastjson2Version = trying({ rootProject.fastjson2Version }, '2.0.22')
+  commonsIOVersion = trying({ rootProject.commonsIOVersion }, "2.11.0")
+  commonsLang3Version = trying({ rootProject.commonsLang3Version }, "3.12.0")
+  slf4jVersion = trying({ rootProject.slf4jVersion }, '2.0.6')
+  hutoolVersion = trying({ rootProject.hutoolVersion }, '5.8.18')
 
   if (trying({ project.ext.springEnv }, false)) {
     set('springCloudVersion', "2021.0.0")
@@ -121,13 +121,14 @@ dependencies {
   compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
   annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-  implementation("org.projectlombok:lombok:${lombokVersion}")
+  compileOnly("org.projectlombok:lombok:${lombokVersion}")
 
+  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+  testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-  def deps = [
+  [
       //"javax.inject:javax.inject:1",
       //"com.google.code.findbugs:jsr305:3.0.2",
-      "org.projectlombok:lombok:${lombokVersion}",
       "commons-io:commons-io:${commonsIOVersion}",
       "org.apache.commons:commons-lang3:${commonsLang3Version}",
       "com.google.guava:guava:${guavaVersion}",
@@ -136,9 +137,8 @@ dependencies {
       "cn.hutool:hutool-all:${hutoolVersion}",
       "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
       "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",]
-
-  deps.forEach {
+      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+  ].forEach {
     implementation(it)
     testImplementation(it)
   }

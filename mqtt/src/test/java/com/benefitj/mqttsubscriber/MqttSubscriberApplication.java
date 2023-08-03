@@ -1,7 +1,7 @@
 package com.benefitj.mqttsubscriber;
 
-import com.benefitj.core.EventLoop;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
+import com.benefitj.spring.listener.EnableAppStateListener;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mqtt.subscriber.EnableMqttSubscriber;
 import com.benefitj.spring.mqtt.subscriber.MqttMessageListener;
@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 /**
  * MQTT消息订阅
  */
+@Slf4j
 @Profile("sub")
+@EnableAppStateListener
 @EnableMqttSubscriber
 @SpringBootApplication
 public class MqttSubscriberApplication {
@@ -23,11 +25,6 @@ public class MqttSubscriberApplication {
     SpringApplication.run(MqttSubscriberApplication.class, args);
   }
 
-  static {
-    EventLoop.main().execute(() -> {});
-  }
-
-  @Slf4j
   @Component
   public static class Example {
 
@@ -49,6 +46,7 @@ public class MqttSubscriberApplication {
         log.info("2.2 {}, payload: {}", topic, new String(msg.getPayload()));
       });
     }
+
   }
 
 }

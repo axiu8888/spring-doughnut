@@ -23,6 +23,10 @@ public class RedisSubscriberApplication {
     SpringApplication.run(RedisSubscriberApplication.class, args);
   }
 
+  static {
+    EventLoop.main().execute(() -> {});
+  }
+
 
   @Slf4j
   @Component

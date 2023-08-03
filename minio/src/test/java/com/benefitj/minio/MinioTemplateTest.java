@@ -1,7 +1,6 @@
 package com.benefitj.minio;
 
 import com.alibaba.fastjson2.JSON;
-import com.benefitj.core.CodecUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
@@ -10,11 +9,10 @@ import com.benefitj.minio.dto.LifecycleRuleEntity;
 import com.benefitj.minio.spring.MinioConfiguration;
 import io.minio.*;
 import io.minio.messages.*;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -30,14 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SpringBootTest(classes = {MinioConfiguration.class})
-class MinioTemplateTest {
-  public static void main(String[] args) {
-    System.err.println("------");
-  }
-
-  private final Logger log = LoggerFactory.getLogger(getClass());
+@Slf4j
+public class MinioTemplateTest {
 
   @Autowired
   MinioTemplate template;
@@ -183,9 +178,7 @@ class MinioTemplateTest {
         , bucketName
         , result.isSuccessful()
         , result.getMessage()
-        , JSON.toJSONString(result.getData()
-            .rules()
-            .stream()
+        , JSON.toJSONString((result.getData() != null ? result.getData().rules().stream() :  Stream.<LifecycleRule>empty())
             .map(LifecycleRuleEntity::from)
             .collect(Collectors.toList()))
     );
@@ -230,10 +223,11 @@ class MinioTemplateTest {
   /**
    * 上传对象
    */
+  @Deprecated
   @Test
   void test_uploadObjects() {
     String bucketName = "test";
-    File dir = new File("D:\\home\\android\\debug");
+    File dir = new File("D:/tmp/");
     String prefix = "/测试/";
     List<SnowballObject> objects = MinioUtils.listObjects(dir, prefix, MinioUtils::snowballObject);
     MinioResult<ObjectWriteResponse> result = template.uploadObjects(UploadSnowballObjectsArgs.builder()
@@ -291,7 +285,7 @@ class MinioTemplateTest {
   @Test
   void test_putObjects() {
     String bucketName = "test";
-    File dir = new File("D:\\home\\android");
+    File dir = new File("D:/tmp/");
     String prefix = "/测试/";
     List<PutObjectArgs.Builder> builders = MinioUtils.listObjects(dir, prefix, MinioUtils::putObjectArgs);
     MinioResult<List<ObjectWriteResponse>> result = template.putObjects(builders, bucketName);
@@ -338,7 +332,7 @@ class MinioTemplateTest {
   void test_statObject() {
     String bucketName = "test";
     String prefix = "/测试/";
-    String objectName = prefix + "nginx-802.conf";
+    String objectName = prefix + "nginx-80.conf";
     MinioResult<StatObjectResponse> result = template.statObject(objectName, bucketName);
     log.info("\n----------------------------------------\n");
     if (result.isSuccessful()) {
@@ -400,7 +394,7 @@ class MinioTemplateTest {
     String bucketName = "test";
     String prefix = "/测试/";
     String objectName = prefix + "nginx-80.conf";
-    File file = IOUtils.createFile("D:/home/logs/tmp/nginx-80.conf");
+    File file = IOUtils.createFile("D:/tmp/nginx-80.conf");
     MinioResult<File> result = template.downloadObject(objectName, file.getPath(), true, bucketName);
     log.info("下载对象: {}, {}, {}, file.exist: {}", bucketName, objectName
         , result.getMessage()

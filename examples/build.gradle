@@ -35,4 +35,6 @@ dependencies {
 
   testImplementation 'org.java-websocket:Java-WebSocket:1.5.2'
 
+  implementation "io.github.fanyong920:jvppeteer:1.1.5"
+
 }

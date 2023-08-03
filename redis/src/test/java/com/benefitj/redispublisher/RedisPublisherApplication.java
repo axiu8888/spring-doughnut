@@ -26,6 +26,7 @@ public class RedisPublisherApplication {
   }
 
   static {
+    EventLoop.main().execute(() -> {});
     AppStateHook.registerStart(e -> {
       final Logger log = LoggerFactory.getLogger(RedisPublisherApplication.class);
       // 启动主线程，防止程序自动自动退出

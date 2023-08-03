@@ -27,7 +27,7 @@ public class MinioConfiguration {
   @ConfigurationProperties("spring.minio")
   @ConditionalOnMissingBean
   @Bean
-  public MinioOptions minIOOptions() {
+  public MinioOptions minioOptions() {
     return new MinioOptions();
   }
 
@@ -50,7 +50,7 @@ public class MinioConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public MinioTemplate minIOTemplate(MinioOptions options,
+  public MinioTemplate minioTemplate(MinioOptions options,
                                      IMinioClient minioClient) {
     MinioTemplate template = new MinioTemplate();
     template.setOptions(options);

@@ -16,7 +16,8 @@ public class WebSocketTest {
   public void testWebSocketClient() {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    URI uri = URI.create("ws://127.0.0.1:80/api/sockets/simple");
+    //URI uri = URI.create("ws://127.0.0.1:80/api/sockets/simple");
+    URI uri = URI.create("/devtools/browser/87af382c-857c-40f5-a313-0f6e44144e8b");
     WebSocketClient client = new WebSocketClient(uri) {
       @Override
       public void onOpen(ServerHandshake handshakedata) {

@@ -2,29 +2,27 @@ package com.benefitj.spring.influxdb;
 
 import com.alibaba.fastjson2.JSON;
 import com.benefitj.core.DateFmtter;
-import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.file.IWriter;
 import com.benefitj.spring.influxdb.dto.QueryResult;
+import com.benefitj.spring.influxdb.spring.InfluxConfiguration;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
 import com.benefitj.spring.influxdb.template.QueryObserver;
 import com.benefitj.spring.influxdb.template.QuerySubscriber;
 import com.benefitj.spring.influxdb.template.ValueConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
 
-@SpringBootTest(classes = App.class)
+@SpringBootTest(classes = InfluxConfiguration.class)
+@Slf4j
 public class InfluxApiDBApiTest {
-
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   @Autowired
   InfluxTemplate template;

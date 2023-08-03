@@ -9,9 +9,15 @@ project.ext.upload = true
 
 dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+  testImplementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
 
-  api 'cglib:cglib:3.3.0'
-  api 'io.minio:minio:8.5.2'
-  api "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+  [
+      'cglib:cglib:3.3.0',
+      'io.minio:minio:8.5.2',
+      "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
+  ].forEach {
+    api(it)
+    testImplementation(it)
+  }
 
 }

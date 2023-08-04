@@ -11,6 +11,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
+import java.util.LinkedHashMap;
 
 /**
  * QueryBody参数解析
@@ -38,7 +39,7 @@ public class QueryBodyArgumentResolver implements CustomHandlerMethodArgumentRes
                                 NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
     AnnotatedElement annotatedElement = parameter.getAnnotatedElement();
     Annotation annotation = annotatedElement.getAnnotation(getAnnotationType());
-    JSONObject json = new JSONObject();
+    JSONObject json = new JSONObject(new LinkedHashMap());
     String prefix;
     if (annotation instanceof QueryBody) {
       prefix = Utils.endWiths(((QueryBody) annotation).value(), ".");

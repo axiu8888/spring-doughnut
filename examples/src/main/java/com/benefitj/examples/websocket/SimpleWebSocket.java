@@ -13,7 +13,7 @@ import org.springframework.web.socket.TextMessage;
 
 @Slf4j
 @Component
-@WebSocketEndpoint("/sockets/simple")
+@WebSocketEndpoint({"/sockets/simple"})
 public class SimpleWebSocket implements WebSocketListener {
 
   private WebSocketManager manager;

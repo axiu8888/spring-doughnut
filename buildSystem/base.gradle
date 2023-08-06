@@ -104,7 +104,7 @@ ext {
   lombokVersion = trying({ project.ext.lombokVersion }, "1.18.28")
   jacksonVersion = trying({ project.ext.jacksonVersion }, "2.14.1")
   guavaVersion = trying({ project.ext.guavaVersion }, '31.1-jre')
-  fastjson2Version = trying({ project.ext.fastjson2Version }, '2.0.22')
+  fastjson2Version = trying({ project.ext.fastjson2Version }, '2.0.38')
   commonsIOVersion = trying({ project.ext.commonsIOVersion }, "2.11.0")
   commonsLang3Version = trying({ project.ext.commonsLang3Version }, "3.12.0")
   slf4jVersion = trying({ project.ext.slf4jVersion }, '2.0.7')

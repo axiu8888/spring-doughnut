@@ -1,28 +1,16 @@
 package com.benefitj.spring.freemarker.ognl;
 
-import com.benefitj.core.ClasspathUtils;
-import com.benefitj.core.IOUtils;
-import com.benefitj.spring.freemarker.ClassDescriptor;
-import com.benefitj.spring.freemarker.CodeGenerator;
-import com.benefitj.spring.freemarker.FieldDescriptor;
-import junit.framework.TestCase;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class OgnlTest extends TestCase {
+public class OgnlTest  {
 
   @BeforeEach
-  @Before
   public void setUp() {
   }
 

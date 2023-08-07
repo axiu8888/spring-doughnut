@@ -27,6 +27,13 @@ trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleNa
 sourceCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
 targetCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
 
+compileJava {
+  options.compilerArgs << '-parameters' // 防止方法的参数名变成 arg0、arg1...
+}
+compileTestJava {
+  options.compilerArgs << '-parameters' // 防止方法的参数名变成 arg0、arg1...
+}
+
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
 }

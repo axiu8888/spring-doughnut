@@ -9,16 +9,15 @@ apply from: "${scriptFile}"
 
 description("http proxy")
 
-group = "http-proxy"
+group = "webspcket-relay"
 version = ''
 
 jar {
-  archivesBaseName = "http-proxy"
+  archivesBaseName = "webspcket-relay"
 }
 
 dependencies {
-  implementation("org.springframework.boot:spring-boot-starter")
-
-  implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.0-M1'
-
+  implementation(project(":all"))
+  implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation("org.springframework.boot:spring-boot-starter-websocket")
 }

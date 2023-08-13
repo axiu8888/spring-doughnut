@@ -1,0 +1,19 @@
+${AnsiColor.BRIGHT_BLUE}
+
+888       888          888            .d8888b.                    888               888         8888888b.          888
+888   o   888          888           d88P  Y88b                   888               888         888   Y88b         888
+888  d8b  888          888           Y88b.                        888               888         888    888         888
+888 d888b 888  .d88b.  88888b.        "Y888b.    .d88b.   .d8888b 888  888  .d88b.  888888      888   d88P .d88b.  888  8888b.  888  888
+888d88888b888 d8P  Y8b 888 "88b          "Y88b. d88""88b d88P"    888 .88P d8P  Y8b 888         8888888P" d8P  Y8b 888     "88b 888  888
+88888P Y88888 88888888 888  888            "888 888  888 888      888888K  88888888 888         888 T88b  88888888 888 .d888888 888  888
+8888P   Y8888 Y8b.     888 d88P      Y88b  d88P Y88..88P Y88b.    888 "88b Y8b.     Y88b.       888  T88b Y8b.     888 888  888 Y88b 888
+888P     Y888  "Y8888  88888P"        "Y8888P"   "Y88P"   "Y8888P 888  888  "Y8888   "Y888      888   T88b "Y8888  888 "Y888888  "Y88888
+                                                                                                                                     888
+                                                                                                                                Y8b d88P
+                                                                                                                                 "Y88P"
+
+${AnsiColor.BRIGHT_GREEN}
+Powered by HSRG
+Version: 3.0
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BLACK}

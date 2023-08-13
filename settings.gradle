@@ -68,14 +68,14 @@ include ":freemarker"
  * MQTT的权限配置 、 mqtt与eventbus配置使用
  */
 include(
-    ":providers:mqtt-acl-redis", // emqx 权限配置
+    ":providers:mqtt-acl-redis",                 // emqx 权限配置
 )
 
 include(
-    ":services:jmods-export", // 导出执行环境
-    ":services:mybatisplus", // mybatis
-//    ":services:http-proxy", // HTTP代理
-    ":services:file-server", // 文件服务
+    ":services:jmods-export",                    // 导出执行环境
+    ":services:mybatisplus",                     // mybatis
+    ":services:websocket-relay",                 // 代理中继
+    ":services:file-server",                     // 文件服务
 )
 
 include ":examples"

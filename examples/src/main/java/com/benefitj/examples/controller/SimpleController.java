@@ -14,6 +14,8 @@ import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
 import com.benefitj.spring.mvc.query.PageRequest;
 import com.benefitj.spring.mvc.query.PageBody;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Slf4j
+@Api("测试demo")
 @AopWebPointCut
 @RestController
 @RequestMapping("/simple")
@@ -33,12 +36,14 @@ public class SimpleController {
   @Autowired
   private EventBusPoster poster;
 
+  @ApiOperation("限流: 5")
   @AopRateLimiter(qps = 5)
   @GetMapping("rateLimiter")
   public ResponseEntity<?> testRateLimiter(String id) {
     return ResponseEntity.ok("rateLimiter ==>: " + id + "\r\n" + "ip: " + ServletUtils.getIp() + "\n" + JSON.toJSONString(ServletUtils.getHeaderMap()));
   }
 
+  @ApiOperation("获取ID: 测试EventBus")
   @GetMapping
   public ResponseEntity<?> get(String id) {
     poster.postSync(RawEvent.of(id));
@@ -50,12 +55,14 @@ public class SimpleController {
   }
 
   @AopIgnore
+  @ApiOperation("忽略EventBus")
   @GetMapping("/notPrint")
   public ResponseEntity<?> notPrint(String id) {
     return ResponseEntity.ok("id ==>: " + id);
   }
 
 
+  @ApiOperation("GET表单")
   @GetMapping("/form")
   public ResponseEntity<?> form(/*@GetBody*/ String id1, MultipartForm form, String id2) {
     System.err.println("id1 ==>: " + id1);
@@ -63,6 +70,7 @@ public class SimpleController {
     return ResponseEntity.ok("form ==>: " + JSON.toJSONString(form));
   }
 
+  @ApiOperation("GET Page转换")
   @GetMapping("/page")
   public ResponseEntity<?> page(String id1, @PageBody PageRequest<MultipartForm> form, String id2) {
     System.err.println("id1 ==>: " + id1);
@@ -70,18 +78,21 @@ public class SimpleController {
     return ResponseEntity.ok("form ==>: " + JSON.toJSONString(form));
   }
 
+  @ApiOperation("上传文件")
   @PostMapping("/upload")
   public ResponseEntity<?> uploadFile(@RequestParam("files") MultipartFile[] files) throws IOException {
     for (MultipartFile file : files) {
       log.info("上传文件: {}, {}MB", file.getOriginalFilename(), Utils.ofMB(file.getSize(), 2));
-      file.transferTo(IOUtils.createFile("D:/opt/tmp/", file.getOriginalFilename()));
+      file.transferTo(IOUtils.createFile("D:/tmp/", file.getOriginalFilename()));
     }
     return ResponseEntity.ok("上传成功");
   }
 
+
+  @ApiOperation("下载文件")
   @GetMapping("/download")
   public void downloadFile(@RequestParam("filename") String filename) throws IOException {
-    File file = new File("D:/opt/tmp/", filename);
+    File file = new File("D:/tmp/", filename);
     HttpServletResponse response = ServletUtils.getResponse();
     if (file.exists() && file.isFile()) {
       ServletUtils.download(ServletUtils.getRequest(), response, file, filename);

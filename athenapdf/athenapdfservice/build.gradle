@@ -11,17 +11,18 @@ version = ''
 archivesBaseName = "athenapdfservice"
 
 dependencies {
-  implementation(project(":commons"))
-  implementation(project(":aop"))
+
+  [
+      project(":commons"),
+      project(":aop"),
+      project(":athenapdf"),
+
+      "org.springframework.boot:spring-boot-starter-web",
+  ].forEach { api(it) }
+
   implementation(project(":spring")) {
     exclude module: "spring-boot-starter-security"
   }
-  implementation(project(":athenapdf"))
-
-  implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
-  implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation "io.springfox:springfox-boot-starter:${swaggerVersion}"
-//  implementation "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
 
 }
 

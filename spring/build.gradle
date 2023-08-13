@@ -5,14 +5,18 @@ apply from: "${scriptFile}"
 
 dependencies {
 
-  def deps = [
+  [
       project(":commons"),
       "org.springframework.boot:spring-boot-starter-security:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}",
-      "io.springfox:springfox-boot-starter:${swaggerVersion}",
-  ]
+  ].forEach { compileOnly(it) }
 
-  deps.forEach { compileOnly(it) }
+  [
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      //"com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+      "com.github.xiaoymin:knife4j-openapi3-spring-boot-starter:${knife4jVersion}",
+      //"com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3",
+  ].forEach { api(it) }
 
 }

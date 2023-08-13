@@ -1,9 +1,15 @@
+${AnsiColor.BRIGHT_BLUE}
 
-                              _       
-                             | |      
-  ____ _   _ ____ ____  ____ | | ____ 
- / _  | \ / ) _  |    \|  _ \| |/ _  )
-( (/ / ) X ( ( | | | | | | | | ( (/ / 
- \____|_/ \_)_||_|_|_|_| ||_/|_|\____)
-                       |_|
+d88888b      db    db       .d8b.       .88b  d88.      d8888b.      db           d88888b      .d8888.
+88'          `8b  d8'      d8' `8b      88'YbdP`88      88  `8D      88           88'          88'  YP
+88ooooo       `8bd8'       88ooo88      88  88  88      88oodD'      88           88ooooo      `8bo.
+88~~~~~       .dPYb.       88~~~88      88  88  88      88~~~        88           88~~~~~        `Y8b.
+88.          .8P  Y8.      88   88      88  88  88      88           88booo.      88.          db   8D
+Y88888P      YP    YP      YP   YP      YP  YP  YP      88           Y88888P      Y88888P      `8888Y'
 
+
+${AnsiColor.BRIGHT_GREEN}
+Powered by HSRG
+Version: 3.0
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BLACK}

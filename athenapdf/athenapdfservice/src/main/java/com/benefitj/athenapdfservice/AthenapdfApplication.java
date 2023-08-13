@@ -1,12 +1,12 @@
 package com.benefitj.athenapdfservice;
 
-import com.benefitj.core.StackLogger;
 import com.benefitj.core.cmd.CmdCall;
 import com.benefitj.core.cmd.CmdExecutor;
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,6 +17,7 @@ import org.springframework.context.annotation.PropertySource;
 @EnableHttpLoggingHandler
 @EnableAthenapdf
 @SpringBootApplication
+@Slf4j
 public class AthenapdfApplication {
   public static void main(String[] args) {
     SpringApplication.run(AthenapdfApplication.class, args);
@@ -31,12 +32,12 @@ public class AthenapdfApplication {
       CmdCall call = CmdExecutor.get().call("docker -v");
       //Docker version 20.10.10, build b485636
       if (StringUtils.isNotBlank(call.getMessage())) {
-        StackLogger.getLogger().info(call.getMessage());
+        log.info(call.getMessage());
       } else {
-        StackLogger.getLogger().info("不支持【docker -v】命令\nmessage: {}\nerror: {}", call.getMessage(), call.getError());
+        log.info("不支持【docker -v】命令\nmessage: {}\nerror: {}", call.getMessage(), call.getError());
       }
     } catch (Exception e) {
-      StackLogger.getLogger().error("不支持【docker -v】命令, error: " + e.getMessage(), e);
+      log.error("不支持【docker -v】命令, error: " + e.getMessage(), e);
     }
   }
 }

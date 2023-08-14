@@ -138,10 +138,12 @@ public class InfluxUtils {
         })
         .flatMap(series -> {
           List<String> columns = series.getColumns();
+          String column;
           for (int i = 0; i < columns.size(); i++) {
-            final FieldKey fieldKey = fieldKeys.get(columns.get(i));
+            column = columns.get(i);
+            final FieldKey fieldKey = fieldKeys.get(column);
             if (fieldKey == null) {
-              throw new IllegalArgumentException("not found column[\"" + columns.get(i) + "\"]");
+              throw new IllegalArgumentException("not found column[\"" + column + "\"]");
             }
             fieldKey.setIndex(i);
           }
@@ -220,6 +222,18 @@ public class InfluxUtils {
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Every JRE must support UTF-8", e);
     }
+  }
+
+  /**
+   * 是否不为空
+   */
+  public static boolean isNoneBlank(final CharSequence ...cs) {
+    for (CharSequence c : cs) {
+      if (isBlank(c)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

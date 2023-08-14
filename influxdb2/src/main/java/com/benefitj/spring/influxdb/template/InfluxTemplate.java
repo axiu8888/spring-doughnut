@@ -16,8 +16,7 @@ import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -175,7 +174,7 @@ public interface InfluxTemplate {
    * @param batchPoints     批量写入的文件
    */
   default void write(String db, String retentionPolicy, InfluxApi.ConsistencyLevel consistency, File batchPoints) {
-    write(db, retentionPolicy, consistency, RequestBody.create(MEDIA_TYPE_STRING, batchPoints));
+    write(db, retentionPolicy, consistency, RequestBody.create(batchPoints, MEDIA_TYPE_STRING));
   }
 
   /**
@@ -207,6 +206,7 @@ public interface InfluxTemplate {
                      TimeUnit precision,
                      InfluxApi.ConsistencyLevel consistency,
                      RequestBody batchPoints) {
+    AtomicReference<Throwable> error = new AtomicReference<>();
     write(db, retentionPolicy, precision, consistency, batchPoints, response -> {
       if (!response.isSuccessful()) {
         try {
@@ -215,7 +215,10 @@ public interface InfluxTemplate {
           throw new IllegalStateException(e);
         }
       }
-    }, Throwable::printStackTrace);
+    }, error::set);
+    if (error.get() != null) {
+      throw new IllegalStateException(error.get());
+    }
   }
 
   /**
@@ -763,6 +766,79 @@ public interface InfluxTemplate {
   default List<QueryResult.Result> getResults(String db, String query) {
     QueryResult queryResult = postQuery(db, query);
     return getResults(queryResult);
+  }
+
+  /**
+   * 导出成文件
+   *
+   * @param out         输出的流
+   * @param measurement 表名
+   * @param chunkSize   块大小，即每次分批给多少条数据
+   * @param startTime   开始时间
+   * @param endTime     结束时间
+   * @param condition   条件：AND deviceId = '123456' AND status = 1
+   * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
+   */
+  default boolean export(File out, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
+    try (final BufferedWriter writer = new BufferedWriter(new FileWriter(out));) {
+      return export(writer, measurement, chunkSize, startTime, endTime, condition);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 导出成文件
+   *
+   * @param out         输出的流
+   * @param measurement 表名
+   * @param chunkSize   块大小，即每次分批给多少条数据
+   * @param startTime   开始时间
+   * @param endTime     结束时间
+   * @param condition   条件：AND deviceId = '123456' AND status = 1
+   * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
+   */
+  default boolean export(Writer out, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
+    return export(out, getDatabase(), getRetentionPolicy(), measurement, chunkSize, startTime, endTime, condition);
+  }
+
+  /**
+   * 导出成文件
+   *
+   * @param out             输出的流
+   * @param db              数据库
+   * @param retentionPolicy 策略
+   * @param measurement     表名
+   * @param chunkSize       块大小，即每次分批给多少条数据
+   * @param startTime       开始时间
+   * @param endTime         结束时间
+   * @param condition       条件：AND deviceId = '123456' AND status = 1
+   * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
+   */
+  default boolean export(Writer out, String db, String retentionPolicy, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
+    Map<String, FieldKey> fieldKeyMap = getFieldKeyMap(db, retentionPolicy, measurement, true);
+    if (fieldKeyMap.isEmpty()) {
+      return false;
+    }
+    String sql = "SELECT * FROM \"" + measurement + "\" " + String.join(" ",
+        (startTime != null && endTime != null ? "WHERE" : "")
+        , (startTime != null ? "time >= '" + DateFmtter.fmtUtcS(startTime) + "'" : "")
+        , (endTime != null ? "AND time <= '" + DateFmtter.fmtUtcS(endTime) + "'" : "")
+        , condition.trim()
+    );
+    AtomicReference<Throwable> error = new AtomicReference<>();
+    query(db, sql, chunkSize)
+        .subscribe(queryResult -> {
+          List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
+          out.write(points.stream()
+              .map(Point::lineProtocol)
+              .collect(Collectors.joining("\n")));
+          out.flush();
+        }, error::set);
+    if (error.get() != null) {
+      throw new IllegalStateException(error.get());
+    }
+    return true;
   }
 
 }

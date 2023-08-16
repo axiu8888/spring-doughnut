@@ -6,6 +6,11 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.lang.annotation.*;
 
 
+/**
+ * WebSocket 端点
+ *
+ * @author Administrator
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

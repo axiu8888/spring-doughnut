@@ -1,4 +1,4 @@
-package com.benefitj.websocketrelay.payload;
+package com.benefitj.websocketrelay.message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -29,7 +29,7 @@ public class Message {
   /**
    * 消息类型
    */
-  Type msgType;
+  Type type;
   /**
    * 消息 ID
    */

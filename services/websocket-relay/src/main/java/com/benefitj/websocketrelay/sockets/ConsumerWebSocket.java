@@ -5,7 +5,6 @@ import com.benefitj.spring.websocket.WebSocket;
 import com.benefitj.spring.websocket.WebSocketEndpoint;
 import com.benefitj.spring.websocket.WebSocketListener;
 import com.benefitj.spring.websocket.WebSocketManager;
-import com.benefitj.websocketrelay.payload.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.stereotype.Component;
@@ -25,11 +24,6 @@ public class ConsumerWebSocket implements WebSocketListener {
   public static WebSocketManager getManager() {
     return managerRef.get();
   }
-
-  public static void send(String clientId, Message msg) {
-
-  }
-
 
   final JSONObject platform = new JSONObject();
 

@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.lang.reflect.Constructor;
 import java.util.Collection;
 
 /**
@@ -26,9 +25,9 @@ public class AutoWebSocketConfiguration extends DelegatingWebSocketConfiguration
 
   private ConfigurableListableBeanFactory beanFactory;
 
-  @ConditionalOnMissingBean(name = "webSocketFactory")
-  @Bean("webSocketFactory")
-  public WebSocketFactory webSocketFactory() {
+  @ConditionalOnMissingBean(name = "websocketFactory")
+  @Bean("websocketFactory")
+  public WebSocketFactory websocketFactory() {
     return WebSocketFactory.INSTANCE;
   }
 
@@ -78,25 +77,4 @@ public class AutoWebSocketConfiguration extends DelegatingWebSocketConfiguration
     }
   }
 
-  private WebSocketManager newManager(Class<? extends WebSocketManager> type) {
-    try {
-      Constructor<?>[] constructors = type.getConstructors();
-      WebSocketManager manager = null;
-      for (Constructor<?> c : constructors) {
-        if (c.getParameterCount() == 0) {
-          c.setAccessible(true);
-          manager = (WebSocketManager) c.newInstance();
-        }
-      }
-      if (manager == null) {
-        manager = type.newInstance();
-      }
-      if (manager == null) {
-        throw new IllegalStateException();
-      }
-      return manager;
-    } catch (Exception e) {
-      throw new IllegalStateException("无法实例化WebSocketManager对象，请指定一个无参的构造!");
-    }
-  }
 }

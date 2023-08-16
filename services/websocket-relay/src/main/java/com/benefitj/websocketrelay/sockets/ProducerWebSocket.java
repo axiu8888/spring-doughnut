@@ -6,9 +6,7 @@ import com.benefitj.spring.websocket.WebSocket;
 import com.benefitj.spring.websocket.WebSocketEndpoint;
 import com.benefitj.spring.websocket.WebSocketListener;
 import com.benefitj.spring.websocket.WebSocketManager;
-import com.benefitj.websocketrelay.payload.Message;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
@@ -50,14 +48,14 @@ public class ProducerWebSocket implements WebSocketListener {
 
     JSONObject json = JSON.parseObject(message.getPayload());
     String clientId = json.getString("clientId");
-    ConsumerWebSocket.send(clientId, Message.builder()
-        .socket(socket)
-        .id(json.getString("id"))
-        .clientId(clientId)
-        .method(json.getString("method"))
-        .params(json.getJSONObject("result"))
-        .error(json.getJSONObject("error"))
-        .build());
+//    ConsumerWebSocket.send(clientId, Message.builder()
+//        .socket(socket)
+//        .id(json.getString("id"))
+//        .clientId(clientId)
+//        .method(json.getString("method"))
+//        .params(json.getJSONObject("result"))
+//        .error(json.getJSONObject("error"))
+//        .build());
   }
 
   @Override

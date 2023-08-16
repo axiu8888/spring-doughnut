@@ -833,6 +833,7 @@ public interface InfluxTemplate {
           out.write(points.stream()
               .map(Point::lineProtocol)
               .collect(Collectors.joining("\n")));
+          out.write("\n");
           out.flush();
         }, error::set);
     if (error.get() != null) {

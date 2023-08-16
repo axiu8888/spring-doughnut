@@ -42,318 +42,7 @@ public class Point {
   private static final ThreadLocal<StringBuilder> CACHED_STRINGBUILDERS =
           ThreadLocal.withInitial(() -> new StringBuilder(DEFAULT_STRING_BUILDER_SIZE));
 
-  Point() {
-  }
-
-  /**
-   * Create a new Point Build build to create a new Point in a fluent manner.
-   *
-   * @param measurement
-   *            the name of the measurement.
-   * @return the Builder to be able to add further Builder calls.
-   */
-
-  public static Builder measurement(final String measurement) {
-    return new Builder(measurement);
-  }
-
-  /**
-   * Create a new Point Build build to create a new Point in a fluent manner from a POJO.
-   *
-   * @param clazz Class of the POJO
-   * @return the Builder instance
-   */
-
-  public static Builder measurementByPOJO(final Class<?> clazz) {
-    Objects.requireNonNull(clazz, "clazz");
-    throwExceptionIfMissingAnnotation(clazz, Measurement.class);
-    String measurementName = findMeasurementName(clazz);
-    return new Builder(measurementName);
-  }
-
-  private static void throwExceptionIfMissingAnnotation(final Class<?> clazz,
-      final Class<? extends Annotation> expectedClass) {
-    if (!clazz.isAnnotationPresent(expectedClass)) {
-      throw new IllegalArgumentException("Class " + clazz.getName() + " is not annotated with @"
-          + Measurement.class.getSimpleName());
-    }
-  }
-
-  /**
-   * Builder for a new Point.
-   *
-   * @author stefan.majer [at] gmail.com
-   *
-   */
-  public static final class Builder {
-    private static final BigInteger NANOSECONDS_PER_SECOND = BigInteger.valueOf(1000000000L);
-    private final String measurement;
-    private final Map<String, String> tags = new TreeMap<>();
-    private Number time;
-    private TimeUnit precision;
-    private final Map<String, Object> fields = new TreeMap<>();
-
-    /**
-     * @param measurement
-     */
-    Builder(final String measurement) {
-      this.measurement = measurement;
-    }
-
-    /**
-     * Add a tag to this point.
-     *
-     * @param tagName
-     *            the tag name
-     * @param value
-     *            the tag value
-     * @return the Builder instance.
-     */
-    public Builder tag(final String tagName, final String value) {
-      Objects.requireNonNull(tagName, "tagName");
-      Objects.requireNonNull(value, "value");
-      if (!tagName.isEmpty() && !value.isEmpty()) {
-        tags.put(tagName, value);
-      }
-      return this;
-    }
-
-    /**
-     * Add a Map of tags to add to this point.
-     *
-     * @param tagsToAdd
-     *            the Map of tags to add
-     * @return the Builder instance.
-     */
-    public Builder tag(final Map<String, String> tagsToAdd) {
-      for (Entry<String, String> tag : tagsToAdd.entrySet()) {
-        tag(tag.getKey(), tag.getValue());
-      }
-      return this;
-    }
-
-    /**
-     * Add a field to this point.
-     *
-     * @param field
-     *            the field name
-     * @param value
-     *            the value of this field
-     * @return the Builder instance.
-     */
-    @SuppressWarnings("checkstyle:finalparameters")
-    @Deprecated
-    public Builder field(final String field, Object value) {
-      if (value instanceof Number) {
-        if (value instanceof Byte) {
-          value = ((Byte) value).doubleValue();
-        } else if (value instanceof Short) {
-          value = ((Short) value).doubleValue();
-        } else if (value instanceof Integer) {
-          value = ((Integer) value).doubleValue();
-        } else if (value instanceof Long) {
-          value = ((Long) value).doubleValue();
-        } else if (value instanceof BigInteger) {
-          value = ((BigInteger) value).doubleValue();
-        }
-      }
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final boolean value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final long value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final double value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final int value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final float value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final short value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final Number value) {
-      fields.put(field, value);
-      return this;
-    }
-
-    public Builder addField(final String field, final String value) {
-      Objects.requireNonNull(value, "value");
-
-      fields.put(field, value);
-      return this;
-    }
-
-    /**
-     * Add a Map of fields to this point.
-     *
-     * @param fieldsToAdd
-     *            the fields to add
-     * @return the Builder instance.
-     */
-    public Builder fields(final Map<String, Object> fieldsToAdd) {
-      this.fields.putAll(fieldsToAdd);
-      return this;
-    }
-
-    /**
-     * Add a time to this point.
-     *
-     * @param timeToSet      the time for this point
-     * @param precisionToSet the TimeUnit
-     * @return the Builder instance.
-     */
-    public Builder time(final Number timeToSet, final TimeUnit precisionToSet) {
-      Objects.requireNonNull(timeToSet, "timeToSet");
-      Objects.requireNonNull(precisionToSet, "precisionToSet");
-      this.time = timeToSet;
-      this.precision = precisionToSet;
-      return this;
-    }
-
-    /**
-     * Add a time to this point as long.
-     * only kept for binary compatibility with previous releases.
-     *
-     * @param timeToSet      the time for this point as long
-     * @param precisionToSet the TimeUnit
-     * @return the Builder instance.
-     */
-    public Builder time(final long timeToSet, final TimeUnit precisionToSet) {
-      return time((Number) timeToSet, precisionToSet);
-    }
-
-    /**
-     * Add a time to this point as Long.
-     * only kept for binary compatibility with previous releases.
-     *
-     * @param timeToSet      the time for this point as Long
-     * @param precisionToSet the TimeUnit
-     * @return the Builder instance.
-     */
-    public Builder time(final Long timeToSet, final TimeUnit precisionToSet) {
-      return time((Number) timeToSet, precisionToSet);
-    }
-
-    /**
-     * Does this builder contain any fields?
-     *
-     * @return true, if the builder contains any fields, false otherwise.
-     */
-    public boolean hasFields() {
-      return !fields.isEmpty();
-    }
-
-    /**
-     * Adds field map from object by reflection using {@link Column}
-     * annotation.
-     *
-     * @param pojo POJO Object with annotation {@link Column} on fields
-     * @return the Builder instance
-     */
-    public Builder addFieldsFromPOJO(final Object pojo) {
-
-      Class<? extends Object> clazz = pojo.getClass();
-      while (clazz != null) {
-
-        for (Field field : clazz.getDeclaredFields()) {
-
-          Column column = field.getAnnotation(Column.class);
-
-          if (column == null) {
-            continue;
-          }
-
-          field.setAccessible(true);
-          String fieldName = column.name();
-          addFieldByAttribute(pojo, field, column, fieldName);
-        }
-      clazz = clazz.getSuperclass();
-    }
-
-      if (this.fields.isEmpty()) {
-        throw new InfluxException("Class " + pojo.getClass().getName()
-            + " has no @" + Column.class.getSimpleName() + " annotation");
-      }
-
-      return this;
-    }
-
-    private void addFieldByAttribute(final Object pojo, final Field field, final Column column,
-        final String fieldName) {
-      try {
-        Object fieldValue = field.get(pojo);
-
-        TimeColumn tc = field.getAnnotation(TimeColumn.class);
-        if (tc != null && Instant.class.isAssignableFrom(field.getType())) {
-          Optional.ofNullable((Instant) fieldValue).ifPresent(instant -> {
-            TimeUnit timeUnit = tc.timeUnit();
-            if (timeUnit == TimeUnit.NANOSECONDS || timeUnit == TimeUnit.MICROSECONDS) {
-              this.time = BigInteger.valueOf(instant.getEpochSecond())
-                                    .multiply(NANOSECONDS_PER_SECOND)
-                                    .add(BigInteger.valueOf(instant.getNano()))
-                                    .divide(BigInteger.valueOf(TimeUnit.NANOSECONDS.convert(1, timeUnit)));
-            } else {
-              this.time = TimeUnit.MILLISECONDS.convert(instant.toEpochMilli(), timeUnit);
-              this.precision = timeUnit;
-            }
-            this.precision = timeUnit;
-          });
-          return;
-        }
-
-        if (column.tag()) {
-          if (fieldValue != null) {
-            this.tags.put(fieldName, (String) fieldValue);
-          }
-        } else {
-          if (fieldValue != null) {
-            this.fields.put(fieldName, fieldValue);
-          }
-        }
-
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        // Can not happen since we use metadata got from the object
-        throw new InfluxException(
-            "Field " + fieldName + " could not found on class " + pojo.getClass().getSimpleName());
-      }
-    }
-
-    /**
-     * Create a new Point.
-     *
-     * @return the newly created Point.
-     */
-    public Point build() {
-      Point point = new Point();
-      point.setFields(this.fields);
-      point.setMeasurement(this.measurement);
-      if (this.time != null) {
-          point.setTime(this.time);
-          point.setPrecision(this.precision);
-      }
-      point.setTags(this.tags);
-      return point;
-    }
+  public Point() {
   }
 
   /**
@@ -616,4 +305,316 @@ public class Point {
   private static String findMeasurementName(final Class<?> clazz) {
     return clazz.getAnnotation(Measurement.class).name();
   }
+
+  /**
+   * Create a new Point Build build to create a new Point in a fluent manner.
+   *
+   * @param measurement
+   *            the name of the measurement.
+   * @return the Builder to be able to add further Builder calls.
+   */
+
+  public static Builder measurement(final String measurement) {
+    return new Builder(measurement);
+  }
+
+  /**
+   * Create a new Point Build build to create a new Point in a fluent manner from a POJO.
+   *
+   * @param clazz Class of the POJO
+   * @return the Builder instance
+   */
+
+  public static Builder measurementByPOJO(final Class<?> clazz) {
+    Objects.requireNonNull(clazz, "clazz");
+    throwExceptionIfMissingAnnotation(clazz, Measurement.class);
+    String measurementName = findMeasurementName(clazz);
+    return new Builder(measurementName);
+  }
+
+  private static void throwExceptionIfMissingAnnotation(final Class<?> clazz,
+                                                        final Class<? extends Annotation> expectedClass) {
+    if (!clazz.isAnnotationPresent(expectedClass)) {
+      throw new IllegalArgumentException("Class " + clazz.getName() + " is not annotated with @"
+          + Measurement.class.getSimpleName());
+    }
+  }
+
+  /**
+   * Builder for a new Point.
+   *
+   * @author stefan.majer [at] gmail.com
+   *
+   */
+  public static final class Builder {
+    private static final BigInteger NANOSECONDS_PER_SECOND = BigInteger.valueOf(1000000000L);
+    private final String measurement;
+    private final Map<String, String> tags = new TreeMap<>();
+    private Number time;
+    private TimeUnit precision;
+    private final Map<String, Object> fields = new TreeMap<>();
+
+    /**
+     * @param measurement
+     */
+    public Builder(final String measurement) {
+      this.measurement = measurement;
+    }
+
+    /**
+     * Add a tag to this point.
+     *
+     * @param tagName
+     *            the tag name
+     * @param value
+     *            the tag value
+     * @return the Builder instance.
+     */
+    public Builder tag(final String tagName, final String value) {
+      Objects.requireNonNull(tagName, "tagName");
+      Objects.requireNonNull(value, "value");
+      if (!tagName.isEmpty() && !value.isEmpty()) {
+        tags.put(tagName, value);
+      }
+      return this;
+    }
+
+    /**
+     * Add a Map of tags to add to this point.
+     *
+     * @param tagsToAdd
+     *            the Map of tags to add
+     * @return the Builder instance.
+     */
+    public Builder tag(final Map<String, String> tagsToAdd) {
+      for (Entry<String, String> tag : tagsToAdd.entrySet()) {
+        tag(tag.getKey(), tag.getValue());
+      }
+      return this;
+    }
+
+    /**
+     * Add a field to this point.
+     *
+     * @param field
+     *            the field name
+     * @param value
+     *            the value of this field
+     * @return the Builder instance.
+     */
+    @SuppressWarnings("checkstyle:finalparameters")
+    @Deprecated
+    public Builder field(final String field, Object value) {
+      if (value instanceof Number) {
+        if (value instanceof Byte) {
+          value = ((Byte) value).doubleValue();
+        } else if (value instanceof Short) {
+          value = ((Short) value).doubleValue();
+        } else if (value instanceof Integer) {
+          value = ((Integer) value).doubleValue();
+        } else if (value instanceof Long) {
+          value = ((Long) value).doubleValue();
+        } else if (value instanceof BigInteger) {
+          value = ((BigInteger) value).doubleValue();
+        }
+      }
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final boolean value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final long value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final double value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final int value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final float value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final short value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final Number value) {
+      fields.put(field, value);
+      return this;
+    }
+
+    public Builder addField(final String field, final String value) {
+      Objects.requireNonNull(value, "value");
+
+      fields.put(field, value);
+      return this;
+    }
+
+    /**
+     * Add a Map of fields to this point.
+     *
+     * @param fieldsToAdd
+     *            the fields to add
+     * @return the Builder instance.
+     */
+    public Builder fields(final Map<String, Object> fieldsToAdd) {
+      this.fields.putAll(fieldsToAdd);
+      return this;
+    }
+
+    /**
+     * Add a time to this point.
+     *
+     * @param timeToSet      the time for this point
+     * @param precisionToSet the TimeUnit
+     * @return the Builder instance.
+     */
+    public Builder time(final Number timeToSet, final TimeUnit precisionToSet) {
+      Objects.requireNonNull(timeToSet, "timeToSet");
+      Objects.requireNonNull(precisionToSet, "precisionToSet");
+      this.time = timeToSet;
+      this.precision = precisionToSet;
+      return this;
+    }
+
+    /**
+     * Add a time to this point as long.
+     * only kept for binary compatibility with previous releases.
+     *
+     * @param timeToSet      the time for this point as long
+     * @param precisionToSet the TimeUnit
+     * @return the Builder instance.
+     */
+    public Builder time(final long timeToSet, final TimeUnit precisionToSet) {
+      return time((Number) timeToSet, precisionToSet);
+    }
+
+    /**
+     * Add a time to this point as Long.
+     * only kept for binary compatibility with previous releases.
+     *
+     * @param timeToSet      the time for this point as Long
+     * @param precisionToSet the TimeUnit
+     * @return the Builder instance.
+     */
+    public Builder time(final Long timeToSet, final TimeUnit precisionToSet) {
+      return time((Number) timeToSet, precisionToSet);
+    }
+
+    /**
+     * Does this builder contain any fields?
+     *
+     * @return true, if the builder contains any fields, false otherwise.
+     */
+    public boolean hasFields() {
+      return !fields.isEmpty();
+    }
+
+    /**
+     * Adds field map from object by reflection using {@link Column}
+     * annotation.
+     *
+     * @param pojo POJO Object with annotation {@link Column} on fields
+     * @return the Builder instance
+     */
+    public Builder addFieldsFromPOJO(final Object pojo) {
+
+      Class<? extends Object> clazz = pojo.getClass();
+      while (clazz != null) {
+
+        for (Field field : clazz.getDeclaredFields()) {
+
+          Column column = field.getAnnotation(Column.class);
+
+          if (column == null) {
+            continue;
+          }
+
+          field.setAccessible(true);
+          String fieldName = column.name();
+          addFieldByAttribute(pojo, field, column, fieldName);
+        }
+        clazz = clazz.getSuperclass();
+      }
+
+      if (this.fields.isEmpty()) {
+        throw new InfluxException("Class " + pojo.getClass().getName()
+            + " has no @" + Column.class.getSimpleName() + " annotation");
+      }
+
+      return this;
+    }
+
+    private void addFieldByAttribute(final Object pojo, final Field field, final Column column,
+                                     final String fieldName) {
+      try {
+        Object fieldValue = field.get(pojo);
+
+        TimeColumn tc = field.getAnnotation(TimeColumn.class);
+        if (tc != null && Instant.class.isAssignableFrom(field.getType())) {
+          Optional.ofNullable((Instant) fieldValue).ifPresent(instant -> {
+            TimeUnit timeUnit = tc.timeUnit();
+            if (timeUnit == TimeUnit.NANOSECONDS || timeUnit == TimeUnit.MICROSECONDS) {
+              this.time = BigInteger.valueOf(instant.getEpochSecond())
+                  .multiply(NANOSECONDS_PER_SECOND)
+                  .add(BigInteger.valueOf(instant.getNano()))
+                  .divide(BigInteger.valueOf(TimeUnit.NANOSECONDS.convert(1, timeUnit)));
+            } else {
+              this.time = TimeUnit.MILLISECONDS.convert(instant.toEpochMilli(), timeUnit);
+              this.precision = timeUnit;
+            }
+            this.precision = timeUnit;
+          });
+          return;
+        }
+
+        if (column.tag()) {
+          if (fieldValue != null) {
+            this.tags.put(fieldName, (String) fieldValue);
+          }
+        } else {
+          if (fieldValue != null) {
+            this.fields.put(fieldName, fieldValue);
+          }
+        }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+        // Can not happen since we use metadata got from the object
+        throw new InfluxException(
+            "Field " + fieldName + " could not found on class " + pojo.getClass().getSimpleName());
+      }
+    }
+
+    /**
+     * Create a new Point.
+     *
+     * @return the newly created Point.
+     */
+    public Point build() {
+      Point point = new Point();
+      point.setFields(this.fields);
+      point.setMeasurement(this.measurement);
+      if (this.time != null) {
+        point.setTime(this.time);
+        point.setPrecision(this.precision);
+      }
+      point.setTags(this.tags);
+      return point;
+    }
+  }
+
 }

@@ -10,11 +10,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SwaggerConfiguration {
 
-  @Value("#{@environment['springfox.documentation.swagger.security.name'] ?: 'token'}")
+  @Value("#{@environment['springfox.documentation.swagger.security.name'] ?: 'Authorization'}")
   private String name;
 
   @Value("#{@environment['springfox.documentation.swagger.doc-type'] ?: 'SWAGGER_2'}")
@@ -102,6 +101,7 @@ public class SwaggerConfiguration {
    * 需要增加swagger授权回调地址
    * http://localhost:8888/webjars/springfox-swagger-ui/o2c.html
    */
+  @ConditionalOnProperty(prefix = "springfox.documentation.swagger.security", name = "nameEnable", matchIfMissing = true)
   @ConditionalOnMissingBean
   @Bean
   public SecurityScheme securityScheme() {

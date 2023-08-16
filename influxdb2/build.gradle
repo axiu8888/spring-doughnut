@@ -1,4 +1,3 @@
-
 project.ext.springTest = true
 
 apply from: "${scriptFile}"
@@ -6,6 +5,17 @@ apply from: "${scriptFile}"
 project.ext.artifactName = "influxdb2"
 // 上传到nexus/maven仓库
 project.ext.upload = true
+
+repositories {
+  maven {
+    url "http://192.168.1.200:9001/repository/hsrgproxy/"
+    allowInsecureProtocol = true
+    credentials {
+      username 'admin'
+      password 'admin123'
+    }
+  }
+}
 
 dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
@@ -28,5 +38,8 @@ dependencies {
   api "com.squareup.retrofit2:converter-jackson:${retrofitVersion}"
 
   api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
+
+
+  testImplementation(project(":spring"))
 
 }

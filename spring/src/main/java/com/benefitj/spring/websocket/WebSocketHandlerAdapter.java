@@ -9,7 +9,7 @@ import org.springframework.web.socket.*;
  */
 public class WebSocketHandlerAdapter implements WebSocketHandler {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  final Logger log = LoggerFactory.getLogger(getClass());
 
   /**
    * WebSocket 管理器

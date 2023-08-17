@@ -9,10 +9,7 @@ import com.benefitj.core.file.IWriter;
 import com.benefitj.http.ProgressRequestBody;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
-import com.benefitj.spring.influxdb.dto.FieldKey;
-import com.benefitj.spring.influxdb.dto.LineProtocol;
-import com.benefitj.spring.influxdb.dto.Point;
-import com.benefitj.spring.influxdb.dto.QueryResult;
+import com.benefitj.spring.influxdb.dto.*;
 import com.benefitj.spring.influxdb.pojo.InfluxWavePackage;
 import com.benefitj.spring.influxdb.spring.InfluxConfiguration;
 import com.benefitj.spring.influxdb.template.*;
@@ -67,11 +64,32 @@ public class InfluxApiDBApiTest {
   }
 
   @Test
+  void test_createSubscriptions() {
+    // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ALL 'http://www.example.com:8086', 'http://www.example.com:8087'
+    // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ANY 'udp://www.example.com:9090', 'udp://www.example.com:9090'
+    //QueryResult result = template.createSubscription("backup", "hsrg", "autogen", false, "http://hsrg-influx2:8086");
+    QueryResult result = template.createSubscription("backup", false, "http://hsrg-influx2:8086");
+    //QueryResult result = template.postQuery("CREATE SUBSCRIPTION \"backup\" ON \"hsrg\".\"autogen\" DESTINATIONS ALL 'http://hsrg-influx2:8086'");
+    log.info("result ===>: {}", JSON.toJSONString(result));
+  }
+
+  @Test
+  void test_showSubscriptions() {
+    List<Subscription> result = template.showSubscriptions();
+    log.info("result ===>: {}", JSON.toJSONString(result));
+  }
+
+  @Test
+  void test_dropSubscriptions() {
+    QueryResult result = template.dropSubscription("backup", "hsrg", "autogen");
+    log.info("result ===>: {}", JSON.toJSONString(result));
+  }
+
+  @Test
   void testQuery() {
     QueryResult result = template.postQuery("SHOW MEASUREMENTS ON test;");
     log.info("result ===>: {}", JSON.toJSONString(result));
   }
-
 
   @Test
   void testWrite() {
@@ -189,7 +207,7 @@ public class InfluxApiDBApiTest {
     String retentionPolicy = template.getRetentionPolicy();
     List<MeasurementInfo> measurementInfos = template.getMeasurements()
         .stream()
-        .filter(name -> !name.equalsIgnoreCase("hs_wave_point")) // 不保存波形趋势
+        .filter(name -> !name.endsWith("_point")) // 不保存波形趋势
         .map(name -> MeasurementInfo.builder()
             .name(name)
             .fieldKeyMap(template.getFieldKeyMap(database, retentionPolicy, name, true))
@@ -198,10 +216,12 @@ public class InfluxApiDBApiTest {
 
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
 
-    Long startTime = DateFmtter.parseToLong("2023-08-15 11:20:00");
-    Long endTime = DateFmtter.parseToLong("2023-08-15 14:17:59");
-    String condition = " AND person_zid = 'fde43e9dc45945d4bac40e3e0053664f'";
-//    String condition = "";
+//    Long startTime = DateFmtter.parseToLong("2023-08-15 11:20:00");
+//    Long endTime = DateFmtter.parseToLong("2023-08-15 14:17:59");
+//    String condition = " AND person_zid = 'fde43e9dc45945d4bac40e3e0053664f'";
+    long startTime = TimeUtils.getToday(18, 44, 0);
+    long endTime = TimeUtils.getToday(18, 55, 0);
+    String condition = " AND device_id = '01001049'";
 
     //log.info("measurementInfos ==>: \n{}", JSON.toJSONString(measurementInfos, JSONWriter.Feature.PrettyFormat));
     for (MeasurementInfo measurementInfo : measurementInfos) {
@@ -226,8 +246,11 @@ public class InfluxApiDBApiTest {
   @Test
   void test_loadLines() {
     File dir = new File("D:/tmp/influxdb");
-//    File[] lines = dir.listFiles(pathname -> pathname.getName().endsWith(".line") && pathname.length() > 0);
-    File[] lines = dir.listFiles(pathname -> pathname.getName().endsWith(".point") && pathname.length() > 0);
+    File[] lines = dir.listFiles(f -> f.length() > 0
+        //&& f.getName().endsWith(".line")
+        //&& f.getName().endsWith(".point")
+        && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
+    );
     assert lines != null;
     for (File line : lines) {
       log.info("upload file: {}", line);
@@ -238,7 +261,7 @@ public class InfluxApiDBApiTest {
         prev.set(current.get());
         current.set(progress);
       }));
-      //line.delete();
+      line.delete();
     }
   }
 
@@ -262,7 +285,7 @@ public class InfluxApiDBApiTest {
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
 
     InfluxOptions srcOptions = BeanHelper.copy(options);
-    //srcOptions.setUrl("http://39.98.251.12:58086");
+//    srcOptions.setUrl("http://39.98.251.12:58086");
     srcOptions.setUrl("http://192.168.1.198:58086");
     srcOptions.setDatabase("hsrg");
     srcOptions.setUsername("admin");
@@ -273,27 +296,29 @@ public class InfluxApiDBApiTest {
     srcTemplate.setApi(factory.create(srcOptions));
     srcTemplate.setJsonAdapter(new Moshi.Builder().build().adapter(QueryResult.class));
 
-    long startTime = TimeUtils.getToday(9, 0, 0);
-    long endTime = TimeUtils.getToday(12, 0, 0);
+    long startTime = TimeUtils.getToday(18, 46, 0);
+    long endTime = TimeUtils.getToday(20, 30, 0);
+    String condition = " AND device_id = '01001049'";
     waveToPoints(srcTemplate
         , dir
         , "hs_wave_package"
         , startTime
         , endTime
-        , ""
+        , condition
         , (line, base) -> mapWaveToPoints(base, "hs_wave_point"
             , "ecg_points", "spo2_points", "resp_points", "abdominal_resp_points", "x_points", "y_points", "z_points")
     );
 
-//    waveToPoints(srcTemplate
-//        , dir
-//        , "hs_teleecg_wave_package"
-//        , startTime
-//        , endTime
-//        , "AND person_zid = '33f57291ff414ce497175e616b5b830b'"
-//        , (line, base) -> mapWaveToPoints(base, "hs_teleecg_wave_point"
-//            , "I", "II", "III", "V1", "V2", "V3", "V4", "V5", "V6", "aVR", "aVL", "aVF")
-//    );
+    waveToPoints(srcTemplate
+        , dir
+        , "hs_teleecg_wave_package"
+        , startTime
+        , endTime
+        , ""
+        //, "AND person_zid = '33f57291ff414ce497175e616b5b830b'"
+        , (line, base) -> mapWaveToPoints(base, "hs_teleecg_wave_point"
+            , "I", "II", "III", "V1", "V2", "V3", "V4", "V5", "V6", "aVR", "aVL", "aVF")
+    );
 
     File[] lines = dir.listFiles(pathname -> pathname.getName().endsWith(".point") && pathname.length() > 0);
     assert lines != null;
@@ -306,7 +331,7 @@ public class InfluxApiDBApiTest {
         prev.set(current.get());
         current.set(progress);
       }));
-      //line.delete();
+      line.delete();
     }
 
   }

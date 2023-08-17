@@ -1,5 +1,6 @@
 package com.benefitj.spring.influxdb.template;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.spring.influxdb.InfluxApi;
 import com.benefitj.spring.influxdb.InfluxOptions;
@@ -493,6 +494,82 @@ public interface InfluxTemplate {
   default List<RetentionPolicy> getRetentionPolicies(String db) {
     QueryResult queryResult = postQuery(db, "SHOW RETENTION POLICIES ON " + db);
     return getConverterFactory().mapperTo(queryResult, RetentionPolicy.class);
+  }
+
+  /**
+   * 创建订阅者(用于备份数据)
+   *
+   * @param name      名称
+   * @param isAny     是否为 ANY，如果为ANY，有多个UDP订阅时会轮询分发
+   * @param addresses 远程地址
+   * @return 创建结果
+   */
+  default QueryResult createSubscription(String name, boolean isAny, String... addresses) {
+    return createSubscription(name, getDatabase(), getRetentionPolicy(), isAny, addresses);
+  }
+
+  /**
+   * 创建订阅者(用于备份数据)
+   *
+   * @param name            名称
+   * @param db              数据库
+   * @param retentionPolicy 保留策略
+   * @param isAny           是否为 ANY，如果为ANY，有多个UDP订阅时会轮询分发
+   * @param addresses       远程地址
+   * @return 创建结果
+   */
+  default QueryResult createSubscription(String name, String db, String retentionPolicy, boolean isAny, String... addresses) {
+    // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ALL 'http://www.example.com:8086', 'http://www.example2.com:8086'
+    // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ANY 'udp://www.example.com:9090', 'udp://www.example2.com:9090'
+    String query = String.format("CREATE SUBSCRIPTION \"%s\" ON \"%s\".\"%s\" DESTINATIONS %s '%s'"
+        , name, db, retentionPolicy, isAny ? "ANY" : "ALL", String.join("', '", addresses));
+    QueryResult result = postQuery(query);
+    if (result.hasError()) {
+      throw new IllegalStateException(result.getError());
+    }
+    return result;
+  }
+
+  /**
+   * 展示当前正在订阅的配置
+   */
+  default List<Subscription> showSubscriptions() {
+    List<Subscription> subscriptions = new ArrayList<>();
+    QueryResult queryResult = postQuery("SHOW SUBSCRIPTIONS");
+    Flowable.just(queryResult)
+        .subscribe(new QueryObserver() {
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            JSONObject json = new JSONObject();
+            json.put("db", c.getName());
+            c.getColumns().forEach(column -> json.put(column, c.getValue(column, null)));
+            subscriptions.add(json.toJavaObject(Subscription.class));
+          }
+        });
+    return subscriptions;
+  }
+
+  /**
+   * 创建订阅者(用于备份数据)
+   *
+   * @param name 名称
+   * @return 创建结果
+   */
+  default QueryResult dropSubscription(String name) {
+    return dropSubscription(name, getDatabase(), getRetentionPolicy());
+  }
+
+  /**
+   * 创建订阅者(用于备份数据)
+   *
+   * @param name            名称
+   * @param db              数据库
+   * @param retentionPolicy 保留策略
+   * @return 创建结果
+   */
+  default QueryResult dropSubscription(String name, String db, String retentionPolicy) {
+    // DROP SUBSCRIPTION "<subscription_name>" ON "<db_name>"."<retention_policy>"
+    return postQuery(String.format("DROP SUBSCRIPTION \"%s\" ON \"%s\".\"%s\"", name, db, retentionPolicy));
   }
 
   /**

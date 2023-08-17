@@ -1,4 +1,4 @@
-package com.benefitj.athenapdfservice.controller;
+package com.benefitj.spring.athenapdf;
 
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.HexUtils;
@@ -7,12 +7,9 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.core.concurrent.CancelableScheduledFuture;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.benefitj.spring.athenapdf.AthenapdfCall;
-import com.benefitj.spring.athenapdf.AthenapdfHelper;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,19 +73,13 @@ public class AthenapdfController {
    * @param force      是否强制生成
    */
   @ApiOperation("生成PDF")
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "url", value = "HTML的路径", dataType = "String", paramType = "query", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "filename", value = "文件名，可选", dataType = "String", paramType = "query", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "encodeType", value = "编码格式, base64/hex", dataType = "String", paramType = "query", dataTypeClass = String.class),
-      @ApiImplicitParam(name = "force", value = "是否强制生成，忽略缓存", dataType = "String", paramType = "query", dataTypeClass = Boolean.class),
-  })
   @GetMapping("/create")
   public void create(HttpServletRequest request,
                      HttpServletResponse response,
-                     String url,
-                     String filename,
-                     String encodeType,
-                     Boolean force) throws IOException {
+                     @ApiParam("HTML的路径") String url,
+                     @ApiParam("文件名，可选") String filename,
+                     @ApiParam("编码格式, base64/hex") String encodeType,
+                     @ApiParam("是否强制生成，忽略缓存") Boolean force) throws IOException {
     url = url != null ? url.trim() : "";
     long start = System.currentTimeMillis();
     if (StringUtils.isNoneBlank(encodeType) && !url.startsWith("http")) {
@@ -101,23 +91,17 @@ public class AthenapdfController {
     }
     try {
       if (StringUtils.isBlank(url)) {
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.getOutputStream().write("缺少url参数".getBytes(StandardCharsets.UTF_8));
+        ServletUtils.write(response, HttpStatus.BAD_REQUEST.value(), "缺少url参数");
         return;
       }
       URL ignore = new URL(url);
 
       if (!athenapdfHelper.supportDocker()) {
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.getOutputStream().write("不支持docker环境!".getBytes(StandardCharsets.UTF_8));
+        ServletUtils.write(response, HttpStatus.BAD_REQUEST.value(), "不支持docker环境");
         return;
       }
     } catch (MalformedURLException e) {
-      response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
-      response.getOutputStream().write("错误的url参数".getBytes(StandardCharsets.UTF_8));
+      ServletUtils.write(response, HttpStatus.BAD_REQUEST.value(), "错误的url参数");
       return;
     }
 

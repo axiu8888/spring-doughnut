@@ -216,9 +216,7 @@ public class InfluxApiDBApiTest {
   @SuperBuilder
   @Data
   public static class MeasurementInfo {
-
     String name;
-
     Map<String, FieldKey> fieldKeyMap;
   }
 
@@ -235,12 +233,12 @@ public class InfluxApiDBApiTest {
       log.info("upload file: {}", line);
       AtomicLong prev = new AtomicLong(0);
       AtomicLong current = new AtomicLong(0);
-      ProgressRequestBody body = new ProgressRequestBody(RequestBody.create(line, InfluxTemplate.MEDIA_TYPE_STRING), (totalLength, progress, done) -> {
+      template.write(new ProgressRequestBody(RequestBody.create(line, InfluxTemplate.MEDIA_TYPE_STRING), (totalLength, progress, done) -> {
         log.info("file[{}], totalLength: {}, progress: {}, done: {}", line, totalLength, progress, done);
         prev.set(current.get());
         current.set(progress);
-      });
-      template.write(body);
+      }));
+      //line.delete();
     }
   }
 
@@ -266,6 +264,9 @@ public class InfluxApiDBApiTest {
     InfluxOptions srcOptions = BeanHelper.copy(options);
     //srcOptions.setUrl("http://39.98.251.12:58086");
     srcOptions.setUrl("http://192.168.1.198:58086");
+    srcOptions.setDatabase("hsrg");
+    srcOptions.setUsername("admin");
+    srcOptions.setPassword("hsrg8888");
     InfluxTemplateImpl srcTemplate = new InfluxTemplateImpl();
     srcTemplate.setConverterFactory(converterFactory);
     srcTemplate.setOptions(srcOptions);
@@ -305,6 +306,7 @@ public class InfluxApiDBApiTest {
         prev.set(current.get());
         current.set(progress);
       }));
+      //line.delete();
     }
 
   }

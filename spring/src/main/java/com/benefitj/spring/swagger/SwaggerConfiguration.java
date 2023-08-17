@@ -28,7 +28,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 接口文档配置
@@ -43,8 +42,8 @@ public class SwaggerConfiguration {
   @Value("#{@environment['springfox.documentation.swagger.security.name'] ?: 'Authorization'}")
   private String name;
 
-  @Value("#{@environment['springfox.documentation.swagger.doc-type'] ?: 'SWAGGER_2'}")
-  private SwaggerDocType docType = SwaggerDocType.SWAGGER_2;
+  @Value("#{@environment['springfox.documentation.swagger.doc-type'] ?: 'OAS_30'}")
+  private SwaggerDocType docType = SwaggerDocType.OAS_30;
 
   @ConditionalOnMissingBean
   @Bean
@@ -127,21 +126,22 @@ public class SwaggerConfiguration {
 
   @EventListener(ApplicationReadyEvent.class)
   public void onAppStart() {
-    EventLoop.io().schedule(() -> CatchUtils.tryThrow(() -> {
+    EventLoop.asyncIO(() -> CatchUtils.tryThrow(() -> {
       String ip = InetAddress.getLocalHost().getHostAddress();
       String port = SpringCtxHolder.getServerPort();
-      String path = SpringCtxHolder.getServerContextPath();
+      String ctxPath = SpringCtxHolder.getServerContextPath();
+      String path = Utils.isEndWiths(ctxPath, "/") ? ctxPath.substring(0, ctxPath.length() - 1) : ctxPath;
       String swaggerBaseUrl = SpringCtxHolder.getEnvProperty("springfox.documentation.swagger-ui.base-url");
       swaggerBaseUrl = Utils.withs(swaggerBaseUrl, "/", "/");
       String address = ip + ":" + port + path;
       log.info("\n---------------------------------------------------------------------------------\n\t" +
           "[ " + SpringCtxHolder.getAppName() + " ] is running! Access URLs:\n\t" +
-          "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
-          "External: \t\thttp://" + address + "/\n\t" +
+          "Local: \t\t\thttp://localhost:" + port + path + "\n\t" +
+          "External: \t\thttp://" + address + "\n\t" +
           "Swagger文档: \thttp://" + address + swaggerBaseUrl + "swagger-ui/index.html\n\t" +
           "knife4j文档: \thttp://" + address + "/doc.html\n" +
           "---------------------------------------------------------------------------------");
-    }), 3, TimeUnit.SECONDS);
+    }), 3000);
   }
 
 }

@@ -1,5 +1,6 @@
 package com.benefitj.spring.athenapdf;
 
+import com.benefitj.core.SingletonSupplier;
 import com.benefitj.core.cmd.CmdExecutor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,7 +15,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class AthenapdfHelper extends CmdExecutor {
 
-  public static final AthenapdfHelper INSTANCE = new AthenapdfHelper();
+  static SingletonSupplier<AthenapdfHelper> singleton = SingletonSupplier.of(AthenapdfHelper::new);
+
+  public static AthenapdfHelper get() {
+    return singleton.get();
+  }
 
   private final AtomicReference<Boolean> supportDocker = new AtomicReference<>();
 

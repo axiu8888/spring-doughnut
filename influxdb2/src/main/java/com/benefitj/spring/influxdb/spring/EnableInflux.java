@@ -9,10 +9,10 @@ import java.lang.annotation.*;
  *
  * @author DINGXIUAN
  */
+@Import(InfluxConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(InfluxConfiguration.class)
 public @interface EnableInflux {
 }

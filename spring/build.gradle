@@ -14,8 +14,8 @@ dependencies {
 
   [
       "io.springfox:springfox-boot-starter:${swaggerVersion}",
-      //"com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
-      "com.github.xiaoymin:knife4j-openapi3-spring-boot-starter:${knife4jVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+      //"com.github.xiaoymin:knife4j-openapi3-spring-boot-starter:${knife4jVersion}",
       //"com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3",
   ].forEach { api(it) }
 

@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Slf4j
-@Api("测试demo")
+@Api(tags = "测试demo")
 @AopWebPointCut
 @RestController
 @RequestMapping("/simple")

@@ -18,7 +18,9 @@ repositories {
 }
 
 dependencies {
-  compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+  compileOnly(project(":aop"))
+  compileOnly(project(":spring"))
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
   api 'org.msgpack:msgpack-core:0.9.3'
   /*api('org.influxdb:influxdb-java:2.23') {
@@ -37,9 +39,11 @@ dependencies {
   api "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
   api "com.squareup.retrofit2:converter-jackson:${retrofitVersion}"
 
-  api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
+  //api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
 
 
-  testImplementation(project(":spring"))
+//  testImplementation
+  implementation("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
+  implementation(project(":spring"))
 
 }

@@ -89,4 +89,10 @@ public class InfluxConfiguration {
     return new InfluxInitializingBean(template);
   }
 
+  @ConditionalOnMissingBean
+  @Bean
+  public ApiController apiController() {
+    return new ApiController();
+  }
+
 }

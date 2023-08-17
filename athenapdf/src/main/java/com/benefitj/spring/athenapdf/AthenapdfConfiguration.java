@@ -12,7 +12,13 @@ public class AthenapdfConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public AthenapdfHelper athenapdfHelper() {
-    return AthenapdfHelper.INSTANCE;
+    return AthenapdfHelper.get();
+  }
+
+  @ConditionalOnMissingBean
+  @Bean
+  public AthenapdfController athenapdfController() {
+    return new AthenapdfController();
   }
 
 }

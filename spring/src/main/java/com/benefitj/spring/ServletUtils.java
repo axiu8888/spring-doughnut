@@ -2,7 +2,6 @@ package com.benefitj.spring;
 
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.Utils;
-import com.benefitj.core.functions.StreamBuilder;
 import com.benefitj.core.http.ContentType;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.StringUtils;
@@ -185,10 +184,6 @@ public class ServletUtils {
     infoMap.put("locale", request.getLocale());
     infoMap.put("locales", request.getLocales());
     return infoMap;
-  }
-
-  public static <T> StreamBuilder<T> stream(T target) {
-    return new StreamBuilder<>(target);
   }
 
   /**

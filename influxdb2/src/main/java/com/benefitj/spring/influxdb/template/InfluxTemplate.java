@@ -747,7 +747,18 @@ public interface InfluxTemplate {
    * @return return field key map
    */
   default Map<String, FieldKey> getFieldKeyMap(String db, String retentionPolicy, String measurement) {
-    return getFieldKeyMap(db, retentionPolicy, measurement, false);
+    return getFieldKeyMap(db, retentionPolicy, measurement, true);
+  }
+
+  /**
+   * Obtain field key map
+   *
+   * @param measurement measurement
+   * @param containTags contains tag
+   * @return return field key map
+   */
+  default Map<String, FieldKey> getFieldKeyMap(String measurement, boolean containTags) {
+    return getFieldKeyMap(getDatabase(), getRetentionPolicy(), measurement, containTags);
   }
 
   /**

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -203,34 +204,28 @@ public class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    String database = template.getDatabase();
-    String retentionPolicy = template.getRetentionPolicy();
-    List<MeasurementInfo> measurementInfos = template.getMeasurements()
+    long startTime = TimeUtils.toDate(2023, 8, 17, 18, 44, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 8, 17, 18, 55, 0).getTime();
+    String condition = " AND device_id = '01001049'";
+    File dir = IOUtils.createFile("D:/tmp/influxdb", true);
+    exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
+  }
+
+  void exportAll(InfluxTemplate template, File dir, long startTime, long endTime, String condition, Predicate<String> measurementFilter) {
+    template.getMeasurements()
         .stream()
-        .filter(name -> !name.endsWith("_point")) // 不保存波形趋势
+        .filter(measurementFilter) // 不保存波形趋势
         .map(name -> MeasurementInfo.builder()
             .name(name)
-            .fieldKeyMap(template.getFieldKeyMap(database, retentionPolicy, name, true))
+            .fieldKeyMap(template.getFieldKeyMap(name, true))
             .build())
-        .collect(Collectors.toList());
-
-    File dir = IOUtils.createFile("D:/tmp/influxdb", true);
-
-//    Long startTime = DateFmtter.parseToLong("2023-08-15 11:20:00");
-//    Long endTime = DateFmtter.parseToLong("2023-08-15 14:17:59");
-//    String condition = " AND person_zid = 'fde43e9dc45945d4bac40e3e0053664f'";
-    long startTime = TimeUtils.getToday(18, 44, 0);
-    long endTime = TimeUtils.getToday(18, 55, 0);
-    String condition = " AND device_id = '01001049'";
-
-    //log.info("measurementInfos ==>: \n{}", JSON.toJSONString(measurementInfos, JSONWriter.Feature.PrettyFormat));
-    for (MeasurementInfo measurementInfo : measurementInfos) {
-      File line = IOUtils.createFile(dir, measurementInfo.name + ".line");
-      template.export(line, measurementInfo.name, 5000, startTime, endTime, condition);
-      if (line.length() <= 0) {
-        line.delete(); // 没有数据，删除空文件
-      }
-    }
+        .forEach(measurementInfo -> {
+          File line = IOUtils.createFile(dir, measurementInfo.name + ".line");
+          template.export(line, measurementInfo.name, 5000, startTime, endTime, condition);
+          if (line.length() <= 0) {
+            line.delete(); // 没有数据，删除空文件
+          }
+        });
   }
 
   @SuperBuilder
@@ -252,17 +247,7 @@ public class InfluxApiDBApiTest {
         && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
     );
     assert lines != null;
-    for (File line : lines) {
-      log.info("upload file: {}", line);
-      AtomicLong prev = new AtomicLong(0);
-      AtomicLong current = new AtomicLong(0);
-      template.write(new ProgressRequestBody(RequestBody.create(line, InfluxTemplate.MEDIA_TYPE_STRING), (totalLength, progress, done) -> {
-        log.info("file[{}], totalLength: {}, progress: {}, done: {}", line, totalLength, progress, done);
-        prev.set(current.get());
-        current.set(progress);
-      }));
-      line.delete();
-    }
+    upload(Arrays.asList(lines), true);
   }
 
   /**
@@ -286,6 +271,8 @@ public class InfluxApiDBApiTest {
 
     InfluxOptions srcOptions = BeanHelper.copy(options);
 //    srcOptions.setUrl("http://39.98.251.12:58086");
+//    srcOptions.setUrl("http://research.sensecho.com:58086");
+//    srcOptions.setUrl("http://192.168.1.211:58039");
     srcOptions.setUrl("http://192.168.1.198:58086");
     srcOptions.setDatabase("hsrg");
     srcOptions.setUsername("admin");
@@ -296,32 +283,49 @@ public class InfluxApiDBApiTest {
     srcTemplate.setApi(factory.create(srcOptions));
     srcTemplate.setJsonAdapter(new Moshi.Builder().build().adapter(QueryResult.class));
 
-    long startTime = TimeUtils.getToday(18, 46, 0);
-    long endTime = TimeUtils.getToday(20, 30, 0);
-    String condition = " AND device_id = '01001049'";
-    waveToPoints(srcTemplate
-        , dir
-        , "hs_wave_package"
-        , startTime
-        , endTime
-        , condition
-        , (line, base) -> mapWaveToPoints(base, "hs_wave_point"
-            , "ecg_points", "spo2_points", "resp_points", "abdominal_resp_points", "x_points", "y_points", "z_points")
-    );
+    long startTime = TimeUtils.getYesterday(8, 0, 0);
+    long endTime = TimeUtils.getYesterday(20, 0, 0);
+    log.info("startTime: {}, endTime: {}", DateFmtter.fmt(startTime), DateFmtter.fmt(endTime));
+    //String condition = " AND device_id = '01001049'";
+    //String condition = " AND person_zid = 'a32610dd1f774293b0aebd11d739dd3c'";
+    //String condition = " AND person_zid = 'b4ca64b27cd74094b005cd3014aaab63'";
+    String condition = "";
+    boolean exportPoint = false;
+//    boolean exportPoint = true;
+    if (exportPoint) {
+      waveToPoints(srcTemplate
+          , dir
+          , "hs_wave_package"
+          , startTime
+          , endTime
+          , condition
+          , (line, base) -> mapWaveToPoints(base, "hs_wave_point"
+              , "ecg_points", "spo2_points", "resp_points", "abdominal_resp_points", "x_points", "y_points", "z_points")
+      );
 
-    waveToPoints(srcTemplate
-        , dir
-        , "hs_teleecg_wave_package"
-        , startTime
-        , endTime
-        , ""
-        //, "AND person_zid = '33f57291ff414ce497175e616b5b830b'"
-        , (line, base) -> mapWaveToPoints(base, "hs_teleecg_wave_point"
-            , "I", "II", "III", "V1", "V2", "V3", "V4", "V5", "V6", "aVR", "aVL", "aVF")
-    );
+      waveToPoints(srcTemplate
+          , dir
+          , "hs_teleecg_wave_package"
+          , startTime
+          , endTime
+          , condition
+          , (line, base) -> mapWaveToPoints(base, "hs_teleecg_wave_point"
+              , "I", "II", "III", "V1", "V2", "V3", "V4", "V5", "V6", "aVR", "aVL", "aVF")
+      );
+    }
 
-    File[] lines = dir.listFiles(pathname -> pathname.getName().endsWith(".point") && pathname.length() > 0);
-    assert lines != null;
+    // 导出全部的数据
+    exportAll(srcTemplate, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
+
+    List<File> lines = Stream.of(Objects.requireNonNull(dir.listFiles()))
+        .filter(f -> f.length() > 0)
+        .filter(f -> f.getName().endsWith(".point") || f.getName().endsWith(".line"))
+        .collect(Collectors.toList());
+    upload(lines, true);
+
+  }
+
+  void upload(List<File> lines, boolean delete) {
     for (File line : lines) {
       log.info("upload file: {}", line);
       AtomicLong prev = new AtomicLong(0);
@@ -331,9 +335,8 @@ public class InfluxApiDBApiTest {
         prev.set(current.get());
         current.set(progress);
       }));
-      line.delete();
+      if(delete) line.delete();
     }
-
   }
 
   static List<String> mapWaveToPoints(LineProtocol base, String measurement, String... columns) {
@@ -383,6 +386,10 @@ public class InfluxApiDBApiTest {
     File lineFile = new File(dir, measurement + ".line");
     // 导出line文件
     template.export(lineFile, measurement, 1000, startTime, endTime, condition);
+    if (lineFile.length() <= 0) {
+      lineFile.delete();
+      return;
+    }
     AtomicReference<FileWriterImpl> writerRef = new AtomicReference<>();
     AtomicInteger index = new AtomicInteger(1);
     IOUtils.readLines(lineFile, line -> {

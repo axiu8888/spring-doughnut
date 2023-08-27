@@ -1,12 +1,15 @@
 package com.benefitj.websocketrelay.sockets;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.spring.websocket.WebSocket;
 import com.benefitj.spring.websocket.WebSocketEndpoint;
 import com.benefitj.spring.websocket.WebSocketListener;
 import com.benefitj.spring.websocket.WebSocketManager;
+import com.benefitj.websocketrelay.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -15,7 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-@WebSocketEndpoint({"/sockets/consumer"})
+@WebSocketEndpoint("/sockets/consumer")
 @Slf4j
 public class ConsumerWebSocket implements WebSocketListener {
 
@@ -25,7 +28,8 @@ public class ConsumerWebSocket implements WebSocketListener {
     return managerRef.get();
   }
 
-  final JSONObject platform = new JSONObject();
+  @Autowired
+  ConsumerMessageDispatcher dispatcher;
 
   @Override
   public void onWebSocketManager(WebSocketManager manager) {
@@ -44,6 +48,10 @@ public class ConsumerWebSocket implements WebSocketListener {
   public void onTextMessage(WebSocket socket, TextMessage message) {
     log.debug("[consumer] WebSocket消息(Text), id: {}, 数量: {}, msg: {}",
         socket.getId(), getManager().size(), message.getPayload());
+    JSONObject json = JSON.parseObject(message.getPayload());
+    Message msg = json.toJavaObject(Message.class);
+    msg.setJson(json);
+    dispatcher.dispatch(socket, msg);
   }
 
   @Override
@@ -60,6 +68,6 @@ public class ConsumerWebSocket implements WebSocketListener {
 
   @Override
   public void onClose(WebSocket socket, CloseStatus reason) {
-    log.debug("[consumer] WebSocket下线, id: {}, 数量: {}", socket.getId(), getManager().size());
+    log.debug("[consumer] WebSocket下线, id: {}, reason: {}, 数量: {}", socket.getId(), reason, getManager().size());
   }
 }

@@ -1,9 +1,13 @@
 package com.benefitj.spring.websocket;
 
 import com.benefitj.core.IOUtils;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface WebSocket {
 
@@ -62,6 +66,33 @@ public interface WebSocket {
    */
   default void close() {
     IOUtils.closeQuietly(getSession());
+  }
+
+  /**
+   * 属性
+   */
+  Map<String, Object> attrs();
+
+  /**
+   * 获取属性值
+   *
+   * @param key 键
+   * @param <T> 属性类型
+   * @return 返回属性对象
+   */
+  default <T> T getAttr(String key) {
+    return (T) attrs().get(key);
+  }
+
+  /**
+   * 设置属性值
+   *
+   * @param key   键
+   * @param value 值
+   * @param <T>   属性类型
+   */
+  default <T> void setAttr(String key, T value) {
+    attrs().put(key, value);
   }
 
 }

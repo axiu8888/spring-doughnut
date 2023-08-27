@@ -6,8 +6,10 @@ import com.benefitj.spring.websocket.WebSocket;
 import com.benefitj.spring.websocket.WebSocketEndpoint;
 import com.benefitj.spring.websocket.WebSocketListener;
 import com.benefitj.spring.websocket.WebSocketManager;
+import com.benefitj.websocketrelay.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -16,7 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-@WebSocketEndpoint({"/sockets/producer"})
+@WebSocketEndpoint("/sockets/producer")
 @Slf4j
 public class ProducerWebSocket implements WebSocketListener {
 
@@ -26,7 +28,8 @@ public class ProducerWebSocket implements WebSocketListener {
     return managerRef.get();
   }
 
-  private final JSONObject platform = new JSONObject();
+  @Autowired
+  ProducerMessageDispatcher dispatcher;
 
   @Override
   public void onWebSocketManager(WebSocketManager manager) {
@@ -45,17 +48,10 @@ public class ProducerWebSocket implements WebSocketListener {
   public void onTextMessage(WebSocket socket, TextMessage message) {
     log.debug("[producer] WebSocket消息(Text), id: {}, 数量: {}, msg: {}",
         socket.getId(), getManager().size(), message.getPayload());
-
     JSONObject json = JSON.parseObject(message.getPayload());
-    String clientId = json.getString("clientId");
-//    ConsumerWebSocket.send(clientId, Message.builder()
-//        .socket(socket)
-//        .id(json.getString("id"))
-//        .clientId(clientId)
-//        .method(json.getString("method"))
-//        .params(json.getJSONObject("result"))
-//        .error(json.getJSONObject("error"))
-//        .build());
+    Message msg = json.toJavaObject(Message.class);
+    msg.setJson(json);
+    dispatcher.dispatch(socket, msg);
   }
 
   @Override
@@ -72,6 +68,6 @@ public class ProducerWebSocket implements WebSocketListener {
 
   @Override
   public void onClose(WebSocket socket, CloseStatus reason) {
-    log.debug("[producer] WebSocket下线, id: {}, 数量: {}", socket.getId(), getManager().size());
+    log.debug("[producer] WebSocket下线, id: {}, reason: {}, 数量: {}", socket.getId(), reason, getManager().size());
   }
 }

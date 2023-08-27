@@ -2,7 +2,6 @@ package com.benefitj.websocketrelay.message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.benefitj.spring.websocket.WebSocket;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -13,10 +12,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class Message {
-
-  @JSONField(serialize = false, deserialize = false)
-  @JsonIgnore
-  WebSocket socket;
 
   @JSONField(serialize = false, deserialize = false)
   @JsonIgnore

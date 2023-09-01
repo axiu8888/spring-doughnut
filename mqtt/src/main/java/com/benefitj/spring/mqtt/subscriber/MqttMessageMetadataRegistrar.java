@@ -6,10 +6,12 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
+import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
+import com.benefitj.spring.ctx.SpringCtxHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -19,6 +21,7 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 import org.springframework.messaging.Message;
 
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -65,11 +68,25 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
       MqttMessageListener listener = metadata.getFirstAnnotation(MqttMessageListener.class);
-      if (listener.singleClient()) {
+      if (listener.singleClient() || StringUtils.isNotBlank(listener.serverURI())) {
         // 单独的客户端
         String prefix = StringUtils.isNotBlank(listener.clientIdPrefix()) ? listener.clientIdPrefix() : getPrefix();
         String id = IdUtils.nextLowerLetterId(prefix, null, 12);
-        PahoMqttClient client = new PahoMqttClient(getOptions(), id);
+        MqttConnectOptions opts = BeanHelper.copy(getOptions());
+        if (StringUtils.isNotBlank(listener.serverURI())) {
+          String serverURI;
+          try {
+            new URL(listener.serverURI());
+            serverURI = listener.serverURI();
+          } catch (Exception e) {
+            serverURI = SpringCtxHolder.getEnvProperty(listener.serverURI());
+            if (StringUtils.isBlank(serverURI)) {
+              throw new IllegalArgumentException("指定的MQTT地址错误: " + listener.serverURI());
+            }
+          }
+          opts.setServerURIs(new String[]{serverURI});
+        }
+        PahoMqttClient client = new PahoMqttClient(opts, id);
         client.setExecutor(EventLoop.newSingle(false));
         // 自动重连
         client.setAutoReconnect(true);

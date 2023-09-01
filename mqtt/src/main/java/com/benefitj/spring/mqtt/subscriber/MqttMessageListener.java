@@ -33,5 +33,9 @@ public @interface MqttMessageListener {
    */
   boolean singleClient() default false;
 
+  /**
+   * 自定义的服务端地址
+   */
+  String serverURI() default "";
 
 }

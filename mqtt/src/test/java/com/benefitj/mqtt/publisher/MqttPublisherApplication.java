@@ -1,9 +1,9 @@
-package com.benefitj.mqttpublisher;
+package com.benefitj.mqtt.publisher;
 
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.ShutdownHook;
-import com.benefitj.spring.listener.EnableAppStateListener;
+import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mqtt.event.EnableEventPublisher;
 import com.benefitj.spring.mqtt.event.EventPublisher;
@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * MQTT消息发布
  */
+@Slf4j
 @Profile("pub")
-@EnableAppStateListener
 @EnableEventPublisher
 @EnableMqttPublisher
 @SpringBootApplication
@@ -38,7 +39,8 @@ public class MqttPublisherApplication {
   }
 
   static {
-    EventLoop.main().execute(() -> {});
+    AppStateHook.registerStart((evt) -> log.info("app start..."));
+    AppStateHook.registerStop((evt) -> log.info("app stop..."));
   }
 
   /**
@@ -46,7 +48,7 @@ public class MqttPublisherApplication {
    */
   @Slf4j
   @Component
-  public static class Example {
+  public static class Example implements InitializingBean {
 
     private final EventLoop single = EventLoop.newSingle(false);
 
@@ -77,6 +79,10 @@ public class MqttPublisherApplication {
       }, 1, 5, TimeUnit.SECONDS);
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      log.error("................");
+    }
   }
 
   @SuperBuilder

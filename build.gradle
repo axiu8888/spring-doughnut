@@ -55,6 +55,7 @@ subprojects {
     compatibilityVersion = JavaVersion.VERSION_1_8
     // 默认是spring环境
     springEnv = true
+    springTest = true
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
     scriptFile = "${getRootDir()}/buildSystem/base.gradle"
 

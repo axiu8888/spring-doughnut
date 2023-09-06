@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * MQTT
@@ -39,8 +40,9 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
   /**
    * 消息发布的客户端
    */
-  @ConditionalOnMissingBean
-  @Bean
+  @Primary
+  @ConditionalOnMissingBean(name = "mqttPublisher")
+  @Bean("mqttPublisher")
   public MqttPublisher mqttPublisher(MqttConnectOptions options) {
     String[] URIs = StringUtils.isBlank(serverURIs) ? options.getServerURIs() : serverURIs.split(",");
     String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";

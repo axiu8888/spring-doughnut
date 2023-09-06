@@ -1,7 +1,7 @@
-package com.benefitj.mqttsubscriber;
+package com.benefitj.mqtt.subscriber;
 
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
-import com.benefitj.spring.listener.EnableAppStateListener;
+import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mqtt.subscriber.EnableMqttSubscriber;
 import com.benefitj.spring.mqtt.subscriber.MqttMessageListener;
@@ -17,12 +17,16 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Profile("sub")
-@EnableAppStateListener
 @EnableMqttSubscriber
 @SpringBootApplication
 public class MqttSubscriberApplication {
   public static void main(String[] args) {
     SpringApplication.run(MqttSubscriberApplication.class, args);
+  }
+
+  static {
+    AppStateHook.registerStart((evt) -> log.info("app start..."));
+    AppStateHook.registerStop((evt) -> log.info("app stop..."));
   }
 
   @Component
@@ -33,7 +37,8 @@ public class MqttSubscriberApplication {
 
     @MqttMessageListener(
         topics = "/device/#",
-        clientIdPrefix = "mqtt-subscriber-"
+        clientIdPrefix = "mqtt-subscriber-",
+        serverURI = "spring.mqtt.custom.serverURIs"
     )
     public void onMessage(String topic, byte[] payload) {
       log.info("1. {}, payload: {}", topic, new String(payload));

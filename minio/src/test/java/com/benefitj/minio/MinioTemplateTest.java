@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 @SpringBootTest(classes = {MinioConfiguration.class})
 @Slf4j
-public class MinioTemplateTest {
+class MinioTemplateTest {
 
   @Autowired
   MinioTemplate template;
@@ -160,7 +160,6 @@ public class MinioTemplateTest {
 //    String bucketName = "test";
 //    MinioResult result = template.setBucketReplication(null, Arrays.asList(
 //        new ReplicationRule(
-//
 //        )
 //    ), bucketName);
 //    log.info("设置副本：{}, msg: {}", result.isSuccessful(), result.getMessage());
@@ -178,7 +177,7 @@ public class MinioTemplateTest {
         , bucketName
         , result.isSuccessful()
         , result.getMessage()
-        , JSON.toJSONString((result.getData() != null ? result.getData().rules().stream() :  Stream.<LifecycleRule>empty())
+        , JSON.toJSONString((result.getData() != null ? result.getData().rules().stream() : Stream.<LifecycleRule>empty())
             .map(LifecycleRuleEntity::from)
             .collect(Collectors.toList()))
     );
@@ -193,6 +192,14 @@ public class MinioTemplateTest {
     boolean removeBucket = template.removeBucket(RemoveBucketArgs.builder(), bucketName, true);
     log.info("remove bucket, [{}], removeBucket: {} bucketExists ==>: {}"
         , bucketName, removeBucket, template.bucketExists(bucketName));
+  }
+
+  @Test
+  void test_delete() {
+    String bucketName = "test";
+    MinioResult<List<DeleteError>> result = template.removeObjects(bucketName, item -> item.objectName().startsWith("测试/tmp"));
+    log.info("remove bucket, [{}], removeBucket: {} bucketExists ==>: {}"
+        , bucketName, result, template.bucketExists(bucketName));
   }
 
   /**
@@ -230,7 +237,7 @@ public class MinioTemplateTest {
     File dir = new File("D:/tmp/");
     String prefix = "/测试/";
     List<SnowballObject> objects = MinioUtils.listObjects(dir, prefix, MinioUtils::snowballObject);
-    MinioResult<ObjectWriteResponse> result = template.uploadObjects(UploadSnowballObjectsArgs.builder()
+    MinioResult<ObjectWriteResponse> result = template.uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
             .objects(objects)
             .userMetadata(MinioUtils.mapOf(Pair.of("Author", "dxa"),
                 Pair.of("description", MinioUtils.encodeURL("测试"))))

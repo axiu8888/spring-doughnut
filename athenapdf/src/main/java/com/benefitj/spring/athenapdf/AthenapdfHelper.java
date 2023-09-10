@@ -50,9 +50,9 @@ public class AthenapdfHelper extends CmdExecutor {
    * @param network   网络别名(当在docker容器中执行时，可能会用到别名)
    * @return 返回调用结果（包含PDF文件）
    */
-  public AthenapdfCall execute(String volumeDir, File destDir, String filename, String url, @Nullable String network) {
+  public AthenapdfCall execute(@Nullable String electron, String volumeDir, File destDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
-    String cmd = formatCMD(volumeDir, filename, url, network);
+    String cmd = formatCMD(electron, volumeDir, filename, url, network);
     AthenapdfCall call = (AthenapdfCall) call(cmd, null, destDir, 60_000);
     File pdf = new File(destDir, filename);
     if (pdf.exists()) {
@@ -61,11 +61,14 @@ public class AthenapdfHelper extends CmdExecutor {
     return call;
   }
 
-  public String formatCMD(String volumeDir, String filename, String url, @Nullable String network) {
+  public String formatCMD(@Nullable String electron, String volumeDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
-    return  "docker run --rm --privileged=true" +
-        " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
-        + " -v " + volumeDir + ":/converted/ arachnysdocker/athenapdf athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
+    return "docker run --rm --privileged=true"
+        + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
+        + (StringUtils.isNotBlank(electron) ? " -v " + electron + ":/athenapdf" : "")
+        + " -v " + volumeDir + ":/converted/"
+        + " arachnysdocker/athenapdf"
+        + " athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
         + url
         + " " + filename;
   }

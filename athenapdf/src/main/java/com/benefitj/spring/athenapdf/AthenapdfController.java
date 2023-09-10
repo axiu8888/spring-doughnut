@@ -49,6 +49,11 @@ public class AthenapdfController {
   /**
    * Athenapdf映射的外部磁盘目录
    */
+  @Value("#{ @environment['spring.athenapdf.electron'] ?: null }")
+  private String electron;
+  /**
+   * Athenapdf映射的外部磁盘目录
+   */
   @Value("#{ @environment['spring.athenapdf.volume-dir'] ?: '/tmp/athenapdf-pdf/' }")
   private String volumeDir;
   /**
@@ -127,7 +132,7 @@ public class AthenapdfController {
     String cmd = null;
     if (!pdf.exists()) {
       callAthenaPdf = true;
-      AthenapdfCall call = athenapdfHelper.execute(volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
+      AthenapdfCall call = athenapdfHelper.execute(electron, volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
       if (!call.isSuccessful()) {
         log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
             , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());
@@ -143,7 +148,7 @@ public class AthenapdfController {
       scheduleDeleteTimer(url, pdf);
     }
     if (StringUtils.isBlank(cmd)) {
-      cmd = athenapdfHelper.formatCMD(volumeDir, pdf.getName(), url, null);
+      cmd = athenapdfHelper.formatCMD(electron, volumeDir, pdf.getName(), url, null);
     }
     log.info("{}, size: {}, callAthenaPdf: {}, cmd: {}, 使用时长: {}"
         , pdf.getAbsolutePath()

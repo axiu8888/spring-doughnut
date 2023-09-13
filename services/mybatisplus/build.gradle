@@ -7,12 +7,9 @@ plugins {
 
 apply from: "${scriptFile}"
 
-
-ext {
-  mybatisPlusVersion = "3.5.3"
-}
-
 dependencies {
+
+  implementation(project(":quartz"))
 
   implementation "org.springframework.boot:spring-boot-starter-web"
   implementation "org.springframework.boot:spring-boot-starter-websocket"

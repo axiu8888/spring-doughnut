@@ -28,6 +28,10 @@ public class MinioOptions {
    */
   private String secretKey;
   /**
+   * 桶名称
+   */
+  private String bucketName;
+  /**
    * 是否自动创建桶，如果桶不存在时
    */
   private boolean autoMakeBucket = false;
@@ -74,6 +78,14 @@ public class MinioOptions {
 
   public void setSecretKey(String secretKey) {
     this.secretKey = secretKey;
+  }
+
+  public String getBucketName() {
+    return bucketName;
+  }
+
+  public void setBucketName(String bucketName) {
+    this.bucketName = bucketName;
   }
 
   public boolean isAutoMakeBucket() {

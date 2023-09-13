@@ -5,7 +5,10 @@ apply from: "${scriptFile}"
 project.ext.upload = true
 
 dependencies {
+  compileOnly(project(":commons"))
   api(project(":spring"))
   // QUARTZ
 	api "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
+  // CG Lib
+  api 'cglib:cglib:3.3.0'
 }

@@ -1,5 +1,9 @@
 package com.benefitj.spring.quartz;
 
+import com.benefitj.spring.quartz.caller.DisallowConcurrentJobTaskCaller;
+import com.benefitj.spring.quartz.caller.PersistentJobTaskCaller;
+import com.benefitj.spring.quartz.caller.PersistentWithDisallowConcurrentJobTaskCaller;
+import com.benefitj.spring.quartz.caller.SimpleJobTaskCaller;
 import org.quartz.Job;
 
 /**
@@ -9,19 +13,19 @@ public enum JobType {
   /**
    * 默认类型
    */
-  DEFAULT(JobTaskCaller.SimpleJobTaskCaller.class, false, false),
+  DEFAULT(SimpleJobTaskCaller.class, false, false),
   /**
    * 执行后持久化数据
    */
-  PERSISTENT(JobTaskCaller.PersistentJobTaskCaller.class, true, false),
+  PERSISTENT(PersistentJobTaskCaller.class, true, false),
   /**
    * 不并发执行
    */
-  DISALLOW_CONCURRENT(JobTaskCaller.DisallowConcurrentJobTaskCaller.class, false, false),
+  DISALLOW_CONCURRENT(DisallowConcurrentJobTaskCaller.class, false, false),
   /**
    * 执行后持久化数据，并且不允许并发执行
    */
-  PERSISTENT_WITH_DISALLOW_CONCURRENT(JobTaskCaller.PersistentWithDisallowConcurrentJobTaskCaller.class, true, true);
+  PERSISTENT_WITH_DISALLOW_CONCURRENT(PersistentWithDisallowConcurrentJobTaskCaller.class, true, true);
 
   private final Class<? extends Job> jobClass;
 

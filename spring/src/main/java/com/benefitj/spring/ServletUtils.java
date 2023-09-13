@@ -1,6 +1,5 @@
 package com.benefitj.spring;
 
-import com.benefitj.core.CatchUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.http.ContentType;
 import org.apache.catalina.connector.ClientAbortException;
@@ -17,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,13 +25,13 @@ import java.util.Map;
  */
 public class ServletUtils {
 
-
   private static final Logger log = LoggerFactory.getLogger(ServletUtils.class);
 
   public static String APPLICATION_FROM_DATA = "application/form-data";
   public static String APPLICATION_JSON = "application/json";
   public static String APPLICATION_XML = "application/xml";
   public static String APPLICATION_FROM_URLENCODED = "application/x-www-form-urlencoded";
+  public static String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
 
   @Nullable
@@ -207,12 +207,28 @@ public class ServletUtils {
    * @return 返回 HttpServletResponse
    */
   public static HttpServletResponse write(HttpServletResponse response, int statusCode, byte[] body) {
-    CatchUtils.ignore(() -> {
-      response.setStatus(statusCode);
-      response.getOutputStream().write(body);
-      response.getOutputStream().flush();
-    });
+    response.setStatus(statusCode);
+    try {
+      write(response.getOutputStream(), body);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
     return response;
+  }
+
+  /**
+   * 响应
+   *
+   * @param body 数据
+   * @return 返回 HttpServletResponse
+   */
+  public static void write(OutputStream out, byte[] body) {
+    try {
+      out.write(body);
+      out.flush();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
   }
 
 
@@ -228,7 +244,7 @@ public class ServletUtils {
    * @return 返回上传的长度
    * @throws IOException IO异常
    */
-  public static RangeSettings upload(HttpServletRequest request,
+  public static RangeSettings upload(@Nullable HttpServletRequest request,
                                      final MultipartFile source,
                                      final File target) throws IOException {
     if (source == null || source.getSize() <= 0) {
@@ -256,9 +272,9 @@ public class ServletUtils {
    * @throws IOException           IO异常
    */
   public static RangeSettings download(HttpServletRequest request,
-                                                                    HttpServletResponse response,
-                                                                    final File source,
-                                                                    final String filename) throws FileNotFoundException, IOException {
+                                       HttpServletResponse response,
+                                       final File source,
+                                       final String filename) throws IOException {
     return download(request, response, source, filename, true);
   }
 
@@ -275,19 +291,18 @@ public class ServletUtils {
    * @throws IOException           IO异常
    */
   public static RangeSettings download(HttpServletRequest request,
-                                                                    HttpServletResponse response,
-                                                                    final File source,
-                                                                    final String filename,
-                                                                    final boolean acceptRanges) throws FileNotFoundException, IOException {
+                                       HttpServletResponse response,
+                                       final File source,
+                                       final String filename,
+                                       final boolean acceptRanges) throws IOException {
     if (!source.exists()) {
       throw new FileNotFoundException(source.getAbsolutePath());
     }
 
     final RangeSettings settings = setResponseHeaders(request, response, source, filename, acceptRanges);
-    try (final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(source));) {
+    try (final BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(source.toPath()));) {
       // 跳过 n 个字节
       bis.skip(settings.getStart());
-
       final ServletOutputStream out = response.getOutputStream();
       transferTo(bis, settings, (buff, len) -> out.write(buff, 0, len));
       out.flush();
@@ -321,7 +336,7 @@ public class ServletUtils {
    * @param source       文件
    * @param filename     下载的文件名
    * @param acceptRanges 是否支持断线续传
-   * @return
+   * @return 返回设置
    */
   public static RangeSettings setResponseHeaders(HttpServletRequest request,
                                                  HttpServletResponse response,
@@ -341,7 +356,11 @@ public class ServletUtils {
    * @param acceptRanges 是否断点续传
    * @return 返回解析的参数
    */
-  public static RangeSettings parseRangeHeader(HttpServletRequest request, long totalLength, boolean acceptRanges) {
+  public static RangeSettings parseRangeHeader(@Nullable HttpServletRequest request, long totalLength, boolean acceptRanges) {
+    request = request != null ? request : getRequest();
+    if (request == null) {
+      throw new IllegalArgumentException("request对象不能为null");
+    }
     String rangeHeader = request.getHeader("Range");
     RangeSettings settings;
     if ((rangeHeader == null || "".equals(rangeHeader.trim())) || !acceptRanges) {
@@ -389,7 +408,6 @@ public class ServletUtils {
   }
 
   public static class RangeSettings {
-
     /**
      * 开始的位置
      */

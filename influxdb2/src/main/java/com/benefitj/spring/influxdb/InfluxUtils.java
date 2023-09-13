@@ -9,7 +9,6 @@ import com.benefitj.spring.influxdb.convert.LineProtocolConverterFactory;
 import com.benefitj.spring.influxdb.convert.PointConverter;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -293,7 +292,7 @@ public class InfluxUtils {
    * @return 返回行协议对象
    */
   public static LineProtocol parseLine(String line) {
-    if (StringUtils.isBlank(line)) {
+    if (InfluxUtils.isBlank(line)) {
       throw new IllegalArgumentException("数据不能为空");
     }
     LineProtocol lineProtocol = new LineProtocol();
@@ -326,7 +325,7 @@ public class InfluxUtils {
                 break;
               case 1: {
                 String str = line.substring(startAt, i);
-                if (StringUtils.isNotBlank(str)) {
+                if (InfluxUtils.isNotBlank(str)) {
                   String[] splits = str.split("=");
                   lineProtocol.getTags().put(splits[0], splits[1]);
                 }

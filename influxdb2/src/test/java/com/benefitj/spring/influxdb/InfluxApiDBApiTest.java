@@ -1,5 +1,6 @@
 package com.benefitj.spring.influxdb;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
@@ -10,16 +11,19 @@ import com.benefitj.http.ProgressRequestBody;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
+import com.benefitj.spring.influxdb.pojo.HsDataStatisticEntity;
 import com.benefitj.spring.influxdb.pojo.InfluxWavePackage;
 import com.benefitj.spring.influxdb.spring.InfluxConfiguration;
 import com.benefitj.spring.influxdb.template.*;
 import com.squareup.moshi.Moshi;
+import io.reactivex.Flowable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.RequestBody;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +94,19 @@ public class InfluxApiDBApiTest {
   void testQuery() {
     QueryResult result = template.postQuery("SHOW MEASUREMENTS ON test;");
     log.info("result ===>: {}", JSON.toJSONString(result));
+  }
+
+  @Test
+  void testQuery2() {
+    Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap("hs_wave_package", true);
+    log.info("fieldKeyMap ==>: \n{}\n", JSON.toJSONString(fieldKeyMap));
+    template.query("SELECT *  FROM hs_wave_package WHERE patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d' order by time desc limit 10")
+        .subscribe(new SimpleSubscriber<QueryResult>() {
+          @Override
+          public void onNext(QueryResult result) {
+            log.info("result ===>: \n{}\n", JSON.toJSONString(result));
+          }
+        });
   }
 
   @Test
@@ -195,8 +212,59 @@ public class InfluxApiDBApiTest {
 
   @Test
   void testMeasurementInfo() {
-    Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap(template.getDatabase(), template.getRetentionPolicy(), "hs_wave_package", true);
+    Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap("hs_wave_package", true);
     log.info("fieldKeyMap: \n{}", JSON.toJSONString(fieldKeyMap, JSONWriter.Feature.PrettyFormat));
+  }
+
+  @Test
+  void test_createContinuousQuery() {
+    long startTime = TimeUtils.getYesterday(0, 0, 0);
+    long endTIme = TimeUtils.getToday(0, 0, 0);
+    String subSql = String.format("SELECT count(package_sn) AS count" +
+            " FROM hs_wave_package" +
+            " WHERE time >= '%s' AND time <= '%s' AND device_id != person_zid" +
+            " GROUP BY person_zid, device_id"
+        , DateFmtter.fmtUtc(startTime)
+        , DateFmtter.fmtUtc(endTIme)
+    );
+    String sql = String.format("SELECT *" +
+        " INTO hs_data_statistic" +
+        " FROM (%s)" +
+        " WHERE count > 0", subSql);
+    log.info("test_createContinuousQuery: {}", sql);
+//    QueryResult result = template.createContinuousQuery("data_statistic_1d", template.getDatabase(), sql);
+//    log.info("result: {}", JSON.toJSONString(result));
+  }
+
+  @Test
+  void testQueryDataStatistic() {
+    String sql = "SELECT *" +
+        " FROM (" +
+        "  SELECT count(package_sn) AS count" +
+        "  FROM hs_wave_package" +
+        "  WHERE time >= '2023-08-22T16:00:00.001Z' AND time <= '2023-08-23T15:59:59.999Z' AND device_id != person_zid" +
+        "  GROUP BY person_zid, device_id" +
+        " )" +
+        " WHERE count > 0";
+    List<HsDataStatisticEntity> list = new LinkedList<>();
+    template.query(sql)
+        .subscribe(new QueryObserver() {
+          @Override
+          public void onSeriesStart(QueryResult.Series series, ValueConverter c) {
+            log.info("result: \n{}\n", JSON.toJSONString(series));
+          }
+
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            JSONObject json = new JSONObject();
+            c.getTags().forEach((tag, v) -> json.set(tag, c.getValue(tag, null)));
+            c.getColumns().forEach(column -> json.set(column, c.getValue(column, null)));
+            json.set("time", c.getTime());
+            json.set("date", DateFmtter.fmtDate(c.getTime()));
+            list.add(json.toBean(HsDataStatisticEntity.class));
+          }
+        });
+    log.info("list: \n{}\n", JSON.toJSONString(list));
   }
 
   /**
@@ -204,9 +272,11 @@ public class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 8, 17, 18, 44, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 8, 17, 18, 55, 0).getTime();
-    String condition = " AND device_id = '01001049'";
+    long startTime = TimeUtils.toDate(2023, 8, 20, 0, 0, 0).getTime();
+    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
+//    String condition = " AND device_id = '01001049'";
+//    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
+    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -222,7 +292,7 @@ public class InfluxApiDBApiTest {
         .forEach(measurementInfo -> {
           File line = IOUtils.createFile(dir, measurementInfo.name + ".line");
           template.export(line, measurementInfo.name, 5000, startTime, endTime, condition);
-          if (line.length() <= 0) {
+          if (line.length() <= 20) {
             line.delete(); // 没有数据，删除空文件
           }
         });
@@ -240,14 +310,15 @@ public class InfluxApiDBApiTest {
    */
   @Test
   void test_loadLines() {
+    test_createSubscriptions();
     File dir = new File("D:/tmp/influxdb");
-    File[] lines = dir.listFiles(f -> f.length() > 0
+    File[] lines = dir.listFiles(f -> f.length() > 20
         //&& f.getName().endsWith(".line")
         //&& f.getName().endsWith(".point")
         && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
     );
     assert lines != null;
-    upload(Arrays.asList(lines), true);
+    upload(Arrays.asList(lines), false);
   }
 
   /**
@@ -283,15 +354,15 @@ public class InfluxApiDBApiTest {
     srcTemplate.setApi(factory.create(srcOptions));
     srcTemplate.setJsonAdapter(new Moshi.Builder().build().adapter(QueryResult.class));
 
-    long startTime = TimeUtils.getYesterday(8, 0, 0);
-    long endTime = TimeUtils.getYesterday(20, 0, 0);
+    long startTime = TimeUtils.toDate(2023, 8, 28, 20, 36, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 8, 28, 20, 50, 0).getTime();
     log.info("startTime: {}, endTime: {}", DateFmtter.fmt(startTime), DateFmtter.fmt(endTime));
-    //String condition = " AND device_id = '01001049'";
+    String condition = " AND device_id = '11000138'";
     //String condition = " AND person_zid = 'a32610dd1f774293b0aebd11d739dd3c'";
     //String condition = " AND person_zid = 'b4ca64b27cd74094b005cd3014aaab63'";
-    String condition = "";
-    boolean exportPoint = false;
-//    boolean exportPoint = true;
+    //String condition = "";
+//    boolean exportPoint = false;
+    boolean exportPoint = true;
     if (exportPoint) {
       waveToPoints(srcTemplate
           , dir
@@ -314,15 +385,34 @@ public class InfluxApiDBApiTest {
       );
     }
 
-    // 导出全部的数据
-    exportAll(srcTemplate, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
+//    // 导出全部的数据
+//    exportAll(srcTemplate, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
 
     List<File> lines = Stream.of(Objects.requireNonNull(dir.listFiles()))
-        .filter(f -> f.length() > 0)
+        .filter(f -> f.length() > 20)
         .filter(f -> f.getName().endsWith(".point") || f.getName().endsWith(".line"))
         .collect(Collectors.toList());
     upload(lines, true);
 
+  }
+
+  @Test
+  void test_statistic() {
+    String sql = "SELECT ecg, chResp, abdResp, spo2" +
+        " FROM " +
+        " (SELECT COUNT(ecg_points) AS ecg, COUNT(resp_points) AS chResp, COUNT(abdominal_points) AS abdResp FROM hs_wave_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' GROUP BY patient_id, device_id)" +
+        " ,(SELECT COUNT(package_sn) AS spo2 FROM hs_base_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' AND spo2_conn_state = 0 GROUP BY patient_id, device_id)"
+        ;
+    log.error("sql: \n{}\n", sql);
+    Flowable.just(template.postQuery(template.getDatabase(), sql))
+        .subscribe(result -> {
+          log.info("result: \n{}", JSON.toJSONString(result));
+        }, Throwable::printStackTrace);
+
+    template.query("SELECT COUNT(ecg_points) AS ecg, COUNT(resp_points) AS chResp, COUNT(abdominal_points) AS abdResp FROM hs_wave_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' GROUP BY patient_id, device_id")
+        .subscribe(result -> {
+          log.info("result2: \n{}", JSON.toJSONString(result));
+        }, Throwable::printStackTrace);
   }
 
   void upload(List<File> lines, boolean delete) {
@@ -335,7 +425,7 @@ public class InfluxApiDBApiTest {
         prev.set(current.get());
         current.set(progress);
       }));
-      if(delete) line.delete();
+      if (delete) line.delete();
     }
   }
 
@@ -393,6 +483,9 @@ public class InfluxApiDBApiTest {
     AtomicReference<FileWriterImpl> writerRef = new AtomicReference<>();
     AtomicInteger index = new AtomicInteger(1);
     IOUtils.readLines(lineFile, line -> {
+      if (StringUtils.isBlank(line)) {
+        return;
+      }
       List<String> lines = converter.apply(line, InfluxUtils.parseLine(line));
       if (writerRef.get() == null) {
         String filename = lineFile.getName().replace(".line", "_" + index.getAndIncrement() + ".point");

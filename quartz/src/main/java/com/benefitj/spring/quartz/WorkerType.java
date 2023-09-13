@@ -15,7 +15,13 @@ public enum WorkerType {
   /**
    * spring 组件类
    */
-  SPRING_BEAN_CLASS;
+  SPRING_BEAN_CLASS,
+  /**
+   * JobWorker
+   */
+  JOB_WORKER,
+
+  ;
 
   /**
    * 获取 WorkerType

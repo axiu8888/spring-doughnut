@@ -1,13 +1,15 @@
 package com.benefitj.spring.quartz;
 
-import com.benefitj.spring.ctx.EnableSpringCtxInit;
+import com.benefitj.spring.quartz.job.QuartzJobManager;
+import com.benefitj.spring.quartz.job.QuartzJobProcessor;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
 import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
+import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
 import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -21,24 +23,24 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import java.util.Map;
 import java.util.Properties;
 
-@EnableSpringCtxInit
 @EnableConfigurationProperties
-@PropertySource("classpath:/quartz-spring.properties")
+@PropertySource("classpath:quartz-spring.properties")
+@QuartzTransactionManager
+@QuartzDataSource
 @Configuration
 public class QuartzConfiguration {
 
-  @ConditionalOnMissingBean(QuartzSchedulerFactory.class)
+  @ConditionalOnMissingBean
   @Bean
-  public QuartzSchedulerFactory schedulerFactory(QuartzProperties quartzProperties, ApplicationContext context) {
+  public StdSchedulerFactory schedulerFactory(QuartzProperties quartzProperties) {
+    final Properties properties = new Properties();
+    final Map<String, String> map = quartzProperties.getProperties();
+    map.forEach((key, value) -> properties.put(
+        key.replaceFirst("spring.quartz.properties.", ""), value));
     try {
-      final Properties properties = new Properties();
-      final Map<String, String> map = quartzProperties.getProperties();
-      map.forEach((key, value) -> properties.put(
-          key.replaceFirst("spring.quartz.properties.", ""), value));
-      StdSchedulerFactory factory = new StdSchedulerFactory(properties);
-      return new QuartzSchedulerFactory(context, factory);
+      return new QuartzStdSchedulerFactory(properties);
     } catch (SchedulerException e) {
-      throw new BeanInstantiationException(QuartzSchedulerFactory.class, e.getMessage());
+      throw new IllegalStateException(e);
     }
   }
 
@@ -94,6 +96,18 @@ public class QuartzConfiguration {
     Properties properties = new Properties();
     properties.putAll(source);
     return properties;
+  }
+
+  @ConditionalOnMissingBean
+  @Bean
+  public QuartzJobManager quartzJobManager() {
+    return new QuartzJobManager();
+  }
+
+  @ConditionalOnMissingBean(name = "quartzJobProcessor")
+  @Bean("quartzJobProcessor")
+  public QuartzJobProcessor quartzJobProcessor(QuartzJobManager manager) {
+    return new QuartzJobProcessor(manager);
   }
 
 }

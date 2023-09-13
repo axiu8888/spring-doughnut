@@ -467,11 +467,11 @@ public interface InfluxTemplate {
         .flatMap(s -> s.getValues()
             .stream()
             .map(values -> {
-              ContinuousQuery continuousQuery = new ContinuousQuery();
-              continuousQuery.setDatabase(s.getName());
-              continuousQuery.setName(String.valueOf(values.get(0)));
-              continuousQuery.setQuery(String.valueOf(values.get(1)));
-              return continuousQuery;
+              ContinuousQuery cq = new ContinuousQuery();
+              cq.setDatabase(s.getName());
+              cq.setName(String.valueOf(values.get(0)));
+              cq.setQuery(String.valueOf(values.get(1)));
+              return cq;
             }))
         .collect(Collectors.toList());
   }
@@ -570,6 +570,21 @@ public interface InfluxTemplate {
   default QueryResult dropSubscription(String name, String db, String retentionPolicy) {
     // DROP SUBSCRIPTION "<subscription_name>" ON "<db_name>"."<retention_policy>"
     return postQuery(String.format("DROP SUBSCRIPTION \"%s\" ON \"%s\".\"%s\"", name, db, retentionPolicy));
+  }
+
+  /**
+   * 创建 continuous query
+   *
+   * @param name          名称
+   * @param database      数据库
+   * @param selectIntoSQL select into 语句
+   * @return 返回结果
+   */
+  default QueryResult createContinuousQuery(String name, String database, String selectIntoSQL) {
+    return postQuery("CREATE CONTINUOUS QUERY \"" + name + "\" ON \"" + database + "\"\n"
+        + "BEGIN\n"
+        + selectIntoSQL
+        + "END\n");
   }
 
   /**

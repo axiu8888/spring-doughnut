@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.http.ContentType;
 import org.apache.catalina.connector.ClientAbortException;
@@ -220,12 +221,28 @@ public class ServletUtils {
    * 响应
    *
    * @param body 数据
-   * @return 返回 HttpServletResponse
    */
   public static void write(OutputStream out, byte[] body) {
     try {
       out.write(body);
       out.flush();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 响应文件
+   *
+   * @param response HTTP响应
+   * @param file     返回的文件
+   */
+  public static void write(HttpServletResponse response, File file) {
+    response.setContentType("application/octet-stream");
+    response.setContentLengthLong(file.length());
+    response.setHeader("Content-Disposition", "attachment;filename=" + new String(file.getName().getBytes(), StandardCharsets.ISO_8859_1));
+    try {
+      IOUtils.write(file, response.getOutputStream(), false);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
@@ -372,7 +389,7 @@ public class ServletUtils {
   }
 
   public static void setResponseHeaders(HttpServletResponse response, RangeSettings settings, String filename) {
-    response.addHeader("Content-Disposition", "attachment; filename=" +
+    response.addHeader("Content-Disposition", "attachment;filename=" +
         new String(filename.getBytes(), StandardCharsets.ISO_8859_1));
     // set the MIME type.
     response.setContentType(ContentType.get(filename));

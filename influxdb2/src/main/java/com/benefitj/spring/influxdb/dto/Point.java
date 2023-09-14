@@ -49,7 +49,7 @@ public class Point {
    * @param measurement
    *            the measurement to set
    */
-  void setMeasurement(final String measurement) {
+  public void setMeasurement(final String measurement) {
     this.measurement = measurement;
   }
 
@@ -57,7 +57,7 @@ public class Point {
    * @param time
    *            the time to set
    */
-  void setTime(final Number time) {
+  public void setTime(final Number time) {
     this.time = time;
   }
 
@@ -65,14 +65,14 @@ public class Point {
    * @param tags
    *            the tags to set
    */
-  void setTags(final Map<String, String> tags) {
+  public void setTags(final Map<String, String> tags) {
     this.tags = tags;
   }
 
   /**
    * @return the tags
    */
-  Map<String, String> getTags() {
+  public Map<String, String> getTags() {
     return this.tags;
   }
 
@@ -80,14 +80,14 @@ public class Point {
    * @param precision
    *            the precision to set
    */
-  void setPrecision(final TimeUnit precision) {
+  public void setPrecision(final TimeUnit precision) {
     this.precision = precision;
   }
 
   /**
    * @return the fields
    */
-  Map<String, Object> getFields() {
+  public Map<String, Object> getFields() {
     return this.fields;
   }
 
@@ -95,8 +95,24 @@ public class Point {
    * @param fields
    *            the fields to set
    */
-  void setFields(final Map<String, Object> fields) {
+  public void setFields(final Map<String, Object> fields) {
     this.fields = fields;
+  }
+
+  public void removeTag(String name) {
+    getTags().remove(name);
+  }
+
+  public void removeField(String name) {
+    getFields().remove(name);
+  }
+
+  public boolean hasTag(String name) {
+    return getTags().containsKey(name);
+  }
+
+  public boolean hasField(String name) {
+    return getFields().containsKey(name);
   }
 
   @Override
@@ -361,6 +377,14 @@ public class Point {
       this.measurement = measurement;
     }
 
+    public Map<String, String> getTags() {
+      return tags;
+    }
+
+    public Map<String, Object> getFields() {
+      return fields;
+    }
+
     /**
      * Add a tag to this point.
      *
@@ -515,6 +539,18 @@ public class Point {
       return time((Number) timeToSet, precisionToSet);
     }
 
+    public void removeTag(String name) {
+      getTags().remove(name);
+    }
+
+    public void removeField(String name) {
+      getFields().remove(name);
+    }
+
+    public boolean hasField(String name) {
+      return getFields().containsKey(name);
+    }
+
     /**
      * Does this builder contain any fields?
      *
@@ -615,6 +651,7 @@ public class Point {
       point.setTags(this.tags);
       return point;
     }
+
   }
 
 }

@@ -1,18 +1,19 @@
 package com.benefitj.spring.influxdb;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.benefitj.core.*;
 import com.benefitj.core.file.FileWriterImpl;
 import com.benefitj.core.file.IWriter;
 import com.benefitj.http.ProgressRequestBody;
+import com.benefitj.javastruct.JavaStructManager;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
 import com.benefitj.spring.influxdb.pojo.HsDataStatisticEntity;
 import com.benefitj.spring.influxdb.pojo.InfluxWavePackage;
+import com.benefitj.spring.influxdb.pojo.SleepPacket;
 import com.benefitj.spring.influxdb.spring.InfluxConfiguration;
 import com.benefitj.spring.influxdb.template.*;
 import com.squareup.moshi.Moshi;
@@ -164,7 +165,7 @@ public class InfluxApiDBApiTest {
 
   @Test
   void testQueryChunk() {
-    IWriter writer = IWriter.newFileWriter("D:/tmp/influxdb/" + IdUtils.uuid() + ".line");
+    IWriter writer = IWriter.createWriter("D:/tmp/influxdb/" + IdUtils.uuid() + ".line", false);
     template.query("SELECT * FROM hs_wave_package WHERE time >= 1d GROUP BY person_zid LIMIT 100;", 10)
         .subscribe(new QueryObserver() {
           @Override
@@ -186,7 +187,8 @@ public class InfluxApiDBApiTest {
 
           @Override
           public void onQueryComplete() {
-            writer.flush().close();
+            writer.flush();
+            writer.close();
           }
         });
   }
@@ -257,11 +259,11 @@ public class InfluxApiDBApiTest {
           @Override
           public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
             JSONObject json = new JSONObject();
-            c.getTags().forEach((tag, v) -> json.set(tag, c.getValue(tag, null)));
-            c.getColumns().forEach(column -> json.set(column, c.getValue(column, null)));
-            json.set("time", c.getTime());
-            json.set("date", DateFmtter.fmtDate(c.getTime()));
-            list.add(json.toBean(HsDataStatisticEntity.class));
+            c.getTags().forEach((tag, v) -> json.put(tag, c.getValue(tag, null)));
+            c.getColumns().forEach(column -> json.put(column, c.getValue(column, null)));
+            json.put("time", c.getTime());
+            json.put("date", DateFmtter.fmtDate(c.getTime()));
+            list.add(json.toJavaObject(HsDataStatisticEntity.class));
           }
         });
     log.info("list: \n{}\n", JSON.toJSONString(list));
@@ -318,7 +320,7 @@ public class InfluxApiDBApiTest {
         && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
     );
     assert lines != null;
-    upload(Arrays.asList(lines), false);
+    upload(template, Arrays.asList(lines), false);
   }
 
   /**
@@ -330,7 +332,7 @@ public class InfluxApiDBApiTest {
     LineProtocol lineProtocol = InfluxUtils.parseLine(line);
     log.info("lineProtocol ==>: \n{}\n", JSON.toJSONString(lineProtocol));
     InfluxWavePackage pkg = lineProtocol.toPoJo(InfluxWavePackage.class);
-    log.info("pkg: \n{}", JSONUtil.toJsonPrettyStr(pkg));
+    log.info("pkg: \n{}", JSON.toJSONString(pkg, JSONWriter.Feature.PrettyFormat));
   }
 
   /**
@@ -354,12 +356,11 @@ public class InfluxApiDBApiTest {
     srcTemplate.setApi(factory.create(srcOptions));
     srcTemplate.setJsonAdapter(new Moshi.Builder().build().adapter(QueryResult.class));
 
-    long startTime = TimeUtils.toDate(2023, 8, 28, 20, 36, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 8, 28, 20, 50, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 9, 13, 21, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 9, 14, 21, 30, 0).getTime();
     log.info("startTime: {}, endTime: {}", DateFmtter.fmt(startTime), DateFmtter.fmt(endTime));
-    String condition = " AND device_id = '11000138'";
-    //String condition = " AND person_zid = 'a32610dd1f774293b0aebd11d739dd3c'";
-    //String condition = " AND person_zid = 'b4ca64b27cd74094b005cd3014aaab63'";
+//    String condition = " AND device_id = '11000138'";
+    String condition = " AND person_zid = 'a88ce9327eeb405ea8f2a9c56440bb01'";
     //String condition = "";
 //    boolean exportPoint = false;
     boolean exportPoint = true;
@@ -371,7 +372,8 @@ public class InfluxApiDBApiTest {
           , endTime
           , condition
           , (line, base) -> mapWaveToPoints(base, "hs_wave_point"
-              , "ecg_points", "spo2_points", "resp_points", "abdominal_resp_points", "x_points", "y_points", "z_points")
+              , "ecg_points", "resp_points", "abdominal_resp_points"//, "spo2_points", "x_points", "y_points", "z_points"
+          )
       );
 
       waveToPoints(srcTemplate
@@ -390,9 +392,10 @@ public class InfluxApiDBApiTest {
 
     List<File> lines = Stream.of(Objects.requireNonNull(dir.listFiles()))
         .filter(f -> f.length() > 20)
-        .filter(f -> f.getName().endsWith(".point") || f.getName().endsWith(".line"))
+//        .filter(f -> f.getName().endsWith(".point") || f.getName().endsWith(".line"))
+        .filter(f -> f.getName().endsWith(".point"))
         .collect(Collectors.toList());
-    upload(lines, true);
+    upload(template, lines, true);
 
   }
 
@@ -401,8 +404,7 @@ public class InfluxApiDBApiTest {
     String sql = "SELECT ecg, chResp, abdResp, spo2" +
         " FROM " +
         " (SELECT COUNT(ecg_points) AS ecg, COUNT(resp_points) AS chResp, COUNT(abdominal_points) AS abdResp FROM hs_wave_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' GROUP BY patient_id, device_id)" +
-        " ,(SELECT COUNT(package_sn) AS spo2 FROM hs_base_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' AND spo2_conn_state = 0 GROUP BY patient_id, device_id)"
-        ;
+        " ,(SELECT COUNT(package_sn) AS spo2 FROM hs_base_package WHERE time >= '2023-08-23T16:00:00Z' AND time < '2023-08-24T16:00:00Z' AND device_id != patient_id AND patient_id != '' AND spo2_conn_state = 0 GROUP BY patient_id, device_id)";
     log.error("sql: \n{}\n", sql);
     Flowable.just(template.postQuery(template.getDatabase(), sql))
         .subscribe(result -> {
@@ -415,7 +417,7 @@ public class InfluxApiDBApiTest {
         }, Throwable::printStackTrace);
   }
 
-  void upload(List<File> lines, boolean delete) {
+  void upload(InfluxTemplate template, List<File> lines, boolean delete) {
     for (File line : lines) {
       log.info("upload file: {}", line);
       AtomicLong prev = new AtomicLong(0);
@@ -443,22 +445,29 @@ public class InfluxApiDBApiTest {
       }
     });
 
+    List<Integer> respList = new ArrayList<>(25);
     List<String> lines = new LinkedList<>();
     List<WaveColumn> waveList = Stream.of(columns)
-        .map(column -> new WaveColumn(column, column.replace("_points", ""), JSON.parseObject((String) baseFields.get(column), int[].class)))
+        .map(column -> new WaveColumn(column, column.replace("_points", ""), JSON.parseObject((String) baseFields.get(column), int[].class), 1))
         .collect(Collectors.toList());
     WaveColumn maxColumn = waveList.stream()
-        .min((o1, o2) -> Integer.compare(o2.wave.length, o1.wave.length))
+        .max(Comparator.comparingInt(o -> o.wave.length))
         .orElse(null);
-    long maxLen = maxColumn.wave.length;
+    int maxLen = maxColumn.wave.length;
+    waveList.forEach(wv -> wv.setRatio(maxLen / wv.wave.length));
     long interval = 1000L / maxLen;
     for (int i = 0; i < maxLen; i++) {
       copy.setTime(base.getTime() + TimeUnit.MILLISECONDS.toNanos(i * interval));
       Point.Builder point = copy.toPointBuilder();
       for (WaveColumn wc : waveList) {
-        if (i % (maxLen / wc.wave.length) == 0) {
-          point.addField(wc.name, wc.wave[i % wc.wave.length]);
+        if (i % wc.ratio == 0) {
+          point.addField(wc.name, wc.wave[i / wc.ratio]);
+        } else {
+          point.removeField(wc.name + "_conn_state");
         }
+      }
+      if (!point.hasField("abdominal_resp")) {
+        point.removeField("abdomina_conn_state");
       }
       lines.add(point.build().lineProtocol());
     }
@@ -473,23 +482,23 @@ public class InfluxApiDBApiTest {
                            long endTime,
                            String condition,
                            BiFunction<String, LineProtocol, List<String>> converter) {
-    File lineFile = new File(dir, measurement + ".line");
+    File file = new File(dir, measurement + ".line");
     // 导出line文件
-    template.export(lineFile, measurement, 1000, startTime, endTime, condition);
-    if (lineFile.length() <= 0) {
-      lineFile.delete();
+    template.export(file, measurement, 1000, startTime, endTime, condition);
+    if (file.length() <= 0) {
+      file.delete();
       return;
     }
     AtomicReference<FileWriterImpl> writerRef = new AtomicReference<>();
     AtomicInteger index = new AtomicInteger(1);
-    IOUtils.readLines(lineFile, line -> {
+    IOUtils.readLines(file, (line, num) -> {
       if (StringUtils.isBlank(line)) {
         return;
       }
       List<String> lines = converter.apply(line, InfluxUtils.parseLine(line));
       if (writerRef.get() == null) {
-        String filename = lineFile.getName().replace(".line", "_" + index.getAndIncrement() + ".point");
-        writerRef.set(new FileWriterImpl(IOUtils.createFile(dir, filename)));
+        String filename = file.getName().replace(".line", "_" + index.getAndIncrement() + ".point");
+        writerRef.set(new FileWriterImpl(IOUtils.createFile(dir, filename), false));
       }
       FileWriterImpl writer = writerRef.get();
       writer.writeAndFlush(String.join("\n", lines), "\n");
@@ -512,5 +521,89 @@ public class InfluxApiDBApiTest {
     String rawName;
     String name;
     int[] wave;
+    int ratio;
   }
+
+  static final String ARR_200;
+  static final String ARR_25;
+  static final String ARR_50;
+
+  static {
+    int[] arr200 = new int[200];
+    Arrays.fill(arr200, 512);
+    ARR_200 = JSON.toJSONString(arr200);
+
+    int[] arr25 = new int[25];
+    Arrays.fill(arr25, 0);
+    ARR_25 = JSON.toJSONString(arr25);
+
+    int[] arr50 = new int[50];
+    Arrays.fill(arr50, 0);
+    ARR_50 = JSON.toJSONString(arr200);
+  }
+
+  @Test
+  void test_exportSleep() {
+    String personZid = "0f7c59ae2a6f4b6b99f0adc9963ef2e3";
+    String startTime = DateFmtter.fmtUtc(TimeUtils.toDate(2023, 9, 13, 21, 0, 0));
+    String endTime = DateFmtter.fmtUtc(TimeUtils.toDate(2023, 9, 14, 8, 0, 0));
+
+    String clause = String.format(" WHERE person_zid = '%s' AND time >= '%s' AND time < '%s'", personZid, startTime, endTime);
+    Map<Long, JSONObject> allRates = new LinkedHashMap<>();
+    template.query("SELECT first(heart_rate) AS hr, first(resp_rate) AS rr, first(spo2) AS spo2, first(gesture) AS gesture" +
+            " FROM hs_all_rates" + clause +
+            " GROUP BY time(1s) fill(null)")
+        .subscribe(new QueryObserver() {
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            allRates.put(c.getTime() / 1000L, new JSONObject() {{
+              put("hr", c.getInteger("hr"));
+              put("rr", c.getInteger("rr"));
+              put("spo2", c.getInteger("spo2"));
+              put("gesture", c.getInteger("gesture"));
+            }});
+          }
+        });
+    String sql = "SELECT" +
+        " first(ecg_points) AS ecg" +
+        ", first(resp_points) AS chResp" +
+        ", first(abdominal_resp_points) AS abdResp" +
+        ", first(x_points) AS x" +
+        ", first(y_points) AS y" +
+        ", first(z_points) AS z" +
+        " FROM hs_wave_package" + clause + " GROUP BY time(1s) fill(null)";
+    log.info("sql: \n{}\n", sql);
+    IWriter writer = IWriter.createWriter(IOUtils.createFile("D:/tmp/sleepData.dat"), false);
+    template.query(sql)
+        .subscribe(new QueryObserver() {
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            JSONObject rates = allRates.get(c.getTime() / 1000L);
+            SleepPacket pkg = SleepPacket.builder()
+                .time(c.getTime() / 1000L)
+                .ecg(JSON.parseObject(c.getString("ecg", ARR_200), int[].class))
+                .chResp(JSON.parseObject(c.getString("chResp", ARR_25), int[].class))
+                .abdResp(JSON.parseObject(c.getString("abdResp", ARR_25), int[].class))
+                .x(JSON.parseObject(c.getString("x", ARR_25), int[].class))
+                .y(JSON.parseObject(c.getString("y", ARR_25), int[].class))
+                .z(JSON.parseObject(c.getString("z", ARR_25), int[].class))
+                .hr(rates != null ? rates.getIntValue("hr", 0) : 0)
+                .rr(rates != null ? rates.getIntValue("rr", 0) : 0)
+                .spo2(rates != null ? rates.getIntValue("spo2", 0) : 0)
+                .gesture(rates != null ? rates.getIntValue("gesture", 0) : 0)
+                .build();
+            byte[] bytes = JavaStructManager.INSTANCE.toBytes(pkg);
+//            log.info("time: {}, data[{}]: {}, {}"
+//                , DateFmtter.fmt(c.getTime())
+//                , bytes.length
+//                , HexUtils.bytesToHex(bytes)
+//                , JSON.toJSONString(pkg)
+//            );
+            writer.writeAndFlush(bytes);
+          }
+        });
+    writer.flush();
+    writer.close();
+  }
+
 }

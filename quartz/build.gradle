@@ -7,8 +7,10 @@ project.ext.upload = true
 dependencies {
   compileOnly(project(":commons"))
   api(project(":spring"))
+  api(project(":aop"))
   // QUARTZ
 	api "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
+	compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
   // CG Lib
   api 'cglib:cglib:3.3.0'
 }

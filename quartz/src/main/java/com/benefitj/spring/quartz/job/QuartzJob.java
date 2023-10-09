@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @author dxa
  */
 @Documented
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface QuartzJob {
@@ -21,6 +21,6 @@ public @interface QuartzJob {
   /**
    * 描述
    */
-  String description() default "";
+  String description();
 
 }

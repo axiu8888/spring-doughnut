@@ -10,6 +10,14 @@ dependencies {
       "org.springframework.boot:spring-boot-starter-security:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}",
+
+      // jwt
+      "io.jsonwebtoken:jjwt-api:${jjwtVersion}",
+      "io.jsonwebtoken:jjwt-impl:${jjwtVersion}",
+      "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}",
+
+      "com.alibaba.fastjson2:fastjson2:${fastjson2Version}",
+
   ].forEach { compileOnly(it) }
 
   [

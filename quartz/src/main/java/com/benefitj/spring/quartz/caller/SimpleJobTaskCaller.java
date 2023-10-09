@@ -40,6 +40,9 @@ public class SimpleJobTaskCaller implements JobTaskCaller {
         case SPRING_BEAN_CLASS:
           jobWorker = getBean(classForName(worker));
           break;
+        case QUARTZ_JOB_WORKER:
+          jobWorker = newQuartzJobWorker();
+          break;
       }
       if (jobWorker != null) {
         if (jobWorker instanceof JobWorker) {
@@ -55,5 +58,6 @@ public class SimpleJobTaskCaller implements JobTaskCaller {
       throw new JobExecutionException(e);
     }
   }
+
 
 }

@@ -4,17 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.benefitj.mybatisplus.entitydescriptor.EntityDescriptor;
-import com.benefitj.mybatisplus.entitydescriptor.EntityFinder;
-import com.benefitj.mybatisplus.entitydescriptor.PropertyDescriptor;
-import com.benefitj.mybatisplus.model.EntityBase;
+import com.benefitj.mybatisplus.service.entitydescriptor.EntityDescriptor;
+import com.benefitj.mybatisplus.service.entitydescriptor.EntityFinder;
+import com.benefitj.mybatisplus.service.entitydescriptor.PropertyDescriptor;
+import com.benefitj.mybatisplus.entity.EntityBase;
 import com.benefitj.spring.mvc.query.OrderUtils;
 import com.benefitj.spring.mvc.query.PageRequest;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Nullable;
-import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -58,30 +57,6 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
   }
 
   /**
-   * 插入一条记录
-   *
-   * @param record 记录
-   * @return 返回插入的条数，如果成功返回1，否则返回0
-   */
-  @Transactional(rollbackOn = Exception.class)
-  public int insert(T record) {
-    record.setCreateTime(new Date());
-    return getMapper().insert(record);
-  }
-
-  /**
-   * 更新一条记录
-   *
-   * @param record 记录
-   * @return 返回更新的条数，如果成功返回1，否则返回0
-   */
-  @Transactional(rollbackOn = Exception.class)
-  public int update(T record) {
-    record.setUpdateTime(new Date());
-    return getMapper().updateById(record);
-  }
-
-  /**
    * 统计
    *
    * @param condition 条件
@@ -104,13 +79,12 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
   /**
    * 获取列表
    *
-   * @param condition  条件
-   * @param startTime  开始时间
-   * @param endTime    结束时间
-   * @param multiLevel 是否为多层次
+   * @param condition 条件
+   * @param startTime 开始时间
+   * @param endTime   结束时间
    * @return 返回查询的列表
    */
-  public List<T> getList(T condition, @Nullable Date startTime, @Nullable Date endTime, @Nullable Boolean multiLevel) {
+  public List<T> getList(T condition, @Nullable Date startTime, @Nullable Date endTime) {
     return getMapper().selectList(newQueryWrapper(condition)
         .lambda()
         .ge(startTime != null, EntityBase::getCreateTime, startTime)
@@ -131,7 +105,7 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
     Date endTime = request.getEndTime();
     // 分页
     return PageHelper.startPage(request.getPageNum(), request.getPageSize(), orderBy).doSelectPageInfo(()
-        -> getList(request.getCondition(), startTime, endTime, request.isMultiLevel()));
+        -> getList(request.getCondition(), startTime, endTime/*, request.isMultiLevel()*/));
   }
 
   /**

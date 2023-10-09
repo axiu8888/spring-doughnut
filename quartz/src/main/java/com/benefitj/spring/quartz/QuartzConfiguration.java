@@ -110,4 +110,10 @@ public class QuartzConfiguration {
     return new QuartzJobProcessor(manager);
   }
 
+  @ConditionalOnMissingBean
+  @Bean
+  public IScheduler ischeduler(Scheduler scheduler) {
+    return scheduler instanceof IScheduler ? (IScheduler) scheduler : IScheduler.create(scheduler);
+  }
+
 }

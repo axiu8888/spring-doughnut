@@ -52,7 +52,7 @@ subprojects {
   version = "2.3.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_1_8
+    compatibilityVersion = JavaVersion.VERSION_18
     // 默认是spring环境
     springEnv = true
     springTest = true

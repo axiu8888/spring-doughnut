@@ -82,8 +82,7 @@ public class HttpLoggingHandler implements WebPointCutHandler {
 
   public void fillPrintArgs(JoinPoint point, Method method, ServletRequestAttributes attrs, Map<String, Object> argsMap) {
     HttpServletRequest request = attrs.getRequest();
-    argsMap.put("uri", request.getRequestURI());
-    argsMap.put("http-method", request.getMethod());
+    argsMap.put(request.getMethod(), request.getRequestURI());
     argsMap.put("class", method.getDeclaringClass().getSimpleName() + "." + method.getName());
     argsMap.put("args", mapToArgs(method.getParameters(), point.getArgs()));
   }

@@ -2,11 +2,12 @@ package com.benefitj.mybatisplus.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
-import com.benefitj.mybatisplus.mybatis.FieldValueCreator;
-import com.benefitj.mybatisplus.mybatis.FieldValueFiellInterceptor;
-import com.benefitj.mybatisplus.mybatis.FieldValueFiller;
-import com.benefitj.mybatisplus.mybatis.SimpleFieldValueFiller;
-import com.benefitj.mybatisplus.security.UserTokenManager;
+import com.benefitj.mybatisplus.dao.mybatis.FieldValueCreator;
+import com.benefitj.mybatisplus.dao.mybatis.FieldValueFiellInterceptor;
+import com.benefitj.mybatisplus.dao.mybatis.FieldValueFiller;
+import com.benefitj.mybatisplus.dao.mybatis.SimpleFieldValueFiller;
+import com.benefitj.spring.security.jwt.token.JwtToken;
+import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import com.github.pagehelper.PageInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -23,25 +24,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @Slf4j
-@EntityScan("com.benefitj.mybatisplus.model")
-@MapperScan("com.benefitj.mybatisplus.mapper")
+@EntityScan("com.benefitj.mybatisplus.entity")
+@MapperScan("com.benefitj.mybatisplus.dao.mapper")
 @Configuration
 public class MybatisPlusConfig {
 
   @Bean
-  public FieldValueFiller insertFiller(UserTokenManager tokenManager) {
+  public FieldValueFiller insertFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
     map.putIfAbsent("createTime", target -> new Date());
-    map.putIfAbsent("createBy", target -> tokenManager.getUserId());
+    map.putIfAbsent("createBy", target -> {
+      JwtToken token = JwtTokenManager.currentToken(true);
+      return token != null ? token.getUserId() : null;
+    });
     map.putIfAbsent("active", target -> true);
     return new SimpleFieldValueFiller(map, Collections.singletonList(SqlCommandType.INSERT));
   }
 
   @Bean
-  public FieldValueFiller updateFiller(UserTokenManager tokenManager) {
+  public FieldValueFiller updateFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
     map.putIfAbsent("updateTime", target -> new Date());
-    map.putIfAbsent("updateBy", target -> tokenManager.getUserId());
+    map.putIfAbsent("updateBy", target -> {
+      JwtToken token = JwtTokenManager.currentToken(true);
+      return token != null ? token.getUserId() : null;
+    });
     return new SimpleFieldValueFiller(map, Collections.singletonList(SqlCommandType.UPDATE));
   }
 

@@ -31,13 +31,13 @@ public class QuartzJobProcessor extends AnnotationBeanProcessor implements Metad
       String name = quartzJob.name();
       String classMethod = method.getDeclaringClass().getName() + "." + method.getName();
       if (StringUtils.isBlank(name)) {
-        throw new IllegalStateException("[ @QuratzJob ]缺少名称: " + classMethod);
+        throw new IllegalStateException("[ @QuartzJob ]缺少名称: " + classMethod);
       }
       if (manager.containsKey(name)) {
         QuartzJobInvoker existInvoker = manager.get(name);
         Method method2 = existInvoker.getMethod();
         String classMethod2 = method2.getDeclaringClass().getName() + "." + method2.getName();
-        throw new IllegalStateException("存在相同名称的[ @QuratzJob ]: " + classMethod2 + " & " + classMethod);
+        throw new IllegalStateException("存在相同名称的[ @QuartzJob ]: " + classMethod2 + " & " + classMethod);
       }
       QuartzJobInvoker invoker = new QuartzJobInvoker();
       invoker.setName(name);

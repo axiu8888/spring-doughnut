@@ -1,7 +1,7 @@
 package com.benefitj.mybatisplus.service;
 
-import com.benefitj.mybatisplus.mapper.SysUerMapper;
-import com.benefitj.mybatisplus.model.SysUserEntity;
+import com.benefitj.mybatisplus.dao.mapper.SysUerMapper;
+import com.benefitj.mybatisplus.entity.SysUser;
 import com.benefitj.spring.quartz.job.QuartzJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class SysUserService extends ServiceBase<SysUserEntity, SysUerMapper> {
+public class SysUserService extends ServiceBase<SysUser, SysUerMapper> {
 
   @Autowired
   public SysUserService(SysUerMapper mapper) {

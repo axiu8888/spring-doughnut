@@ -7,11 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class QuartzJobManager implements WrappedMap<String, QuartzJobInvoker> {
 
-  final Map<String, QuartzJobInvoker> invokers = new ConcurrentHashMap<>();
+  final Map<String, QuartzJobInvoker> _internal = new ConcurrentHashMap<>();
 
   @Override
-  public Map<String, QuartzJobInvoker> getOriginal() {
-    return invokers;
+  public Map<String, QuartzJobInvoker> map() {
+    return _internal;
   }
 
 }

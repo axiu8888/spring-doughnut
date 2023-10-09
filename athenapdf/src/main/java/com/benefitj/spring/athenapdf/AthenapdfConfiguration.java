@@ -17,8 +17,8 @@ public class AthenapdfConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public AthenapdfController athenapdfController() {
-    return new AthenapdfController();
+  public ApiController athenapdfController() {
+    return new ApiController();
   }
 
 }

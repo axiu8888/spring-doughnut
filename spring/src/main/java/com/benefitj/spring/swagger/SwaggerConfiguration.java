@@ -45,6 +45,9 @@ public class SwaggerConfiguration {
   @Value("#{@environment['springfox.documentation.swagger.doc-type'] ?: 'OAS_30'}")
   private SwaggerDocType docType = SwaggerDocType.OAS_30;
 
+  @Value("#{@environment['app.start-print.delay'] ?: 3000L}")
+  private Long delay;
+
   @ConditionalOnMissingBean
   @Bean
   public SwaggerApiInfo swaggerApiInfo() {
@@ -141,7 +144,7 @@ public class SwaggerConfiguration {
           "Swagger文档: \thttp://" + address + swaggerBaseUrl + "swagger-ui/index.html\n\t" +
           "knife4j文档: \thttp://" + address + "/doc.html\n" +
           "---------------------------------------------------------------------------------");
-    }), 3000);
+    }), delay);
   }
 
 }

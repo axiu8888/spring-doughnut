@@ -1,13 +1,18 @@
 package com.benefitj.spring.quartz;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.quartz.*;
 
 /**
  * 触发器类型
  */
+@ApiModel("触发器类型")
 public enum TriggerType {
-
-  SIMPLE, CRON;
+  @ApiModelProperty("普通触发器(指定可执行的次数和时间)")
+  SIMPLE,
+  @ApiModelProperty("CRON表达式触发器(参考: https://help.aliyun.com/zh/ecs/user-guide/cron-expressions)")
+  CRON;
 
   /**
    * 获取触发器类型

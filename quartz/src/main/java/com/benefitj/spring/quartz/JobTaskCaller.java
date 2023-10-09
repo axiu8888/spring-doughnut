@@ -3,7 +3,10 @@ package com.benefitj.spring.quartz;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.quartz.caller.SimpleJobTaskCaller;
-import org.quartz.*;
+import com.benefitj.spring.quartz.job.QuartzJobWorker;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
  * job 任务
@@ -30,6 +33,15 @@ public interface JobTaskCaller extends Job {
    */
   default Object newJobWorkerInstance(Class<?> worker, Object... args) {
     return ReflectUtils.newInstance(worker, args);
+  }
+
+  /**
+   * 创建调用
+   *
+   * @return 返回
+   */
+  default QuartzJobWorker newQuartzJobWorker() {
+    return new QuartzJobWorker();
   }
 
   /**

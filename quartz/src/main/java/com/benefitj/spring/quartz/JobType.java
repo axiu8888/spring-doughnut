@@ -4,27 +4,34 @@ import com.benefitj.spring.quartz.caller.DisallowConcurrentJobTaskCaller;
 import com.benefitj.spring.quartz.caller.PersistentJobTaskCaller;
 import com.benefitj.spring.quartz.caller.PersistentWithDisallowConcurrentJobTaskCaller;
 import com.benefitj.spring.quartz.caller.SimpleJobTaskCaller;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.quartz.Job;
 
 /**
- * JOB类型
+ * JobTaskCaller类型
  */
+@ApiModel("JobTaskCaller类型")
 public enum JobType {
   /**
    * 默认类型
    */
+  @ApiModelProperty("默认类型")
   DEFAULT(SimpleJobTaskCaller.class, false, false),
   /**
    * 执行后持久化数据
    */
+  @ApiModelProperty("执行后持久化数据")
   PERSISTENT(PersistentJobTaskCaller.class, true, false),
   /**
    * 不并发执行
    */
+  @ApiModelProperty("不并发执行")
   DISALLOW_CONCURRENT(DisallowConcurrentJobTaskCaller.class, false, false),
   /**
    * 执行后持久化数据，并且不允许并发执行
    */
+  @ApiModelProperty("执行后持久化数据，并且不允许并发执行")
   PERSISTENT_WITH_DISALLOW_CONCURRENT(PersistentWithDisallowConcurrentJobTaskCaller.class, true, true);
 
   private final Class<? extends Job> jobClass;

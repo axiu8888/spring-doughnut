@@ -23,10 +23,10 @@ public abstract class LongIdEntity extends EntityBase {
    * ID
    */
   @ApiModelProperty(value = "主键")
-  @TableId(type = IdType.ASSIGN_UUID)
+  @TableId(type = IdType.ASSIGN_ID)
   @Id
   @GeneratedValue
   @Column(name = "id", columnDefinition = "bigint comment '主键ID'")
-  private String id;
+  private Long id;
 
 }

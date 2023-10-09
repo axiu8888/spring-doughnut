@@ -41,10 +41,13 @@ public class QuartzJobWorker implements JobWorker {
       localArgs.put("jobDetail", jobDetail);
       localArgs.put("taskId", taskId);
       if (StringUtils.isNotBlank(jobArgs)) {
-        localArgs.put("args", JSON.parseObject(jobArgs));
+        JSONObject argsJson = JSON.parseObject(jobArgs);
+        localArgs.put("_args", argsJson);
+        localArgs.putAll(argsJson);
       }
 
-      invoker.invoke(context, jobDetail, taskId, localArgs);
+      Object[] providedArgs = invoker.mapArgs(localArgs);
+      invoker.invoke(providedArgs);
 
     } finally {
       LOCAL_ARGS.remove();

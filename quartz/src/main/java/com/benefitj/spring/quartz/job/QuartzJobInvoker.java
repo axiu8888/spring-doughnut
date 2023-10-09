@@ -1,16 +1,20 @@
 package com.benefitj.spring.quartz.job;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.executable.MethodInvokerImpl;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuartzJobInvoker extends MethodInvokerImpl {
 
   private String name;
   private AnnotationMetadata metadata;
   private Object bean;
+  private List<ArgDescriptor> argDescriptors = new ArrayList<>();
 
   public QuartzJobInvoker() {
   }
@@ -63,6 +67,21 @@ public class QuartzJobInvoker extends MethodInvokerImpl {
 
   public String getDescription() {
     return getAnnotation().description();
+  }
+
+  public List<ArgDescriptor> getArgDescriptors() {
+    return argDescriptors;
+  }
+
+  public void setArgDescriptors(List<ArgDescriptor> argDescriptors) {
+    this.argDescriptors = argDescriptors;
+  }
+
+  public Object[] mapArgs(JSONObject args) {
+    return getArgDescriptors()
+        .stream()
+        .map(ad -> args.getObject(ad.getName(), ad.getParameter().getType()))
+        .toArray(Object[]::new);
   }
 
 }

@@ -67,18 +67,6 @@ public interface QuartzJobTask {
   void setDescription(String description);
 
   /**
-   * 获取是否异步执行
-   */
-  Boolean getAsync();
-
-  /**
-   * 设置是否异步执行
-   *
-   * @param async 是否异步
-   */
-  void setAsync(Boolean async);
-
-  /**
    * 获取是否恢复
    */
   Boolean getRecovery();

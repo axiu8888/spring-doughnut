@@ -76,9 +76,6 @@ public class QuartzUtils {
       // 至少开始后的5秒再结束
       task.setEndAt(Math.max(task.getStartAt() + 5_000, task.getEndAt()));
     }
-    if (task.getAsync() == null) {
-      task.setAsync(false);
-    }
     if (task.getRecovery() == null) {
       task.setRecovery(Boolean.FALSE);
     }

@@ -17,17 +17,17 @@ public enum WorkerType {
   /**
    * spring 组件名
    */
-  @ApiModelProperty("Spring 组件名")
+  @ApiModelProperty("spring 组件名")
   SPRING_BEAN_NAME,
   /**
    * spring 组件类
    */
-  @ApiModelProperty("Spring 组件类")
+  @ApiModelProperty("spring 组件类")
   SPRING_BEAN_CLASS,
   /**
    * {@link QuartzJob} 注解
    */
-  @ApiModelProperty("被@QuartzJob注释的method")
+  @ApiModelProperty("被@QuartzJob注释的方法")
   QUARTZ_JOB_WORKER,
 
   ;

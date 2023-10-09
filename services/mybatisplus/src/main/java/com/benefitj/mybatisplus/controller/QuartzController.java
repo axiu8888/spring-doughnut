@@ -1,7 +1,9 @@
 package com.benefitj.mybatisplus.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.mybatisplus.controller.vo.HttpResult;
+import com.benefitj.mybatisplus.controller.vo.QuartzJobArgVo;
 import com.benefitj.mybatisplus.entity.SysQuartzJobTask;
 import com.benefitj.mybatisplus.service.QuartzJobTaskService;
 import com.benefitj.spring.aop.web.AopWebPointCut;
@@ -10,6 +12,7 @@ import com.benefitj.spring.mvc.query.PageRequest;
 import com.benefitj.spring.quartz.JobType;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
+import com.benefitj.spring.quartz.job.QuartzJobInvoker;
 import com.benefitj.spring.quartz.job.QuartzJobManager;
 import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import com.benefitj.spring.security.url.UrlPermitted;
@@ -57,7 +60,7 @@ public class QuartzController {
     return HttpResult.success(WorkerType.values());
   }
 
-  @ApiOperation("获取quartzJobWorker")
+  @ApiOperation("获取发布的QuartzJobWorker")
   @GetMapping("/quartzJobWorkers")
   public HttpResult<List<JSONObject>> getQuartzJobWorkers() {
     List<JSONObject> list = manager.values()
@@ -67,15 +70,33 @@ public class QuartzController {
           put("methodName", qji.getMethod().getName());
           put("name", qji.getAnnotation().name());
           put("description", qji.getAnnotation().description());
-          put("parametersLength", qji.getParameters().length);
-//          put("", );
-//          put("", );
+          put("parameters", qji.getArgDescriptors().stream()
+              .map(ad -> QuartzJobArgVo.builder()
+                  .name(ad.getName())
+                  .type(ad.getType())
+                  .position(ad.getPosition())
+                  .description(ad.getDescription())
+                  .build())
+              .collect(Collectors.toList()));
         }})
         .collect(Collectors.toList());
     return HttpResult.success(list);
   }
 
-  @ApiOperation("获取Cron调度任务")
+  @ApiOperation("调用QuartzJobWorker")
+  @PostMapping("/invokeJobWorker")
+  public HttpResult<?> invokeJobWorker(@ApiParam("jobWorker名称") String name,
+                                       @ApiParam("参数") String args) {
+    QuartzJobInvoker invoker = manager.get(name);
+    if (invoker == null) {
+      return HttpResult.failure("无法发现[ " + name + " ] job worker");
+    }
+    Object[] providedArgs = invoker.mapArgs(JSON.parseObject(args));
+    Object result = invoker.invoke(providedArgs);
+    return HttpResult.success(result);
+  }
+
+  @ApiOperation("获取存在的调度任务")
   @GetMapping
   public HttpResult<SysQuartzJobTask> get(@ApiParam("Cron调度任务的ID") String id) {
     return HttpResult.success(quartzService.get(id));
@@ -121,7 +142,7 @@ public class QuartzController {
 
   @ApiOperation("获取机构的任务调度列表")
   @GetMapping("/list")
-  public HttpResult<List<SysQuartzJobTask>> getJobTaskList(@ApiParam("条件") @RequestBody SysQuartzJobTask condition) {
+  public HttpResult<List<SysQuartzJobTask>> getList(@ApiParam("条件") @RequestBody SysQuartzJobTask condition) {
     condition.setOrgId(StringUtils.getIfBlank(condition.getOrgId(), JwtTokenManager::currentOrgId));
     return HttpResult.success(quartzService.getList(condition, null, null));
   }

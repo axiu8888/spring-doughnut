@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,8 +45,29 @@ public class QuartzJobProcessor extends AnnotationBeanProcessor implements Metad
       invoker.setName(name);
       invoker.setMetadata(metadata);
       invoker.setBean(metadata.getBean());
+      invoker.setArgDescriptors(mapArgs(metadata.getMethod()));
       manager.put(name, invoker);
     }
+  }
+
+  public List<ArgDescriptor> mapArgs(Method method) {
+    Parameter[] parameters = method.getParameters();
+    List<ArgDescriptor> args = new ArrayList<>(parameters.length);
+    for (int i = 0; i < parameters.length; i++) {
+      Parameter p = parameters[i];
+      QuartzJobArg annotation = p.getAnnotation(QuartzJobArg.class);
+      if (annotation == null) {
+        String declaringName = method.getDeclaringClass().getName() + "." + method.getName();
+        throw new IllegalStateException("[ " + declaringName + " ] 方法的参数\"" + p.getName() + "\", 需要被 @QuartzJobArg 注解注释");
+      }
+      ArgDescriptor ad = new ArgDescriptor(p, i);
+      ad.setName(p.getName());
+      ad.setType(ArgType.find(p.getType()));
+      ad.setAnnotation(annotation);
+      ad.setDescription(annotation.description());
+      args.add(ad);
+    }
+    return args;
   }
 
   @Override

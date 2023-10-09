@@ -4,13 +4,13 @@ import com.benefitj.spring.quartz.JobType;
 import com.benefitj.spring.quartz.QuartzJobTask;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
+import com.benefitj.spring.quartz.job.QuartzJob;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import nonapi.io.github.classgraph.json.Id;
 
 import javax.persistence.Column;
 
@@ -19,15 +19,16 @@ import javax.persistence.Column;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysQuartzJobTask extends EntityBase implements QuartzJobTask {
-
-  /**
-   * 任务id
-   */
-  @ApiModelProperty("任务id")
-  @Id
-  @Column(name = "id", columnDefinition = "varchar(32) comment '调度任务的ID'", length = 32)
-  private String id;
+public class SysQuartzJobTask extends UuidEntity implements QuartzJobTask {
+//  /**
+//   * ID
+//   */
+//  @ApiModelProperty(value = "ID")
+//  @TableId(type = IdType.ASSIGN_UUID)
+//  @Id
+//  @GeneratedValue
+//  @Column(name = "id", length = 32, columnDefinition = "varchar(32) comment '主键ID'")
+//  private String id;
   /**
    * group名称
    */
@@ -52,12 +53,6 @@ public class SysQuartzJobTask extends EntityBase implements QuartzJobTask {
   @ApiModelProperty("描述")
   @Column(name = "description", columnDefinition = "varchar(1024) comment '任务描述'", length = 1024)
   private String description;
-  /**
-   * 是否异步
-   */
-  @ApiModelProperty("是否异步")
-  @Column(name = "async", columnDefinition = "tinyint(1) comment '是否异步执行程序' DEFAULT 0", length = 1)
-  private Boolean async;
   /**
    * 是否不恢复
    */
@@ -94,6 +89,12 @@ public class SysQuartzJobTask extends EntityBase implements QuartzJobTask {
   @ApiModelProperty("jobWorker的类型")
   @Column(name = "worker_type", columnDefinition = "varchar(50) comment 'jobWorker的类型'", length = 50)
   private WorkerType workerType;
+  /**
+   * jobWorker的名称，参考：{@link QuartzJob} 的注释方法
+   */
+  @ApiModelProperty("jobWorker的名称")
+  @Column(name = "job_worker_name", columnDefinition = "varchar(50) comment 'jobWorker的名称'", length = 50)
+  private String jobWorkerName;
   /**
    * Job携带的数据
    */

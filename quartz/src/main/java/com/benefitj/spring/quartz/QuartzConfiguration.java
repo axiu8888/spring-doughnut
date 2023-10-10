@@ -1,7 +1,7 @@
 package com.benefitj.spring.quartz;
 
-import com.benefitj.spring.quartz.job.QuartzJobManager;
-import com.benefitj.spring.quartz.job.QuartzJobProcessor;
+import com.benefitj.spring.quartz.worker.QuartzWorkerManager;
+import com.benefitj.spring.quartz.worker.QuartzWorkerProcessor;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -100,20 +100,20 @@ public class QuartzConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public QuartzJobManager quartzJobManager() {
-    return new QuartzJobManager();
+  public QuartzWorkerManager quartzJobManager() {
+    return QuartzWorkerManager.get();
   }
 
   @ConditionalOnMissingBean(name = "quartzJobProcessor")
   @Bean("quartzJobProcessor")
-  public QuartzJobProcessor quartzJobProcessor(QuartzJobManager manager) {
-    return new QuartzJobProcessor(manager);
+  public QuartzWorkerProcessor quartzJobProcessor(QuartzWorkerManager manager) {
+    return new QuartzWorkerProcessor(manager);
   }
 
   @ConditionalOnMissingBean
   @Bean
   public IScheduler ischeduler(Scheduler scheduler) {
-    return scheduler instanceof IScheduler ? (IScheduler) scheduler : IScheduler.create(scheduler);
+    return (IScheduler) scheduler;
   }
 
 }

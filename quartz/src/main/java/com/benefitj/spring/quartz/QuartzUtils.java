@@ -1,14 +1,26 @@
 package com.benefitj.spring.quartz;
 
+import com.benefitj.core.IdUtils;
+import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
+import com.benefitj.spring.quartz.worker.QuartzWorkerManager;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
-import org.springframework.context.ApplicationContext;
 
 import java.text.ParseException;
 import java.util.Date;
 
 public class QuartzUtils {
+
+  /**
+   * 设置默认的参数
+   *
+   * @param task 调度任务
+   * @return 返回调度任务
+   */
+  public static QuartzJobTask setup(QuartzJobTask task) {
+    return setup(task, task.getTriggerType().name() + "_" + IdUtils.uuid(8));
+  }
 
   /**
    * 设置默认的参数
@@ -103,31 +115,41 @@ public class QuartzUtils {
 
   /**
    * 检查 task 的 worker
-   *
-   * @param task
    */
   public static void checkWorker(QuartzJobTask task) {
     WorkerType workerType = task.getWorkerType();
     if (workerType == null) {
-      throw new QuartzException("WorkerType错误!");
+      throw new QuartzException("WorkerType不能为空");
     }
 
     if (StringUtils.isBlank(task.getWorker())) {
       throw new QuartzException("worker不能为空");
     }
 
-    if (workerType != WorkerType.SPRING_BEAN_NAME) {
-      try {
-        Class.forName(task.getWorker());
-      } catch (ClassNotFoundException e) {
-        throw new QuartzException("请指定正确的worker");
-      }
-    } else {
-      String worker = task.getWorker();
-      ApplicationContext ctx = SpringCtxHolder.getCtx();
-      if (!(ctx.containsBean(worker)) || !(ctx.getBean(task.getWorker()) instanceof JobWorker)) {
-        throw new QuartzException("未发现匹配的JobWorker实例!");
-      }
+    switch (workerType) {
+      case QUARTZ_WORKER:
+        if (!QuartzWorkerManager.get().containsKey(task.getWorker())) {
+          throw new QuartzException("无法发现对应的QuartzWorker: " + task.getWorker());
+        }
+        break;
+      case NEW_INSTANCE:
+        try {
+          Class<?> cls = Class.forName(task.getWorker());
+          if (!cls.isAssignableFrom(JobWorker.class)) {
+            throw new QuartzException("请指定正确的 JobWorker 类型");
+          }
+        } catch (ClassNotFoundException e) {
+          throw new QuartzException("请指定正确的worker");
+        }
+        break;
+      case SPRING_BEAN_NAME:
+        String worker = task.getWorker();
+        if (!(SpringCtxHolder.containsBean(worker))
+            || !(SpringCtxHolder.getBean(task.getWorker()) instanceof JobWorker)) {
+          throw new QuartzException("未发现匹配的JobWorker实例!");
+        }
+        break;
+      default:
     }
   }
 
@@ -149,8 +171,7 @@ public class QuartzUtils {
     jb.storeDurably(false);
     jb.usingJobData(JobWorker.KEY_ID, task.getId());
     jb.usingJobData(JobWorker.KEY_JOB_DATA, task.getJobData());
-    jb.usingJobData(JobWorker.KEY_WORKER, task.getWorker());
-    jb.usingJobData(JobWorker.KEY_WORKER_TYPE, task.getWorkerType().name());
+    jb.usingJobData(JobWorker.KEY_TASK, JsonUtils.toJson(task));
     return jb;
   }
 
@@ -251,6 +272,7 @@ public class QuartzUtils {
       }
 
       JobDetail jd = job(task).build();
+
       Trigger trigger = scheduler.getTrigger(triggerKey(task));
       if (trigger == null) {
         trigger = trigger(task).forJob(jd).build();

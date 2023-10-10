@@ -1,7 +1,5 @@
 package com.benefitj.spring.quartz;
 
-import java.util.Date;
-
 public interface QuartzJobTask {
 
   int TRIGGER_PRIORITY = 50;
@@ -293,29 +291,5 @@ public interface QuartzJobTask {
    * @param active 状态
    */
   void setActive(Boolean active);
-
-  /**
-   * 获取创建时间
-   */
-  Date getCreateTime();
-
-  /**
-   * 设置创建时间
-   *
-   * @param createTime 时间
-   */
-  void setCreateTime(Date createTime);
-
-  /**
-   * 获取更新时间
-   */
-  Date getUpdateTime();
-
-  /**
-   * 设置更新时间
-   *
-   * @param updateTime 时间
-   */
-  void setUpdateTime(Date updateTime);
 
 }

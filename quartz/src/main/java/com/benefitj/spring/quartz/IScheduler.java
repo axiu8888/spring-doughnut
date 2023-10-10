@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 调度接口
+ */
 public interface IScheduler extends Scheduler {
 
   static IScheduler create(Scheduler scheduler) {

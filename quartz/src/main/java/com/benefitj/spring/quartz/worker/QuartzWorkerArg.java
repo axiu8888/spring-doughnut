@@ -1,4 +1,4 @@
-package com.benefitj.spring.quartz.job;
+package com.benefitj.spring.quartz.worker;
 
 
 import java.lang.annotation.*;
@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface QuartzJobArg {
+public @interface QuartzWorkerArg {
   /**
    * 名称
    */

@@ -9,6 +9,6 @@ import org.quartz.PersistJobDataAfterExecution;
  */
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
-public class PersistentWithDisallowConcurrentJobTaskCaller extends SimpleJobTaskCaller {
+public class PersistentWithDisallowConcurrentJobTaskCaller extends DefaultJobTaskCaller {
 }
 

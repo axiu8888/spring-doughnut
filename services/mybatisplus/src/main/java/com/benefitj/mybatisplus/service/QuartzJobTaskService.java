@@ -1,7 +1,6 @@
 package com.benefitj.mybatisplus.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.benefitj.core.IdUtils;
 import com.benefitj.mybatisplus.dao.mapper.SysQuartzJobTaskMapper;
 import com.benefitj.mybatisplus.entity.SysQuartzJobTask;
 import com.benefitj.spring.BeanHelper;
@@ -9,7 +8,6 @@ import com.benefitj.spring.quartz.IScheduler;
 import com.benefitj.spring.quartz.QuartzException;
 import com.benefitj.spring.quartz.QuartzUtils;
 import com.benefitj.spring.quartz.TriggerType;
-import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,31 +27,8 @@ public class QuartzJobTaskService extends ServiceBase<SysQuartzJobTask, SysQuart
     super(mapper);
   }
 
-  /**
-   * 获取 job name
-   */
-  private String nextJobName() {
-    String name = null;
-    for (int i = 0; i < 1000; i++) {
-      name = IdUtils.nextId(8);
-      if (countJobName(name) <= 0) {
-        break;
-      }
-    }
-    if (StringUtils.isBlank(name)) {
-      throw new QuartzException("无法获取jobName");
-    }
-    return name;
-  }
-
-  /**
-   * 统计 job name 出现的次数
-   *
-   * @param jobName job name
-   * @return 返回出现的次数
-   */
-  public long countJobName(String jobName) {
-    return getMapper().countJobName(jobName);
+  public IScheduler getScheduler() {
+    return scheduler;
   }
 
   /**
@@ -78,15 +53,8 @@ public class QuartzJobTaskService extends ServiceBase<SysQuartzJobTask, SysQuart
     if (StringUtils.isBlank(task.getDescription())) {
       throw new QuartzException("请给此调度任务添加一个描述");
     }
-
-    // 任务ID
-    task.setId(IdUtils.uuid());
-    // 机构ID
-    task.setOrgId(StringUtils.getIfBlank(task.getOrgId(), JwtTokenManager::currentOrgId));
-    // 创建时间
-    task.setCreateTime(new Date());
     task.setActive(Boolean.TRUE);
-    QuartzUtils.setup(task, nextJobName());
+    QuartzUtils.setup(task);
     QuartzUtils.scheduleJob(scheduler, task);
     // 保存
     super.save(task);
@@ -121,7 +89,7 @@ public class QuartzJobTaskService extends ServiceBase<SysQuartzJobTask, SysQuart
       existTask.setActive(copy.getActive());
 
       // 重置调度
-      QuartzUtils.setup(existTask, nextJobName());
+      QuartzUtils.setup(existTask);
       try {
         // 停止任务和触发器
         // 删除存在的job
@@ -184,4 +152,5 @@ public class QuartzJobTaskService extends ServiceBase<SysQuartzJobTask, SysQuart
   public List<SysQuartzJobTask> getList(SysQuartzJobTask condition, Date startTime, Date endTime) {
     return getMapper().selectList(condition, startTime, endTime);
   }
+
 }

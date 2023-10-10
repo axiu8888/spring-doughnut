@@ -4,7 +4,7 @@ import com.benefitj.spring.quartz.JobType;
 import com.benefitj.spring.quartz.QuartzJobTask;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
-import com.benefitj.spring.quartz.job.QuartzJob;
+import com.benefitj.spring.quartz.worker.QuartzWorker;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,12 +13,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @ApiModel("quartz调度实体类")
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Entity(name = "sys_quartz_job_task")
+@Table(name = "sys_quartz_job_task")
 public class SysQuartzJobTask extends UuidEntity implements QuartzJobTask {
 //  /**
 //   * ID
@@ -78,23 +82,17 @@ public class SysQuartzJobTask extends UuidEntity implements QuartzJobTask {
   @Column(name = "job_type", columnDefinition = "varchar(50) comment 'Job的执行类型'", length = 50)
   private JobType jobType;
   /**
-   * JobWorker的实现
+   * JobWorker的实现，或者被 {@link QuartzWorker} 注释的方法
    */
   @ApiModelProperty("JobWorker的实现")
-  @Column(name = "worker", columnDefinition = "varchar(50) comment 'JobWorker的实现类'", length = 50)
+  @Column(name = "worker", columnDefinition = "varchar(50) comment 'JobWorker的实现类，或者被@QuartzWorker注释的方法'", length = 50)
   private String worker;
   /**
    * jobWorker的类型，参考：{@link WorkerType}
    */
-  @ApiModelProperty("jobWorker的类型")
-  @Column(name = "worker_type", columnDefinition = "varchar(50) comment 'jobWorker的类型'", length = 50)
+  @ApiModelProperty("JobWorker的类型")
+  @Column(name = "worker_type", columnDefinition = "varchar(50) comment 'JobWorker的类型'", length = 50)
   private WorkerType workerType;
-  /**
-   * jobWorker的名称，参考：{@link QuartzJob} 的注释方法
-   */
-  @ApiModelProperty("jobWorker的名称")
-  @Column(name = "job_worker_name", columnDefinition = "varchar(50) comment 'jobWorker的名称'", length = 50)
-  private String jobWorkerName;
   /**
    * Job携带的数据
    */
@@ -177,14 +175,14 @@ public class SysQuartzJobTask extends UuidEntity implements QuartzJobTask {
    * 机构ID
    */
   @ApiModelProperty("机构ID")
-  @Column(name = "org_id", columnDefinition = "varchar(32) comment '拥有者'", length = 32)
+  @Column(name = "org_id", columnDefinition = "varchar(32) comment '机构ID'", length = 32)
   private String orgId;
   /**
    * 拥有者
    */
-  @ApiModelProperty("拥有者")
-  @Column(name = "owner", columnDefinition = "varchar(32) comment '拥有者'", length = 32)
-  private String owner;
+  @ApiModelProperty("拥有者ID")
+  @Column(name = "owner_id", columnDefinition = "varchar(32) comment '拥有者ID'", length = 32)
+  private String ownerId;
   /**
    * 拥有者类型
    */

@@ -24,7 +24,6 @@ public class TokenLogFilter extends OncePerRequestFilter {
       if (token != null) {
         HttpLoggingHandler.putArg("userId", token.getUserId());
         HttpLoggingHandler.putArg("orgId", token.getOrgId());
-        HttpLoggingHandler.putArg("orgId", token.getOrgId());
       }
     } catch (Exception ignore) { /* ~ */ }
      finally {

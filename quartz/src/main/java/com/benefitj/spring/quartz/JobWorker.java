@@ -1,6 +1,5 @@
 package com.benefitj.spring.quartz;
 
-import com.benefitj.core.DateFmtter;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -11,39 +10,18 @@ import org.quartz.JobExecutionException;
  */
 public interface JobWorker {
 
+  String KEY_TASK = "task";
   String KEY_ID = "id";
   String KEY_JOB_DATA = "jobData";
-  String KEY_WORKER = "worker";
-  String KEY_WORKER_TYPE = "workerType";
 
   /**
    * 执行方法
    *
    * @param context   上下文
    * @param jobDetail detail
-   * @param taskId    任务ID
+   * @param task      任务
    */
-  void execute(JobExecutionContext context, JobDetail jobDetail, String taskId) throws JobExecutionException;
-
-  /**
-   * 格式化时间 pattern: yyyy-MM-dd HH:mm:ss.SSS
-   *
-   * @param date 时间 Date|Long
-   * @return 返回格式化好的时间
-   */
-  default String fmtS(Object date) {
-    return date != null ? DateFmtter.fmtS(date) : null;
-  }
-
-  /**
-   * 格式化时间 pattern: yyyy-MM-dd HH:mm:ss
-   *
-   * @param date 时间 Date|Long
-   * @return 返回格式化好的时间
-   */
-  default String fmt(Object date) {
-    return date != null ? DateFmtter.fmt(date) : null;
-  }
+  void execute(JobExecutionContext context, JobDetail jobDetail, QuartzJobTask task) throws JobExecutionException;
 
   /**
    * 获取Spring的Bean实例

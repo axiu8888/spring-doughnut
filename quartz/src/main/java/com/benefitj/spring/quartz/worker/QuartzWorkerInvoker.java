@@ -1,4 +1,4 @@
-package com.benefitj.spring.quartz.job;
+package com.benefitj.spring.quartz.worker;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.executable.MethodInvokerImpl;
@@ -7,19 +7,20 @@ import com.benefitj.spring.annotation.AnnotationMetadata;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public class QuartzJobInvoker extends MethodInvokerImpl {
+public class QuartzWorkerInvoker extends MethodInvokerImpl {
 
   private String name;
   private AnnotationMetadata metadata;
   private Object bean;
   private List<ArgDescriptor> argDescriptors = new ArrayList<>();
 
-  public QuartzJobInvoker() {
+  public QuartzWorkerInvoker() {
   }
 
-  public QuartzJobInvoker(String name, AnnotationMetadata metadata, Object bean) {
+  public QuartzWorkerInvoker(String name, AnnotationMetadata metadata, Object bean) {
     this.name = name;
     this.metadata = metadata;
     this.bean = bean;
@@ -61,8 +62,8 @@ public class QuartzJobInvoker extends MethodInvokerImpl {
     return getMethod().getParameters();
   }
 
-  public QuartzJob getAnnotation() {
-    return getMethod().getAnnotation(QuartzJob.class);
+  public QuartzWorker getAnnotation() {
+    return getMethod().getAnnotation(QuartzWorker.class);
   }
 
   public String getDescription() {
@@ -80,6 +81,7 @@ public class QuartzJobInvoker extends MethodInvokerImpl {
   public Object[] mapArgs(JSONObject args) {
     return getArgDescriptors()
         .stream()
+        .sorted(Comparator.comparingInt(ArgDescriptor::getPosition))
         .map(ad -> args.getObject(ad.getName(), ad.getParameter().getType()))
         .toArray(Object[]::new);
   }

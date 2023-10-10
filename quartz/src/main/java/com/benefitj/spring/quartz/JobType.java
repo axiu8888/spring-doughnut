@@ -3,7 +3,7 @@ package com.benefitj.spring.quartz;
 import com.benefitj.spring.quartz.caller.DisallowConcurrentJobTaskCaller;
 import com.benefitj.spring.quartz.caller.PersistentJobTaskCaller;
 import com.benefitj.spring.quartz.caller.PersistentWithDisallowConcurrentJobTaskCaller;
-import com.benefitj.spring.quartz.caller.SimpleJobTaskCaller;
+import com.benefitj.spring.quartz.caller.DefaultJobTaskCaller;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.quartz.Job;
@@ -17,7 +17,7 @@ public enum JobType {
    * 默认类型
    */
   @ApiModelProperty("默认类型")
-  DEFAULT(SimpleJobTaskCaller.class, false, false),
+  DEFAULT(DefaultJobTaskCaller.class, false, false),
   /**
    * 执行后持久化数据
    */

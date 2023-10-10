@@ -2,10 +2,7 @@ package com.benefitj.mybatisplus.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
-import com.benefitj.mybatisplus.dao.mybatis.FieldValueCreator;
-import com.benefitj.mybatisplus.dao.mybatis.FieldValueFiellInterceptor;
-import com.benefitj.mybatisplus.dao.mybatis.FieldValueFiller;
-import com.benefitj.mybatisplus.dao.mybatis.SimpleFieldValueFiller;
+import com.benefitj.mybatisplus.dao.mybatis.*;
 import com.benefitj.spring.security.jwt.token.JwtToken;
 import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import com.github.pagehelper.PageInterceptor;
@@ -32,20 +29,22 @@ public class MybatisPlusConfig {
   @Bean
   public FieldValueFiller insertFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
-    map.putIfAbsent("createTime", target -> new Date());
-    map.putIfAbsent("createBy", target -> {
+    map.putIfAbsent("createTime", (NullValueFieldValueCreator) target -> new Date());
+    map.putIfAbsent("createBy", (NullValueFieldValueCreator) target -> {
       JwtToken token = JwtTokenManager.currentToken(true);
       return token != null ? token.getUserId() : null;
     });
-    map.putIfAbsent("active", target -> true);
+    map.putIfAbsent("orgId", (NullValueFieldValueCreator) target -> JwtTokenManager.currentOrgId());
+    map.putIfAbsent("active", (NullValueFieldValueCreator) target -> true);
     return new SimpleFieldValueFiller(map, Collections.singletonList(SqlCommandType.INSERT));
   }
+
 
   @Bean
   public FieldValueFiller updateFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
-    map.putIfAbsent("updateTime", target -> new Date());
-    map.putIfAbsent("updateBy", target -> {
+    map.putIfAbsent("updateTime", (NullValueFieldValueCreator) target -> new Date());
+    map.putIfAbsent("updateBy", (NullValueFieldValueCreator) target -> {
       JwtToken token = JwtTokenManager.currentToken(true);
       return token != null ? token.getUserId() : null;
     });

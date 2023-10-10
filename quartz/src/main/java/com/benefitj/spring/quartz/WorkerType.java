@@ -1,6 +1,6 @@
 package com.benefitj.spring.quartz;
 
-import com.benefitj.spring.quartz.job.QuartzJob;
+import com.benefitj.spring.quartz.worker.QuartzWorker;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -20,15 +20,10 @@ public enum WorkerType {
   @ApiModelProperty("spring 组件名")
   SPRING_BEAN_NAME,
   /**
-   * spring 组件类
+   * {@link QuartzWorker} 注解
    */
-  @ApiModelProperty("spring 组件类")
-  SPRING_BEAN_CLASS,
-  /**
-   * {@link QuartzJob} 注解
-   */
-  @ApiModelProperty("被@QuartzJob注释的方法")
-  QUARTZ_JOB_WORKER,
+  @ApiModelProperty("被@QuartzWorker注释的方法")
+  QUARTZ_WORKER,
 
   ;
 

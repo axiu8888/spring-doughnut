@@ -2,8 +2,8 @@ package com.benefitj.spring.quartz;
 
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
-import com.benefitj.spring.quartz.caller.SimpleJobTaskCaller;
-import com.benefitj.spring.quartz.job.QuartzJobWorker;
+import com.benefitj.spring.quartz.caller.DefaultJobTaskCaller;
+import com.benefitj.spring.quartz.worker.QuartzJobWorker;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -70,28 +70,28 @@ public interface JobTaskCaller extends Job {
    * 创建默认的调度
    */
   static JobTaskCaller newJobTaskCaller() {
-    return new SimpleJobTaskCaller();
+    return new DefaultJobTaskCaller();
   }
 
   /**
    * 创建可持久化的调度
    */
   static JobTaskCaller newPersistentJobTaskCaller() {
-    return new SimpleJobTaskCaller();
+    return new DefaultJobTaskCaller();
   }
 
   /**
    * 创建不允许并发的调度
    */
   static JobTaskCaller newDisallowConcurrentJobTaskCaller() {
-    return new SimpleJobTaskCaller();
+    return new DefaultJobTaskCaller();
   }
 
   /**
    * 创建可持久化切不允许并发的调度
    */
   static JobTaskCaller newPersistentWithDisallowConcurrentJobTaskCaller() {
-    return new SimpleJobTaskCaller();
+    return new DefaultJobTaskCaller();
   }
 
 }

@@ -57,7 +57,7 @@ public interface SysQuartzJobTaskMapper extends BaseMapper<SysQuartzJobTask> {
         .ge(condition.getTriggerGroup() != null, SysQuartzJobTask::getTriggerGroup, condition.getTriggerGroup())
         .ge(condition.getTriggerName() != null, SysQuartzJobTask::getTriggerName, condition.getTriggerName())
         .ge(condition.getOrgId() != null, SysQuartzJobTask::getOrgId, condition.getOrgId())
-        .ge(condition.getOwner() != null, SysQuartzJobTask::getOwner, condition.getOwner())
+        .ge(condition.getOwnerId() != null, SysQuartzJobTask::getOwnerId, condition.getOwnerId())
         .ge(condition.getOwnerType() != null, SysQuartzJobTask::getOwnerType, condition.getOwnerType())
         .ge(condition.getActive() != null, SysQuartzJobTask::getActive, condition.getActive())
     );

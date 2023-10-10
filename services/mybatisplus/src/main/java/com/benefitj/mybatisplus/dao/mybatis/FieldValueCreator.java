@@ -1,13 +1,16 @@
 package com.benefitj.mybatisplus.dao.mybatis;
 
-public interface FieldValueCreator<T> {
+import java.lang.reflect.Field;
+
+public interface FieldValueCreator {
 
   /**
    * 创建值
    *
    * @param target 目标对象
+   * @param field  字段
    * @return 返回创建的值
    */
-  T create(Object target);
+  Object create(Object target, Field field);
 
 }

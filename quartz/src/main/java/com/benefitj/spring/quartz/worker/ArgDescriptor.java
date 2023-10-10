@@ -1,4 +1,4 @@
-package com.benefitj.spring.quartz.job;
+package com.benefitj.spring.quartz.worker;
 
 import java.lang.reflect.Parameter;
 
@@ -24,7 +24,7 @@ public class ArgDescriptor {
   /**
    * 注解
    */
-  private QuartzJobArg annotation;
+  private QuartzWorkerArg annotation;
 
   public ArgDescriptor(Parameter parameter, int position) {
     this.parameter = parameter;
@@ -63,11 +63,11 @@ public class ArgDescriptor {
     this.description = description;
   }
 
-  public QuartzJobArg getAnnotation() {
+  public QuartzWorkerArg getAnnotation() {
     return annotation;
   }
 
-  public void setAnnotation(QuartzJobArg annotation) {
+  public void setAnnotation(QuartzWorkerArg annotation) {
     this.annotation = annotation;
   }
 }

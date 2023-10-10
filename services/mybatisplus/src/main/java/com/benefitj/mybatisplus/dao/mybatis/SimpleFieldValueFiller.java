@@ -1,7 +1,6 @@
 package com.benefitj.mybatisplus.dao.mybatis;
 
 import com.benefitj.core.ReflectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 
@@ -41,25 +40,20 @@ public class SimpleFieldValueFiller implements FieldValueFiller {
 
   @Override
   public void fill(Object target, MappedStatement ms) {
-    getFields().forEach((name, creator) -> setFieldValue(target, name, creator.create(target)));
-  }
-
-  public Object setFieldValue(Object target, String name, Object value) {
-    Field field = ReflectUtils.getField(target.getClass(), name);
-    if (field != null) {
-      Object rawValue = ReflectUtils.getFieldValue(field, target);
-      if (rawValue == null) {
-        ReflectUtils.setFieldValue(field, target, value);
-        return value;
-      } else if (rawValue instanceof CharSequence && StringUtils.isBlank((CharSequence) rawValue)) {
-        ReflectUtils.setFieldValue(field, target, value);
-        return value;
+    getFields().forEach((name, creator) -> {
+      Field field = getField(target, name);
+      if (field != null) {
+        Object value = creator.create(target, field);
+        if (value != null) {
+          ReflectUtils.setFieldValue(field, target, value);
+        }
       }
-      return rawValue;
-    }
-    return null;
+    });
   }
 
+  public Field getField(Object target, String name) {
+    return ReflectUtils.getField(target.getClass(), name);
+  }
 
   public Map<String, FieldValueCreator> getFields() {
     return fields;

@@ -1,6 +1,6 @@
 package com.benefitj.mybatisplus.controller.vo;
 
-import com.benefitj.spring.quartz.job.ArgType;
+import com.benefitj.spring.quartz.worker.ArgType;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.NoArgsConstructor;

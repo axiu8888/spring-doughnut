@@ -1,7 +1,8 @@
 package com.benefitj.mybatisplus.controller;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.benefitj.core.IdUtils;
+import com.benefitj.core.TimeUtils;
 import com.benefitj.mybatisplus.controller.vo.HttpResult;
 import com.benefitj.mybatisplus.controller.vo.QuartzJobArgVo;
 import com.benefitj.mybatisplus.entity.SysQuartzJobTask;
@@ -12,8 +13,8 @@ import com.benefitj.spring.mvc.query.PageRequest;
 import com.benefitj.spring.quartz.JobType;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
-import com.benefitj.spring.quartz.job.QuartzJobInvoker;
-import com.benefitj.spring.quartz.job.QuartzJobManager;
+import com.benefitj.spring.quartz.worker.QuartzWorkerInvoker;
+import com.benefitj.spring.quartz.worker.QuartzWorkerManager;
 import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import com.benefitj.spring.security.url.UrlPermitted;
 import com.github.pagehelper.PageInfo;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 public class QuartzController {
 
   @Autowired
-  QuartzJobManager manager;
+  QuartzWorkerManager manager;
 
   @Autowired
   QuartzJobTaskService quartzService;
@@ -83,17 +84,29 @@ public class QuartzController {
     return HttpResult.success(list);
   }
 
-  @ApiOperation("调用QuartzJobWorker")
-  @PostMapping("/invokeJobWorker")
-  public HttpResult<?> invokeJobWorker(@ApiParam("jobWorker名称") String name,
-                                       @ApiParam("参数") String args) {
-    QuartzJobInvoker invoker = manager.get(name);
+  @ApiOperation("调用QuartzWorker")
+  @PostMapping("/invokeWorker")
+  public HttpResult<?> invokeQuartzWorker(@ApiParam("quartzWorker名称") String name,
+                                          @ApiParam("参数") String args) {
+    QuartzWorkerInvoker invoker = manager.get(name);
     if (invoker == null) {
-      return HttpResult.failure("无法发现[ " + name + " ] job worker");
+      return HttpResult.failure("无法发现[ " + name + " ] quartz worker");
     }
-    Object[] providedArgs = invoker.mapArgs(JSON.parseObject(args));
-    Object result = invoker.invoke(providedArgs);
-    return HttpResult.success(result);
+    return HttpResult.success(quartzService.create(SysQuartzJobTask.builder()
+        .jobName(invoker.getName() + "_@_" + IdUtils.uuid(8))
+        .description(invoker.getDescription())
+        .jobData(args)
+        .triggerType(TriggerType.SIMPLE)
+        .worker(invoker.getName())
+        .workerType(WorkerType.QUARTZ_WORKER)
+        .simpleInterval(60L)
+        .simpleRepeatCount(0)
+        .startAt(TimeUtils.now())
+        .jobType(JobType.DEFAULT)
+        .orgId(JwtTokenManager.currentOrgId())
+        .ownerId(JwtTokenManager.currentUserId())
+        .ownerType("user")
+        .build()));
   }
 
   @ApiOperation("获取存在的调度任务")

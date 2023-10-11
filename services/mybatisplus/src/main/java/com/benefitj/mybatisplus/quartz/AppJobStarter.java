@@ -4,6 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.mybatisplus.entity.SysJob;
 import com.benefitj.mybatisplus.service.SysJobService;
 import com.benefitj.spring.listener.OnAppStart;
+import com.benefitj.spring.quartz.IScheduler;
 import com.benefitj.spring.quartz.QuartzUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class AppJobStarter {
 
   @Autowired
   SysJobService service;
+
+  @Autowired
+  IScheduler scheduler;
 
   /**
    * 是否启动
@@ -50,7 +54,7 @@ public class AppJobStarter {
     condition.setActive(Boolean.TRUE);
     List<SysJob> list = service.getList(condition, null, null);
     for (SysJob job : list) {
-      QuartzUtils.scheduleJob(service.getScheduler(), job);
+      QuartzUtils.scheduleJob(scheduler, job);
     }
   }
 

@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.benefitj.mybatisplus.entity.base.EntityBase;
 import com.benefitj.mybatisplus.service.entitydescriptor.EntityDescriptor;
 import com.benefitj.mybatisplus.service.entitydescriptor.EntityFinder;
 import com.benefitj.mybatisplus.service.entitydescriptor.PropertyDescriptor;
-import com.benefitj.mybatisplus.entity.base.EntityBase;
 import com.benefitj.spring.mvc.query.OrderUtils;
 import com.benefitj.spring.mvc.query.PageRequest;
 import com.github.pagehelper.PageHelper;
@@ -28,25 +28,8 @@ import java.util.stream.Collectors;
  */
 public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>> extends ServiceImpl<M, T> implements IService<T> {
 
-  private M mapper;
-
-  public ServiceBase(M mapper) {
-    this.mapper = mapper;
-  }
-
   protected EntityDescriptor getEntityDescriptor() {
     return EntityFinder.INSTANCE.getEntityClass(getClass(), "T");
-  }
-
-  /**
-   * 获取Mapper对象
-   */
-  protected M getMapper() {
-    return mapper;
-  }
-
-  public void setMapper(M mapper) {
-    this.mapper = mapper;
   }
 
   /**
@@ -63,7 +46,7 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
    * @return 返回统计的条数
    */
   public long count(T condition) {
-    return getMapper().selectCount(new QueryWrapper<>(condition));
+    return getBaseMapper().selectCount(new QueryWrapper<>(condition));
   }
 
   /**
@@ -73,7 +56,7 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
    * @return 返回统计的条数
    */
   public long countByPK(List<?> ids) {
-    return getMapper().selectCount(new QueryWrapper<T>().in(getEntityDescriptor().getId().getColumn(), ids));
+    return getBaseMapper().selectCount(new QueryWrapper<T>().in(getEntityDescriptor().getId().getColumn(), ids));
   }
 
   /**
@@ -85,7 +68,7 @@ public abstract class ServiceBase<T extends EntityBase, M extends BaseMapper<T>>
    * @return 返回查询的列表
    */
   public List<T> getList(T condition, @Nullable Date startTime, @Nullable Date endTime) {
-    return getMapper().selectList(newQueryWrapper(condition)
+    return getBaseMapper().selectList(newQueryWrapper(condition)
         .lambda()
         .ge(startTime != null, EntityBase::getCreateTime, startTime)
         .le(endTime != null, EntityBase::getCreateTime, endTime)

@@ -23,14 +23,6 @@ public class SysJobService extends ServiceBase<SysJob, SysJobMapper> {
   @Autowired
   IScheduler scheduler;
 
-  public SysJobService(SysJobMapper mapper) {
-    super(mapper);
-  }
-
-  public IScheduler getScheduler() {
-    return scheduler;
-  }
-
   /**
    * 通过ID获取Cron的调度任务
    *
@@ -38,7 +30,7 @@ public class SysJobService extends ServiceBase<SysJob, SysJobMapper> {
    * @return 返回调度任务
    */
   public SysJob get(String id) {
-    return getMapper().selectOne(new QueryWrapper<SysJob>()
+    return getBaseMapper().selectOne(new QueryWrapper<SysJob>()
         .lambda()
         .eq(SysJob::getId, id)
     );
@@ -142,14 +134,14 @@ public class SysJobService extends ServiceBase<SysJob, SysJobMapper> {
       } else {
         scheduler.pauseJob(jobKey);
       }
-      return getMapper().updateById(job) > 0;
+      return getBaseMapper().updateById(job) > 0;
     }
     return false;
   }
 
   @Override
   public List<SysJob> getList(SysJob condition, Date startTime, Date endTime) {
-    return getMapper().selectList(condition, startTime, endTime);
+    return getBaseMapper().selectList(condition, startTime, endTime);
   }
 
 }

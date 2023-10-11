@@ -19,13 +19,8 @@ import java.util.List;
 @Service
 public class SysAccountService extends ServiceBase<SysAccount, SysAccountMapper> {
 
+  @Autowired
   private PasswordEncoder passwordEncoder;
-
-  public SysAccountService(SysAccountMapper mapper,
-                           @Autowired PasswordEncoder passwordEncoder) {
-    super(mapper);
-    this.passwordEncoder = passwordEncoder;
-  }
 
   /**
    * 通过账号名获取
@@ -34,11 +29,11 @@ public class SysAccountService extends ServiceBase<SysAccount, SysAccountMapper>
    * @return 返回查询的账号
    */
   public SysAccount getByUsername(String username) {
-    return getMapper().selectByUserName(username);
+    return getBaseMapper().selectByUserName(username);
   }
 
   public long countByUsername(String username) {
-    return getMapper().countByUsername(username);
+    return getBaseMapper().countByUsername(username);
   }
 
   /**
@@ -83,7 +78,7 @@ public class SysAccountService extends ServiceBase<SysAccount, SysAccountMapper>
    * @return 返回账号列表
    */
   public List<SysAccount> getList(SysAccount condition) {
-    return getMapper().selectList(condition, null, null);
+    return getBaseMapper().selectList(condition, null, null);
   }
 
   /**
@@ -93,7 +88,7 @@ public class SysAccountService extends ServiceBase<SysAccount, SysAccountMapper>
    * @return 返回帐号信息
    */
   public SysAccount getByUserId(String userId) {
-    return getMapper().selectByUserId(userId);
+    return getBaseMapper().selectByUserId(userId);
   }
 
   /**

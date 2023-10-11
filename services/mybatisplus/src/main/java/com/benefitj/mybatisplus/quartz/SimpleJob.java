@@ -3,7 +3,6 @@ package com.benefitj.mybatisplus.quartz;
 
 import com.benefitj.mybatisplus.entity.SysJob;
 import com.benefitj.spring.BeanHelper;
-import com.benefitj.spring.quartz.QuartzJob;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
 import com.benefitj.spring.quartz.worker.QuartzWorker;
@@ -18,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class SimpleJob {
 
-  public static SimpleJob from(QuartzJob job) {
+  public static SimpleJob from(SysJob job) {
     SimpleJob copy = BeanHelper.copy(job, SimpleJob.class);
     copy.setTriggerType(TriggerType.SIMPLE);
     return copy;

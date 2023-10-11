@@ -26,6 +26,7 @@ dependencies {
   //implementation 'com.h2database:h2:1.4.200'
   implementation "com.mysql:mysql-connector-j:${mysqlVersion}"
   implementation "com.alibaba:druid-spring-boot-starter:${druidVersion}"
+  implementation "org.postgresql:postgresql:${postgresqlVersion}"
 
   // swagger-ui
   implementation "io.springfox:springfox-boot-starter:3.0.0"

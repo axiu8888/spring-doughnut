@@ -14,7 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -26,7 +25,7 @@ import java.util.Date;
 @Entity
 @TableName(value = "sys_users")
 @Table(name = "sys_users"
-    , indexes = {@Index(name = "idx_org_id", columnList = "org_id")}
+    //, indexes = {@Index(name = "idx_org_id", columnList = "org_id")}
 )
 public class SysUser extends UuidEntity {
 

@@ -9,9 +9,4 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SysLogService extends ServiceBase<SysOpLog, SysLogMapper> {
-
-  public SysLogService(SysLogMapper mapper) {
-    super(mapper);
-  }
-
 }

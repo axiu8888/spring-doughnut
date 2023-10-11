@@ -1,8 +1,9 @@
-package com.benefitj.mybatisplus.controller.vo;
+package com.benefitj.mybatisplus.quartz;
 
-import com.benefitj.mybatisplus.entity.SysQuartzJobTask;
+
+import com.benefitj.mybatisplus.entity.SysJob;
 import com.benefitj.spring.BeanHelper;
-import com.benefitj.spring.quartz.QuartzJobTask;
+import com.benefitj.spring.quartz.QuartzJob;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
 import com.benefitj.spring.quartz.worker.QuartzWorker;
@@ -15,19 +16,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Data
-public class CronJobTask {
+public class SimpleJob {
 
-  public static CronJobTask from(QuartzJobTask task) {
-    CronJobTask copy = BeanHelper.copy(task, CronJobTask.class);
-    copy.setTriggerType(TriggerType.CRON);
+  public static SimpleJob from(QuartzJob job) {
+    SimpleJob copy = BeanHelper.copy(job, SimpleJob.class);
+    copy.setTriggerType(TriggerType.SIMPLE);
     return copy;
   }
 
-  public static SysQuartzJobTask to(CronJobTask task) {
-    SysQuartzJobTask copy = BeanHelper.copy(task, SysQuartzJobTask.class);
-    copy.setTriggerType(TriggerType.CRON);
+  public static SysJob to(SimpleJob job) {
+    SysJob copy = BeanHelper.copy(job, SysJob.class);
+    copy.setTriggerType(TriggerType.SIMPLE);
     return copy;
   }
+
 
   /**
    * ID
@@ -44,6 +46,11 @@ public class CronJobTask {
    */
   @ApiModelProperty("描述")
   private String description;
+  /**
+   * 是否不恢复
+   */
+  @ApiModelProperty("是否不恢复")
+  private Boolean recovery;
   /**
    * JobWorker的实现，或者被 {@link QuartzWorker} 注释的方法
    */
@@ -74,12 +81,18 @@ public class CronJobTask {
    */
   @ApiModelProperty("触发器类型")
   @Builder.Default
-  private TriggerType triggerType = TriggerType.CRON;
+  private TriggerType triggerType = TriggerType.SIMPLE;
   /**
-   * Cron表达式
+   * 每次执行的间隔
    */
-  @ApiModelProperty("Cron表达式")
-  private String cronExpression;
+  @ApiModelProperty("每次执行的间隔")
+  private Long simpleInterval;
+  /**
+   * 重复次数
+   */
+  @ApiModelProperty("重复次数")
+  @Builder.Default
+  private Integer simpleRepeatCount = 0;
   /**
    * 可用状态
    */
@@ -101,4 +114,7 @@ public class CronJobTask {
   @ApiModelProperty("拥有者类型")
   private String ownerType;
 
+  public SysJob toJob() {
+    return to(this);
+  }
 }

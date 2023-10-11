@@ -1,8 +1,8 @@
 package com.benefitj.mybatisplus.quartz;
 
 import com.benefitj.core.EventLoop;
-import com.benefitj.mybatisplus.entity.SysQuartzJobTask;
-import com.benefitj.mybatisplus.service.QuartzJobTaskService;
+import com.benefitj.mybatisplus.entity.SysJob;
+import com.benefitj.mybatisplus.service.SysJobService;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.quartz.QuartzUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,37 +19,38 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
-public class QuartzStartListener {
+public class AppJobStarter {
 
   @Autowired
   QuartzProperties properties;
 
   @Autowired
-  QuartzJobTaskService service;
+  SysJobService service;
 
   /**
    * 是否启动
    */
-  @Value("#{@environment['spring.quartz.task.start-up'] ?: true}")
-  private boolean startup;
+  @Value("#{@environment['spring.quartz.job.auto-load'] ?: true}")
+  private boolean autoLoad;
 
-  public QuartzStartListener() {
+  public AppJobStarter() {
   }
 
   @OnAppStart
   public void onAppStart() {
-    if (startup) {
+    if (autoLoad) {
       // 调度任务
-      EventLoop.asyncIO(this::scheduleJobTasks, properties.getStartupDelay().getSeconds() * 1000L + 3000L, TimeUnit.MILLISECONDS);
+      long delay = properties.getStartupDelay().getSeconds() * 1000L + 3000L;
+      EventLoop.asyncIO(this::startJobs, delay, TimeUnit.MILLISECONDS);
     }
   }
 
-  public void scheduleJobTasks() {
-    SysQuartzJobTask condition = new SysQuartzJobTask();
+  public void startJobs() {
+    SysJob condition = new SysJob();
     condition.setActive(Boolean.TRUE);
-    List<SysQuartzJobTask> all = service.getList(condition, null, null);
-    for (SysQuartzJobTask task : all) {
-      QuartzUtils.scheduleJob(service.getScheduler(), task);
+    List<SysJob> list = service.getList(condition, null, null);
+    for (SysJob job : list) {
+      QuartzUtils.scheduleJob(service.getScheduler(), job);
     }
   }
 

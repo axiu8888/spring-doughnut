@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class QuartzJobTaskImpl implements QuartzJobTask {
+public class QuartzJobImpl implements QuartzJob {
 
   String id;
   /**

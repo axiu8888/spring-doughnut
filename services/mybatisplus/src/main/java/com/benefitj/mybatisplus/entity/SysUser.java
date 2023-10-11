@@ -2,6 +2,7 @@ package com.benefitj.mybatisplus.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.benefitj.core.TimeUtils;
+import com.benefitj.mybatisplus.entity.base.UuidEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

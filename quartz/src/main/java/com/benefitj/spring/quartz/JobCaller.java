@@ -2,7 +2,6 @@ package com.benefitj.spring.quartz;
 
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
-import com.benefitj.spring.quartz.caller.DefaultJobTaskCaller;
 import com.benefitj.spring.quartz.worker.QuartzJobWorker;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -11,14 +10,17 @@ import org.quartz.JobExecutionException;
 /**
  * job 任务
  */
-public interface JobTaskCaller extends Job {
+public interface JobCaller extends Job {
 
   @Override
   void execute(JobExecutionContext context) throws JobExecutionException;
 
-  default Class<? extends JobWorker> classForName(String name) throws QuartzException {
+  /**
+   * 加载Class
+   */
+  default <T> Class<T> classForName(String name) throws QuartzException {
     try {
-      return (Class<? extends JobWorker>) Class.forName(name);
+      return (Class<T>) Class.forName(name);
     } catch (ClassNotFoundException e) {
       throw new QuartzException(e.getMessage());
     }
@@ -64,34 +66,6 @@ public interface JobTaskCaller extends Job {
    */
   default <T> T getBean(String name) {
     return SpringCtxHolder.getBean(name);
-  }
-
-  /**
-   * 创建默认的调度
-   */
-  static JobTaskCaller newJobTaskCaller() {
-    return new DefaultJobTaskCaller();
-  }
-
-  /**
-   * 创建可持久化的调度
-   */
-  static JobTaskCaller newPersistentJobTaskCaller() {
-    return new DefaultJobTaskCaller();
-  }
-
-  /**
-   * 创建不允许并发的调度
-   */
-  static JobTaskCaller newDisallowConcurrentJobTaskCaller() {
-    return new DefaultJobTaskCaller();
-  }
-
-  /**
-   * 创建可持久化切不允许并发的调度
-   */
-  static JobTaskCaller newPersistentWithDisallowConcurrentJobTaskCaller() {
-    return new DefaultJobTaskCaller();
   }
 
 }

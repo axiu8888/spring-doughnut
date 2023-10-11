@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.benefitj.mybatisplus.service.entitydescriptor.EntityDescriptor;
 import com.benefitj.mybatisplus.service.entitydescriptor.EntityFinder;
 import com.benefitj.mybatisplus.service.entitydescriptor.PropertyDescriptor;
-import com.benefitj.mybatisplus.entity.EntityBase;
+import com.benefitj.mybatisplus.entity.base.EntityBase;
 import com.benefitj.spring.mvc.query.OrderUtils;
 import com.benefitj.spring.mvc.query.PageRequest;
 import com.github.pagehelper.PageHelper;

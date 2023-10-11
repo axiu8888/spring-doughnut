@@ -15,126 +15,126 @@ public class QuartzUtils {
   /**
    * 设置默认的参数
    *
-   * @param task 调度任务
+   * @param job 调度任务
    * @return 返回调度任务
    */
-  public static QuartzJobTask setup(QuartzJobTask task) {
-    return setup(task, task.getTriggerType().name() + "_" + IdUtils.uuid(8));
+  public static QuartzJob setup(QuartzJob job) {
+    return setup(job, job.getTriggerType().name() + "_" + IdUtils.uuid(8));
   }
 
   /**
    * 设置默认的参数
    *
-   * @param task    调度任务
+   * @param job    调度任务
    * @param jobName job 名称
    * @return 返回调度任务
    */
-  public static QuartzJobTask setup(QuartzJobTask task, String jobName) {
-    TriggerType triggerType = task.getTriggerType();
+  public static QuartzJob setup(QuartzJob job, String jobName) {
+    TriggerType triggerType = job.getTriggerType();
     if (triggerType == null) {
       throw new QuartzException("请指定正确的触发器类型");
     }
 
-    checkWorker(task);
+    checkWorker(job);
 
     // 触发器组名称
-    task.setTriggerGroup(triggerType.name());
+    job.setTriggerGroup(triggerType.name());
     // 创建随机的触发器名称
-    task.setTriggerName("trigger-" + jobName);
+    job.setTriggerName("trigger-" + jobName);
     // Job组名称
-    task.setJobGroup(triggerType.name());
+    job.setJobGroup(triggerType.name());
     // 创建随机的 JobName
-    task.setJobName(jobName);
+    job.setJobName(jobName);
 
     // 开始时间
     long now = System.currentTimeMillis();
-    if (task.getStartAt() == null) {
-      task.setStartAt(now);
+    if (job.getStartAt() == null) {
+      job.setStartAt(now);
     }
 
     // 调度的时间不能比当前时间更早
-    if (task.getStartAt() < now) {
-      task.setStartAt(now);
+    if (job.getStartAt() < now) {
+      job.setStartAt(now);
     }
 
     if (triggerType == TriggerType.CRON) {
       try {
         // 验证表达式
-        CronExpression.validateExpression(task.getCronExpression());
+        CronExpression.validateExpression(job.getCronExpression());
       } catch (ParseException e) {
-        throw new QuartzException("[" + task.getCronExpression() + "]表达式错误: " + e.getMessage());
+        throw new QuartzException("[" + job.getCronExpression() + "]表达式错误: " + e.getMessage());
       }
-      if (task.getMisfirePolicy() == null) {
+      if (job.getMisfirePolicy() == null) {
         // 默认什么都不做
-        task.setMisfirePolicy(TriggerType.CronPolicy.DO_NOTHING.getPolicy());
+        job.setMisfirePolicy(TriggerType.CronPolicy.DO_NOTHING.getPolicy());
       }
     } else {
       // 验证Simple的值
       // 执行次数
-      if (task.getSimpleRepeatCount() == null) {
-        task.setSimpleRepeatCount(0);
+      if (job.getSimpleRepeatCount() == null) {
+        job.setSimpleRepeatCount(0);
       }
       // 间隔时间
-      if (task.getSimpleInterval() == null) {
-        task.setSimpleInterval(0L);
+      if (job.getSimpleInterval() == null) {
+        job.setSimpleInterval(0L);
       }
-      if (task.getMisfirePolicy() == null) {
+      if (job.getMisfirePolicy() == null) {
         // 默认什么都不做
-        task.setMisfirePolicy(TriggerType.SimplePolicy.SMART_POLICY.getPolicy());
+        job.setMisfirePolicy(TriggerType.SimplePolicy.SMART_POLICY.getPolicy());
       }
     }
 
-    if (task.getEndAt() != null) {
+    if (job.getEndAt() != null) {
       // 至少开始后的5秒再结束
-      task.setEndAt(Math.max(task.getStartAt() + 5_000, task.getEndAt()));
+      job.setEndAt(Math.max(job.getStartAt() + 5_000, job.getEndAt()));
     }
-    if (task.getRecovery() == null) {
-      task.setRecovery(Boolean.FALSE);
+    if (job.getRecovery() == null) {
+      job.setRecovery(Boolean.FALSE);
     }
-    if (task.getPersistent() == null) {
-      task.setPersistent(false);
+    if (job.getPersistent() == null) {
+      job.setPersistent(false);
     }
-    if (task.getDisallowConcurrent() == null) {
-      task.setDisallowConcurrent(false);
+    if (job.getDisallowConcurrent() == null) {
+      job.setDisallowConcurrent(false);
     }
-    if (task.getPriority() == null) {
-      task.setPriority(QuartzJobTask.TRIGGER_PRIORITY);
+    if (job.getPriority() == null) {
+      job.setPriority(QuartzJob.TRIGGER_PRIORITY);
     }
 
     // job类型
-    JobType jobType = task.getJobType() != null ? task.getJobType() : JobType.DEFAULT;
+    JobType jobType = job.getJobType() != null ? job.getJobType() : JobType.DEFAULT;
     // 任务类型
-    task.setJobType(jobType);
+    job.setJobType(jobType);
     // 是否持久化
-    task.setPersistent(jobType.isPersistent());
+    job.setPersistent(jobType.isPersistent());
     // 不允许并发执行
-    task.setDisallowConcurrent(jobType.isDisallowConcurrent());
+    job.setDisallowConcurrent(jobType.isDisallowConcurrent());
 
-    return task;
+    return job;
   }
 
   /**
-   * 检查 task 的 worker
+   * 检查 job 的 worker
    */
-  public static void checkWorker(QuartzJobTask task) {
-    WorkerType workerType = task.getWorkerType();
+  public static void checkWorker(QuartzJob job) {
+    WorkerType workerType = job.getWorkerType();
     if (workerType == null) {
       throw new QuartzException("WorkerType不能为空");
     }
 
-    if (StringUtils.isBlank(task.getWorker())) {
+    if (StringUtils.isBlank(job.getWorker())) {
       throw new QuartzException("worker不能为空");
     }
 
     switch (workerType) {
       case QUARTZ_WORKER:
-        if (!QuartzWorkerManager.get().containsKey(task.getWorker())) {
-          throw new QuartzException("无法发现对应的QuartzWorker: " + task.getWorker());
+        if (!QuartzWorkerManager.get().containsKey(job.getWorker())) {
+          throw new QuartzException("无法发现对应的QuartzWorker: " + job.getWorker());
         }
         break;
       case NEW_INSTANCE:
         try {
-          Class<?> cls = Class.forName(task.getWorker());
+          Class<?> cls = Class.forName(job.getWorker());
           if (!cls.isAssignableFrom(JobWorker.class)) {
             throw new QuartzException("请指定正确的 JobWorker 类型");
           }
@@ -143,9 +143,9 @@ public class QuartzUtils {
         }
         break;
       case SPRING_BEAN_NAME:
-        String worker = task.getWorker();
+        String worker = job.getWorker();
         if (!(SpringCtxHolder.containsBean(worker))
-            || !(SpringCtxHolder.getBean(task.getWorker()) instanceof JobWorker)) {
+            || !(SpringCtxHolder.getBean(job.getWorker()) instanceof JobWorker)) {
           throw new QuartzException("未发现匹配的JobWorker实例!");
         }
         break;
@@ -156,61 +156,62 @@ public class QuartzUtils {
   /**
    * 构建 JobDetail
    *
-   * @param task 任务
+   * @param job 任务
    * @return 返回 JobBuilder
    */
-  public static JobBuilder job(QuartzJobTask task) {
-    checkWorker(task);
+  public static JobBuilder job(QuartzJob job) {
+    checkWorker(job);
     // 创建 JobDetails
     JobBuilder jb = JobBuilder.newJob();
-    jb.ofType(task.getJobType().getJobClass());
-    jb.withIdentity(task.getJobName(), task.getJobGroup());
-    jb.withDescription(task.getDescription());
-    jb.requestRecovery(task.getRecovery());
+    jb.ofType(job.getJobType().getJobClass());
+    jb.withIdentity(job.getJobName(), job.getJobGroup());
+    jb.withDescription(job.getDescription());
+    jb.requestRecovery(job.getRecovery());
     // 不持久化
     jb.storeDurably(false);
-    jb.usingJobData(JobWorker.KEY_ID, task.getId());
-    jb.usingJobData(JobWorker.KEY_JOB_DATA, task.getJobData());
-    jb.usingJobData(JobWorker.KEY_TASK, JsonUtils.toJson(task));
+    jb.usingJobData(JobWorker.KEY_ID, job.getId());
+    jb.usingJobData(JobWorker.KEY_JOB_DATA, job.getJobData());
+    jb.usingJobData(JobWorker.KEY_JOB, JsonUtils.toJson(job));
+    jb.usingJobData(JobWorker.KEY_JOB_CLASS, job.getClass().getName());
     return jb;
   }
 
   /**
    * 构建触发器
    *
-   * @param task 任务
+   * @param job 任务
    * @return 返回TriggerBuilder
    */
-  public static TriggerBuilder<Trigger> trigger(QuartzJobTask task) {
-    TriggerType triggerType = task.getTriggerType();
+  public static TriggerBuilder<Trigger> trigger(QuartzJob job) {
+    TriggerType triggerType = job.getTriggerType();
     if (triggerType == null) {
       throw new QuartzException("触发器类型错误");
     }
-    return triggerType == TriggerType.CRON ? cronTrigger(task) : simpleTrigger(task);
+    return triggerType == TriggerType.CRON ? cronTrigger(job) : simpleTrigger(job);
   }
 
   /**
    * 构建触发器
    *
-   * @param task 任务
+   * @param job 任务
    * @return 返回TriggerBuilder
    */
-  public static TriggerBuilder<Trigger> trigger(QuartzJobTask task, TriggerBuilder<Trigger> tb) {
-    tb.withIdentity(task.getTriggerName(), task.getTriggerGroup());
+  public static TriggerBuilder<Trigger> trigger(QuartzJob job, TriggerBuilder<Trigger> tb) {
+    tb.withIdentity(job.getTriggerName(), job.getTriggerGroup());
     // 触发器优先级
-    tb.withPriority(task.getPriority());
+    tb.withPriority(job.getPriority());
     // 开始执行的时间
-    if (task.getStartAt() != null) {
-      tb.startAt(new Date(task.getStartAt()));
+    if (job.getStartAt() != null) {
+      tb.startAt(new Date(job.getStartAt()));
     } else {
       tb.startNow();
     }
     // 结束时间
-    if (task.getEndAt() != null) {
-      tb.endAt(new Date(task.getEndAt()));
+    if (job.getEndAt() != null) {
+      tb.endAt(new Date(job.getEndAt()));
     }
-    if (StringUtils.isNotBlank(task.getCalendarName())) {
-      tb.modifiedByCalendar(task.getCalendarName());
+    if (StringUtils.isNotBlank(job.getCalendarName())) {
+      tb.modifiedByCalendar(job.getCalendarName());
     }
     return tb;
   }
@@ -218,17 +219,17 @@ public class QuartzUtils {
   /**
    * 构建触发器
    *
-   * @param task 任务
+   * @param job 任务
    * @return 返回TriggerBuilder
    */
-  public static TriggerBuilder<Trigger> simpleTrigger(QuartzJobTask task) {
+  public static TriggerBuilder<Trigger> simpleTrigger(QuartzJob job) {
     TriggerBuilder<Trigger> tb = TriggerBuilder.newTrigger();
-    trigger(task, tb);
+    trigger(job, tb);
     // 调度器
     SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
-    TriggerType.SimplePolicy.schedulePolicy(ssb, task.getMisfirePolicy());
-    ssb.withIntervalInMilliseconds(task.getSimpleInterval());
-    ssb.withRepeatCount(task.getSimpleRepeatCount());
+    TriggerType.SimplePolicy.schedulePolicy(ssb, job.getMisfirePolicy());
+    ssb.withIntervalInMilliseconds(job.getSimpleInterval());
+    ssb.withRepeatCount(job.getSimpleRepeatCount());
     tb.withSchedule(ssb);
     return tb;
   }
@@ -236,15 +237,15 @@ public class QuartzUtils {
   /**
    * 构建触发器
    *
-   * @param task 任务
+   * @param job 任务
    * @return 返回TriggerBuilder
    */
-  public static TriggerBuilder<Trigger> cronTrigger(QuartzJobTask task) {
+  public static TriggerBuilder<Trigger> cronTrigger(QuartzJob job) {
     TriggerBuilder<Trigger> tb = TriggerBuilder.newTrigger();
-    trigger(task, tb);
+    trigger(job, tb);
     // 调度器
-    CronScheduleBuilder csb = CronScheduleBuilder.cronSchedule(task.getCronExpression());
-    TriggerType.CronPolicy.schedulePolicy(csb, task.getMisfirePolicy());
+    CronScheduleBuilder csb = CronScheduleBuilder.cronSchedule(job.getCronExpression());
+    TriggerType.CronPolicy.schedulePolicy(csb, job.getMisfirePolicy());
     tb.withSchedule(csb);
     return tb;
   }
@@ -252,37 +253,40 @@ public class QuartzUtils {
   /**
    * 触发器的Key
    */
-  public static JobKey jobKey(QuartzJobTask task) {
-    return new JobKey(task.getJobName(), task.getJobGroup());
+  public static JobKey jobKey(QuartzJob job) {
+    return new JobKey(job.getJobName(), job.getJobGroup());
   }
 
   /**
    * 触发器的Key
    */
-  public static TriggerKey triggerKey(QuartzJobTask task) {
-    return new TriggerKey(task.getTriggerName(), task.getTriggerGroup());
+  public static TriggerKey triggerKey(QuartzJob job) {
+    return new TriggerKey(job.getTriggerName(), job.getTriggerGroup());
   }
 
-  public static void scheduleJob(Scheduler scheduler, QuartzJobTask task) throws IllegalStateException {
+  public static void scheduleJob(Scheduler scheduler, QuartzJob job) throws IllegalStateException {
     try {
+      // 设置默认值
+      setup(job);
+
       // 创建 JobDetails
-      if (scheduler.checkExists(jobKey(task))) {
-        scheduler.resumeJob(jobKey(task));
+      if (scheduler.checkExists(jobKey(job))) {
+        scheduler.resumeJob(jobKey(job));
         return;
       }
 
-      JobDetail jd = job(task).build();
+      JobDetail jd = job(job).build();
 
-      Trigger trigger = scheduler.getTrigger(triggerKey(task));
+      Trigger trigger = scheduler.getTrigger(triggerKey(job));
       if (trigger == null) {
-        trigger = trigger(task).forJob(jd).build();
+        trigger = trigger(job).forJob(jd).build();
       }
 
       // 添加调度器
       scheduler.scheduleJob(jd, trigger);
 
       // 是否暂停job
-      if (!Boolean.TRUE.equals(task.getActive())) {
+      if (!Boolean.TRUE.equals(job.getActive())) {
         scheduler.pauseJob(jd.getKey());
       }
 

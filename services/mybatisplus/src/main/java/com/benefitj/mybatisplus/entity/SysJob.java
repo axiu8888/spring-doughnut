@@ -1,7 +1,9 @@
 package com.benefitj.mybatisplus.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.benefitj.mybatisplus.entity.base.UuidEntity;
 import com.benefitj.spring.quartz.JobType;
-import com.benefitj.spring.quartz.QuartzJobTask;
+import com.benefitj.spring.quartz.QuartzJob;
 import com.benefitj.spring.quartz.TriggerType;
 import com.benefitj.spring.quartz.WorkerType;
 import com.benefitj.spring.quartz.worker.QuartzWorker;
@@ -21,9 +23,10 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Entity(name = "sys_quartz_job_task")
-@Table(name = "sys_quartz_job_task")
-public class SysQuartzJobTask extends UuidEntity implements QuartzJobTask {
+@Entity
+@Table(name = "sys_job")
+@TableName("sys_job")
+public class SysJob extends UuidEntity implements QuartzJob {
 //  /**
 //   * ID
 //   */

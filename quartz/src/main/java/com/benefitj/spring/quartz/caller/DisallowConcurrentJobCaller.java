@@ -6,5 +6,5 @@ import org.quartz.DisallowConcurrentExecution;
  * 不允许并发执行
  */
 @DisallowConcurrentExecution
-public class DisallowConcurrentJobTaskCaller extends DefaultJobTaskCaller {
+public class DisallowConcurrentJobCaller extends DefaultJobCaller {
 }

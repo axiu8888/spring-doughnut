@@ -1,4 +1,4 @@
-package com.benefitj.mybatisplus.entity;
+package com.benefitj.mybatisplus.entity.base;
 
 
 import com.baomidou.mybatisplus.annotation.Version;

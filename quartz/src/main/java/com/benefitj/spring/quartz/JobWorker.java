@@ -10,8 +10,9 @@ import org.quartz.JobExecutionException;
  */
 public interface JobWorker {
 
-  String KEY_TASK = "task";
   String KEY_ID = "id";
+  String KEY_JOB = "job";
+  String KEY_JOB_CLASS = "jobClass";
   String KEY_JOB_DATA = "jobData";
 
   /**
@@ -19,9 +20,9 @@ public interface JobWorker {
    *
    * @param context   上下文
    * @param jobDetail detail
-   * @param task      任务
+   * @param job      任务
    */
-  void execute(JobExecutionContext context, JobDetail jobDetail, QuartzJobTask task) throws JobExecutionException;
+  void execute(JobExecutionContext context, JobDetail jobDetail, QuartzJob job) throws JobExecutionException;
 
   /**
    * 获取Spring的Bean实例

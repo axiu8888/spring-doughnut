@@ -1,10 +1,9 @@
 package com.benefitj.spring.quartz.caller;
 
 import com.benefitj.spring.JsonUtils;
-import com.benefitj.spring.quartz.JobTaskCaller;
+import com.benefitj.spring.quartz.JobCaller;
 import com.benefitj.spring.quartz.JobWorker;
-import com.benefitj.spring.quartz.QuartzJobTask;
-import com.benefitj.spring.quartz.QuartzJobTaskImpl;
+import com.benefitj.spring.quartz.QuartzJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -12,12 +11,12 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * 调用 job task
+ * 调用 job
  */
 @Slf4j
-public class DefaultJobTaskCaller implements JobTaskCaller {
+public class DefaultJobCaller implements JobCaller {
 
-  public DefaultJobTaskCaller() {
+  public DefaultJobCaller() {
   }
 
   @Override
@@ -25,12 +24,13 @@ public class DefaultJobTaskCaller implements JobTaskCaller {
     try {
       JobDetail detail = context.getJobDetail();
       JobDataMap jobDataMap = detail.getJobDataMap();
-      String taskJson = jobDataMap.getString(JobWorker.KEY_TASK);
-      QuartzJobTask task = JsonUtils.fromJson(taskJson, QuartzJobTaskImpl.class);
+      String jobJson = jobDataMap.getString(JobWorker.KEY_JOB);
+      String jobClass = jobDataMap.getString(JobWorker.KEY_JOB_CLASS);
+      QuartzJob job = JsonUtils.fromJson(jobJson, classForName(jobClass));
 
-      String worker = task.getWorker();
+      String worker = job.getWorker();
       Object jobWorker = null;
-      switch (task.getWorkerType()) {
+      switch (job.getWorkerType()) {
         case NEW_INSTANCE:
           jobWorker = newJobWorkerInstance(classForName(worker));
           break;
@@ -43,7 +43,7 @@ public class DefaultJobTaskCaller implements JobTaskCaller {
       }
       if (jobWorker != null) {
         if (jobWorker instanceof JobWorker) {
-          ((JobWorker) jobWorker).execute(context, detail, task);
+          ((JobWorker) jobWorker).execute(context, detail, job);
         } else {
           log.warn("Fail JobWorker instance: {}", jobWorker.getClass());
         }

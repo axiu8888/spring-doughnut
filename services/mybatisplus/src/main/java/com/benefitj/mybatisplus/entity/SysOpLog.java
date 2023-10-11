@@ -1,6 +1,7 @@
 package com.benefitj.mybatisplus.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.benefitj.mybatisplus.entity.base.LongIdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.benefitj.spring.quartz;
 
-public interface QuartzJobTask {
+public interface QuartzJob {
 
   int TRIGGER_PRIORITY = 50;
 

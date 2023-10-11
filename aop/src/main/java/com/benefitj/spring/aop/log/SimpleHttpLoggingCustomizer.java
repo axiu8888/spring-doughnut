@@ -39,13 +39,7 @@ public class SimpleHttpLoggingCustomizer implements HttpLoggingCustomizer {
     final StringBuilder sb = new StringBuilder();
     sb.append(isMultiLine() ? "\n" : "");
     String separator = separator();
-    args.forEach((key, value) ->
-        sb.append(key)
-            .append("[")
-            .append(toValue(value))
-            .append("]")
-            .append(separator)
-    );
+    args.forEach((key, value) -> sb.append(key).append(": ").append(toValue(value)).append(separator));
     sb.replace(sb.length() - separator.length(), sb.length(), "");
     log.info(sb.toString());
   }

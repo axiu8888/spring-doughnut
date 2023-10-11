@@ -7,7 +7,7 @@ import org.quartz.JobListener;
 /**
  * 监听
  */
-public interface SimpleJobListener extends JobListener {
+public interface QuartzJobListener extends JobListener {
 
   @Override
   default String getName() {

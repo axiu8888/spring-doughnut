@@ -1,6 +1,8 @@
 package com.benefitj.mybatisplus.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.benefitj.mybatisplus.entity.base.UuidEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,6 +25,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "sys_account")
+@TableName("sys_account")
 public class SysAccount extends UuidEntity {
 
   /**

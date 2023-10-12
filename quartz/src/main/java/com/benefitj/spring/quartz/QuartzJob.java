@@ -65,42 +65,6 @@ public interface QuartzJob {
   void setDescription(String description);
 
   /**
-   * 获取是否恢复
-   */
-  Boolean getRecovery();
-
-  /**
-   * 设置是否恢复
-   *
-   * @param recovery 是否恢复
-   */
-  void setRecovery(Boolean recovery);
-
-  /**
-   * 获取是否持久化
-   */
-  Boolean getPersistent();
-
-  /**
-   * 设置是否持久化
-   *
-   * @param persistent 是否持久化
-   */
-  void setPersistent(Boolean persistent);
-
-  /**
-   * 获取是否允许并发执行
-   */
-  Boolean getDisallowConcurrent();
-
-  /**
-   * 设置是否允许并发执行
-   *
-   * @param disallowConcurrent 是否允许并发
-   */
-  void setDisallowConcurrent(Boolean disallowConcurrent);
-
-  /**
    * 获取 Job 类型
    */
   JobType getJobType();
@@ -173,18 +137,6 @@ public interface QuartzJob {
   void setTriggerName(String triggerName);
 
   /**
-   * 获取调度优先级
-   */
-  Integer getPriority();
-
-  /**
-   * 设置调度优先级
-   *
-   * @param priority 优先级
-   */
-  void setPriority(Integer priority);
-
-  /**
    * 获取开始时间
    */
   Long getStartAt();
@@ -207,30 +159,6 @@ public interface QuartzJob {
    * @param endAt 时间
    */
   void setEndAt(Long endAt);
-
-  /**
-   * 获取日历名称
-   */
-  String getCalendarName();
-
-  /**
-   * 设置日历名称
-   *
-   * @param calendarName 名称
-   */
-  void setCalendarName(String calendarName);
-
-  /**
-   * 获取失效策略
-   */
-  Integer getMisfirePolicy();
-
-  /**
-   * 设置失效策略
-   *
-   * @param misfirePolicy 策略
-   */
-  void setMisfirePolicy(Integer misfirePolicy);
 
   /**
    * 获取调度器类型

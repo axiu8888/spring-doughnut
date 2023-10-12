@@ -64,10 +64,6 @@ public class QuartzUtils {
       } catch (ParseException e) {
         throw new QuartzException("[" + job.getCronExpression() + "]表达式错误: " + e.getMessage());
       }
-      if (job.getMisfirePolicy() == null) {
-        // 默认什么都不做
-        job.setMisfirePolicy(TriggerType.CronPolicy.DO_NOTHING.getPolicy());
-      }
     } else {
       // 验证Simple的值
       // 执行次数
@@ -78,38 +74,17 @@ public class QuartzUtils {
       if (job.getSimpleInterval() == null) {
         job.setSimpleInterval(0L);
       }
-      if (job.getMisfirePolicy() == null) {
-        // 默认什么都不做
-        job.setMisfirePolicy(TriggerType.SimplePolicy.SMART_POLICY.getPolicy());
-      }
     }
 
     if (job.getEndAt() != null) {
       // 至少开始后的5秒再结束
       job.setEndAt(Math.max(job.getStartAt() + 5_000, job.getEndAt()));
     }
-    if (job.getRecovery() == null) {
-      job.setRecovery(Boolean.FALSE);
-    }
-    if (job.getPersistent() == null) {
-      job.setPersistent(false);
-    }
-    if (job.getDisallowConcurrent() == null) {
-      job.setDisallowConcurrent(false);
-    }
-    if (job.getPriority() == null) {
-      job.setPriority(QuartzJob.TRIGGER_PRIORITY);
-    }
 
     // job类型
     JobType jobType = job.getJobType() != null ? job.getJobType() : JobType.DEFAULT;
     // 任务类型
     job.setJobType(jobType);
-    // 是否持久化
-    job.setPersistent(jobType.isPersistent());
-    // 不允许并发执行
-    job.setDisallowConcurrent(jobType.isDisallowConcurrent());
-
     return job;
   }
 
@@ -166,7 +141,7 @@ public class QuartzUtils {
     jb.ofType(job.getJobType().getJobClass());
     jb.withIdentity(job.getJobName(), job.getJobGroup());
     jb.withDescription(job.getDescription());
-    jb.requestRecovery(job.getRecovery());
+    jb.requestRecovery(false);
     // 不持久化
     jb.storeDurably(false);
     jb.usingJobData(JobWorker.KEY_ID, job.getId());
@@ -198,8 +173,6 @@ public class QuartzUtils {
    */
   public static TriggerBuilder<Trigger> trigger(QuartzJob job, TriggerBuilder<Trigger> tb) {
     tb.withIdentity(job.getTriggerName(), job.getTriggerGroup());
-    // 触发器优先级
-    tb.withPriority(job.getPriority());
     // 开始执行的时间
     if (job.getStartAt() != null) {
       tb.startAt(new Date(job.getStartAt()));
@@ -209,9 +182,6 @@ public class QuartzUtils {
     // 结束时间
     if (job.getEndAt() != null) {
       tb.endAt(new Date(job.getEndAt()));
-    }
-    if (StringUtils.isNotBlank(job.getCalendarName())) {
-      tb.modifiedByCalendar(job.getCalendarName());
     }
     return tb;
   }
@@ -227,7 +197,7 @@ public class QuartzUtils {
     trigger(job, tb);
     // 调度器
     SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
-    TriggerType.SimplePolicy.schedulePolicy(ssb, job.getMisfirePolicy());
+    TriggerType.SimplePolicy.schedulePolicy(ssb, TriggerType.SimplePolicy.SMART_POLICY);
     ssb.withIntervalInMilliseconds(job.getSimpleInterval());
     ssb.withRepeatCount(job.getSimpleRepeatCount());
     tb.withSchedule(ssb);
@@ -245,7 +215,7 @@ public class QuartzUtils {
     trigger(job, tb);
     // 调度器
     CronScheduleBuilder csb = CronScheduleBuilder.cronSchedule(job.getCronExpression());
-    TriggerType.CronPolicy.schedulePolicy(csb, job.getMisfirePolicy());
+    TriggerType.CronPolicy.schedulePolicy(csb, TriggerType.CronPolicy.DO_NOTHING);
     tb.withSchedule(csb);
     return tb;
   }

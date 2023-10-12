@@ -61,24 +61,6 @@ public class SysJob extends UuidEntity implements QuartzJob {
   @Column(name = "description", columnDefinition = "varchar comment '任务描述'", length = 1024)
   private String description;
   /**
-   * 是否不恢复
-   */
-  @ApiModelProperty("是否不恢复")
-  @Column(name = "recovery", columnDefinition = "tinyint comment '是否恢复' DEFAULT 0", length = 1)
-  private Boolean recovery;
-  /**
-   * 执行后是否持久化数据，默认不持久化
-   */
-  @ApiModelProperty("执行后是否持久化数据，默认不持久化")
-  @Column(name = "persistent", columnDefinition = "tinyint comment '执行后是否持久化数据，默认不持久化' DEFAULT 0", length = 1)
-  private Boolean persistent;
-  /**
-   * 是否不允许并发执行，默认并发执行
-   */
-  @ApiModelProperty("是否不允许并发执行，默认并发执行")
-  @Column(name = "disallow_concurrent", columnDefinition = "tinyint comment '是否不允许并发执行，默认并发执行' DEFAULT 1", length = 1)
-  private Boolean disallowConcurrent;
-  /**
    * Job的执行类型，参考: {@link JobType }
    */
   @ApiModelProperty("Job的执行类型")
@@ -115,12 +97,6 @@ public class SysJob extends UuidEntity implements QuartzJob {
   @Column(name = "trigger_name", columnDefinition = "varchar comment '触发器名称'", length = 50)
   private String triggerName;
   /**
-   * 触发器的优先级
-   */
-  @ApiModelProperty("触发器的优先级")
-  @Column(name = "priority", columnDefinition = "integer comment '触发器的优先级' DEFAULT 50")
-  private Integer priority;
-  /**
    * 开始执行的时间
    */
   @ApiModelProperty("开始执行的时间")
@@ -132,18 +108,6 @@ public class SysJob extends UuidEntity implements QuartzJob {
   @ApiModelProperty("结束执行的时间")
   @Column(name = "end_at", columnDefinition = "bigint comment '结束执行的时间'")
   private Long endAt;
-  /**
-   * Calendar
-   */
-  @ApiModelProperty("Calendar")
-  @Column(name = "calendar_name", columnDefinition = "varchar comment 'Calendar Name'", length = 50)
-  private String calendarName;
-  /**
-   * 失效后的策略
-   */
-  @ApiModelProperty("失效后的策略")
-  @Column(name = "misfire_policy", columnDefinition = "integer comment '失效后的策略'")
-  private Integer misfirePolicy;
   /**
    * 触发器类型: {@link TriggerType#SIMPLE}, {@link TriggerType#CRON}
    */

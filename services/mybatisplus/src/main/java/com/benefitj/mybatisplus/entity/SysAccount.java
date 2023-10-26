@@ -51,7 +51,7 @@ public class SysAccount extends UuidEntity {
    * 是否被锁住
    */
   @ApiModelProperty("是否被锁住")
-  @Column(name = "locked", columnDefinition = "tinyint(1) NOT NULL DEFAULT 0 comment '是否被锁住'")
+  @Column(name = "locked", columnDefinition = "tinyint(2) NOT NULL DEFAULT 0 comment '是否被锁住'")
   private Boolean locked;
 
 }

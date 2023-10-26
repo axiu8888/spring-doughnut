@@ -48,7 +48,7 @@ public class SysUser extends UuidEntity {
   private Date birthday;
 
   @ApiModelProperty("是否被锁住")
-  @Column(name = "locked", columnDefinition = "tinyint(1) NOT NULL DEFAULT 0 comment '是否被锁住'")
+  @Column(name = "locked", columnDefinition = "tinyint(2) NOT NULL DEFAULT 0 comment '是否被锁住'")
   private Boolean locked;
 
   public Integer getAge() {

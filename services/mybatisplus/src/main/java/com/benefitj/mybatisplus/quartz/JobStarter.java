@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
-public class AppJobStarter {
+public class JobStarter {
 
   @Autowired
   QuartzProperties properties;
@@ -37,7 +38,7 @@ public class AppJobStarter {
   @Value("#{@environment['spring.quartz.job.auto-load'] ?: true}")
   private boolean autoLoad;
 
-  public AppJobStarter() {
+  public JobStarter() {
   }
 
   @OnAppStart
@@ -52,9 +53,13 @@ public class AppJobStarter {
   public void startJobs() {
     SysJob condition = new SysJob();
     condition.setActive(Boolean.TRUE);
-    List<SysJob> list = service.getList(condition, null, null);
+    List<SysJob> list = service.getList(condition, null, new Date());
     for (SysJob job : list) {
-      QuartzUtils.scheduleJob(scheduler, job);
+      try {
+        QuartzUtils.scheduleJob(scheduler, job);
+      } catch (Exception e) {
+        log.error("throws: " + e.getMessage(), e);
+      }
     }
   }
 

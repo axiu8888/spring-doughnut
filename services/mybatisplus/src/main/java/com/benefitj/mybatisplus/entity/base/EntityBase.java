@@ -48,7 +48,7 @@ public abstract class EntityBase {
    * 是否可用
    */
   @ApiModelProperty("是否可用")
-  @Column(name = "active", columnDefinition = "tinyint(1) NOT NULL DEFAULT 1 comment '是否可用'")
+  @Column(name = "active", columnDefinition = "tinyint(2) NOT NULL DEFAULT 1 comment '是否可用'")
   private Boolean active;
 
 }

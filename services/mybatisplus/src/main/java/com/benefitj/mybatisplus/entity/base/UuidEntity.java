@@ -26,7 +26,7 @@ public abstract class UuidEntity extends EntityBase {
   @TableId(type = IdType.ASSIGN_UUID)
   @Id
   @GeneratedValue
-  @Column(name = "id", columnDefinition = "varchar comment '主键ID'", length = 32)
+  @Column(name = "id", columnDefinition = "varchar(32) comment '主键ID'", length = 32)
   private String id;
 
 }

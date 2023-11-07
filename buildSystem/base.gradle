@@ -123,8 +123,14 @@ ext {
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation fileTree(dir: 'libs/jar', include: ['*.jar'])
+  def libsApi = trying({ project.ext.libsApi }, false)
+  [
+      fileTree(dir: 'libs', include: ['*.jar']),
+      fileTree(dir: 'libs/jar', include: ['*.jar'])
+  ].forEach {
+    libsApi ? api(it) : implementation(it)
+  }
+
   compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 
   annotationProcessor("org.projectlombok:lombok:${lombokVersion}")

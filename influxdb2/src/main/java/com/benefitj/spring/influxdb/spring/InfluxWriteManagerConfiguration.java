@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 /**
  * InfluxDB行协议文件写入配置
@@ -63,6 +64,7 @@ public class InfluxWriteManagerConfiguration {
     manager.setMaxSize(options.getCacheSize() * Utils.MB);
     manager.setFileFactory(lineFileFactory);
     manager.setFileListener(lineFileListener);
+    manager.setCharset(StandardCharsets.UTF_8);
     return manager;
   }
 

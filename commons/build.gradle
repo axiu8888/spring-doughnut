@@ -1,9 +1,7 @@
 
+ext.libsApi = true
 apply from: "${scriptFile}"
 
 dependencies {
-  api fileTree(dir: 'libs', include: ['*.jar'])
-  api fileTree(dir: 'libs/jar', include: ['*.jar'])
-  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
 }
 

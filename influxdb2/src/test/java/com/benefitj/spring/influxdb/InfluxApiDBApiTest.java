@@ -139,6 +139,7 @@ class InfluxApiDBApiTest {
     tr.setEnergy(random.nextDouble());
     tr.setType("1");
     tr.setStep((short) random.nextInt(1000));
+    tr.setDescription("描述: " + DateFmtter.fmtNow("yyyy年MM月dd日 HH时mm分ss秒"));
     return template.lineProtocol(Collections.singletonList(tr));
   }
 

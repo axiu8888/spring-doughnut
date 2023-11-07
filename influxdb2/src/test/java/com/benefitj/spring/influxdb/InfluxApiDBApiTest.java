@@ -15,7 +15,9 @@ import com.benefitj.spring.influxdb.pojo.HsDataStatisticEntity;
 import com.benefitj.spring.influxdb.pojo.InfluxWavePackage;
 import com.benefitj.spring.influxdb.pojo.SleepPacket;
 import com.benefitj.spring.influxdb.spring.InfluxConfiguration;
+import com.benefitj.spring.influxdb.spring.InfluxWriteManagerConfiguration;
 import com.benefitj.spring.influxdb.template.*;
+import com.benefitj.spring.influxdb.write.InfluxWriteManager;
 import com.squareup.moshi.Moshi;
 import io.reactivex.Flowable;
 import lombok.AllArgsConstructor;
@@ -43,9 +45,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SpringBootTest(classes = InfluxConfiguration.class)
+@SpringBootTest(classes = {
+    InfluxConfiguration.class,
+    InfluxWriteManagerConfiguration.class
+})
 @Slf4j
-public class InfluxApiDBApiTest {
+class InfluxApiDBApiTest {
 
   @Autowired
   InfluxTemplate template;
@@ -58,6 +63,9 @@ public class InfluxApiDBApiTest {
 
   @Autowired
   PointConverterFactory converterFactory;
+
+  @Autowired
+  InfluxWriteManager writeManager;
 
   private Random random = new Random();
 
@@ -114,7 +122,10 @@ public class InfluxApiDBApiTest {
   void testWrite() {
     String line = generateLine();
     log.info(line);
-    template.write(line);
+//    template.write(line);
+
+    writeManager.write(line);
+    writeManager.flush();
   }
 
   private String generateLine() {
@@ -274,11 +285,13 @@ public class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 8, 20, 0, 0, 0).getTime();
-    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 10, 24, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 10, 25, 0, 0, 0).getTime();
+//    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
-    String condition = "";
+    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
+//    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -312,7 +325,7 @@ public class InfluxApiDBApiTest {
    */
   @Test
   void test_loadLines() {
-    test_createSubscriptions();
+//    test_createSubscriptions();
     File dir = new File("D:/tmp/influxdb");
     File[] lines = dir.listFiles(f -> f.length() > 20
         //&& f.getName().endsWith(".line")
@@ -343,10 +356,10 @@ public class InfluxApiDBApiTest {
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
 
     InfluxOptions srcOptions = BeanHelper.copy(options);
-//    srcOptions.setUrl("http://39.98.251.12:58086");
+    srcOptions.setUrl("http://39.98.251.12:58086");
 //    srcOptions.setUrl("http://research.sensecho.com:58086");
 //    srcOptions.setUrl("http://192.168.1.211:58039");
-    srcOptions.setUrl("http://192.168.1.198:58086");
+//    srcOptions.setUrl("http://192.168.1.198:58086");
     srcOptions.setDatabase("hsrg");
     srcOptions.setUsername("admin");
     srcOptions.setPassword("hsrg8888");
@@ -356,11 +369,11 @@ public class InfluxApiDBApiTest {
     srcTemplate.setApi(factory.create(srcOptions));
     srcTemplate.setJsonAdapter(new Moshi.Builder().build().adapter(QueryResult.class));
 
-    long startTime = TimeUtils.toDate(2023, 9, 13, 21, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 9, 14, 21, 30, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 10, 24, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 10, 25, 0, 0, 0).getTime();
     log.info("startTime: {}, endTime: {}", DateFmtter.fmt(startTime), DateFmtter.fmt(endTime));
 //    String condition = " AND device_id = '11000138'";
-    String condition = " AND person_zid = 'a88ce9327eeb405ea8f2a9c56440bb01'";
+    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
     //String condition = "";
 //    boolean exportPoint = false;
     boolean exportPoint = true;

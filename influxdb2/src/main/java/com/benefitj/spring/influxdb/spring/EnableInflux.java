@@ -9,7 +9,10 @@ import java.lang.annotation.*;
  *
  * @author DINGXIUAN
  */
-@Import(InfluxConfiguration.class)
+@Import({
+    InfluxConfiguration.class,
+    InfluxWriteManagerConfiguration.class
+})
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

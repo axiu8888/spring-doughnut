@@ -9,7 +9,9 @@ apply from: "${scriptFile}"
 
 dependencies {
   api(project(":commons"))
-  api(project(":spring"))
+  api(project(":spring")) {
+    exclude group: "*"//, module: ""
+  }
   api(project(":vertx-mqtt"))
 
   implementation 'org.springframework.boot:spring-boot-starter'

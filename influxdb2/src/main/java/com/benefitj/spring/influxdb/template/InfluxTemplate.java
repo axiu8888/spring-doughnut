@@ -19,6 +19,7 @@ import retrofit2.Response;
 
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -883,7 +884,7 @@ public interface InfluxTemplate {
    * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
    */
   default boolean export(File out, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
-    try (final BufferedWriter writer = new BufferedWriter(new FileWriter(out));) {
+    try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out), StandardCharsets.UTF_8));) {
       return export(writer, measurement, chunkSize, startTime, endTime, condition);
     } catch (IOException e) {
       throw new IllegalStateException(e);

@@ -1,8 +1,18 @@
- ________  _______   ________   _______   ________ ___  _________      ___                 ___      ___ _______   ________  _________   ___    ___
-|\   __  \|\  ___ \ |\   ___  \|\  ___ \ |\  _____\\  \|\___   ___\   |\  \               |\  \    /  /|\  ___ \ |\   __  \|\___   ___\|\  \  /  /|
-\ \  \|\ /\ \   __/|\ \  \\ \  \ \   __/|\ \  \__/\ \  \|___ \  \_|   \ \  \  ____________\ \  \  /  / | \   __/|\ \  \|\  \|___ \  \_|\ \  \/  / /
- \ \   __  \ \  \_|/_\ \  \\ \  \ \  \_|/_\ \   __\\ \  \   \ \  \  __ \ \  \|\____________\ \  \/  / / \ \  \_|/_\ \   _  _\   \ \  \  \ \    / /
-  \ \  \|\  \ \  \_|\ \ \  \\ \  \ \  \_|\ \ \  \_| \ \  \   \ \  \|\  \\_\  \|____________|\ \    / /   \ \  \_|\ \ \  \\  \|   \ \  \  /     \/
-   \ \_______\ \_______\ \__\\ \__\ \_______\ \__\   \ \__\   \ \__\ \________\              \ \__/ /     \ \_______\ \__\\ _\    \ \__\/  /\   \
-    \|_______|\|_______|\|__| \|__|\|_______|\|__|    \|__|    \|__|\|________|               \|__|/       \|_______|\|__|\|__|    \|__/__/ /\ __\
-                                                                                                                                       |__|/ \|__|
+${AnsiColor.BRIGHT_BLUE}
+
+
+`7MMM.     ,MMF' .g8""8q.  MMP""MM""YMM MMP""MM""YMM      .M"""bgd `7MM"""YMM  `7MM"""Mq.`7MMF'   `7MF'`7MM"""YMM  `7MM"""Mq.
+  MMMb    dPMM .dP'    `YM.P'   MM   `7 P'   MM   `7     ,MI    "Y   MM    `7    MM   `MM. `MA     ,V    MM    `7    MM   `MM.
+  M YM   ,M MM dM'      `MM     MM           MM          `MMb.       MM   d      MM   ,M9   VM:   ,V     MM   d      MM   ,M9
+  M  Mb  M' MM MM        MM     MM           MM            `YMMNq.   MMmmMM      MMmmdM9     MM.  M'     MMmmMM      MMmmdM9
+  M  YM.P'  MM MM.      ,MP     MM           MM          .     `MM   MM   Y  ,   MM  YM.     `MM A'      MM   Y  ,   MM  YM.
+  M  `YM'   MM `Mb.    ,dP'     MM           MM          Mb     dM   MM     ,M   MM   `Mb.    :MM;       MM     ,M   MM   `Mb.
+.JML. `'  .JMML. `"bmmd"'     .JMML.       .JMML.        P"Ybmmd"  .JMMmmmmMMM .JMML. .JMM.    VF      .JMMmmmmMMM .JMML. .JMM.
+                     MMb
+                      `bood'
+
+${AnsiColor.BRIGHT_GREEN}
+Powered by HSRG
+Version: 6.0
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BLACK}

@@ -7,10 +7,7 @@ import com.benefitj.mqtt.vertx.server.MqttServerProperty;
 import com.benefitj.mqtt.vertx.server.VertxMqttServer;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
-import com.benefitj.spring.listener.AppStateListenerWrapper;
 import io.vertx.core.Vertx;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,6 +16,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * MQTT 服务端
@@ -26,8 +24,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @Configuration
 public class MqttServerConfiguration {
-
-  static final Logger log = LoggerFactory.getLogger(MqttServerConfiguration.class);
 
   /**
    * vertx
@@ -60,7 +56,7 @@ public class MqttServerConfiguration {
   /**
    * MQTT服务端
    */
-  @ConditionalOnProperty(prefix = "spring.mqtt.server", value = "wsEnable", matchIfMissing = true)
+  @ConditionalOnProperty(prefix = "spring.mqtt.server", name = "ws-enable")
   @ConditionalOnMissingBean(name = "wsMqttServer")
   @Bean("wsMqttServer")
   public VertxMqttServer wsMqttServer(@Qualifier("mqttServerOptions") MqttServerOptions options,
@@ -77,7 +73,7 @@ public class MqttServerConfiguration {
   /**
    * MQTT服务端
    */
-  @ConditionalOnProperty(prefix = "spring.mqtt.server", value = "tcpEnable", matchIfMissing = true)
+  @ConditionalOnProperty(prefix = "spring.mqtt.server", name = "tcp-enable")
   @ConditionalOnMissingBean(name = "tcpMqttServer")
   @Bean("tcpMqttServer")
   public VertxMqttServer tcpMqttServer(@Qualifier("mqttServerOptions") MqttServerOptions options,
@@ -94,53 +90,13 @@ public class MqttServerConfiguration {
   /**
    * MQTT启动器
    */
+  @Lazy(value = false)
   @ConditionalOnMissingBean(name = "vertxMqttServerSwitcher")
   @Bean("vertxMqttServerSwitcher")
   public AppStateListener vertxMqttServerSwitcher(@Qualifier("vertx") Vertx vertx,
-                                                  @Autowired(required = false) @Qualifier("wsMqttServer") VertxMqttServer wsServer,
-                                                  @Autowired(required = false) @Qualifier("tcpMqttServer") VertxMqttServer tcpServer) {
-    return new AppStateListenerWrapper(
-        // 部署
-        e -> {
-          if (tcpServer != null) {
-            try {
-              tcpServer.deploy(vertx)
-                  .onComplete(event -> {
-                    log.info("Successful start mqtt[tcp] port: {}", tcpServer.getOptions().getPort());
-                  })
-                  .onFailure(event -> {
-                    log.info("Fail start mqtt[tcp] port: {}, cause: {}", tcpServer.getOptions().getPort(), event.getMessage());
-                  });
-            } catch (Exception ex) {
-              log.error(ex.getMessage(), ex);
-            }
-          }
-          if (wsServer != null) {
-            try {
-              wsServer.deploy(vertx)
-                  .onComplete(event -> {
-                    log.info("Successful start mqtt[ws] port: {}", wsServer.getOptions().getPort());
-                  })
-                  .onFailure(event -> {
-                    log.info("Fail start mqtt[ws] port: {}, cause: {}", wsServer.getOptions().getPort(), event.getMessage());
-                  });
-            } catch (Exception ex) {
-              log.error(ex.getMessage(), ex);
-            }
-          }
-        },
-        // 停止，
-        e -> {
-          if (tcpServer != null) {
-            tcpServer.stop();
-            log.info("stop mqtt[tcp] port: {}", tcpServer.getOptions().getPort());
-          }
-          if(wsServer != null) {
-            wsServer.stop();
-            log.info("stop mqtt[ws] port: {}", wsServer.getOptions().getPort());
-          }
-        }
-    );
+                                                  @Qualifier("wsMqttServer") @Autowired(required = false) VertxMqttServer wsServer,
+                                                  @Qualifier("tcpMqttServer") @Autowired(required = false) VertxMqttServer tcpServer) {
+    return new VertxMqttServerSwitcher(vertx, wsServer, tcpServer);
   }
 
 }

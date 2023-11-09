@@ -1,13 +1,11 @@
 package com.benefitj.spring.vertxmqtt.server;
 
 import com.benefitj.mqtt.vertx.VertxHolder;
-import com.benefitj.mqtt.vertx.server.MqttEndpointHandler;
-import com.benefitj.mqtt.vertx.server.MqttEndpointHandlerImpl;
-import com.benefitj.mqtt.vertx.server.MqttServerProperty;
-import com.benefitj.mqtt.vertx.server.VertxMqttServer;
+import com.benefitj.mqtt.vertx.server.*;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
 import io.vertx.core.Vertx;
+import io.vertx.mqtt.MqttEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -65,6 +63,7 @@ public class MqttServerConfiguration {
     property.setPort(options.getWsPort());
     property.setUseWebSocket(true);
     VertxMqttServer server = new VertxMqttServer();
+    server.setAuthenticator(endpoint -> true);  // 认证
     server.setProperty(property);
     server.setEndpointHandler(mqttEndpointHandler);
     return server;
@@ -82,6 +81,7 @@ public class MqttServerConfiguration {
     property.setPort(options.getTcpPort());
     property.setUseWebSocket(false);
     VertxMqttServer server = new VertxMqttServer();
+    server.setAuthenticator(endpoint -> true);  // 认证
     server.setProperty(property);
     server.setEndpointHandler(mqttEndpointHandler);
     return server;

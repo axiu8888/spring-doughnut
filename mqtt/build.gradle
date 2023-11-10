@@ -1,12 +1,18 @@
-
 apply from: "${scriptFile}"
 
 // 上传到nexus/maven仓库
 project.ext.upload = true
 
 dependencies {
-	api(project(":spring"))
-	api "org.springframework.boot:spring-boot-starter-integration:${springbootVersion}"
-	api "org.springframework.integration:spring-integration-stream:${springIntegrationVersion}"
-	api "org.springframework.integration:spring-integration-mqtt:${springIntegrationVersion}"
+
+  [
+      project(":spring"),
+
+      "org.springframework.boot:spring-boot-starter-integration:${springbootVersion}",
+      "org.springframework.integration:spring-integration-stream:${springIntegrationVersion}",
+      "org.springframework.integration:spring-integration-mqtt:${springIntegrationVersion}",
+
+  ].forEach {
+    api(it)
+  }
 }

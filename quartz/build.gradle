@@ -1,16 +1,27 @@
-
 apply from: "${scriptFile}"
 
 // 上传到nexus/maven仓库
 project.ext.upload = true
 
 dependencies {
-  compileOnly(project(":commons"))
-  api(project(":spring"))
-  api(project(":aop"))
+
   // QUARTZ
-	api "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
-	compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+  api "org.springframework.boot:spring-boot-starter-quartz:${springbootVersion}"
   // CG Lib
   api 'cglib:cglib:3.3.0'
+
+  [
+      project(":commons"),
+      project(":spring"),
+      project(":aop"),
+
+      "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+  ].forEach {
+    compileOnly(it)
+    testImplementation(it)
+  }
+
 }

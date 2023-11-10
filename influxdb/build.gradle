@@ -18,32 +18,47 @@ repositories {
 }
 
 dependencies {
-  compileOnly(project(":aop"))
-  compileOnly(project(":spring"))
-  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
-  api 'org.msgpack:msgpack-core:0.9.3'
+  [
+      project(":aop"),
+      project(":spring"),
+
+      "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+  ].forEach {
+    compileOnly(it)
+    testImplementation(it)
+  }
+
+  [
+
+      // OkHttp + RxJava + Retrofit
+      "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
+      "com.squareup.okhttp3:okhttp:${okHttpVersion}",
+      "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
+      "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+      "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}",
+      "com.squareup.retrofit2:converter-scalars:${retrofitVersion}",
+      "com.squareup.retrofit2:converter-moshi:${retrofitVersion}",
+      "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+      "com.squareup.retrofit2:converter-jackson:${retrofitVersion}",
+
+      // 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
+      'org.msgpack:msgpack-core:0.9.3'
+
+  ].forEach {
+    api(it) {
+      exclude group: "org.springframework.boot"//, module: ""
+    }
+    testImplementation(it)
+  }
+
   /*api('org.influxdb:influxdb-java:2.23') {
     exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
     exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
     exclude group: 'org.msgpack'//, module: 'msgpack-core'
   }*/
-  // OkHttp + RxJava + Retrofit
-  api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
-  api "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-  api "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-  api "com.squareup.retrofit2:retrofit:${retrofitVersion}"
-  api "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
-  api "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
-  api "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
-  api "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
-  api "com.squareup.retrofit2:converter-jackson:${retrofitVersion}"
-
-  //api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
-
-
-//  testImplementation
-  implementation("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
-  implementation(project(":spring"))
 
 }

@@ -7,6 +7,8 @@ plugins {
 
 apply from: "${scriptFile}"
 
+project.ext.versionFlag = true
+
 description = "examples"
 
 dependencies {
@@ -26,6 +28,10 @@ dependencies {
       //"org.springframework.boot:spring-boot-starter-data-jpa",
       //"mysql:mysql-connector-java:8.0.23",
       //"com.alibaba:druid-spring-boot-starter:1.2.5",
+
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
   ].forEach { implementation(it) }
 
   testImplementation 'org.java-websocket:Java-WebSocket:1.5.2'

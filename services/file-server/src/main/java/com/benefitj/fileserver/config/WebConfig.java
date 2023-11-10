@@ -1,4 +1,4 @@
-package com.hsrg.fileserver.config;
+package com.benefitj.fileserver.config;
 
 
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;

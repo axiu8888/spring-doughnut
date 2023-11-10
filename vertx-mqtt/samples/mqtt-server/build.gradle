@@ -7,6 +7,9 @@ plugins {
 
 apply from: "${scriptFile}"
 
+// 写入版本
+project.ext.versionFlag = true
+
 dependencies {
   [
       project(":commons"),

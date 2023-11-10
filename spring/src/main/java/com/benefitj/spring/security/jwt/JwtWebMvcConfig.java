@@ -4,6 +4,7 @@ import com.benefitj.spring.mvc.EnableCustomArgumentResolverWebMvcConfigurer;
 import com.benefitj.spring.security.jwt.token.JwtOptions;
 import com.benefitj.spring.security.jwt.token.JwtTokenManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.Collections;
 import java.util.Map;
 
+@ConditionalOnWebApplication
 @EnableCustomArgumentResolverWebMvcConfigurer
 @Configuration
 public class JwtWebMvcConfig {

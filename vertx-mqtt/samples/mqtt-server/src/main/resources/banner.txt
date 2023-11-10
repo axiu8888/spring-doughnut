@@ -14,7 +14,7 @@ ${AnsiColor.BRIGHT_BLUE}
 
 
 ${AnsiColor.BRIGHT_GREEN}
-Powered by HSRG
-Version: 6.0
-Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
-${AnsiColor.BLACK}
+Powered By dxa
+Name: ${spring.application.name}
+Springboot Version: ${spring-boot.version}
+${AnsiColor.RED}

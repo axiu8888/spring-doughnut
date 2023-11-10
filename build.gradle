@@ -104,5 +104,22 @@ subprojects {
       }
     } catch(Exception ignore) {}
   }
-}
 
+  afterEvaluate {
+    try {
+      if(project.ext.versionFlag) {
+        def path = sourceSets.main.resources.srcDirs
+            .stream()
+            .filter({ it2 -> it2.getName().equalsIgnoreCase("resources") })
+            .findFirst()
+            .orElse(sourceSets.main.resources.srcDirs[0])
+            .getAbsolutePath()
+        def file = new File(path, "version.properties")
+        file.text = "build.version=${version}" +
+            "\nbuild.date=${new Date().format('yyyy-MM-dd HH:mm')}"
+      }
+    } catch (e) {
+      //e.printStackTrace()
+    }
+  }
+}

@@ -12,7 +12,7 @@ ${AnsiColor.BRIGHT_BLUE}
                                                         888P"
 
 ${AnsiColor.BRIGHT_GREEN}
-Powered by HSRG
-Version: 3.0
-Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
-${AnsiColor.BLACK}
+Powered by dxa
+Version: ${version}
+springboot version: ${spring-boot.version}
+${AnsiColor.RED}

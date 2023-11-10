@@ -1,4 +1,4 @@
-package com.hsrg.fileserver;
+package com.benefitj.fileserver;
 
 import com.benefitj.minio.spring.EnableMinio;
 import org.springframework.boot.SpringApplication;

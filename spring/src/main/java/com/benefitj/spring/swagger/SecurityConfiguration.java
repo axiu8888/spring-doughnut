@@ -5,10 +5,12 @@ import com.benefitj.spring.security.url.UrlRegistryHttpSecurityCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+@ConditionalOnWebApplication
 @ConditionalOnClass(HttpSecurity.class)
 @ConditionalOnBean(UrlRegistryHttpSecurityCustomizer.class)
 @Configuration

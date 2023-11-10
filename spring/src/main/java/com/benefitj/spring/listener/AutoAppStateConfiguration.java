@@ -32,8 +32,7 @@ public class AutoAppStateConfiguration {
   @ConditionalOnMissingBean(name = "appStateProcessor")
   @Bean("appStateProcessor")
   public AnnotationBeanProcessor appStateProcessor() {
-    AnnotationResolver resolver = new AnnotationResolverImpl(
-        Arrays.asList(OnAppStart.class, OnAppStop.class), false);
+    AnnotationResolver resolver = new AnnotationResolverImpl(Arrays.asList(OnAppStart.class, OnAppStop.class), false);
     return new AnnotationBeanProcessor(resolver, new AppStateMetadataHandler());
   }
 

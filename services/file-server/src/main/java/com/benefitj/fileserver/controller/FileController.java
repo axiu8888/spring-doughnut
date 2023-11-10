@@ -1,4 +1,4 @@
-package com.hsrg.fileserver.controller;
+package com.benefitj.fileserver.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.*;
@@ -10,9 +10,9 @@ import com.benefitj.minio.MinioUtils;
 import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
-import com.hsrg.fileserver.controller.vo.FileItemVo;
-import com.hsrg.fileserver.controller.vo.HttpResult;
-import com.hsrg.fileserver.controller.vo.UploadVo;
+import com.benefitj.fileserver.controller.vo.FileItemVo;
+import com.benefitj.fileserver.controller.vo.HttpResult;
+import com.benefitj.fileserver.controller.vo.UploadVo;
 import io.minio.GetObjectResponse;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;

@@ -3,11 +3,13 @@ package com.benefitj.spring.mvc;
 import com.benefitj.spring.mvc.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+@ConditionalOnWebApplication
 @Configuration
 public class CustomArgumentResolverConfiguration {
 

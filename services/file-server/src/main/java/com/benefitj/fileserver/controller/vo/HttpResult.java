@@ -1,4 +1,4 @@
-package com.hsrg.fileserver.controller.vo;
+package com.benefitj.fileserver.controller.vo;
 
 
 import io.swagger.annotations.ApiModel;

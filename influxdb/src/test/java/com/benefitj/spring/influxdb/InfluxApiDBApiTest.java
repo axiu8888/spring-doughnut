@@ -11,7 +11,6 @@ import com.benefitj.javastruct.JavaStructManager;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
-import com.benefitj.spring.influxdb.pojo.HsDataStatisticEntity;
 import com.benefitj.spring.influxdb.pojo.InfluxWavePackage;
 import com.benefitj.spring.influxdb.pojo.SleepPacket;
 import com.benefitj.spring.influxdb.spring.InfluxConfiguration;

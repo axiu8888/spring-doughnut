@@ -7,10 +7,19 @@ subprojects {
   ext.groupId = "${group}"
 
   dependencies {
-    implementation(project(":commons"))
-    implementation(project(":all")) {
-      exclude(module: "quartz")
+
+    [
+        project(":commons"),
+        project(":all"),
+
+        "io.springfox:springfox-boot-starter:${swaggerVersion}",
+        "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+    ].forEach {
+      implementation(it) {
+        exclude(module: "quartz")
+      }
     }
+
   }
 
 }

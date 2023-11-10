@@ -16,21 +16,15 @@ dependencies {
       "io.jsonwebtoken:jjwt-impl:${jjwtVersion}",
       "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}",
 
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
   ].forEach {
     compileOnly(it)
     testImplementation(it)
   }
 
-  [
-      "io.springfox:springfox-boot-starter:${swaggerVersion}",
-      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
-      //"com.github.xiaoymin:knife4j-openapi3-spring-boot-starter:${knife4jVersion}",
-      //"com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3",
-  ].forEach {
-    api(it) {
-      exclude group: "org.springframework.boot", module: "*"
-    }
-    testImplementation(it)
-  }
+  //exclude group: "org.springframework.boot"
+  //exclude group: "org.springframework"
 
 }

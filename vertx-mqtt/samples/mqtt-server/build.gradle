@@ -8,11 +8,17 @@ plugins {
 apply from: "${scriptFile}"
 
 dependencies {
-  api(project(":commons"))
-  api(project(":spring")) {
-    exclude group: "*"//, module: ""
+  [
+      project(":commons"),
+      project(":spring"),
+      project(":vertx-mqtt"),
+  ].forEach {
+    api(it) {
+      //exclude group: "*"//, module: ""
+      exclude group: "org.springframework.boot"
+      exclude group: "org.springframework"
+    }
   }
-  api(project(":vertx-mqtt"))
 
   implementation 'org.springframework.boot:spring-boot-starter'
 }

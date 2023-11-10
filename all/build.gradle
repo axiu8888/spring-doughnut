@@ -1,4 +1,3 @@
-
 apply from: "${scriptFile}"
 
 archivesBaseName = "spring-doughnut"
@@ -11,7 +10,7 @@ project.ext.upload = true
 dependencies {
   compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
-  def deps = [
+  [
       ":spring",
       ":aop",
       ":eventbus",
@@ -21,9 +20,10 @@ dependencies {
       ":influxdb",
       ":athenapdf",
       ":vertx-mqtt",
-  ]
-  deps.forEach {
+  ].forEach {
     api(project(it)) {
+      exclude group: "org.springframework.boot"
+      exclude group: "org.springframework"
       exclude module: "spring-boot-starter-quartz"
     }
   }

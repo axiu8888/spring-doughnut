@@ -5,7 +5,6 @@ import com.benefitj.mqtt.vertx.server.*;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
 import io.vertx.core.Vertx;
-import io.vertx.mqtt.MqttEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,18 +34,27 @@ public class MqttServerConfiguration {
   /**
    * MQTT消息处理
    */
-  @ConfigurationProperties(prefix = "spring.mqtt.server")
-  @ConditionalOnMissingBean(name = "mqttServerOptions")
-  @Bean("mqttServerOptions")
+  @ConfigurationProperties
+  @ConditionalOnMissingBean
+  @Bean
   public MqttServerOptions mqttServerOptions() {
     return new MqttServerOptions();
   }
 
   /**
+   * MQTT客户端状态
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public VertxMqttEndpointManager mqttEndpointManager() {
+    return VertxMqttEndpointManager.get();
+  }
+
+  /**
    * MQTT客户端状态、消息处理
    */
-  @ConditionalOnMissingBean(name = "mqttEndpointHandler")
-  @Bean("mqttEndpointHandler")
+  @ConditionalOnMissingBean
+  @Bean
   public MqttEndpointHandler mqttEndpointHandler() {
     return new MqttEndpointHandlerImpl();
   }
@@ -57,7 +65,8 @@ public class MqttServerConfiguration {
   @ConditionalOnProperty(prefix = "spring.mqtt.server", name = "ws-enable")
   @ConditionalOnMissingBean(name = "wsMqttServer")
   @Bean("wsMqttServer")
-  public VertxMqttServer wsMqttServer(@Qualifier("mqttServerOptions") MqttServerOptions options,
+  public VertxMqttServer wsMqttServer(VertxMqttEndpointManager mqttEndpointManager,
+                                      @Qualifier("mqttServerOptions") MqttServerOptions options,
                                       @Qualifier("mqttEndpointHandler") MqttEndpointHandler mqttEndpointHandler) {
     MqttServerProperty property = BeanHelper.copy(options, new MqttServerProperty());
     property.setPort(options.getWsPort());
@@ -65,6 +74,7 @@ public class MqttServerConfiguration {
     VertxMqttServer server = new VertxMqttServer();
     server.setAuthenticator(endpoint -> true);  // 认证
     server.setProperty(property);
+    server.setEndpointManager(mqttEndpointManager);
     server.setEndpointHandler(mqttEndpointHandler);
     return server;
   }
@@ -75,7 +85,8 @@ public class MqttServerConfiguration {
   @ConditionalOnProperty(prefix = "spring.mqtt.server", name = "tcp-enable")
   @ConditionalOnMissingBean(name = "tcpMqttServer")
   @Bean("tcpMqttServer")
-  public VertxMqttServer tcpMqttServer(@Qualifier("mqttServerOptions") MqttServerOptions options,
+  public VertxMqttServer tcpMqttServer(VertxMqttEndpointManager mqttEndpointManager,
+                                       @Qualifier("mqttServerOptions") MqttServerOptions options,
                                        @Qualifier("mqttEndpointHandler") MqttEndpointHandler mqttEndpointHandler) {
     MqttServerProperty property = BeanHelper.copy(options, new MqttServerProperty());
     property.setPort(options.getTcpPort());
@@ -83,6 +94,7 @@ public class MqttServerConfiguration {
     VertxMqttServer server = new VertxMqttServer();
     server.setAuthenticator(endpoint -> true);  // 认证
     server.setProperty(property);
+    server.setEndpointManager(mqttEndpointManager);
     server.setEndpointHandler(mqttEndpointHandler);
     return server;
   }
@@ -91,8 +103,8 @@ public class MqttServerConfiguration {
    * MQTT启动器
    */
   @Lazy(value = false)
-  @ConditionalOnMissingBean(name = "vertxMqttServerSwitcher")
-  @Bean("vertxMqttServerSwitcher")
+  @ConditionalOnMissingBean
+  @Bean
   public AppStateListener vertxMqttServerSwitcher(@Qualifier("vertx") Vertx vertx,
                                                   @Qualifier("wsMqttServer") @Autowired(required = false) VertxMqttServer wsServer,
                                                   @Qualifier("tcpMqttServer") @Autowired(required = false) VertxMqttServer tcpServer) {

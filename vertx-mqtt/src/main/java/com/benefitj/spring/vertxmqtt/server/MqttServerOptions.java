@@ -16,6 +16,10 @@ public class MqttServerOptions {
    */
   int wsPort = 8083;
   /**
+   * WebSocket最大帧
+   */
+  int wsMaxFrameSize = io.vertx.mqtt.MqttServerOptions.DEFAULT_WEB_SOCKET_MAX_FRAME_SIZE;
+  /**
    * 是否启用WebSocket服务
    */
   boolean wsEnable = false;
@@ -78,6 +82,14 @@ public class MqttServerOptions {
 
   public void setWsEnable(boolean wsEnable) {
     this.wsEnable = wsEnable;
+  }
+
+  public int getWsMaxFrameSize() {
+    return wsMaxFrameSize;
+  }
+
+  public void setWsMaxFrameSize(int wsMaxFrameSize) {
+    this.wsMaxFrameSize = wsMaxFrameSize;
   }
 
   public int getMaxMessageSize() {

@@ -88,6 +88,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         }
         PahoMqttClient client = new PahoMqttClient(opts, id);
         client.setExecutor(EventLoop.newSingle(false));
+        client.getExecutor().execute(() -> {});
         // 自动重连
         client.setAutoReconnect(true);
         // 重新连接的间隔

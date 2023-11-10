@@ -52,6 +52,7 @@ public class MqttSubscriberConfiguration {
     client.setCallback(dispatcher);
     client.setAutoReconnect(true);
     client.setExecutor(EventLoop.newSingle(false));
+    client.getExecutor().execute(() -> {});
     return client;
   }
 

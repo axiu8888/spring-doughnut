@@ -10,6 +10,9 @@ ${AnsiColor.BRIGHT_BLUE}
                              88
                              88
 
-${AnsiColor.CYAN}
-Powered by axiu8888
-Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BRIGHT_GREEN}
+Powered By dxa
+Name: ${spring.application.name}
+Springboot Version: ${spring-boot.version}
+${AnsiColor.RED}
+

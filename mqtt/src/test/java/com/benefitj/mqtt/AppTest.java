@@ -2,14 +2,18 @@ package com.benefitj.mqtt;
 
 
 import com.benefitj.core.ShutdownHook;
-import com.benefitj.mqtt.publisher.MqttPublisherApplication;
+import com.benefitj.mqtt.subscriber.MqttSubscriberApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.CountDownLatch;
 
-@SpringBootTest(classes = {MqttPublisherApplication.class, MqttPublisherApplication.Example.class})
+@SpringBootTest(classes = {
+//    MqttPublisherApplication.class,
+//    MqttPublisherApplication.Example.class,
+    MqttSubscriberApplication.class
+})
 @Slf4j
 class AppTest {
 

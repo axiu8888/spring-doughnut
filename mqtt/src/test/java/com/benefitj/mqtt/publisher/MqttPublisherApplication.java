@@ -20,7 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * MQTT消息发布
  */
 @Slf4j
-@Profile("pub")
+@PropertySource(value = {"classpath:application-pub.properties"}, encoding = "utf-8")
 @EnableEventPublisher
 @EnableMqttPublisher
 @SpringBootApplication

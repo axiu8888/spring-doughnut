@@ -249,37 +249,6 @@ class InfluxApiDBApiTest {
 //    log.info("result: {}", JSON.toJSONString(result));
   }
 
-  @Test
-  void testQueryDataStatistic() {
-    String sql = "SELECT *" +
-        " FROM (" +
-        "  SELECT count(package_sn) AS count" +
-        "  FROM hs_wave_package" +
-        "  WHERE time >= '2023-08-22T16:00:00.001Z' AND time <= '2023-08-23T15:59:59.999Z' AND device_id != person_zid" +
-        "  GROUP BY person_zid, device_id" +
-        " )" +
-        " WHERE count > 0";
-    List<HsDataStatisticEntity> list = new LinkedList<>();
-    template.query(sql)
-        .subscribe(new QueryObserver() {
-          @Override
-          public void onSeriesStart(QueryResult.Series series, ValueConverter c) {
-            log.info("result: \n{}\n", JSON.toJSONString(series));
-          }
-
-          @Override
-          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
-            JSONObject json = new JSONObject();
-            c.getTags().forEach((tag, v) -> json.put(tag, c.getValue(tag, null)));
-            c.getColumns().forEach(column -> json.put(column, c.getValue(column, null)));
-            json.put("time", c.getTime());
-            json.put("date", DateFmtter.fmtDate(c.getTime()));
-            list.add(json.toJavaObject(HsDataStatisticEntity.class));
-          }
-        });
-    log.info("list: \n{}\n", JSON.toJSONString(list));
-  }
-
   /**
    * 导出 line 文件
    */

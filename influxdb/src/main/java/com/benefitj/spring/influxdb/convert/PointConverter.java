@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
-import org.influxdb.dto.Point;
+
+import com.benefitj.spring.influxdb.dto.Point;
 
 /**
  * Point 转换器

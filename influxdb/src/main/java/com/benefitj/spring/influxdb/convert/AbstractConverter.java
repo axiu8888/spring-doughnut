@@ -1,7 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
 import com.benefitj.core.ReflectUtils;
-import org.influxdb.dto.Point;
+import com.benefitj.spring.influxdb.dto.Point;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

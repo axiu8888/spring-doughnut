@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
-import org.influxdb.dto.Point;
+
+import com.benefitj.spring.influxdb.dto.Point;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

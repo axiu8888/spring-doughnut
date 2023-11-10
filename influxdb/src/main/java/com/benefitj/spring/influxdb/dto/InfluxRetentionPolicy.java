@@ -1,7 +1,8 @@
 package com.benefitj.spring.influxdb.dto;
 
-import org.influxdb.annotation.Column;
-import org.influxdb.annotation.Measurement;
+
+import com.benefitj.spring.influxdb.annotation.Column;
+import com.benefitj.spring.influxdb.annotation.Measurement;
 
 @Measurement(name = "retentionPolicy")
 public class InfluxRetentionPolicy {

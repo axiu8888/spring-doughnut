@@ -38,8 +38,7 @@ include(
  */
 include ":redis"
 
-//include ":influxdb"
-include ":influxdb2"
+include ":influxdb"
 
 /**
  * athenapdf 调用docker生成PDF

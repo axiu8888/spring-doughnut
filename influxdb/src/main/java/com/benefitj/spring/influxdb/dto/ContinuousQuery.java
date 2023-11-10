@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.dto;
 
-import org.influxdb.annotation.Column;
+
+import com.benefitj.spring.influxdb.annotation.Column;
 
 /**
  * 持续查询

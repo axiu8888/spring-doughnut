@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.template;
 
-import org.influxdb.dto.QueryResult;
+
+import com.benefitj.spring.influxdb.dto.QueryResult;
 
 import java.util.Collections;
 import java.util.HashMap;

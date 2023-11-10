@@ -4,12 +4,15 @@ apply from: "${scriptFile}"
 project.ext.upload = true
 
 dependencies {
-  api "io.vertx:vertx-mqtt:${vertxVersion}"
   [
       project(":spring"),
       "org.springframework.boot:spring-boot-starter:${springbootVersion}",
+
+      "io.vertx:vertx-mqtt:${vertxVersion}",
   ].forEach {
-    compileOnly(it)
+    api(it) {
+      exclude group: "org.springframework.boot", module: "*"
+    }
     testImplementation(it)
   }
 }

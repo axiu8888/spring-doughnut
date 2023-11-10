@@ -14,7 +14,7 @@ public class MqttServerOptions {
   /**
    * WebSocket端口
    */
-  int wsPort = 8883;
+  int wsPort = 8083;
   /**
    * 是否启用WebSocket服务
    */

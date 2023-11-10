@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
-import org.influxdb.dto.QueryResult;
+
+import com.benefitj.spring.influxdb.dto.QueryResult;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -1,13 +1,13 @@
 package com.benefitj.spring.influxdb.convert;
 
 import com.benefitj.core.ReflectUtils;
-import com.benefitj.spring.influxdb.InfluxDBUtils;
-import com.benefitj.spring.influxdb.dto.ColumnIgnore;
-import com.benefitj.spring.influxdb.dto.TagNullable;
-import org.influxdb.annotation.Column;
-import org.influxdb.annotation.Measurement;
-import org.influxdb.annotation.TimeColumn;
-import org.influxdb.dto.QueryResult;
+import com.benefitj.spring.influxdb.InfluxUtils;
+import com.benefitj.spring.influxdb.annotation.Column;
+import com.benefitj.spring.influxdb.annotation.Measurement;
+import com.benefitj.spring.influxdb.annotation.TimeColumn;
+import com.benefitj.spring.influxdb.annotation.ColumnIgnore;
+import com.benefitj.spring.influxdb.dto.QueryResult;
+import com.benefitj.spring.influxdb.annotation.TagNullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -71,7 +71,7 @@ public abstract class AbstractConverterFactory<U> implements ConverterFactory<U>
     }
 
     Measurement measurement = type.getAnnotation(Measurement.class);
-    converter.setMeasurement(InfluxDBUtils.isNotBlank(measurement.name())
+    converter.setMeasurement(InfluxUtils.isNotBlank(measurement.name())
         ? measurement.name() : type.getSimpleName());
 
     // 忽略被static和final修饰的字段、忽略InfluxIgnore注解的字段
@@ -118,7 +118,7 @@ public abstract class AbstractConverterFactory<U> implements ConverterFactory<U>
     Field field = columnField.getField();
     Column column = field.getAnnotation(Column.class);
     if (column != null) {
-      columnField.setColumn(InfluxDBUtils.isNotBlank(column.name()) ? column.name() : field.getName());
+      columnField.setColumn(InfluxUtils.isNotBlank(column.name()) ? column.name() : field.getName());
       if (timestamp) {
         columnField.setTagNullable(false);
       } else {

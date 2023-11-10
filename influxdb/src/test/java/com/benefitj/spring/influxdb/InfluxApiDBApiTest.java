@@ -286,12 +286,13 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 10, 24, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 10, 25, 0, 0, 0).getTime();
-//    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 11, 9, 23, 0, 0).getTime();
+//    long endTime = TimeUtils.toDate(2023, 10, 25, 0, 0, 0).getTime();
+    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
-    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
+//    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
+    String condition = " AND device_no = '641938000489'";
 //    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
@@ -347,6 +348,27 @@ class InfluxApiDBApiTest {
     log.info("lineProtocol ==>: \n{}\n", JSON.toJSONString(lineProtocol));
     InfluxWavePackage pkg = lineProtocol.toPoJo(InfluxWavePackage.class);
     log.info("pkg: \n{}", JSON.toJSONString(pkg, JSONWriter.Feature.PrettyFormat));
+  }
+
+  /**
+   * 测试解析行协议
+   */
+  @Test
+  void test_parseLine2() {
+    File lineFile = new File("D:/tmp/influxdb/hs_darma_mattress.line");
+//    String type = "hr";
+    String type = "rr";
+    List<Integer> points = IOUtils.readLines(IOUtils.newBufferedReader(lineFile, "UTF-8"))
+        .stream()
+        .map(InfluxUtils::parseLine)
+        .map(line -> JSON.parseObject((String) line.getFields().get(type + "_points"), Integer[].class))
+        .filter(Objects::nonNull)
+        .flatMap(Stream::of)
+        .collect(Collectors.toList());
+    IWriter writer = IWriter.createWriter(IOUtils.createFile(lineFile.getParentFile(), lineFile.getName().replace(".line", "_" + type + ".csv")), false);
+    String jsonString = JSON.toJSONString(points);
+    writer.write(jsonString.substring(1, jsonString.length() - 2)).flush();
+    writer.close();
   }
 
   /**

@@ -1,27 +1,33 @@
-
 project.ext.springTest = true
 
 apply from: "${scriptFile}"
 
-sourceSets {
-  main {
-    java.srcDirs = ["src/main/java", "src/main/influxdb-java"]
-  }
-}
-
-project.ext.artifactName = "influxdb"
+project.ext.artifactName = "influxdb2"
 // 上传到nexus/maven仓库
 project.ext.upload = true
 
+repositories {
+  maven {
+    url "http://192.168.1.200:9001/repository/hsrgproxy/"
+    allowInsecureProtocol = true
+    credentials {
+      username 'admin'
+      password 'admin123'
+    }
+  }
+}
+
 dependencies {
-  compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
+  compileOnly(project(":aop"))
+  compileOnly(project(":spring"))
+  compileOnly("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
 
   api 'org.msgpack:msgpack-core:0.9.3'
-  api('org.influxdb:influxdb-java:2.23') {
+  /*api('org.influxdb:influxdb-java:2.23') {
     exclude group: 'com.squareup.okhttp3'//, module: 'okhttp'
     exclude group: 'com.squareup.retrofit2'//, module: 'retrofit'
     exclude group: 'org.msgpack'//, module: 'msgpack-core'
-  }
+  }*/
   // OkHttp + RxJava + Retrofit
   api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
   api "com.squareup.okhttp3:okhttp:${okHttpVersion}"
@@ -30,19 +36,14 @@ dependencies {
   api "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
   api "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
   api "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+  api "com.squareup.retrofit2:converter-jackson:${retrofitVersion}"
 
-  api 'org.jetbrains.kotlin:kotlin-stdlib:1.7.21'
+  //api 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
 
-//  // OkHttp + RxJava + Retrofit
-//  implementation "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
-//  implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-//  implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-//  implementation "com.squareup.retrofit2:retrofit:${retrofitVersion}"
-//  implementation "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
-//  implementation "com.squareup.retrofit2:converter-scalars:${retrofitVersion}"
-//  implementation "com.squareup.retrofit2:converter-moshi:${retrofitVersion}"
 
-  testImplementation(project(":spring"))
-  testImplementation 'com.alibaba:easyexcel:3.0.5'
+//  testImplementation
+  implementation("org.springframework.boot:spring-boot-starter-web:${springbootVersion}")
+  implementation(project(":spring"))
 
 }

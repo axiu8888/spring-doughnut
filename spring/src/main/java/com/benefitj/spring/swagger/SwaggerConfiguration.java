@@ -105,7 +105,7 @@ public class SwaggerConfiguration {
    * 需要增加swagger授权回调地址
    * http://localhost:8888/webjars/springfox-swagger-ui/o2c.html
    */
-  @ConditionalOnProperty(prefix = "springfox.documentation.swagger.security", name = "nameEnable", matchIfMissing = true)
+  @ConditionalOnProperty(prefix = "springfox.documentation.swagger.security", name = "nameEnable", matchIfMissing = false)
   @ConditionalOnMissingBean
   @Bean
   public SecurityScheme securityScheme() {

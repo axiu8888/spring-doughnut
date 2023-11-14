@@ -292,7 +292,7 @@ public class InfluxUtils {
    * @return 返回行协议对象
    */
   public static LineProtocol parseLine(String line) {
-    if (InfluxUtils.isBlank(line)) {
+    if (isBlank(line)) {
       throw new IllegalArgumentException("数据不能为空");
     }
     LineProtocol lineProtocol = new LineProtocol();
@@ -325,7 +325,7 @@ public class InfluxUtils {
                 break;
               case 1: {
                 String str = line.substring(startAt, i);
-                if (InfluxUtils.isNotBlank(str)) {
+                if (isNotBlank(str)) {
                   String[] splits = str.split("=");
                   lineProtocol.getTags().put(splits[0], splits[1]);
                 }
@@ -376,7 +376,7 @@ public class InfluxUtils {
     if (value.endsWith("i")) {
       return Long.parseLong(value.substring(0, value.length() - 1));
     }
-    switch (value) {
+    switch (value.toUpperCase()) {
       case "false":
       case "true":
         return Boolean.parseBoolean(value);

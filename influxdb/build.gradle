@@ -2,20 +2,9 @@ project.ext.springTest = true
 
 apply from: "${scriptFile}"
 
-project.ext.artifactName = "influxdb2"
+project.ext.artifactName = "influxdb"
 // 上传到nexus/maven仓库
 project.ext.upload = true
-
-repositories {
-  maven {
-    url "http://192.168.1.200:9001/repository/hsrgproxy/"
-    allowInsecureProtocol = true
-    credentials {
-      username 'admin'
-      password 'admin123'
-    }
-  }
-}
 
 dependencies {
 

@@ -108,17 +108,17 @@ repositories {
 
 
 ext {
-  lombokVersion = trying({ project.ext.lombokVersion }, "1.18.28")
-  jacksonVersion = trying({ project.ext.jacksonVersion }, "2.14.1")
-  guavaVersion = trying({ project.ext.guavaVersion }, '31.1-jre')
-  fastjson2Version = trying({ project.ext.fastjson2Version }, '2.0.38')
-  commonsIOVersion = trying({ project.ext.commonsIOVersion }, "2.11.0")
-  commonsLang3Version = trying({ project.ext.commonsLang3Version }, "3.12.0")
-  slf4jVersion = trying({ project.ext.slf4jVersion }, '2.0.7')
-  hutoolVersion = trying({ project.ext.hutoolVersion }, '5.8.18')
+  lombokVersion = trying({ project.ext.lombokVersion }, "1.18.30")
+  jacksonVersion = trying({ project.ext.jacksonVersion }, "2.15.3")
+  guavaVersion = trying({ project.ext.guavaVersion }, '32.1.3-jre')
+  fastjson2Version = trying({ project.ext.fastjson2Version }, '2.0.42')
+  commonsIOVersion = trying({ project.ext.commonsIOVersion }, "2.15.0")
+  commonsLang3Version = trying({ project.ext.commonsLang3Version }, "3.13.0")
+  slf4jVersion = trying({ project.ext.slf4jVersion }, '2.0.9')
+  hutoolVersion = trying({ project.ext.hutoolVersion }, '5.8.23')
 
   if (trying({ project.ext.springEnv }, false)) {
-    set('springCloudVersion', "2021.0.0")
+    set('springCloudVersion', "2023.0.0")
   }
 }
 
@@ -180,7 +180,7 @@ if (trying({ project.ext.springEnv }, false) || trying({ project.ext.springTest 
   if (trying({ project.ext.springEnv }, false)) {
     trying({
       tasks.named('bootBuildImage') {
-        builder = 'paketobuildpacks/builder:tiny'
+        builder = "${project.group}/${project.artifactId}:latest"
         environment = ['BP_NATIVE_IMAGE': 'true']
       }
     })

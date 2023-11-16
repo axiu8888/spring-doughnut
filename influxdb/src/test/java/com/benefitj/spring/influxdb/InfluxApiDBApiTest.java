@@ -254,14 +254,14 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 11, 9, 23, 0, 0).getTime();
-//    long endTime = TimeUtils.toDate(2023, 10, 25, 0, 0, 0).getTime();
-    long endTime = TimeUtils.now();//TimeUtils.toDate(2023, 8, 23, 15, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 11, 14, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 11, 15, 0, 0, 0).getTime();
+//    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
-    String condition = " AND device_no = '641938000489'";
-//    String condition = "";
+//    String condition = " AND device_no = '641938000489'";
+    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -303,7 +303,7 @@ class InfluxApiDBApiTest {
         && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
     );
     assert lines != null;
-    upload(template, Arrays.asList(lines), false);
+    upload(template, Arrays.asList(lines), true);
   }
 
   /**

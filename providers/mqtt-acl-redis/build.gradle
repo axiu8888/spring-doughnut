@@ -4,6 +4,8 @@ ext.upload = false
 
 dependencies {
 
+  // redis
+  api "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
   api(project(":all")) {
     exclude group: "org.springframework.boot", module: "spring-boot-starter-quartz"
   }

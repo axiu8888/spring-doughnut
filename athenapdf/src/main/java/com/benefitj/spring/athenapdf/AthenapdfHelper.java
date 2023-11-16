@@ -2,6 +2,7 @@ package com.benefitj.spring.athenapdf;
 
 import com.benefitj.core.SingletonSupplier;
 import com.benefitj.core.cmd.CmdExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -13,9 +14,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * docker: docker pull arachnysdocker/athenapdf
  */
+@Slf4j
 public class AthenapdfHelper extends CmdExecutor {
 
-  static SingletonSupplier<AthenapdfHelper> singleton = SingletonSupplier.of(AthenapdfHelper::new);
+  static final SingletonSupplier<AthenapdfHelper> singleton = SingletonSupplier.of(AthenapdfHelper::new);
 
   public static AthenapdfHelper get() {
     return singleton.get();
@@ -31,6 +33,7 @@ public class AthenapdfHelper extends CmdExecutor {
       AthenapdfCall call = (AthenapdfCall) call("docker -v");
       String message = call.getMessage();
       supportDocker.set(StringUtils.isNotBlank(message) && message.contains("Docker version"));
+      log.info("{}", call.toPrintInfo("@_athenapdf_@", null));
     }
     return supportDocker.get();
   }
@@ -50,9 +53,9 @@ public class AthenapdfHelper extends CmdExecutor {
    * @param network   网络别名(当在docker容器中执行时，可能会用到别名)
    * @return 返回调用结果（包含PDF文件）
    */
-  public AthenapdfCall execute(@Nullable String electron, String volumeDir, File destDir, String filename, String url, @Nullable String network) {
+  public AthenapdfCall execute(String volumeDir, File destDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
-    String cmd = formatCMD(electron, volumeDir, filename, url, network);
+    String cmd = formatCMD(volumeDir, filename, url, network);
     AthenapdfCall call = (AthenapdfCall) call(cmd, null, destDir, 60_000);
     File pdf = new File(destDir, filename);
     if (pdf.exists()) {
@@ -61,11 +64,10 @@ public class AthenapdfHelper extends CmdExecutor {
     return call;
   }
 
-  public String formatCMD(@Nullable String electron, String volumeDir, String filename, String url, @Nullable String network) {
+  public String formatCMD(String volumeDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
     return "docker run --rm --privileged=true"
         + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
-        + (StringUtils.isNotBlank(electron) ? " -v " + electron + ":/athenapdf" : "")
         + " -v " + volumeDir + ":/converted/"
         + " arachnysdocker/athenapdf"
         + " athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "

@@ -18,6 +18,9 @@ dependencies {
       project(":athenapdf"),
 
       "org.springframework.boot:spring-boot-starter-web",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
   ].forEach { api(it) }
 
   implementation(project(":spring")) {

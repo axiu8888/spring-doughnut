@@ -1,5 +1,6 @@
 package com.benefitj.spring.security.jwt.token;
 
+import com.benefitj.core.functions.WrappedMap;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.security.jwt.JwtUserDetails;
 import io.jsonwebtoken.Claims;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.impl.DefaultHeader;
 import io.jsonwebtoken.impl.DefaultJwt;
 import org.springframework.security.core.GrantedAuthority;
 
+import javax.security.auth.Subject;
 import java.util.*;
 
 /**
@@ -17,7 +19,7 @@ import java.util.*;
  *
  * @author DINGXIUAN
  */
-public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
+public class DefaultJwtToken extends DefaultJwt<Header, Claims> implements JwtToken, WrappedMap<String, Object> {
 
   public static final String REFRESH = "refresh";
   /**
@@ -43,15 +45,15 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
   private boolean authenticated = false;
 
   public DefaultJwtToken() {
-    super(new DefaultHeader(), new DefaultClaims());
+    super(new DefaultHeader(new LinkedHashMap<>()), new DefaultClaims(new LinkedHashMap<>()));
   }
 
   public DefaultJwtToken(Jwt<Header, Claims> jwt) {
-    super(jwt.getHeader(), jwt.getBody());
+    super(jwt.getHeader(), jwt.getPayload());
   }
 
   public DefaultJwtToken(String rawToken, Jwt<Header, Claims> jwt) {
-    super(jwt.getHeader(), jwt.getBody());
+    super(jwt.getHeader(), jwt.getPayload());
     this.rawToken = rawToken;
   }
 
@@ -144,7 +146,12 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
 
   @Override
   public String getName() {
-    return null;
+    return get("principal", String.class);
+  }
+
+  @Override
+  public boolean implies(Subject subject) {
+    return JwtToken.super.implies(subject);
   }
 
   @Override
@@ -152,9 +159,8 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return getBody().getIssuer();
   }
 
-  @Override
-  public Claims setIssuer(String iss) {
-    return getBody().setIssuer(iss);
+  public void setIssuer(String iss) {
+    getBody().put(Claims.ISSUER, iss);
   }
 
   @Override
@@ -162,19 +168,17 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return getBody().getSubject();
   }
 
-  @Override
-  public Claims setSubject(String sub) {
-    return getBody().setSubject(sub);
+  public void setSubject(String sub) {
+    getBody().put(Claims.SUBJECT, sub);
   }
 
   @Override
-  public String getAudience() {
+  public Set<String> getAudience() {
     return getBody().getAudience();
   }
 
-  @Override
-  public Claims setAudience(String aud) {
-    return getBody().setAudience(aud);
+  public void setAudience(String aud) {
+    getBody().put(Claims.AUDIENCE, aud);
   }
 
   @Override
@@ -182,9 +186,8 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return getBody().getExpiration();
   }
 
-  @Override
-  public Claims setExpiration(Date exp) {
-    return getBody().setExpiration(exp);
+  public void setExpiration(Date exp) {
+    getBody().put(Claims.EXPIRATION, exp);
   }
 
   @Override
@@ -192,9 +195,8 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return getBody().getNotBefore();
   }
 
-  @Override
-  public Claims setNotBefore(Date nbf) {
-    return getBody().setNotBefore(nbf);
+  public void setNotBefore(Date nbf) {
+    getBody().put(Claims.NOT_BEFORE, nbf);
   }
 
   @Override
@@ -202,9 +204,8 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return getBody().getIssuedAt();
   }
 
-  @Override
-  public Claims setIssuedAt(Date iat) {
-    return getBody().setIssuedAt(iat);
+  public void setIssuedAt(Date iat) {
+    getBody().put(Claims.ISSUED_AT, iat);
   }
 
   @Override
@@ -213,73 +214,12 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
   }
 
   @Override
-  public Claims setId(String jti) {
-    return getBody().setId(jti);
-  }
-
-  @Override
   public <T> T get(String claimName, Class<T> requiredType) {
     return getBody().get(claimName, requiredType);
   }
 
-  @Override
-  public int size() {
-    return getBody().size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return getBody().isEmpty();
-  }
-
-  @Override
-  public boolean containsKey(Object key) {
-    return getBody().containsKey(key);
-  }
-
-  @Override
-  public boolean containsValue(Object value) {
-    return getBody().containsValue(value);
-  }
-
-  @Override
-  public Object get(Object key) {
-    return getBody().get(key);
-  }
-
-  @Override
-  public Object remove(Object key) {
-    return getBody().remove(key);
-  }
-
-  @Override
-  public void putAll(Map m) {
-    getBody().putAll(m);
-  }
-
-  @Override
-  public void clear() {
-    getBody().clear();
-  }
-
-  @Override
-  public Set<String> keySet() {
-    return getBody().keySet();
-  }
-
-  @Override
-  public Collection<Object> values() {
-    return getBody().values();
-  }
-
-  @Override
-  public Set<Entry<String, Object>> entrySet() {
-    return getBody().entrySet();
-  }
-
-  @Override
-  public Object put(String key, Object value) {
-    return getBody().put(key, value);
+  public void setId(String jti) {
+    getBody().put(Claims.ID, jti);
   }
 
   /**
@@ -293,4 +233,8 @@ public class DefaultJwtToken extends DefaultJwt<Claims> implements JwtToken {
     return copy;
   }
 
+  @Override
+  public Map<String, Object> map() {
+    return getBody();
+  }
 }

@@ -1,11 +1,11 @@
 ext {
 
-//  springbootVersion = "3.0.6"
-//  springDependencyManagementVersion = "1.1.0"
-//  springIntegrationVersion = "6.0.5"
+//  springbootVersion = "3.1.5"
+//  springDependencyManagementVersion = "1.1.3"
+//  springIntegrationVersion = "6.1.4"
   springbootVersion = "2.7.17"
   springDependencyManagementVersion = "1.0.15.RELEASE"
-  springIntegrationVersion = "5.5.16"
+  springIntegrationVersion = "5.5.19"
 
   lombokVersion = "1.18.30"
   jacksonVersion = "2.15.3"
@@ -53,7 +53,7 @@ subprojects {
   version = "2.3.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_11
+    compatibilityVersion = JavaVersion.VERSION_15
     // 默认是spring环境
     springEnv = true
     springTest = true

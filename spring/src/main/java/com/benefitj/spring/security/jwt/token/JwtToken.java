@@ -7,9 +7,49 @@ import io.jsonwebtoken.Jwt;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * token
+ */
 public interface JwtToken extends Jwt<Header, Claims>, Claims, Authentication {
+
+  @Override
+  String getIssuer();
+
+  void setIssuer(String iss);
+
+  @Override
+  String getSubject();
+
+  void setSubject(String sub);
+
+  @Override
+  Set<String> getAudience();
+
+  void setAudience(String aud);
+
+  @Override
+  Date getExpiration();
+
+  void setExpiration(Date exp);
+
+  @Override
+  Date getNotBefore();
+
+  void setNotBefore(Date nbf);
+
+  @Override
+  Date getIssuedAt();
+
+  void setIssuedAt(Date iat);
+
+  @Override
+  String getId();
+
+  void setId(String jti);
 
   /**
    * 是否为 refresh token

@@ -116,6 +116,7 @@ ext {
   commonsLang3Version = trying({ project.ext.commonsLang3Version }, "3.13.0")
   slf4jVersion = trying({ project.ext.slf4jVersion }, '2.0.9')
   hutoolVersion = trying({ project.ext.hutoolVersion }, '5.8.23')
+  cglibVersion = trying({ project.ext.cglibVersion }, '3.3.0')
 
   if (trying({ project.ext.springEnv }, false)) {
     set('springCloudVersion', "2023.0.0")
@@ -152,6 +153,7 @@ dependencies {
       //"com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
       "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
       "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+      "cglib:cglib:${cglibVersion}",
   ].forEach {
     implementation(it)
     testImplementation(it)

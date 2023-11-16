@@ -6,7 +6,7 @@ project.ext.upload = true
 
 dependencies {
 	api(project(":spring"))
-	api 'org.apache.commons:commons-pool2:2.10.0'
+	api 'org.apache.commons:commons-pool2:2.12.0'
 	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 	api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
 	// redis

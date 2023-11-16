@@ -2,12 +2,14 @@ package com.benefitj.spring.swagger;
 
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.NetworkUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.EnableAppStateListener;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,6 +31,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 接口文档配置
@@ -132,7 +135,15 @@ public class SwaggerConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   public void onAppStart() {
     EventLoop.asyncIO(() -> CatchUtils.tryThrow(() -> {
-      String ip = InetAddress.getLocalHost().getHostAddress();
+      List<String> ips = NetworkUtils.getInetAddressAll()
+          .stream()
+          .filter(ia -> !ia.isAnyLocalAddress())
+          .filter(ia -> !ia.isLoopbackAddress())
+          .filter(ia -> !ia.isLinkLocalAddress())
+          .filter(ia -> !ia.isMCNodeLocal())
+          .map(InetAddress::getHostAddress)
+          .collect(Collectors.toList());
+      String ip = ips.get(0);//InetAddress.getLocalHost().getHostAddress();
       String port = SpringCtxHolder.getServerPort();
       String ctxPath = SpringCtxHolder.getServerContextPath();
       String path = Utils.isEndWiths(ctxPath, "/") ? ctxPath.substring(0, ctxPath.length() - 1) : ctxPath;
@@ -141,6 +152,7 @@ public class SwaggerConfiguration {
       String address = ip + ":" + port + path;
       log.info("\n---------------------------------------------------------------------------------\n\t" +
           "[ " + SpringCtxHolder.getAppName() + " ] is running! Access URLs:\n\t" +
+          "ips: \t\t\t[" + StringUtils.join(ips, ", ") + "]\n\t" +
           "Local: \t\t\thttp://localhost:" + port + path + "\n\t" +
           "External: \t\thttp://" + address + "\n\t" +
           "Swagger文档: \thttp://" + address + swaggerBaseUrl + "swagger-ui/index.html\n\t" +

@@ -215,9 +215,10 @@ public class JwtTokenManager {
     }
     Jwt<Header, Claims> jwt;
     try {
-      token = token.startsWith(JWT_PREFIX) ?
-          token.replaceFirst(JWT_PREFIX, "") : token;
-      jwt = Jwts.parserBuilder()
+      token = token.startsWith(JWT_PREFIX)
+          ? token.replaceFirst(JWT_PREFIX, "")
+          : token;
+      jwt = (Jwt<Header, Claims>) Jwts.parser()
           .setSigningKey(getJwtProperty().getSigningKey())
           .build()
           .parse(token);
@@ -235,7 +236,7 @@ public class JwtTokenManager {
         split[i] = new String(Base64.getDecoder().decode(split[i]));
       }
 
-      DefaultHeader header = new DefaultHeader<>(JSON.parseObject(split[0]));
+      DefaultHeader header = new DefaultHeader(JSON.parseObject(split[0]));
       DefaultClaims body = new DefaultClaims(JSON.parseObject(split[1]));
       jwt = new DefaultJwt<>(header, body);
     }

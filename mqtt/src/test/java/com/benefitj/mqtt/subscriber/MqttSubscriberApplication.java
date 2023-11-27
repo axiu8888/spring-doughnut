@@ -36,7 +36,11 @@ public class MqttSubscriberApplication {
     private MqttCallbackDispatcher dispatcher;
 
     @MqttMessageListener(
-        topics = "/device/#",
+        topics = {
+            "/device/#",
+            "#{topic2}",
+            "#{@environment['topic3'] ?: '/test3'}",
+        },
         clientIdPrefix = "mqtt-subscriber-",
         serverURI = "spring.mqtt.custom.serverURIs"
     )

@@ -4,6 +4,7 @@ import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
+import com.benefitj.mqtt.MqttMessageSubscriber;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
 import com.benefitj.spring.BeanHelper;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
@@ -110,10 +112,22 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
                            MqttCallbackDispatcher dispatcher,
                            MqttMessageListener listener) {
     final SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
-    dispatcher.subscribe(listener.topics(), (topic, msg) -> {
+
+    MqttMessageSubscriber<MqttMessage> subscriber = (topic, msg) -> {
       Message<?> message = getMessageConverter().toMessage(topic, msg);
       invoker.invoke(topic, msg.getPayload(), msg, message, message.getHeaders());
-    });
+    };
+    // dispatcher.subscribe(topics, subscriber);
+    for (String topic : listener.topics()) {
+      String realTopic = topic.startsWith("${") || topic.startsWith("#{")
+          ? SpringCtxHolder.getEnvProperty(topic)
+          : topic;
+      if (StringUtils.isNotBlank(realTopic)) {
+        topic = realTopic;
+      }
+      dispatcher.subscribe(topic, subscriber);
+    }
+
     try {
       if (!client.isConnected()) {
         // 连接客户端

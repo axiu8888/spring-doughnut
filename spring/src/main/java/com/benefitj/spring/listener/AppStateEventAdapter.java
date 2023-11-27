@@ -11,7 +11,7 @@ import java.util.List;
 
 public class AppStateEventAdapter {
 
-  private static final Logger log = LoggerFactory.getLogger(AppStateEventAdapter.class);
+  static final Logger log = LoggerFactory.getLogger(AppStateEventAdapter.class);
 
   private AppStateHook registrar = AppStateHook.getInstance();
 

@@ -77,6 +77,12 @@ class InfluxApiDBApiTest {
   }
 
   @Test
+  void test_showMeasurements() {
+    QueryResult result = template.postQuery(template.getDatabase(), "show measurements;");
+    log.info("{}", JSON.toJSONString(result));
+  }
+
+  @Test
   void test_createSubscriptions() {
     // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ALL 'http://www.example.com:8086', 'http://www.example.com:8087'
     // CREATE SUBSCRIPTION "sub0" ON "mydb"."autogen" DESTINATIONS ANY 'udp://www.example.com:9090', 'udp://www.example.com:9090'

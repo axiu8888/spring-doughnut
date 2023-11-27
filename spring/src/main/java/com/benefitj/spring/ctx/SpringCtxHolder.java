@@ -1,6 +1,7 @@
 package com.benefitj.spring.ctx;
 
 import com.benefitj.core.NetworkUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +37,7 @@ public class SpringCtxHolder {
   /**
    * Spring的ApplicationContext对象
    */
-  private volatile ApplicationContext context;
+  volatile ApplicationContext context;
   /**
    * Spring是否已销毁
    */
@@ -140,7 +141,26 @@ public class SpringCtxHolder {
   }
 
   public static String getEnvProperty(String key) {
-    return getEnvironment().getProperty(key);
+    String newKey = key.trim();
+    if ((newKey.startsWith("#{") || newKey.startsWith("${")) && newKey.endsWith("}")) {
+      newKey = newKey.substring(2, newKey.length() - 1);
+      if (newKey.contains("@environment[")) {
+        int startAt = newKey.indexOf("'", newKey.indexOf("@environment["));
+        int endAt = newKey.indexOf("'", startAt + 1);
+        String placeholder = newKey.substring(startAt, endAt);
+        String subValue = getEnvironment().getProperty(placeholder);
+        if (StringUtils.isBlank(subValue) && (newKey.indexOf("?:", endAt) > 0)) {
+          String defaultValue = newKey.substring(newKey.indexOf("?:", endAt) + 2).trim();
+          if (StringUtils.isNotBlank(defaultValue)) {
+            defaultValue = defaultValue.startsWith("'") ? defaultValue.substring(1) : defaultValue;
+            defaultValue = defaultValue.endsWith("'") ? defaultValue.substring(0, defaultValue.length() - 1) : defaultValue;
+            return defaultValue;
+          }
+        }
+        return subValue;
+      }
+    }
+    return getEnvironment().getProperty(newKey);
   }
 
   /**

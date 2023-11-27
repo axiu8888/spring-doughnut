@@ -145,8 +145,8 @@ public class SpringCtxHolder {
     if ((newKey.startsWith("#{") || newKey.startsWith("${")) && newKey.endsWith("}")) {
       newKey = newKey.substring(2, newKey.length() - 1);
       if (newKey.contains("@environment[")) {
-        int startAt = newKey.indexOf("'", newKey.indexOf("@environment["));
-        int endAt = newKey.indexOf("'", startAt + 1);
+        int startAt = newKey.indexOf("'", newKey.indexOf("@environment[")) + 1;
+        int endAt = newKey.indexOf("'", startAt);
         String placeholder = newKey.substring(startAt, endAt);
         String subValue = getEnvironment().getProperty(placeholder);
         if (StringUtils.isBlank(subValue) && (newKey.indexOf("?:", endAt) > 0)) {

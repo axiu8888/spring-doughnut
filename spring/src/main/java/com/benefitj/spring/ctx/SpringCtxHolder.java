@@ -140,7 +140,24 @@ public class SpringCtxHolder {
     return getCtx().getEnvironment();
   }
 
+  /**
+   * 获取环境参数
+   *
+   * @param key 键
+   * @return 返回对应的值
+   */
   public static String getEnvProperty(String key) {
+    return getEnvProperty(key, "");
+  }
+
+  /**
+   * 获取环境参数
+   *
+   * @param key          键
+   * @param defaultValue 默认值
+   * @return 返回对应的值
+   */
+  public static String getEnvProperty(String key, String defaultValue) {
     String newKey = key.trim();
     if ((newKey.startsWith("#{") || newKey.startsWith("${")) && newKey.endsWith("}")) {
       newKey = newKey.substring(2, newKey.length() - 1);
@@ -150,17 +167,17 @@ public class SpringCtxHolder {
         String placeholder = newKey.substring(startAt, endAt);
         String subValue = getEnvironment().getProperty(placeholder);
         if (StringUtils.isBlank(subValue) && (newKey.indexOf("?:", endAt) > 0)) {
-          String defaultValue = newKey.substring(newKey.indexOf("?:", endAt) + 2).trim();
-          if (StringUtils.isNotBlank(defaultValue)) {
-            defaultValue = defaultValue.startsWith("'") ? defaultValue.substring(1) : defaultValue;
-            defaultValue = defaultValue.endsWith("'") ? defaultValue.substring(0, defaultValue.length() - 1) : defaultValue;
-            return defaultValue;
+          String value = newKey.substring(newKey.indexOf("?:", endAt) + 2).trim();
+          if (StringUtils.isNotBlank(value)) {
+            value = value.startsWith("'") ? value.substring(1) : value;
+            value = value.endsWith("'") ? value.substring(0, value.length() - 1) : value;
+            return value;
           }
         }
-        return subValue;
+        return StringUtils.isNotBlank(subValue) ? subValue : defaultValue;
       }
     }
-    return getEnvironment().getProperty(newKey);
+    return getEnvironment().getProperty(newKey, defaultValue);
   }
 
   /**

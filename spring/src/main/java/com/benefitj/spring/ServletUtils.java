@@ -13,6 +13,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -185,6 +186,42 @@ public class ServletUtils {
     infoMap.put("locale", request.getLocale());
     infoMap.put("locales", request.getLocales());
     return infoMap;
+  }
+
+  /**
+   * 获取请求体
+   *
+   * @param request 请求
+   */
+  public static byte[] getBody(ServletRequest request) {
+    try {
+      return IOUtils.readFully(request.getInputStream()).toByteArray();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 获取请求体
+   *
+   * @param request 请求
+   */
+  public static String getBodyAsString(ServletRequest request) {
+    return getBodyAsString(request, request.getCharacterEncoding());
+  }
+
+  /**
+   * 获取请求体
+   *
+   * @param request           请求
+   * @param characterEncoding 编码
+   */
+  public static String getBodyAsString(ServletRequest request, String characterEncoding) {
+    try {
+      return IOUtils.readFully(request.getInputStream()).toString(characterEncoding);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**

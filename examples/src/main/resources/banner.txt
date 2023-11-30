@@ -13,6 +13,6 @@ ${AnsiColor.BRIGHT_BLUE}
 
 ${AnsiColor.BRIGHT_GREEN}
 Powered by dxa
-Version: ${version}
+Version: ${build.version}
 springboot version: ${spring-boot.version}
 ${AnsiColor.RED}

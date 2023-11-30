@@ -1,6 +1,7 @@
 package com.benefitj.examples.controller;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.Utils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.event.EventBusPoster;
@@ -22,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +107,14 @@ public class SimpleController {
       }
       response.flushBuffer();
     }
+  }
+
+  @ApiOperation("测试POST")
+  @PostMapping("/testPOst")
+  public JSONObject testPost(HttpServletRequest request) throws IOException {
+    ServletInputStream in = request.getInputStream();
+    String bodyStr = IOUtils.readFully(in).toString();
+    return JSON.parseObject(bodyStr);
   }
 
 }

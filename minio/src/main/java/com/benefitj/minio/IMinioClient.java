@@ -1,14 +1,34 @@
 package com.benefitj.minio;
 
+import com.benefitj.core.local.LocalCache;
 import io.minio.*;
 import io.minio.messages.*;
 
+import javax.annotation.Nonnull;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
 public interface IMinioClient {
+
+  LocalCache<MinioResult> getLocalResult();
+
+  /**
+   * 获取请求结果
+   */
+  default <T> MinioResult<T> getResult() {
+    return getLocalResult().get();
+  }
+
+  /**
+   * 获取并移除一个请求结果
+   */
+  @Nonnull
+  default <T> MinioResult<T> removeResult() {
+    return getLocalResult().getAndRemove();
+  }
+
 
   /**
    * Gets information of an object.

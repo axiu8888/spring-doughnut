@@ -60,7 +60,7 @@ public class MinioTemplate {
       }
       // 创建桶
       makeBucket(bucketName);
-      MinioUtils.removeResult();
+      getClient().removeResult();
     }
   }
 
@@ -87,7 +87,7 @@ public class MinioTemplate {
                                                     @Nonnull String objectName,
                                                     @Nonnull String bucketName) {
     getClient().statObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -130,7 +130,7 @@ public class MinioTemplate {
                                                   @Nonnull String objectName,
                                                   @Nonnull String bucketName) {
     getClient().getObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -164,7 +164,7 @@ public class MinioTemplate {
                                           boolean overwrite,
                                           @Nonnull String bucketName) {
     getClient().downloadObject(MinioUtils.newObjectArgs(builder.filename(file).overwrite(overwrite), objectName, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful() ? Paths.get(file).toFile() : null));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful() ? Paths.get(file).toFile() : null));
   }
 
   /**
@@ -202,7 +202,7 @@ public class MinioTemplate {
             .source(source)
             .taggingDirective(taggingDirective != null ? taggingDirective : Directive.COPY)
         , destObjectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -233,7 +233,7 @@ public class MinioTemplate {
                                                         @Nonnull List<ComposeSource> sources,
                                                         @Nonnull String bucketName) {
     getClient().composeObject(MinioUtils.newObjectArgs(builder.sources(sources), objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -260,7 +260,7 @@ public class MinioTemplate {
                                                    @Nonnull String objectName,
                                                    @Nonnull String bucketName) {
     getClient().getPresignedObjectUrl(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -271,7 +271,7 @@ public class MinioTemplate {
    */
   public MinioResult<Map<String, String>> getPresignedPostFormData(PostPolicy policy) {
     getClient().getPresignedPostFormData(policy);
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -298,7 +298,7 @@ public class MinioTemplate {
                               @Nonnull String objectName,
                               @Nonnull String bucketName) {
     getClient().removeObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult().isSuccessful();
+    return getClient().removeResult().isSuccessful();
   }
 
   /**
@@ -331,7 +331,7 @@ public class MinioTemplate {
       if (!list.isEmpty()) {
         removeObjects(RemoveObjectsArgs.builder(), list, bucketName);
         // 返回删除的结果
-        return MinioUtils.removeResult();
+        return getClient().removeResult();
       }
       // 空目录，返回成功
       return MinioUtils.obtainSucceedResult();
@@ -352,7 +352,7 @@ public class MinioTemplate {
     // 删除文件
     Iterable<Result<DeleteError>> iterable =
         getClient().removeObjects(MinioUtils.newBucketArgs(builder.objects(objects), bucketName));
-    return MinioUtils.removeResult().handle(r -> {
+    return getClient().removeResult().handle(r -> {
       if (r.isSuccessful()) {
         List<DeleteError> list = new ArrayList<>();
         iterable.forEach(dr -> list.add(CatchUtils.ignore(dr::get)));
@@ -380,7 +380,7 @@ public class MinioTemplate {
    */
   public MinioResult<Boolean> restoreObject(RestoreObjectArgs.Builder builder, String bucketName) {
     getClient().restoreObject(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful()));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
 
   /**
@@ -406,7 +406,7 @@ public class MinioTemplate {
                                              boolean recursive,
                                              @Nonnull String bucketName) {
     Iterable<Result<Item>> results = getClient().listObjects(MinioUtils.newBucketArgs(builder.recursive(recursive), bucketName));
-    return MinioUtils.removeResult().handle(r -> {
+    return getClient().removeResult().handle(r -> {
       List<Item> items = Utils.toList(results)
           .stream()
           .map(itemResult -> CatchUtils.tryThrow(itemResult::get, e -> {
@@ -428,7 +428,7 @@ public class MinioTemplate {
    */
   public MinioResult<List<Bucket>> listBuckets() {
     getClient().listBuckets();
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -436,7 +436,7 @@ public class MinioTemplate {
    */
   public MinioResult<List<Bucket>> listBuckets(ListBucketsArgs.Builder builder) {
     getClient().listBuckets(builder.build());
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -458,7 +458,7 @@ public class MinioTemplate {
    */
   public boolean bucketExists(BucketExistsArgs.Builder builder, String bucketName) {
     getClient().bucketExists(MinioUtils.newBucketArgs(builder, bucketName));
-    return Boolean.TRUE.equals(MinioUtils.removeResult().getData());
+    return Boolean.TRUE.equals(getClient().removeResult().getData());
   }
 
   /**
@@ -482,7 +482,7 @@ public class MinioTemplate {
       return true;
     }
     getClient().makeBucket(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult().isSuccessful();
+    return getClient().removeResult().isSuccessful();
   }
 
   /**
@@ -516,7 +516,7 @@ public class MinioTemplate {
         ? new VersioningConfiguration(status, mfaDelete)
         : new VersioningConfiguration();
     getClient().setBucketVersioning(MinioUtils.newBucketArgs(builder.config(config), bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -539,7 +539,7 @@ public class MinioTemplate {
   public MinioResult<VersioningConfiguration> getBucketVersioning(GetBucketVersioningArgs.Builder builder,
                                                                   String bucketName) {
     getClient().getBucketVersioning(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -565,7 +565,7 @@ public class MinioTemplate {
                                                 String bucketName) {
     ObjectLockConfiguration config = new ObjectLockConfiguration(mode, duration);
     getClient().setObjectLockConfiguration(MinioUtils.newBucketArgs(builder.config(config), bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -588,7 +588,7 @@ public class MinioTemplate {
   public MinioResult deleteObjectLockConfiguration(DeleteObjectLockConfigurationArgs.Builder builder,
                                                    String bucketName) {
     getClient().deleteObjectLockConfiguration(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -611,7 +611,7 @@ public class MinioTemplate {
   public MinioResult<ObjectLockConfiguration> getObjectLockConfiguration(GetObjectLockConfigurationArgs.Builder builder,
                                                                          String bucketName) {
     getClient().getObjectLockConfiguration(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -634,7 +634,7 @@ public class MinioTemplate {
   public MinioResult setObjectRetention(SetObjectRetentionArgs.Builder builder,
                                         String bucketName) {
     getClient().setObjectRetention(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -657,7 +657,7 @@ public class MinioTemplate {
   public MinioResult<Retention> getObjectRetention(GetObjectRetentionArgs.Builder builder,
                                                    String bucketName) {
     getClient().getObjectRetention(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -681,7 +681,7 @@ public class MinioTemplate {
   public MinioResult enableObjectLegalHold(EnableObjectLegalHoldArgs.Builder builder,
                                            String bucketName) {
     getClient().enableObjectLegalHold(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -705,7 +705,7 @@ public class MinioTemplate {
   public MinioResult disableObjectLegalHold(DisableObjectLegalHoldArgs.Builder builder,
                                             String bucketName) {
     getClient().disableObjectLegalHold(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -729,7 +729,7 @@ public class MinioTemplate {
   public MinioResult<Boolean> isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs.Builder builder,
                                                        String bucketName) {
     getClient().isObjectLegalHoldEnabled(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -746,7 +746,7 @@ public class MinioTemplate {
         removeObjects(bucketName);
       }
       getClient().removeBucket(MinioUtils.newBucketArgs(builder, bucketName));
-      return MinioUtils.removeResult().isSuccessful();
+      return getClient().removeResult().isSuccessful();
     }
     return true;
   }
@@ -801,7 +801,7 @@ public class MinioTemplate {
                                                     @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().putObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -819,7 +819,7 @@ public class MinioTemplate {
             .bucket(bucketName)
             .build()))
         .collect(Collectors.toList());
-    return MinioUtils.removeResult().handle(r -> {
+    return getClient().removeResult().handle(r -> {
       r.setData(list);
       r.setCode(200);
       r.setMessage("SUCCESS");
@@ -859,7 +859,7 @@ public class MinioTemplate {
     requireBucketExist(bucketName);
     CatchUtils.tryThrow(() -> builder.filename(file));
     getClient().uploadObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -882,7 +882,7 @@ public class MinioTemplate {
   public MinioResult<String> getBucketPolicy(GetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().getBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -905,7 +905,7 @@ public class MinioTemplate {
   public MinioResult<String> setBucketPolicy(SetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().setBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -928,7 +928,7 @@ public class MinioTemplate {
   public MinioResult<String> deleteBucketPolicy(DeleteBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().deleteBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   // setBucketLifecycle ...
@@ -954,7 +954,7 @@ public class MinioTemplate {
   public MinioResult<LifecycleConfiguration> getBucketLifecycle(GetBucketLifecycleArgs.Builder builder,
                                                                 @Nonnull String bucketName) {
     getClient().getBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -977,7 +977,7 @@ public class MinioTemplate {
   public MinioResult<LifecycleConfiguration> getBucketNotification(GetBucketNotificationArgs.Builder builder,
                                                                    @Nonnull String bucketName) {
     getClient().getBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1010,7 +1010,7 @@ public class MinioTemplate {
     config.setQueueConfigurationList(queueConfigurationList);
     config.setTopicConfigurationList(topicConfigurationList);
     getClient().setBucketNotification(MinioUtils.newBucketArgs(builder.config(config), bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1033,7 +1033,7 @@ public class MinioTemplate {
   public MinioResult<LifecycleConfiguration> deleteBucketNotification(DeleteBucketNotificationArgs.Builder builder,
                                                                       @Nonnull String bucketName) {
     getClient().deleteBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1044,7 +1044,7 @@ public class MinioTemplate {
    */
   public MinioResult<ReplicationConfiguration> getBucketReplication(String bucketName) {
     getClient().getBucketReplication(MinioUtils.newBucketArgs(GetBucketReplicationArgs.builder(), bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1057,7 +1057,7 @@ public class MinioTemplate {
   public MinioResult<ReplicationConfiguration> getBucketReplication(GetBucketReplicationArgs.Builder builder,
                                                                     @Nonnull String bucketName) {
     getClient().getBucketReplication(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1089,7 +1089,7 @@ public class MinioTemplate {
                                           @Nonnull String bucketName) {
     ReplicationConfiguration config = new ReplicationConfiguration(role, rules);
     getClient().setBucketReplication(MinioUtils.newBucketArgs(builder.config(config), bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1112,7 +1112,7 @@ public class MinioTemplate {
   public MinioResult deleteBucketReplication(DeleteBucketReplicationArgs.Builder builder,
                                              @Nonnull String bucketName) {
     getClient().deleteBucketReplication(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1135,7 +1135,7 @@ public class MinioTemplate {
   public MinioResult<CloseableIterator<Result<NotificationRecords>>> listenBucketNotification(ListenBucketNotificationArgs.Builder builder,
                                                                                               @Nonnull String bucketName) {
     getClient().listenBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1159,7 +1159,7 @@ public class MinioTemplate {
   public MinioResult<SelectResponseStream> selectObjectContent(SelectObjectContentArgs.Builder builder,
                                                                @Nonnull String bucketName) {
     getClient().selectObjectContent(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   // setBucketEncryption ...
@@ -1185,7 +1185,7 @@ public class MinioTemplate {
    */
   public MinioResult<Map<String, String>> getBucketTags(GetBucketTagsArgs.Builder builder, String bucketName) {
     Tags bucketTags = getClient().getBucketTags(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(bucketTags != null ? bucketTags.get() : null));
+    return getClient().removeResult().handle(r -> r.setData(bucketTags != null ? bucketTags.get() : null));
   }
 
   /**
@@ -1211,7 +1211,7 @@ public class MinioTemplate {
                                             Map<String, String> tags,
                                             String bucketName) {
     getClient().setBucketTags(MinioUtils.newBucketArgs(builder.tags(tags), bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful()));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
 
   /**
@@ -1233,7 +1233,7 @@ public class MinioTemplate {
    */
   public MinioResult<Boolean> deleteBucketTags(DeleteBucketTagsArgs.Builder builder, String bucketName) {
     getClient().deleteBucketTags(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful()));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
 
   /**
@@ -1260,7 +1260,7 @@ public class MinioTemplate {
                                          @Nonnull String objectName,
                                          @Nonnull String bucketName) {
     getClient().getObjectTags(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
   /**
@@ -1291,7 +1291,7 @@ public class MinioTemplate {
                                             Map<String, String> tags,
                                             @Nonnull String bucketName) {
     getClient().setObjectTags(MinioUtils.newObjectArgs(builder.tags(tags), objectName, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful()));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
 
   /**
@@ -1318,7 +1318,7 @@ public class MinioTemplate {
                                                @Nonnull String objectName,
                                                @Nonnull String bucketName) {
     getClient().deleteObjectTags(MinioUtils.newObjectArgs(builder, objectName, bucketName));
-    return MinioUtils.removeResult().handle(r -> r.setData(r.isSuccessful()));
+    return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
 
   /**
@@ -1354,7 +1354,7 @@ public class MinioTemplate {
                                                                 @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().uploadSnowballObjects(MinioUtils.newBucketArgs(builder, bucketName));
-    return MinioUtils.removeResult();
+    return getClient().removeResult();
   }
 
 

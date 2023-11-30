@@ -33,23 +33,6 @@ import java.util.function.Predicate;
  */
 public class MinioUtils {
 
-  private static final LocalCache<MinioResult> localResult = LocalCacheFactory.newCache(() -> MinioResult.fail("FAIL"));
-
-  /**
-   * 获取请求结果
-   */
-  public static <T> MinioResult<T> getResult() {
-    return localResult.get();
-  }
-
-  /**
-   * 获取并移除一个请求结果
-   */
-  @Nonnull
-  public static <T> MinioResult<T> removeResult() {
-    return localResult.getAndRemove();
-  }
-
   /**
    * 获取一个成功的结果
    */
@@ -84,9 +67,13 @@ public class MinioUtils {
    * @return 返回代理对象
    */
   public static <T> T newProxy(@Nullable Class<?> superclass, @Nonnull Class<?>[] interfaces, @Nonnull Object[] objects) {
-    Map<Method, CGLibMethodInvoker> invokers = new ConcurrentHashMap<>(20);
+    final Map<Method, CGLibMethodInvoker> invokers = new ConcurrentHashMap<>(20);
+    final LocalCache<MinioResult> localResult = LocalCacheFactory.newCache(() -> MinioResult.fail("FAIL"));
     return CGLibProxy.newProxy(superclass, interfaces, (obj, method, args, proxy) -> {
-      MinioResult result = getResult();
+      if (method.getName().equals("getLocalResult")) {
+        return localResult;
+      }
+      MinioResult result = localResult.get();
       try {
         CGLibMethodInvoker invoker = invokers.get(method);
         if (invoker == null) {

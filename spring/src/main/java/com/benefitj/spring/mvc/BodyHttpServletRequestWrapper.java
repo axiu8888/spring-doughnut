@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -39,11 +40,6 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
   }
 
   public RewriteServletInputStream getStream() {
-    return stream;
-  }
-
-  @Override
-  public ServletInputStream getInputStream() throws IOException {
     RewriteServletInputStream is = stream;
     if (is == null) {
       synchronized (this) {
@@ -55,10 +51,39 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
     return is;
   }
 
+  @Override
+  public ServletInputStream getInputStream() {
+    return getStream();
+  }
+
   public void reset() {
     try {
       getInputStream().reset();
     } catch (IOException ignore) {/* ignore */}
+  }
+
+
+  public void setNewInput(String content) {
+    try {
+      getStream().setNewInput(content.getBytes(getCharacterEncoding()));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  public void setNewInput(byte[] content) {
+    getStream().setNewInput(content);
+  }
+
+  @Override
+  public int getContentLength() {
+    //return super.getContentLength();
+    return getStream().getInput().available();
+  }
+
+  @Override
+  public long getContentLengthLong() {
+    return super.getContentLengthLong();
   }
 
   public static class RewriteServletInputStream extends ServletInputStream {
@@ -87,11 +112,11 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
       return input;
     }
 
-    public void setInput(String content) {
-      setInput(content.getBytes(StandardCharsets.UTF_8));
+    public void setNewInput(String content) {
+      setNewInput(content.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void setInput(byte[] content) {
+    public void setNewInput(byte[] content) {
       setInput(new ByteArrayInputStream(content));
     }
 

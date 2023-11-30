@@ -15,19 +15,19 @@ public class AnyEventAdapter extends BaseEventAdapter<Event> {
 
   @Override
   public void process(Event event) {
-    logger.info("接收到事件1: {}, {}", JSON.toJSONString(event), event.getClass());
+    log.info("接收到事件1: {}, {}", JSON.toJSONString(event), event.getClass());
   }
 
   @Subscribe
   public void onEvent2(Event event) {
-    logger.info("接收到事件2: {}, {}", JSON.toJSONString(event), event.getClass());
+    log.info("接收到事件2: {}, {}", JSON.toJSONString(event), event.getClass());
   }
 
   @SubscriberIgnore
   @Subscribe
   public void onEventIgnore(Event event) {
     // 不可达
-    logger.info("接收到事件3: {}, {}", JSON.toJSONString(event), event.getClass());
+    log.info("接收到事件3: {}, {}", JSON.toJSONString(event), event.getClass());
   }
 
   /**
@@ -36,7 +36,7 @@ public class AnyEventAdapter extends BaseEventAdapter<Event> {
   @SubscriberName(name = "id")
   @Subscribe
   public void onEvent4(IdEvent event) {
-    logger.info("接收到事件4: {}, {}", JSON.toJSONString(event), event.getClass());
+    log.info("接收到事件4: {}, {}", JSON.toJSONString(event), event.getClass());
   }
 
   /**
@@ -45,7 +45,7 @@ public class AnyEventAdapter extends BaseEventAdapter<Event> {
   @SubscriberName(pattern = "([\\s\\S]*)")
   @Subscribe
   public void onEvent5(IdEvent event) {
-    logger.info("接收到事件5: {}, {}", JSON.toJSONString(event), event.getClass());
+    log.info("接收到事件5: {}, {}", JSON.toJSONString(event), event.getClass());
   }
 
 }

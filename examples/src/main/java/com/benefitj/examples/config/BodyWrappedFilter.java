@@ -22,14 +22,8 @@ public class BodyWrappedFilter extends OncePerRequestFilter {
     if (method == HttpMethod.POST || method == HttpMethod.PUT) {
       BodyHttpServletRequestWrapper wrap = BodyHttpServletRequestWrapper.wrap(request);
       JSONObject json = wrap.getStream().toJson();
-      wrap.reset();
-      if (!json.isEmpty()) {
-//        JwtToken token = JwtTokenManager.currentToken();
-//        json.put("userId", token.getUserId());
-//        json.put("orgId", token.getOrgId());
-        json.put("userId", IdUtils.uuid());
-        wrap.getStream().setInput(json.toJSONBBytes());
-      }
+      json.put("userId", IdUtils.uuid());
+      wrap.setNewInput(json.toJSONString().getBytes(request.getCharacterEncoding()));
       filterChain.doFilter(wrap, response);
     } else {
       filterChain.doFilter(request, response);

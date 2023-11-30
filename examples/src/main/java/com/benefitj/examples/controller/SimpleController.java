@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Api(tags = "测试demo")
@@ -110,10 +111,10 @@ public class SimpleController {
   }
 
   @ApiOperation("测试POST")
-  @PostMapping("/testPOst")
+  @PostMapping("/testPost")
   public JSONObject testPost(HttpServletRequest request) throws IOException {
     ServletInputStream in = request.getInputStream();
-    String bodyStr = IOUtils.readFully(in).toString();
+    String bodyStr = IOUtils.readFully(in).toString(StandardCharsets.UTF_8);
     return JSON.parseObject(bodyStr);
   }
 

@@ -7,6 +7,7 @@
 
 apply plugin: 'java-library'
 apply plugin: 'java'
+apply plugin: 'idea'
 
 //beforeEvaluate { }
 
@@ -66,6 +67,34 @@ trying({
   task copyJars(type: Copy) {
     from configurations.runtimeClasspath
     into "${buildDir}/libs/lib" // 目标位置
+  }
+
+  processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    [
+        project.sourceSets.main.resources,
+        "src/main/java",
+    ].forEach {
+      from(it) {
+        exclude '**/*.java'
+        exclude '**/*.kt'
+        include '**/**'
+      }
+    }
+  }
+
+  processTestResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    [
+        project.sourceSets.test.resources,
+        "src/test/java",
+    ].forEach {
+      from(it) {
+        exclude '**/*.java'
+        exclude '**/*.kt'
+        include '**/**'
+      }
+    }
   }
 })
 

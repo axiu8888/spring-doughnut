@@ -7,7 +7,8 @@ import org.springframework.context.annotation.PropertySource;
 
 @ConditionalOnProperty(prefix = "spring.quartz", value = "jdbc-enable", matchIfMissing = false)
 @EnableConfigurationProperties
-@PropertySource("classpath:quartz-jdbc-spring.properties")
+//@PropertySource("classpath:quartz-jdbc-spring.properties")
+@PropertySource("classpath:quartz-spring.properties")
 @Configuration
 public class QuartzJdbcConfiguration {
 }

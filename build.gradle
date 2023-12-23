@@ -36,9 +36,7 @@ ext {
   try {
     def props = new Properties()
     props.load(new FileReader("${getRootDir()}/nexus.properties"))
-    repoUrl = props["repoUrl"]
-    repoUsername = props["repoUsername"]
-    repoPassword = props["repoPassword"]
+    props.forEach(ext::set)
   } catch (e) {
     e.printStackTrace()
   }

@@ -299,12 +299,12 @@ afterEvaluate {
 
           repositories {
             maven {
-              url = "${project.ext.versionId}".endsWith('-SNAPSHOT') ? trying({ project.ext.repoSnapshot }) : trying({ project.ext.repoRelease })
+              url = "${project.ext.versionId}".endsWith('-SNAPSHOT') ? trying({ repoSnapshot }) : trying({ repoRelease })
               if (!url.toString().startsWith('file:/')) {
                 allowInsecureProtocol = true
                 credentials {
-                  username trying({ project.ext.repoUsername })
-                  password trying({ project.ext.repoPassword })
+                  username trying({ repoUsername })
+                  password trying({ repoPassword })
                 }
               }
             }

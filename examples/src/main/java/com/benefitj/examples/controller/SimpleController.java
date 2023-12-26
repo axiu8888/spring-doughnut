@@ -2,8 +2,8 @@ package com.benefitj.examples.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.benefitj.core.Utils;
 import com.benefitj.core.IOUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
 import com.benefitj.examples.vo.IdEvent;
@@ -13,12 +13,13 @@ import com.benefitj.spring.aop.AopIgnore;
 import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
-import com.benefitj.spring.mvc.query.PageRequest;
 import com.benefitj.spring.mvc.query.PageBody;
+import com.benefitj.spring.mvc.query.PageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +39,10 @@ import java.nio.charset.StandardCharsets;
 public class SimpleController {
 
   @Autowired
-  private EventBusPoster poster;
+  EventBusPoster poster;
+
+  @Autowired
+  RedisTemplate<String, Object> redisTemplate;
 
   @ApiOperation("限流: 5")
   @AopRateLimiter(qps = 5)
@@ -116,6 +120,25 @@ public class SimpleController {
     ServletInputStream in = request.getInputStream();
     String bodyStr = IOUtils.readFully(in).toString(StandardCharsets.UTF_8);
     return JSON.parseObject(bodyStr);
+  }
+
+  @ApiOperation("测试POST2")
+  @PostMapping("/testPost2")
+  public JSONObject testPost2(@RequestBody JSONObject body) {
+    return body;
+  }
+
+  @ApiOperation("测试 redis")
+  @PostMapping("/testRedis")
+  public JSONObject testRedis(HttpServletRequest request, @RequestBody JSONObject body) {
+    String key = body.getString("key");
+    String value = body.getString("value");
+    redisTemplate.opsForValue()
+        .set(key, value);
+    return new JSONObject(){{
+      put("code", 200);
+      put("msg", "success");
+    }};
   }
 
 }

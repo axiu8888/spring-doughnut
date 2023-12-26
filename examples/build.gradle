@@ -18,6 +18,8 @@ dependencies {
   }
 
   [
+      'joda-time:joda-time:2.12.5',
+      'com.moandjiezana.toml:toml4j:0.7.2',
       "org.springframework.boot:spring-boot-starter-web",
       "org.springframework.boot:spring-boot-starter-websocket",
       "org.springframework.boot:spring-boot-starter-data-redis",

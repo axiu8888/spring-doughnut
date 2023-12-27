@@ -260,15 +260,15 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 12, 21, 21, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 12, 22, 9, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 12, 27, 17, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2023, 12, 27, 19, 0, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
-    String condition = " AND device_no = '641938001136'";
+//    String condition = " AND device_no = '641938001136'";
 //    String condition = " AND (device_no = '641938001103' OR device_no = '641938001136')";
-//    String condition = "";
+    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -279,7 +279,7 @@ class InfluxApiDBApiTest {
         .filter(measurementFilter) // 不保存波形趋势
         .map(name -> MeasurementInfo.builder()
             .name(name)
-            .fieldKeyMap(template.getFieldKeyMap(name, true))
+            .fieldKeys(template.getFieldKeyMap(name, true))
             .build())
         .forEach(measurementInfo -> {
           File line = IOUtils.createFile(dir, measurementInfo.name + ".line");
@@ -294,7 +294,7 @@ class InfluxApiDBApiTest {
   @Data
   public static class MeasurementInfo {
     String name;
-    Map<String, FieldKey> fieldKeyMap;
+    Map<String, FieldKey> fieldKeys;
   }
 
   /**

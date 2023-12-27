@@ -1,0 +1,28 @@
+plugins {
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+}
+
+apply from: "${scriptFile}"
+
+description("NAT proxy")
+
+group = "nat-proxy"
+version = ''
+
+jar {
+  archivesBaseName = "nat-proxy"
+}
+
+dependencies {
+  [
+      //project(":all"),
+      project(":nat-proxy"),
+      "org.springframework.boot:spring-boot-starter-web",
+      //"org.springframework.boot:spring-boot-starter-websocket",
+  ].forEach {
+    implementation(it)
+  }
+}

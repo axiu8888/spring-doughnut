@@ -18,10 +18,11 @@ include ":commons"
 /**
  * spring包
  */
-include ":all" // 全部的依赖
-include ":spring"
-include ":aop"
-include ":eventbus"
+include ":all"            // 全部的依赖
+include ":aop"            // AOP
+include ":eventbus"       // eventbus
+include ":spring"         // spring
+include ":nat-proxy"      // 内网穿透
 /**
  * MQTT
  */
@@ -37,7 +38,9 @@ include(
  * redis
  */
 include ":redis"
-
+/**
+ * influxdb
+ */
 include ":influxdb"
 
 /**
@@ -75,6 +78,7 @@ include(
     ":services:mybatisplus",                     // mybatis
     ":services:websocket-relay",                 // 代理中继
     ":services:file-server",                     // 文件服务
+    ":services:nat-proxy",                       // NAT代理
 )
 
 include ":examples"

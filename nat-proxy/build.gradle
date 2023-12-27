@@ -1,0 +1,14 @@
+apply from: "${scriptFile}"
+
+// 上传到nexus/maven仓库
+project.ext.upload = true
+
+dependencies {
+
+  [
+      project(":spring"),
+      "io.netty:netty-all:${nettyAllVersion}",
+  ].forEach {
+    api(it)
+  }
+}

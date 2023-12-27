@@ -1,0 +1,19 @@
+${AnsiColor.BRIGHT_BLUE}
+
+
+888b      88         db    888888888888
+8888b     88        d88b        88
+88 `8b    88       d8'`8b       88
+88  `8b   88      d8'  `8b      88          8b,dPPYba,   8b,dPPYba,   ,adPPYba,  8b,     ,d8  8b       d8
+88   `8b  88     d8YaaaaY8b     88          88P'    "8a  88P'   "Y8  a8"     "8a  `Y8, ,8P'   `8b     d8'
+88    `8b 88    d8""""""""8b    88          88       d8  88          8b       d8    )888(      `8b   d8'
+88     `8888   d8'        `8b   88          88b,   ,a8"  88          "8a,   ,a8"  ,d8" "8b,     `8b,d8'
+88      `888  d8'          `8b  88          88`YbbdP"'   88           `"YbbdP"'  8P'     `Y8      Y88'
+                                            88                                                    d8'
+                                            88                                                   d8'                                                                                                                                       "Y88P"
+
+${AnsiColor.BRIGHT_GREEN}
+Powered by dxa
+Version: 3.0
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+${AnsiColor.BLACK}

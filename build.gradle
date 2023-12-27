@@ -37,9 +37,7 @@ ext {
     def props = new Properties()
     props.load(new FileReader("${getRootDir()}/nexus.properties"))
     props.forEach(ext::set)
-  } catch (e) {
-    e.printStackTrace()
-  }
+  } catch (ignored) {/*~*/}
 
 }
 

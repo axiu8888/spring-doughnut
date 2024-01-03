@@ -9,6 +9,7 @@ import com.benefitj.spring.influxdb.template.InfluxTemplate;
 import com.benefitj.spring.influxdb.template.InfluxTemplateImpl;
 import com.squareup.moshi.Moshi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -89,6 +90,7 @@ public class InfluxConfiguration {
     return new InfluxInitializingBean(template);
   }
 
+  @ConditionalOnWebApplication
   @ConditionalOnMissingBean
   @Bean
   public ApiController apiController() {

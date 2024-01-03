@@ -2,6 +2,7 @@ package com.benefitj.spring.influxdb.template;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.DateFmtter;
+import com.benefitj.core.ShutdownHook;
 import com.benefitj.spring.influxdb.InfluxApi;
 import com.benefitj.spring.influxdb.InfluxOptions;
 import com.benefitj.spring.influxdb.InfluxTimeUtil;
@@ -10,6 +11,7 @@ import com.benefitj.spring.influxdb.convert.PointConverter;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -853,7 +855,9 @@ public interface InfluxTemplate {
    * get QueryResult.Result list
    */
   default List<QueryResult.Result> getResults(QueryResult result) {
-    return checkResult(result) ? result.getResults() : Collections.emptyList();
+    if(checkResult(result))
+      return result.getResults();
+    throw new IllegalStateException(result.getError());
   }
 
   /**
@@ -924,14 +928,15 @@ public interface InfluxTemplate {
     if (fieldKeyMap.isEmpty()) {
       return false;
     }
+    String clause = (""
+        + (startTime != null ? "time >= '" + DateFmtter.fmtUtcS(startTime) + "'" : "")
+        + (endTime != null ? "AND time <= '" + DateFmtter.fmtUtcS(endTime) + "'" : "")
+        + condition).trim();
     String sql = "SELECT * FROM \"" + measurement + "\" " + String.join(" ",
-        (startTime != null && endTime != null ? "WHERE" : "")
-        , (startTime != null ? "time >= '" + DateFmtter.fmtUtcS(startTime) + "'" : "")
-        , (endTime != null ? "AND time <= '" + DateFmtter.fmtUtcS(endTime) + "'" : "")
-        , condition.trim()
+        clause.isEmpty() ? clause : (clause.startsWith("WHERE") || clause.startsWith("where") ? clause : "WHERE " + clause)
     );
     AtomicReference<Throwable> error = new AtomicReference<>();
-    query(db, sql, chunkSize)
+    Disposable disposable = query(db, sql, chunkSize)
         .subscribe(queryResult -> {
           List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
           out.write(points.stream()
@@ -940,6 +945,7 @@ public interface InfluxTemplate {
           out.write("\n");
           out.flush();
         }, error::set);
+    ShutdownHook.register(disposable::dispose);
     if (error.get() != null) {
       throw new IllegalStateException(error.get());
     }

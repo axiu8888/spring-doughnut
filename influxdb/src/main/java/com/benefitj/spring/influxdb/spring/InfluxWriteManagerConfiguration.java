@@ -1,10 +1,13 @@
 package com.benefitj.spring.influxdb.spring;
 
 import com.benefitj.core.Utils;
+import com.benefitj.spring.influxdb.InfluxOptions;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
-import com.benefitj.spring.influxdb.write.*;
+import com.benefitj.spring.influxdb.write.AppStarterAutoWriter;
+import com.benefitj.spring.influxdb.write.InfluxWriteManager;
+import com.benefitj.spring.influxdb.write.LineFileFactory;
+import com.benefitj.spring.influxdb.write.LineFileListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,16 +19,6 @@ import java.nio.charset.StandardCharsets;
  */
 @Configuration
 public class InfluxWriteManagerConfiguration {
-
-  /**
-   * 配置属性
-   */
-  @ConfigurationProperties(prefix = "spring.influxdb.writer")
-  @ConditionalOnMissingBean
-  @Bean
-  public InfluxWriteOptions influxWriteOptions() {
-    return new InfluxWriteOptions();
-  }
 
   /**
    * 行协议文件工厂
@@ -57,11 +50,12 @@ public class InfluxWriteManagerConfiguration {
   @Bean
   public InfluxWriteManager influxWriterManager(LineFileFactory lineFileFactory,
                                                 LineFileListener lineFileListener,
-                                                InfluxWriteOptions options) {
-    File cacheDir = new File(options.getCacheDir());
+                                                InfluxOptions options) {
+    InfluxOptions.Writer writer = options.getWriter();
+    File cacheDir = new File(writer.getCacheDir());
     InfluxWriteManager manager = new InfluxWriteManager(cacheDir);
-    manager.setDelay(options.getDelay() * 1000);
-    manager.setMaxSize(options.getCacheSize() * Utils.MB);
+    manager.setDelay(writer.getDelay() * 1000);
+    manager.setMaxSize(writer.getCacheSize() * Utils.MB);
     manager.setFileFactory(lineFileFactory);
     manager.setFileListener(lineFileListener);
     manager.setCharset(StandardCharsets.UTF_8);
@@ -78,7 +72,7 @@ public class InfluxWriteManagerConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public AppStarterAutoWriter influxAutoWriteListener(InfluxTemplate template,
-                                                      InfluxWriteOptions options) {
+                                                      InfluxOptions options) {
     return new AppStarterAutoWriter(template, options);
   }
 

@@ -260,15 +260,15 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 12, 27, 17, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2023, 12, 27, 19, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2023, 12, 30, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 1, 2, 20, 0, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
 //    String condition = " AND device_no = '641938001136'";
-//    String condition = " AND (device_no = '641938001103' OR device_no = '641938001136')";
-    String condition = "";
+    String condition = " AND (person_zid = 'e218e965d2774791b3a82801fcd9997b' OR person_zid = 'f3234f58273a4055b89224be0d73c576')";
+//    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -434,7 +434,7 @@ class InfluxApiDBApiTest {
       AtomicLong prev = new AtomicLong(0);
       AtomicLong current = new AtomicLong(0);
       template.write(new ProgressRequestBody(RequestBody.create(line, InfluxTemplate.MEDIA_TYPE_STRING), (totalLength, progress, done) -> {
-        log.info("file[{}], totalLength: {}, progress: {}, done: {}", line, totalLength, progress, done);
+        log.info("file[{}], totalLength: {}, progress: {}, precent: {}, done: {}", line, totalLength, progress, progress / totalLength * 100f, done);
         prev.set(current.get());
         current.set(progress);
       }));

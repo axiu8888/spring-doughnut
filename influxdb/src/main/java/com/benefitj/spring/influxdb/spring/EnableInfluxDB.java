@@ -17,5 +17,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableInflux {
+public @interface EnableInfluxDB {
 }

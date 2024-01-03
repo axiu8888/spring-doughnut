@@ -4,7 +4,7 @@ import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.aop.ratelimiter.EnableRedisRateLimiter;
 import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
-import com.benefitj.spring.influxdb.spring.EnableInflux;
+import com.benefitj.spring.influxdb.spring.EnableInfluxDB;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageChannel;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 @EnableRedisRateLimiter         // redis RateLimiter
 @EnableEventBusPoster           // eventbus
 @EnableAthenapdf                // PDF
-@EnableInflux                   // InfluxDB
+@EnableInfluxDB                   // InfluxDB
 @SpringBootApplication
 @Slf4j
 public class SpringbootDoughnutApplication {

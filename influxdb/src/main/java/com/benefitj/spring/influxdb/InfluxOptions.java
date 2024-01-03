@@ -1,151 +1,135 @@
 package com.benefitj.spring.influxdb;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+import java.time.Duration;
+
+@SuperBuilder
+@NoArgsConstructor
+@Data
 public class InfluxOptions {
 
   /**
    * InfluxDB连接路径
    */
-  private String url;
+  String url;
   /**
    * 用户名
    */
-  private String username;
+  String username;
   /**
    * 密码
    */
-  private String password;
+  String password;
   /**
    * 数据库
    */
-  private String database;
+  String database;
   /**
    * 存储策略，默认 autogen
    */
-  private String retentionPolicy = "autogen";
+  @Builder.Default
+  String retentionPolicy = "autogen";
   /**
    * 批量保存时的一致性策略，默认 {@link InfluxApi.ConsistencyLevel#ALL}
    */
-  private InfluxApi.ConsistencyLevel consistencyLevel = InfluxApi.ConsistencyLevel.ALL;
+  @Builder.Default
+  InfluxApi.ConsistencyLevel consistencyLevel = InfluxApi.ConsistencyLevel.ALL;
   /**
    * 连接超时时长，默认5秒
    */
-  private int connectTimeout = 5;
+  @Builder.Default
+  int connectTimeout = 5;
   /**
    * 读取超时时长，默认30秒
    */
-  private int readTimeout = 30;
+  @Builder.Default
+  int readTimeout = 30;
   /**
    * 写入超时时长，默认60秒
    */
-  private int writeTimeout = 60;
+  @Builder.Default
+  int writeTimeout = 60;
   /**
    * gzip压缩
    */
-  private boolean gzip = true;
+  @Builder.Default
+  boolean gzip = true;
   /**
    * 响应格式，默认JSON
    */
-  private InfluxApi.ResponseFormat responseFormat = InfluxApi.ResponseFormat.JSON;
+  @Builder.Default
+  InfluxApi.ResponseFormat responseFormat = InfluxApi.ResponseFormat.JSON;
   /**
    * 日志等级
    */
-  private HttpLoggingInterceptor.Level logLevel = HttpLoggingInterceptor.Level.NONE;
+  @Builder.Default
+  HttpLoggingInterceptor.Level logLevel = HttpLoggingInterceptor.Level.NONE;
 
-  public String getUrl() {
-    return url;
+  /**
+   * 写入配置
+   */
+  @Builder.Default
+  Writer writer = new Writer();
+
+  @Builder.Default
+  Api api = new Api();
+
+
+  @SuperBuilder
+  @NoArgsConstructor
+  @Data
+  public static class Writer {
+
+    /**
+     * 缓存大小(MB)，默认30MB
+     */
+    @Builder.Default
+    Integer cacheSize = 30;
+    /**
+     * 延迟时长(秒)，默认5分钟
+     */
+    @Builder.Default
+    Integer delay = 5 * 60;
+    /**
+     * 缓存目录：默认当前目录下的 ./tmp/influxdb
+     */
+    @Builder.Default
+    String cacheDir = "./tmp/influxdb";
+    /**
+     * 是否自动上传，默认false
+     */
+    @Builder.Default
+    boolean autoUpload = false;
+    /**
+     * 文件后缀，默认是 “.line”
+     */
+    @Builder.Default
+    String suffix = ".line";
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getDatabase() {
-    return database;
-  }
-
-  public void setDatabase(String database) {
-    this.database = database;
-  }
-
-  public String getRetentionPolicy() {
-    return retentionPolicy;
-  }
-
-  public void setRetentionPolicy(String retentionPolicy) {
-    this.retentionPolicy = retentionPolicy;
-  }
-
-  public InfluxApi.ConsistencyLevel getConsistencyLevel() {
-    return consistencyLevel;
-  }
-
-  public void setConsistencyLevel(InfluxApi.ConsistencyLevel consistencyLevel) {
-    this.consistencyLevel = consistencyLevel;
-  }
-
-  public int getConnectTimeout() {
-    return connectTimeout;
-  }
-
-  public void setConnectTimeout(int connectTimeout) {
-    this.connectTimeout = connectTimeout;
-  }
-
-  public int getReadTimeout() {
-    return readTimeout;
-  }
-
-  public void setReadTimeout(int readTimeout) {
-    this.readTimeout = readTimeout;
-  }
-
-  public int getWriteTimeout() {
-    return writeTimeout;
-  }
-
-  public void setWriteTimeout(int writeTimeout) {
-    this.writeTimeout = writeTimeout;
-  }
-
-  public boolean isGzip() {
-    return gzip;
-  }
-
-  public void setGzip(boolean gzip) {
-    this.gzip = gzip;
-  }
-
-  public InfluxApi.ResponseFormat getResponseFormat() {
-    return responseFormat;
-  }
-
-  public void setResponseFormat(InfluxApi.ResponseFormat responseFormat) {
-    this.responseFormat = responseFormat;
-  }
-
-  public HttpLoggingInterceptor.Level getLogLevel() {
-    return logLevel;
-  }
-
-  public void setLogLevel(HttpLoggingInterceptor.Level logLevel) {
-    this.logLevel = logLevel;
+  @SuperBuilder
+  @NoArgsConstructor
+  @Data
+  public static class Api {
+    /**
+     * 缓存目录
+     */
+    @Builder.Default
+    String cacheDir = "./tmp";
+    /**
+     * 缓存时长，默认30分钟
+     */
+    @Builder.Default
+    Duration cacheDuration = Duration.ofMinutes(30);
+    /**
+     * 是否自动删除
+     */
+    @Builder.Default
+    boolean autoDelete = true;
   }
 }

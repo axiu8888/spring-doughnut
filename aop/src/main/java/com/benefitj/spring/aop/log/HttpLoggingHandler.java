@@ -1,5 +1,6 @@
 package com.benefitj.spring.aop.log;
 
+import com.benefitj.core.Utils;
 import com.benefitj.spring.aop.AopAdvice;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
@@ -99,11 +100,14 @@ public class HttpLoggingHandler implements WebPointCutHandler {
           argsMap.put(parameter.getName(), "[ServletResponse]");
         } else if (arg instanceof MultipartFile) {
           MultipartFile mf = (MultipartFile) arg;
-          argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %d)]"
-              , mf.getOriginalFilename(), mf.getSize()));
+          String size = mf.getSize() <= Utils.MB ? Utils.fmtKB(mf.getSize(), "0.00KB") : Utils.fmtMB(mf.getSize(), "0.000MB");
+          argsMap.put(parameter.getName(), String.format("[MultipartFile(%s, %s)]", mf.getOriginalFilename(), size));
         } else if (arg instanceof MultipartFile[]) {
           argsMap.put(parameter.getName(), "MultipartFiles[" + Arrays.stream(((MultipartFile[]) arg))
-              .map(mf -> String.format("(%s, %d)", mf.getOriginalFilename(), mf.getSize()))
+              .map(mf -> {
+                String size = mf.getSize() <= Utils.MB ? Utils.fmtKB(mf.getSize(), "0.00KB") : Utils.fmtMB(mf.getSize(), "0.000MB");
+                return String.format("(%s, %s)", mf.getOriginalFilename(), size);
+              })
               .collect(Collectors.joining(", ")) + "]");
         } else if (arg instanceof InputStream) {
           argsMap.put(parameter.getName(), "[input]");

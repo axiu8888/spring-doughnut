@@ -20,7 +20,7 @@ public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements In
   private long delay = 5 * 60_000;
 
   public InfluxWriteManager(File cacheDir) {
-    this(cacheDir, 20 * Utils.MB);
+    this(cacheDir, 50 * Utils.MB);
   }
 
   public InfluxWriteManager(File cacheDir, long maxSize) {
@@ -37,7 +37,7 @@ public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements In
     }
 
     // 检查是否写入数据
-    EventLoop.io().scheduleAtFixedRate(() -> {
+    EventLoop.asyncIOFixedRate(() -> {
       if (isWritable()) {
         flush();
       }

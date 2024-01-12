@@ -26,6 +26,7 @@ public class BodyWrappedFilter extends OncePerRequestFilter {
       wrap.setNewInput(json.toJSONString().getBytes(request.getCharacterEncoding()));
       filterChain.doFilter(wrap, response);
     } else {
+      //request.getParameterMap().put("userId", new String[]{IdUtils.uuid()});
       filterChain.doFilter(request, response);
     }
   }

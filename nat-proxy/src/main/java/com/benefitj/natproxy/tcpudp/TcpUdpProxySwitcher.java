@@ -15,8 +15,6 @@ public class TcpUdpProxySwitcher implements ProxySwitcher {
    TcpUdpOptions options;
    TcpUdpProxyServer server;
 
-
-
   public TcpUdpProxySwitcher(TcpUdpOptions options, TcpUdpProxyServer server) {
     this.options = options;
     this.server = server;

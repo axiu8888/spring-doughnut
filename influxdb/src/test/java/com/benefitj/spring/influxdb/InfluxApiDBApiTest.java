@@ -260,14 +260,15 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2023, 12, 30, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 1, 2, 20, 0, 0).getTime();
+    long startTime = TimeUtils.toDate(2024, 1, 9, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 1, 9, 23, 59, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
 //    String condition = " AND device_no = '641938001136'";
-    String condition = " AND (person_zid = 'e218e965d2774791b3a82801fcd9997b' OR person_zid = 'f3234f58273a4055b89224be0d73c576')";
+//    String condition = " AND (device_id != person_zid AND device_id != '01001080' AND device_id != '01001169' AND device_id != '01001148' AND device_id != '01001149' AND device_id != '01001192') ";
+    String condition = " AND device_id = '01000446'";
 //    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
@@ -616,5 +617,48 @@ class InfluxApiDBApiTest {
     writer.flush();
     writer.close();
   }
+
+  @Test
+  void test_Spo2() {
+    IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb/tmp.txt"), false);
+    template.query("select * from hs_oximeter_package where time > now() - 1d")
+        .subscribe(new QueryObserver() {
+          JSONObject json = new JSONObject(new LinkedHashMap());
+
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            json.put("time", c.getTime());
+            json.put("date", DateFmtter.fmt(c.getTime()));
+            json.put("points", JSON.parseObject(c.getString("points"), int[].class));
+            writer.write(json.toJSONString());
+            writer.writeAndFlush("\n");
+          }
+        });
+  }
+
+  @Test
+  void test_Spo2Point() {
+    IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb/tmp2.txt"), false);
+    template.query("select * from hs_oximeter_point where time > now() - 1d")
+        .subscribe(new QueryObserver() {
+          @Override
+          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
+            writer.write(c.getTime() + " ," + c.getInteger("point") + ", " + DateFmtter.fmtS(c.getTime()));
+            writer.writeAndFlush("\n");
+          }
+        });
+  }
+
+  @Test
+  void test_Spo2Point2() {
+    int[] arr = new int[]{81,79,77,75,72,70,69,67,65,63,60,56,52,48,45,41,37,34,32,29,27,25,22,20,17,15,16,20,27,37,49,59,66,70,71,70,69,67,65,63,61,59,58,57,56,55,53,50,46,42};
+    System.err.println("len: " + arr.length);
+    long time = 1704770480000L;
+    for (int i = 0; i < arr.length; i++) {
+      System.err.println("time: " + DateFmtter.fmtS((time + i * 20L)));
+    }
+
+  }
+
 
 }

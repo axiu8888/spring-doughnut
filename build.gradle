@@ -46,10 +46,10 @@ subprojects {
   apply plugin: 'java'
 
   group = "com.benefitj.spring"
-  version = "2.3.0-SNAPSHOT"
+  version = "2.4.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_15
+    compatibilityVersion = JavaVersion.VERSION_11
     // 默认是spring环境
     springEnv = true
     springTest = true

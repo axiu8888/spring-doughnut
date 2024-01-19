@@ -9,12 +9,40 @@ apply from: "${scriptFile}"
 
 dependencies {
 
-  implementation(project(":quartz"))
+  [
+      project(":quartz"),
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
 
-  implementation "org.springframework.boot:spring-boot-starter-web"
-  implementation "org.springframework.boot:spring-boot-starter-websocket"
-  implementation "org.springframework.boot:spring-boot-starter-security"
-  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+      "org.springframework.boot:spring-boot-starter-web" ,
+      "org.springframework.boot:spring-boot-starter-websocket" ,
+      "org.springframework.boot:spring-boot-starter-security" ,
+      "org.springframework.boot:spring-boot-starter-data-jpa" ,
+
+      "com.github.jsqlparser:jsqlparser:4.5",
+      "com.github.pagehelper:pagehelper:5.3.2",
+      "com.baomidou:mybatis-plus-boot-starter:${mybatisPlusVersion}",
+      // "com.baomidou:mybatis-plus-generator:${mybatisPlusVersion}",
+      // “com.baomidou:mybatis-plus-extension:${mybatisPlusVersion}",
+      // "com.baomidou:dynamic-datasource-spring-boot-starter:3.6.1",
+
+      // 'com.h2database:h2:1.4.200',
+      "com.mysql:mysql-connector-j:${mysqlVersion}",
+      "com.alibaba:druid-spring-boot-starter:${druidVersion}",
+      "org.postgresql:postgresql:${postgresqlVersion}",
+
+      // swagger-ui
+      "io.springfox:springfox-boot-starter:3.0.0",
+      'com.github.xiaoymin:knife4j-spring-ui:3.0.3',
+
+      // jwt
+      "io.jsonwebtoken:jjwt-api:${jjwtVersion}",
+      "io.jsonwebtoken:jjwt-impl:${jjwtVersion}",
+      "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}",
+
+  ].forEach {
+    implementation(it)
+  }
 
 //  // springboot admin 管理
 //  implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -22,29 +50,6 @@ dependencies {
 //  implementation 'de.codecentric:spring-boot-admin-starter-server:2.7.13'
 //  implementation 'de.codecentric:spring-boot-admin-starter-client:2.7.13'
 //  implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
-
-
-  implementation "com.github.jsqlparser:jsqlparser:4.5"
-  implementation "com.github.pagehelper:pagehelper:5.3.2"
-  implementation "com.baomidou:mybatis-plus-boot-starter:${mybatisPlusVersion}"
-  //implementation "com.baomidou:mybatis-plus-generator:${mybatisPlusVersion}"
-  //implementation “com.baomidou:mybatis-plus-extension:${mybatisPlusVersion}"
-  //implementation "com.baomidou:dynamic-datasource-spring-boot-starter:3.6.1"
-
-  //implementation 'com.h2database:h2:1.4.200'
-  implementation "com.mysql:mysql-connector-j:${mysqlVersion}"
-  implementation "com.alibaba:druid-spring-boot-starter:${druidVersion}"
-  implementation "org.postgresql:postgresql:${postgresqlVersion}"
-
-  // swagger-ui
-  implementation "io.springfox:springfox-boot-starter:3.0.0"
-  implementation 'com.github.xiaoymin:knife4j-spring-ui:3.0.3'
-
-  // jwt
-  implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-  implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-  implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
 
 }
 

@@ -21,7 +21,7 @@ public class EventBusConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public EventBusPoster eventBusPoster(EventWrapper eventWrapper) {
-    EventBusPoster poster = EventBusPoster.getInstance();
+    EventBusPoster poster = EventBusPoster.get();
     poster.setEventWrapper(eventWrapper);
     return poster;
   }

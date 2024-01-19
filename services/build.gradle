@@ -15,11 +15,12 @@ subprojects {
         project(":spring"),
 
         'org.springframework.boot:spring-boot-devtools',
-        "io.springfox:springfox-boot-starter:${swaggerVersion}",
-        "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
     ].forEach {
       implementation(it) {
         exclude(module: "quartz")
+        exclude group: "io.springfox", module: "springfox-boot-starter"
+        exclude group: "com.github.xiaoymin", module: "knife4j-openapi2-spring-boot-starter"
       }
     }
 

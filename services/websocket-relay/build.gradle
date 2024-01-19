@@ -17,7 +17,15 @@ jar {
 }
 
 dependencies {
-  implementation(project(":all"))
-  implementation "org.springframework.boot:spring-boot-starter-web"
-  implementation "org.springframework.boot:spring-boot-starter-websocket"
+  [
+      project(":all"),
+
+      "org.springframework.boot:spring-boot-starter-web",
+      "org.springframework.boot:spring-boot-starter-websocket",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+  ].forEach {
+    implementation(it)
+  }
 }

@@ -9,26 +9,32 @@ apply from: "${scriptFile}"
 
 
 dependencies {
-  implementation(project(":minio"))
-  implementation 'org.springframework.boot:spring-boot-devtools'
 
-  implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
-  implementation "org.springframework.boot:spring-boot-starter-web"
-  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-  // redis
-//  implementation "org.springframework.boot:spring-boot-starter-data-redis"
-
-  //implementation 'io.github.swagger2markup:swagger2markup:1.3.4'
-
-  // OkHttp + RxJava + Retrofit
   [
+      project(":minio"),
+
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+      "org.aspectj:aspectjweaver:${aspectjVersion}",
+      'org.springframework.boot:spring-boot-devtools',
+      "org.springframework.boot:spring-boot-starter-web",
+
+      // redis
+      //"org.springframework.boot:spring-boot-starter-data-redis",
+      //'io.github.swagger2markup:swagger2markup:1.3.4',
+
       "com.squareup.okhttp3:okhttp:${okHttpVersion}",
       "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
       "com.squareup.retrofit2:retrofit:${retrofitVersion}",
       "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}",
       "com.squareup.retrofit2:converter-scalars:${retrofitVersion}",
       "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
-  ].forEach { implementation(it) }
+
+  ].forEach {
+    implementation(it)
+  }
+  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 }
 

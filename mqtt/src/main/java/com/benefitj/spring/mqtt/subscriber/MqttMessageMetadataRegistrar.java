@@ -23,7 +23,7 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 import org.springframework.messaging.Message;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -78,7 +78,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         if (StringUtils.isNotBlank(listener.serverURI())) {
           String serverURI;
           try {
-            new URL(listener.serverURI());
+            new URI(listener.serverURI());
             serverURI = listener.serverURI();
           } catch (Exception e) {
             serverURI = SpringCtxHolder.getEnvProperty(listener.serverURI());

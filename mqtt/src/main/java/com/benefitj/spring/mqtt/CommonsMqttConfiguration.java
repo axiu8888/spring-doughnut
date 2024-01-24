@@ -38,7 +38,7 @@ public class CommonsMqttConfiguration {
     // 设置连接的用户名
     options.setUserName(property.getUsername());
     // 设置连接的密码
-    options.setPassword(property.getPassword().toCharArray());
+    options.setPassword((StringUtils.isNotBlank(property.getPassword()) ? property.getPassword() : "").toCharArray());
     options.setServerURIs(StringUtils.split(property.getServerURIs(), ","));
     // 设置超时时间 单位为秒
     options.setConnectionTimeout(property.getConnectionTimeout());

@@ -1,26 +1,28 @@
 ext {
-
-//  springbootVersion = "3.2.0"
-//  springDependencyManagementVersion = "1.1.4"
-//  springIntegrationVersion = "6.2.0"
   springbootVersion = "2.7.17"
   springDependencyManagementVersion = "1.0.15.RELEASE"
   springIntegrationVersion = "5.5.19"
 
+//  springbootVersion = "3.2.2"
+//  springDependencyManagementVersion = "1.1.4"
+//  springIntegrationVersion = "6.2.1"
+
   lombokVersion = "1.18.30"
-  jacksonVersion = "2.15.3"
-  guavaVersion = '32.1.3-jre'
-  fastjson2Version = '2.0.42'
-  commonsIOVersion = "2.15.0"
-  commonsLang3Version = "3.13.0"
-  slf4jVersion = '2.0.9'
-  hutoolVersion = '5.8.23'
+  jacksonVersion = "2.16.1"
+  guavaVersion = "33.0.0-jre"
+  caffeineVersion = '3.1.8'
+  fastjson2Version = "2.0.45"
+  commonsIOVersion = "2.15.1"
+  commonsLang3Version = "3.14.0"
+  slf4jVersion = "2.0.11"
+  hutoolVersion = "5.8.25"
+  cglibVersion = "3.3.0"
+  nettyAllVersion = "4.1.106.Final"
 
   aspectjVersion = "1.9.20"
   swaggerVersion = "3.0.0"
   knife4jVersion = "4.3.0"
   jjwtVersion = "0.12.3"
-  nettyAllVersion = '4.1.101.Final'
   vertxVersion = "4.4.6"
 
   rxJavaVersion = '2.2.21'
@@ -49,12 +51,9 @@ subprojects {
   version = "2.4.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_11
-    // 默认是spring环境
-    springEnv = true
-    springTest = true
+    compatibilityVersion = JavaVersion.VERSION_17
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
-    scriptFile = "${getRootDir()}/buildSystem/base.gradle"
+    scriptFile = "${getRootDir()}/gradleScript/base.gradle"
 
     groupId = "$group"
     artifactPrefix = ""
@@ -76,7 +75,6 @@ subprojects {
       compileOnly(commons)
       testImplementation(commons)
     }
-
   }
 
   repositories {
@@ -88,34 +86,21 @@ subprojects {
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/release' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    mavenCentral()
 
-    try {
+    def nexusFile = file("${rootDir}/nexus.properties")
+    if (nexusFile.exists() && nexusFile.length() > 0) {
+      def props = new Properties()
+      props.load(nexusFile.newReader("UTF-8"))
+      //println("props ==>: ${props}")
       maven {
-        url = repoUrl
+        url = props["repoUrl"]
         allowInsecureProtocol = true
         credentials {
-          username repoUsername
-          password repoPassword
+          username props["repoUsername"]
+          password props["repoPassword"]
         }
       }
-    } catch(Exception ignore) {}
-  }
-
-  afterEvaluate {
-    try {
-      if(project.ext.versionFlag) {
-        def path = sourceSets.main.resources.srcDirs
-            .stream()
-            .filter({ it2 -> it2.getName().equalsIgnoreCase("resources") })
-            .findFirst()
-            .orElse(sourceSets.main.resources.srcDirs[0])
-            .getAbsolutePath()
-        def file = new File(path, "version.properties")
-        file.text = "build.version=${version}" +
-            "\nbuild.date=${new Date().format('yyyy-MM-dd HH:mm')}"
-      }
-    } catch (e) {
-      //e.printStackTrace()
     }
   }
 }

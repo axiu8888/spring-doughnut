@@ -1,36 +1,50 @@
 //plugins {
-//    id 'org.springframework.boot' version "$springbootVersion"
-//    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
-//    id 'java'
-//    id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
+//  id 'java'
+//  id 'org.springframework.boot' version "${springbootVersion}"
+//  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 //}
 
+//apply plugin: 'java'
 apply plugin: 'java-library'
-apply plugin: 'java'
-apply plugin: 'idea'
 
-//beforeEvaluate { }
+//ext {
+//  springbootVersion = "3.2.2"
+//  springDependencyManagementVersion = "1.1.4"
+//  springIntegrationVersion = "6.2.1"
+//
+//  lombokVersion = "1.18.30"
+//  guavaVersion = "33.0.0-jre"
+//  caffeineVersion = '3.1.8'
+//  fastjson2Version = "2.0.45"
+//  commonsIOVersion = "2.15.1"
+//  commonsLang3Version = "3.14.0"
+//  slf4jVersion = "2.0.11"
+//  hutoolVersion = "5.8.25"
+//  cglibVersion = "3.3.0"
+//  nettyAllVersion = "4.1.106.Final"
+//}
 
 // build后加载
 afterEvaluate {
   trying({
     def ma = project.ext.manifestAttributes as Map
     jar { manifest.attributes(ma) }
-    sourcesJar { manifest.attributes(ma) }
+    sourceJar { manifest.attributes(ma) }
     javadocJar { manifest.attributes(ma) }
   })
 }
 
 trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
 
-//archivesBaseName = "${getProject().name}"
-
-sourceCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
-targetCompatibility = trying({ project.ext.compatibilityVersion }, JavaVersion.VERSION_1_8)
+java {
+  sourceCompatibility = trying({ javaVersion }, JavaVersion.VERSION_17)
+  targetCompatibility = trying({ javaVersion }, JavaVersion.VERSION_17)
+}
 
 compileJava {
   options.compilerArgs << '-parameters' // 防止方法的参数名变成 arg0、arg1...
 }
+
 compileTestJava {
   options.compilerArgs << '-parameters' // 防止方法的参数名变成 arg0、arg1...
 }
@@ -38,46 +52,47 @@ compileTestJava {
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
 }
+
 tasks.withType(Javadoc) {
   options.encoding = "UTF-8"
   options.addStringOption('Xdoclint:none', '-quiet')
   options.addStringOption('encoding', 'UTF-8')
-  options.addStringOption('charSet', 'UTF-8')
+  options.addStringOption('charset', 'UTF-8')
 }
 
 trying({
-  trying({
-    jar {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-      from project.sourceSets.main.resources
-    }
-  })
-
-  task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+  jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from project.sourceSets.main.resources
   }
 
-  task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+  tasks.register('sourceJar', Jar) {
+    dependsOn classes
+    archiveClassifier = 'sources'
+    from project.sourceSets.main.allSource
+  }
+
+  tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
   }
 
   // 拷贝所有依赖的Jar包到lib目录下
-  task copyJars(type: Copy) {
+  tasks.register('copyJars', Copy) {
     from configurations.runtimeClasspath
     into "${buildDir}/libs/lib" // 目标位置
   }
 
   processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    [
-        project.sourceSets.main.resources,
-        "src/main/java",
-    ].forEach {
+    project.sourceSets.main.allSource.forEach {
+      it
       from(it) {
         exclude '**/*.java'
         exclude '**/*.kt'
+        exclude '**/*.groovy'
+        exclude '**/licence.txt'
         include '**/**'
       }
     }
@@ -85,28 +100,31 @@ trying({
 
   processTestResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    [
-        project.sourceSets.test.resources,
-        "src/test/java",
-    ].forEach {
+    project.sourceSets.test.allSource.forEach {
       from(it) {
         exclude '**/*.java'
         exclude '**/*.kt'
+        exclude '**/*.groovy'
+        exclude '**/licence.txt'
         include '**/**'
       }
     }
   }
+
 })
 
 artifacts {
-  archives sourcesJar
-  //archives javadocJar
+  archives jar
+  archives sourceJar
+  archives javadocJar
 }
 
 configurations {
-  developmentOnly
-  runtimeClasspath {
-    extendsFrom developmentOnly
+  if (springEnv) {
+    developmentOnly
+    runtimeClasspath {
+      extendsFrom developmentOnly
+    }
   }
   compileOnly {
     extendsFrom annotationProcessor
@@ -122,60 +140,47 @@ repositories {
   maven { url 'https://repo.spring.io/milestone' }
   maven { url 'https://repo.spring.io/release' }
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  mavenCentral()
 
-  trying({
-    maven {
-      url = repoUrl
-      allowInsecureProtocol = true
-      credentials {
-        username repoUsername
-        password repoPassword
+  def nexusFile = file("${rootDir}/nexus.properties")
+  if (nexusFile.exists() && nexusFile.length() > 0) {
+    def props = new Properties()
+    props.load(nexusFile.newReader("UTF-8"))
+    //println("props ==>: ${props}")
+    trying({
+      maven {
+        url = props["repoUrl"]
+        allowInsecureProtocol = true
+        credentials {
+          username props["repoUsername"]
+          password props["repoPassword"]
+        }
       }
-    }
-  })
-}
-
-
-ext {
-  lombokVersion = trying({ project.ext.lombokVersion }, "1.18.30")
-  jacksonVersion = trying({ project.ext.jacksonVersion }, "2.15.3")
-  guavaVersion = trying({ project.ext.guavaVersion }, '32.1.3-jre')
-  caffeineVersion = trying({ project.ext.caffeineVersion }, '3.1.8')
-  fastjson2Version = trying({ project.ext.fastjson2Version }, '2.0.42')
-  commonsIOVersion = trying({ project.ext.commonsIOVersion }, "2.15.0")
-  commonsLang3Version = trying({ project.ext.commonsLang3Version }, "3.13.0")
-  slf4jVersion = trying({ project.ext.slf4jVersion }, '2.0.9')
-  hutoolVersion = trying({ project.ext.hutoolVersion }, '5.8.23')
-  cglibVersion = trying({ project.ext.cglibVersion }, '3.3.0')
-
-  if (trying({ project.ext.springEnv }, false)) {
-    set('springCloudVersion', "2023.0.0")
+    })
   }
 }
 
 dependencies {
-  def libsApi = trying({ project.ext.libsApi }, false)
+  def useApi = trying({ project.ext.useApi }, false)
   [
       fileTree(dir: 'libs', include: ['*.jar']),
       fileTree(dir: 'libs/jar', include: ['*.jar'])
   ].forEach {
-    libsApi ? api(it) : implementation(it)
+    useApi ? api(it) : implementation(it)
   }
 
-  compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
-
-  annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-  compileOnly("org.projectlombok:lombok:${lombokVersion}")
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  testImplementation "org.projectlombok:lombok:${lombokVersion}"
   testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 
-//  compileOnly("org.slf4j:slf4j-api:${slf4jVersion}")
-//  testImplementation("org.slf4j:slf4j-api:${slf4jVersion}")
-//  //testImplementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
-//  testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+  compileOnly("org.slf4j:slf4j-api:${slf4jVersion}")
+  testImplementation("org.slf4j:slf4j-api:${slf4jVersion}")
+  //testImplementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+  testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
 
   [
-      //"javax.inject:javax.inject:1",
+
       //"com.google.code.findbugs:jsr305:3.0.2",
       "commons-io:commons-io:${commonsIOVersion}",
       "org.apache.commons:commons-lang3:${commonsLang3Version}",
@@ -183,42 +188,54 @@ dependencies {
       "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}",
       "com.alibaba.fastjson2:fastjson2:${fastjson2Version}",
       "cn.hutool:hutool-all:${hutoolVersion}",
-      //"com.fasterxml.jackson.core:jackson-core:${jacksonVersion}",
-      "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
       "cglib:cglib:${cglibVersion}",
   ].forEach {
-    implementation(it)
-    testImplementation(it)
+    if (!it.isBlank()) {
+      useApi ? api(it) : implementation(it)
+      testImplementation(it)
+    }
   }
 
-  if (trying({ project.ext.springEnv }, false) || trying({ project.ext.springTest }, false)) {
-    compileOnly("org.springframework.boot:spring-boot-starter:${springbootVersion}")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}")
+  [
+      "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+  ].forEach {
+    compileOnly(it)
+  }
 
-    testImplementation("org.springframework.boot:spring-boot-starter:${springbootVersion}")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:${springbootVersion}")
 
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.2"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.6.2"
-  } else {
-    testImplementation 'junit:junit:4.13.2'
+  if (springEnv) {
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}"
+    [
+        "org.springframework.boot:spring-boot-starter:${springbootVersion}",
+    ].forEach {
+      useApi ? api(it) : implementation(it)
+      testImplementation(it)
+    }
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
   }
 
 }
 
-if (trying({ project.ext.springEnv }, false) || trying({ project.ext.springTest }, false)) {
-  tasks.named('test') {
-    useJUnitPlatform()
-  }
-  if (trying({ project.ext.springEnv }, false)) {
-    trying({
-      tasks.named('bootBuildImage') {
-        builder = "${project.group}/${project.artifactId}:latest"
-        environment = ['BP_NATIVE_IMAGE': 'true']
-      }
-    })
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+afterEvaluate {
+  try {
+    if (project.ext.versionFlag) {
+      def path = sourceSets.main.resources.srcDirs
+          .stream()
+          .filter({ it2 -> it2.getName().equalsIgnoreCase("resources") })
+          .findFirst()
+          .orElse(sourceSets.main.resources.srcDirs[0])
+          .getAbsolutePath()
+      def file = new File(path, "version.properties")
+      file.text = "build.version=${version}" +
+          "\nbuild.date=${new Date().format('yyyy-MM-dd HH:mm')}"
+    }
+  } catch (ignored) {/* ^_^ */
   }
 }
 
@@ -249,7 +266,7 @@ afterEvaluate {
         }
       }
 
-      sourcesJar {
+      sourceJar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         // compileClasspath、runtimeClasspath、testCompileClasspath、testRuntimeClasspath
         configurations.compileClasspath.collect {
@@ -265,8 +282,8 @@ afterEvaluate {
       }
 
       artifacts {
-        archives sourcesJar
-        //archives javadocJar
+        archives sourceJar
+        archives javadocJar
       }
     }
   })
@@ -279,7 +296,7 @@ afterEvaluate {
       apply plugin: 'maven-publish'
 
       def props = new Properties()
-      props.load(new FileReader("${getRootDir()}/nexus.properties"))
+      props.load(file("${rootDir}/nexus.properties").newReader("UTF-8"))
 
       afterEvaluate {
         publishing {
@@ -294,8 +311,8 @@ afterEvaluate {
 
               from components.java
               // 配置上传源码
-              artifact sourcesJar
-              //artifact javadocJar
+              artifact sourceJar
+              artifact javadocJar
             }
           }
 
@@ -316,6 +333,27 @@ afterEvaluate {
     }
   })
 }
+
+
+static <V> V trying(java.util.concurrent.Callable<V> call, V defaultValue = null, def print = false) {
+  try {
+    return call.call()
+  } catch (Exception e) {
+    if (print) {
+      e.printStackTrace()
+    }
+    return defaultValue
+  }
+}
+
+static void tryElse(Runnable r1, Runnable r2) {
+  try {
+    r1.run()
+  } catch (Exception ignored) {
+    r2.run()
+  }
+}
+
 
 /**
  * 查找项目
@@ -338,15 +376,4 @@ static Project findProject(Project root, String path) {
     }
   }
   return null
-}
-
-static <V> V trying(java.util.concurrent.Callable<V> call, V ops = null, def print = false) {
-  try {
-    return call.call()
-  } catch (Exception e) {
-    if (print) {
-      e.printStackTrace()
-    }
-    return ops
-  }
 }

@@ -1,0 +1,26 @@
+plugins {
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+}
+
+apply from: "${scriptFile}"
+
+version = ''
+
+jar {
+  archivesBaseName = "app"
+}
+
+dependencies {
+  [
+      //project(":all"),
+      project(":influxdb"),
+      "org.springframework.boot:spring-boot-starter",
+      "org.springframework.boot:spring-boot-starter-data-mongodb",
+  ].forEach {
+    implementation(it)
+  }
+
+}

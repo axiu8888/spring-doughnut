@@ -20,6 +20,7 @@ dependencies {
       ":influxdb",
       ":athenapdf",
       ":vertx-mqtt",
+      ":minio",
   ].forEach {
     api(project(it)) {
       exclude group: "org.springframework.boot"

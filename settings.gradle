@@ -80,6 +80,7 @@ include(
     ":services:file-server",                     // 文件服务
     ":services:nat-proxy",                       // NAT代理
     ":services:influxdb-tools",                  // InfluxDB工具
+    ":services:report-export",                   // 报告导出
 )
 
 include ":examples"

@@ -39,7 +39,7 @@ ext {
     def props = new Properties()
     props.load(new FileReader("${getRootDir()}/nexus.properties"))
     props.forEach(ext::set)
-  } catch (ignored) {/*~*/}
+  } catch (ignored) {/*^_^*/}
 
 }
 
@@ -51,7 +51,7 @@ subprojects {
   version = "2.4.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_17
+    compatibilityVersion = JavaVersion.VERSION_11
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
     scriptFile = "${getRootDir()}/gradleScript/base.gradle"
 

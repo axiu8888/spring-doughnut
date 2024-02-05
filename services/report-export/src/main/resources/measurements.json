@@ -1,0 +1,2936 @@
+{
+  "guard_info": {
+    "bluetooth_diastolic_blood": {
+      "column": "bluetooth_diastolic_blood",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "bluetooth_temperature": {
+      "column": "bluetooth_temperature",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "bluetooth_systolic_blood": {
+      "column": "bluetooth_systolic_blood",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    }
+  },
+  "hs_alarm": {
+    "temperatureAlarm": {
+      "column": "temperatureAlarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "spo2BatteryAlarm": {
+      "column": "spo2BatteryAlarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "source": {
+      "column": "source",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "temperatureBatteryAlarm": {
+      "column": "temperatureBatteryAlarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "data_type": {
+      "column": "data_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "elecMmhgBatteryAlarm": {
+      "column": "elecMmhgBatteryAlarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "deviceOutBatteryAlarm": {
+      "column": "deviceOutBatteryAlarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2Alarm": {
+      "column": "spo2Alarm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    }
+  },
+  "hs_all_rates": {
+    "srcIp": {
+      "column": "srcIp",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "resp_rate": {
+      "column": "resp_rate",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "heart_rate": {
+      "column": "heart_rate",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "source": {
+      "column": "source",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "gesture": {
+      "column": "gesture",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "spo2": {
+      "column": "spo2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "temperature": {
+      "column": "temperature",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "data_type": {
+      "column": "data_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "step": {
+      "column": "step",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "energy": {
+      "column": "energy",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    }
+  },
+  "hs_arrhythmia_alarm": {
+    "duration": {
+      "column": "duration",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_base_package": {
+    "arrhythmia_type": {
+      "column": "arrhythmia_type",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "abdomina_conn_state": {
+      "column": "abdomina_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "source": {
+      "column": "source",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "elec_mmhg_battery": {
+      "column": "elec_mmhg_battery",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "elec_mmhg_conn_state": {
+      "column": "elec_mmhg_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "temperature": {
+      "column": "temperature",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "ecg_conn_state": {
+      "column": "ecg_conn_state",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "resp_conn_state": {
+      "column": "resp_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_out_battery": {
+      "column": "device_out_battery",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_battery": {
+      "column": "device_battery",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "loss_package": {
+      "column": "loss_package",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "wifi_signal": {
+      "column": "wifi_signal",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "ap_mac": {
+      "column": "ap_mac",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "srcIp": {
+      "column": "srcIp",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "temperature_battery": {
+      "column": "temperature_battery",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2_battery": {
+      "column": "spo2_battery",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2_signal": {
+      "column": "spo2_signal",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2_probe_conn_state": {
+      "column": "spo2_probe_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "plus_rate": {
+      "column": "plus_rate",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_date": {
+      "column": "device_date",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2": {
+      "column": "spo2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "temperature_conn_state": {
+      "column": "temperature_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "data_type": {
+      "column": "data_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "spo2_conn_state": {
+      "column": "spo2_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_blood": {
+    "date": {
+      "column": "date",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "err": {
+      "column": "err",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "blood_hr": {
+      "column": "blood_hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "mode": {
+      "column": "mode",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "avg": {
+      "column": "avg",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "diastolic": {
+      "column": "diastolic",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "systolic": {
+      "column": "systolic",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "measure": {
+      "column": "measure",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "position": {
+      "column": "position",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    }
+  },
+  "hs_darma_mattress": {
+    "rr": {
+      "column": "rr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "sleep_flag": {
+      "column": "sleep_flag",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "hr": {
+      "column": "hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_no": {
+      "column": "device_no",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "points": {
+      "column": "points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "hr_points": {
+      "column": "hr_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "rr_points": {
+      "column": "rr_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_stress": {
+      "column": "min_stress",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_update": {
+      "column": "min_update",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "out_of_bed": {
+      "column": "out_of_bed",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_ratio": {
+      "column": "min_ratio",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "body_motion": {
+      "column": "body_motion",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "algorithm_version": {
+      "column": "algorithm_version",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_motion_time": {
+      "column": "min_motion_time",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_std_hr": {
+      "column": "min_std_hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_mean_rr": {
+      "column": "min_mean_rr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_score": {
+      "column": "min_score",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_motion_value": {
+      "column": "min_motion_value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "min_mean_hr": {
+      "column": "min_mean_hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "remarks": {
+      "column": "remarks",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_ecg_wave": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "point": {
+      "column": "point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_iew_alarm": {
+    "duration": {
+      "column": "duration",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_location": {
+    "lon": {
+      "column": "lon",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "personZid": {
+      "column": "personZid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "deviceId": {
+      "column": "deviceId",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "lat": {
+      "column": "lat",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_loss_package": {
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    }
+  },
+  "hs_mattress_package": {
+    "pulseWave": {
+      "column": "pulseWave",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "lowerLimbDirectCurrent": {
+      "column": "lowerLimbDirectCurrent",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "upperLimbBodyMovement": {
+      "column": "upperLimbBodyMovement",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "upperLimbDirectCurrent": {
+      "column": "upperLimbDirectCurrent",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "packageSn": {
+      "column": "packageSn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "outSpo2": {
+      "column": "outSpo2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "lowerLimbOriginal": {
+      "column": "lowerLimbOriginal",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "cough": {
+      "column": "cough",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "lowerLimbBodyMovement": {
+      "column": "lowerLimbBodyMovement",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "deviceId": {
+      "column": "deviceId",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "outHeartRate": {
+      "column": "outHeartRate",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "snore": {
+      "column": "snore",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "respiratoryWave": {
+      "column": "respiratoryWave",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "heartRate": {
+      "column": "heartRate",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2": {
+      "column": "spo2",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "upperLimbHeartImpact": {
+      "column": "upperLimbHeartImpact",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "lowerLimbHeartImpact": {
+      "column": "lowerLimbHeartImpact",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "outResp": {
+      "column": "outResp",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "personZid": {
+      "column": "personZid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "upperLimbOriginal": {
+      "column": "upperLimbOriginal",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_offline_algo": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    }
+  },
+  "hs_patient_alarm": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_realtime_alarm_record": {
+    "alarmconfig_zid": {
+      "column": "alarmconfig_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "alarm_value": {
+      "column": "alarm_value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "source": {
+      "column": "source",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "alarmconfig_id": {
+      "column": "alarmconfig_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "event_type": {
+      "column": "event_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "alarm_type": {
+      "column": "alarm_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "data_type": {
+      "column": "data_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "event_value": {
+      "column": "event_value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_resp_alarm": {
+    "duration": {
+      "column": "duration",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_resp_filter": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    }
+  },
+  "hs_resp_xyz_wave": {
+    "svm_point": {
+      "column": "svm_point",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "abdominal_resp_point": {
+      "column": "abdominal_resp_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "y_point": {
+      "column": "y_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "z_point": {
+      "column": "z_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "xyz_out_point": {
+      "column": "xyz_out_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "resp_point": {
+      "column": "resp_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "x_point": {
+      "column": "x_point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_routines_alarm": {
+    "duration": {
+      "column": "duration",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "type": {
+      "column": "type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_spo2_wave": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "point": {
+      "column": "point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_sport_point": {
+    "heat": {
+      "column": "heat",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "distance": {
+      "column": "distance",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "item_type": {
+      "column": "item_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "breakdown": {
+      "column": "breakdown",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "hr": {
+      "column": "hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "metabolic_equivalent": {
+      "column": "metabolic_equivalent",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "target_speed": {
+      "column": "target_speed",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "target_slope": {
+      "column": "target_slope",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "speed": {
+      "column": "speed",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "mac": {
+      "column": "mac",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "slope_ad_value": {
+      "column": "slope_ad_value",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "duration": {
+      "column": "duration",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "resistance_gears": {
+      "column": "resistance_gears",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "ble_name": {
+      "column": "ble_name",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "stage": {
+      "column": "stage",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "machine_state": {
+      "column": "machine_state",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "power": {
+      "column": "power",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "rotate_speed": {
+      "column": "rotate_speed",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_svm_wave": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "point": {
+      "column": "point",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_teleecg_wave_package": {
+    "packetSn": {
+      "column": "packetSn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V3_state": {
+      "column": "V3_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V5_state": {
+      "column": "V5_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "LL_state": {
+      "column": "LL_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "I": {
+      "column": "I",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "lastSn": {
+      "column": "lastSn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "hr": {
+      "column": "hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "deviceId": {
+      "column": "deviceId",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "firstSn": {
+      "column": "firstSn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVF": {
+      "column": "aVF",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "last_sn": {
+      "column": "last_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "packet_sn": {
+      "column": "packet_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVL": {
+      "column": "aVL",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "personZid": {
+      "column": "personZid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "V1": {
+      "column": "V1",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V2": {
+      "column": "V2",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVR": {
+      "column": "aVR",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V3": {
+      "column": "V3",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V4": {
+      "column": "V4",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V5": {
+      "column": "V5",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "II": {
+      "column": "II",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V4_state": {
+      "column": "V4_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V6": {
+      "column": "V6",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "III": {
+      "column": "III",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V2_state": {
+      "column": "V2_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "PCB": {
+      "column": "PCB",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V6_state": {
+      "column": "V6_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V1_state": {
+      "column": "V1_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "LA_state": {
+      "column": "LA_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "first_sn": {
+      "column": "first_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "RA_state": {
+      "column": "RA_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_teleecg_wave_point": {
+    "V3_state": {
+      "column": "V3_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V5_state": {
+      "column": "V5_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "LL_state": {
+      "column": "LL_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "I": {
+      "column": "I",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVF": {
+      "column": "aVF",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "packet_sn": {
+      "column": "packet_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVL": {
+      "column": "aVL",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V1": {
+      "column": "V1",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V2": {
+      "column": "V2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "aVR": {
+      "column": "aVR",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V3": {
+      "column": "V3",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V4": {
+      "column": "V4",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V5": {
+      "column": "V5",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "II": {
+      "column": "II",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V4_state": {
+      "column": "V4_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V6": {
+      "column": "V6",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "III": {
+      "column": "III",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V2_state": {
+      "column": "V2_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "PCB": {
+      "column": "PCB",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V6_state": {
+      "column": "V6_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "V1_state": {
+      "column": "V1_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "LA_state": {
+      "column": "LA_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "RA_state": {
+      "column": "RA_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_temperature": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "personZid": {
+      "column": "personZid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "mac": {
+      "column": "mac",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "voltage": {
+      "column": "voltage",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_tidal_volume": {
+    "item": {
+      "column": "item",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "value": {
+      "column": "value",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_tidal_volume_wave": {
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "point": {
+      "column": "point",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_trend_rates": {
+    "ews": {
+      "column": "ews",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "rr": {
+      "column": "rr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "spo2": {
+      "column": "spo2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "qsofa": {
+      "column": "qsofa",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "hr": {
+      "column": "hr",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "gesture": {
+      "column": "gesture",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "mhi": {
+      "column": "mhi",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_wave_package": {
+    "abdomina_conn_state": {
+      "column": "abdomina_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "ca_ratio": {
+      "column": "ca_ratio",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "source": {
+      "column": "source",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "abdominal_resp_points": {
+      "column": "abdominal_resp_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "ecg_conn_state": {
+      "column": "ecg_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "resp_conn_state": {
+      "column": "resp_conn_state",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "resp_points": {
+      "column": "resp_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "srcIp": {
+      "column": "srcIp",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "spo2_points": {
+      "column": "spo2_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "x_points": {
+      "column": "x_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "y_points": {
+      "column": "y_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "z_points": {
+      "column": "z_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "ei_ratio": {
+      "column": "ei_ratio",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "volume": {
+      "column": "volume",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "data_type": {
+      "column": "data_type",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "tidal_volume": {
+      "column": "tidal_volume",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "ecg_points": {
+      "column": "ecg_points",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_wave_point": {
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "resp": {
+      "column": "resp",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "abdominalRespX": {
+      "column": "abdominalRespX",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "ecg": {
+      "column": "ecg",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "svm": {
+      "column": "svm",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "package_sn": {
+      "column": "package_sn",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "abdominal_resp": {
+      "column": "abdominal_resp",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "spo2": {
+      "column": "spo2",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "save_time": {
+      "column": "save_time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "org_id": {
+      "column": "org_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "patient_id": {
+      "column": "patient_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "x": {
+      "column": "x",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "y": {
+      "column": "y",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "z": {
+      "column": "z",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "tidal_volume": {
+      "column": "tidal_volume",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "simulate": {
+      "column": "simulate",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "respX": {
+      "column": "respX",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "hs_wit_point": {
+    "angle_z": {
+      "column": "angle_z",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angle_y": {
+      "column": "angle_y",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angle_x": {
+      "column": "angle_x",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angular_velocity": {
+      "column": "angular_velocity",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "add_circle": {
+      "column": "add_circle",
+      "fieldType": "java.lang.Boolean",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "acceleration": {
+      "column": "acceleration",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angular_velocity_y": {
+      "column": "angular_velocity_y",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angular_velocity_z": {
+      "column": "angular_velocity_z",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "angular_velocity_x": {
+      "column": "angular_velocity_x",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "temperature": {
+      "column": "temperature",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "angle": {
+      "column": "angle",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "signal": {
+      "column": "signal",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "magnetic_field": {
+      "column": "magnetic_field",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "battery_level": {
+      "column": "battery_level",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_id": {
+      "column": "device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "device_sn": {
+      "column": "device_sn",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "version": {
+      "column": "version",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "acceleration_y": {
+      "column": "acceleration_y",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "acceleration_z": {
+      "column": "acceleration_z",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "magnetic_field_z": {
+      "column": "magnetic_field_z",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "magnetic_field_y": {
+      "column": "magnetic_field_y",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "acceleration_x": {
+      "column": "acceleration_x",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "magnetic_field_x": {
+      "column": "magnetic_field_x",
+      "fieldType": "java.lang.Double",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "boying12_device_id": {
+      "column": "boying12_device_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    }
+  },
+  "trend_back_data": {
+    "ews": {
+      "column": "ews",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "gesture_m": {
+      "column": "gesture_m",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "person_zid": {
+      "column": "person_zid",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    },
+    "qsofa": {
+      "column": "qsofa",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "hr_m": {
+      "column": "hr_m",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "gestrue_m": {
+      "column": "gestrue_m",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "rr_m": {
+      "column": "rr_m",
+      "fieldType": "java.lang.Long",
+      "index": 0,
+      "tag": false,
+      "timestamp": false
+    },
+    "time": {
+      "column": "time",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": true
+    },
+    "person_id": {
+      "column": "person_id",
+      "fieldType": "java.lang.String",
+      "index": 0,
+      "tag": true,
+      "timestamp": false
+    }
+  }
+}

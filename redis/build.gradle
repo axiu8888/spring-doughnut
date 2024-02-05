@@ -1,20 +1,19 @@
-
 apply from: "${scriptFile}"
 
 // 上传到nexus/maven仓库
 project.ext.upload = true
 
 dependencies {
-	api(project(":spring"))
-	api 'org.apache.commons:commons-pool2:2.12.0'
-	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-	api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
-	// redis
-	api "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
 
-//	def lombokVersion = "1.18.28"
-//	annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-//	implementation("org.projectlombok:lombok:${lombokVersion}")
-//	testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-//	testImplementation("org.projectlombok:lombok:${lombokVersion}")
+  [
+      project(":spring"),
+      'org.apache.commons:commons-pool2:2.12.0',
+      "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+      "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+      // redis
+      "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}",
+  ].forEach {
+    api(it)
+  }
+
 }

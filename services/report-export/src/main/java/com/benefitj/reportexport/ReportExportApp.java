@@ -61,8 +61,12 @@ public class ReportExportApp {
     personName = StringUtils.isBlank(personName) ? report.getStr("person_name") : personName;
     personName = StringUtils.isBlank(personName) ? "" : personName;
     dir = dir + personName + "__" + reportId + "/";
-    String task_startTime = StringUtils.getIfBlank(report.getStr("task_startTime"), () -> report.getStr("startTime"));
-    String task_endTime = StringUtils.getIfBlank(report.getStr("task_endTime"), () -> report.getStr("endTime"));
+    String task_startTime = report.getStr("task_startTime");
+    task_startTime = StringUtils.isBlank(task_startTime) ? report.getStr("startTime") : task_startTime;
+    task_startTime = StringUtils.isBlank(task_startTime) ? report.getStr("start_time") : task_startTime;
+    String task_endTime = report.getStr("task_endTime");
+    task_endTime = StringUtils.isBlank(task_endTime) ? report.getStr("endTime") : task_endTime;
+    task_endTime = StringUtils.isBlank(task_endTime) ? report.getStr("end_time") : task_endTime;
     startTime = StringUtils.isNotBlank(task_startTime) ? DateFmtter.parseToLong(task_startTime) : startTime;
     endTime = StringUtils.isNotBlank(task_endTime) ? DateFmtter.parseToLong(task_endTime) : endTime;
     try (final IWriter w = IWriter.createWriter(IOUtils.createFile(dir + "report.json"), false)) {

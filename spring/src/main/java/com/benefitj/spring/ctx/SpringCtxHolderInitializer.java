@@ -36,7 +36,7 @@ public class SpringCtxHolderInitializer implements ApplicationContextAware, Disp
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  final SpringCtxHolder holder = SpringCtxHolder.getInstance();
+  final SpringCtxHolder holder = SpringCtxHolder.get();
 
   @Override
   public void setApplicationContext(ApplicationContext context) throws BeansException {

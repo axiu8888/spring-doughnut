@@ -1,6 +1,7 @@
 package com.benefitj.spring.ctx;
 
 import com.benefitj.core.NetworkUtils;
+import com.benefitj.core.SingletonSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,25 +15,17 @@ import java.util.Map;
  */
 public class SpringCtxHolder {
 
-  public static SpringCtxHolder getInstance() {
-    return Holder.INSTANCE;
+  static final SingletonSupplier<SpringCtxHolder> singleton = SingletonSupplier.of(SpringCtxHolder::new);
+
+  static SpringCtxHolder get() {
+    return singleton.get();
   }
 
   public static ApplicationContext getCtx() {
-    return getInstance().getContext();
+    return get().getContext();
   }
 
-  private static final class Holder {
-
-    private static final SpringCtxHolder INSTANCE;
-
-    static {
-      INSTANCE = new SpringCtxHolder();
-    }
-
-  }
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   /**
    * Spring的ApplicationContext对象
@@ -41,7 +34,7 @@ public class SpringCtxHolder {
   /**
    * Spring是否已销毁
    */
-  private volatile boolean destroy = false;
+  volatile boolean destroy = false;
 
   private SpringCtxHolder() {
     // ~
@@ -55,7 +48,7 @@ public class SpringCtxHolder {
       throw new IllegalArgumentException("applicationContext属性未注入, 请在ApplicationContextAware中注入.");
     }
     if (isDestroy()) {
-      logger.warn("applicationContext已被销毁");
+      log.warn("applicationContext已被销毁");
     }
     return context;
   }
@@ -75,6 +68,30 @@ public class SpringCtxHolder {
    */
   protected void setContext(ApplicationContext context) {
     this.context = context;
+  }
+
+  /**
+   * 加载class
+   *
+   * @param className 全类名
+   * @return 返回加载的类
+   * @param <T> 类
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T> loadClass(String className) {
+    try {
+      ClassLoader classLoader = getCtx().getClassLoader();
+      return (Class<T>) classLoader.loadClass(className);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  /**
+   * 是否包含 Bean
+   */
+  public static boolean containsBean(String bean) {
+    return getCtx().containsBean(bean);
   }
 
   /**
@@ -103,6 +120,18 @@ public class SpringCtxHolder {
   /**
    * 获取某类型的bean
    *
+   * @param name Bean名
+   * @param type Class
+   * @param <T>  类型
+   * @return 返回类型的集合
+   */
+  public static <T> T getBean(String name, Class<T> type) {
+    return getCtx().getBean(name, type);
+  }
+
+  /**
+   * 获取某类型的bean
+   *
    * @param type Class
    * @param <T>  类型
    * @return 返回类型的集合
@@ -124,13 +153,6 @@ public class SpringCtxHolder {
                                                   boolean includeNonSingletons,
                                                   boolean allowEagerInit) {
     return getCtx().getBeansOfType(type, includeNonSingletons, allowEagerInit);
-  }
-
-  /**
-   * 是否包含 Bean
-   */
-  public static boolean containsBean(String bean) {
-    return getCtx().containsBean(bean);
   }
 
   /**

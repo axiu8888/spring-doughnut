@@ -6,7 +6,7 @@ import com.benefitj.spring.athenapdf.EnableAthenapdf;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
 import com.benefitj.spring.influxdb.spring.EnableInfluxDB;
 import com.benefitj.spring.listener.AppStateHook;
-import com.benefitj.spring.redis.EnableRedisMessageChannel;
+import com.benefitj.spring.redis.EnableRedisMessageListener;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @PropertySource(value = "classpath:/swagger-api-info.properties", encoding = "utf-8")
 @EnableSwaggerApi
-@EnableRedisMessageChannel
+@EnableRedisMessageListener
 @EnableHttpLoggingHandler       // HTTP请求日志
 @EnableRedisRateLimiter         // redis RateLimiter
 @EnableEventBusPoster           // eventbus

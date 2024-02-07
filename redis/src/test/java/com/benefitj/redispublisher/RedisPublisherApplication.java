@@ -4,7 +4,7 @@ import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
-import com.benefitj.spring.redis.EnableRedisMessageChannel;
+import com.benefitj.spring.redis.EnableRedisMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * redis通道消息发布
  */
 @Profile("pub")
-@EnableRedisMessageChannel
+@EnableRedisMessageListener
 @SpringBootApplication
 public class RedisPublisherApplication {
   public static void main(String[] args) {

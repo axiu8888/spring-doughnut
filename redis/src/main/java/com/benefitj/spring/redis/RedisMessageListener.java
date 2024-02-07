@@ -11,11 +11,12 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface RedisMessageChannel {
+public @interface RedisMessageListener {
   /**
    * example   channel:test
    *
    * @return 消息通道
    */
   String[] value();
+
 }

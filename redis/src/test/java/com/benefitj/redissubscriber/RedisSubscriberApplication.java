@@ -3,8 +3,8 @@ package com.benefitj.redissubscriber;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.OnAppStart;
-import com.benefitj.spring.redis.EnableRedisMessageChannel;
-import com.benefitj.spring.redis.RedisMessageChannel;
+import com.benefitj.spring.redis.EnableRedisMessageListener;
+import com.benefitj.spring.redis.RedisMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * redis通道消息订阅
  */
 @Profile("sub")
-@EnableRedisMessageChannel
+@EnableRedisMessageListener
 @SpringBootApplication
 public class RedisSubscriberApplication {
   public static void main(String[] args) {
@@ -37,7 +37,7 @@ public class RedisSubscriberApplication {
       EventLoop.main().execute(() -> log.info("{} start...", SpringCtxHolder.getAppName()));
     }
 
-    @RedisMessageChannel({"${spring.redis.subscribe-channel}"})
+    @RedisMessageListener({"${spring.redis.subscribe-channel}"})
     public void onMessage(String pattern, Message message) {
       // 处理消息
       log.info("接收到消息1: {}, pattern: {}"
@@ -46,7 +46,7 @@ public class RedisSubscriberApplication {
       );
     }
 
-    @RedisMessageChannel({"${spring.redis.subscribe-channel}"})
+    @RedisMessageListener({"${spring.redis.subscribe-channel}"})
     public void onMessage2(String pattern, Message message) {
       // 处理消息
       log.info("接收到消息2, {}, pattern: {}"

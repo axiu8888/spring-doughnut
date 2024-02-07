@@ -5,10 +5,9 @@ import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
+import com.benefitj.spring.ctx.SpringCtxHolder;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -19,32 +18,22 @@ import java.util.List;
 /**
  * Redis注册器
  */
-public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
-    implements MetadataHandler, ApplicationContextAware {
+public class RedisMessageListenerRegistrar extends AnnotationBeanProcessor implements MetadataHandler {
 
   private RedisMessageListenerContainer container;
 
   private ApplicationContext context;
 
-  public RedisMessageChannelRegistrar(RedisMessageListenerContainer container) {
+  public RedisMessageListenerRegistrar(RedisMessageListenerContainer container) {
     this.container = container;
     this.setMetadataHandler(this);
-    this.setResolver(new AnnotationResolverImpl(RedisMessageChannel.class));
-  }
-
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.context = applicationContext;
-  }
-
-  public ApplicationContext getContext() {
-    return context;
+    this.setResolver(new AnnotationResolverImpl(RedisMessageListener.class));
   }
 
   @Override
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
-      RedisMessageChannel rmc = metadata.getFirstAnnotation(RedisMessageChannel.class);
+      RedisMessageListener rmc = metadata.getFirstAnnotation(RedisMessageListener.class);
       String[] channels = rmc.value();
       if (channels.length <= 0) {
         continue;
@@ -58,21 +47,17 @@ public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
         }
         channel = channel.trim();
         if ((channel.startsWith("${") || channel.startsWith("#{")) && channel.endsWith("}")) {
-          StringBuilder sb = new StringBuilder(channel);
-          sb.delete(0, 2);
-          sb.delete(sb.length() - 1, sb.length());
-          channel = getContext().getEnvironment().getProperty(sb.toString());
+          channel = SpringCtxHolder.getEnvProperty(channel);
           if (StringUtils.isBlank(channel)) {
-            throw new IllegalStateException("redis channel不能为空: " + sb);
+            throw new IllegalStateException("redis channel不能为空: " + channel);
           }
-          String[] split = channel.split(",");
-          for (String ch : split) {
-            if (StringUtils.isNoneBlank(ch)) {
-              getContainer().addMessageListener(adapter, new PatternTopic(ch.trim()));
+          for (String subChannel : channel.split(",")) {
+            if (StringUtils.isNoneBlank(subChannel)) {
+              container.addMessageListener(adapter, new PatternTopic(subChannel.trim()));
             }
           }
         } else {
-          getContainer().addMessageListener(adapter, new PatternTopic(channel));
+          container.addMessageListener(adapter, new PatternTopic(channel));
         }
       }
     }
@@ -88,19 +73,10 @@ public class RedisMessageChannelRegistrar extends AnnotationBeanProcessor
     SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
     MessageListenerAdapter adapter = new MessageListenerAdapter();
     // 代理对象
-    adapter.setDelegate((MessageListener) (message, pattern)
-        -> invoker.invoke(message, pattern, new String(pattern)));
+    adapter.setDelegate((MessageListener) (message, pattern) -> invoker.invoke(message, pattern, new String(pattern)));
     // 代理方法
     adapter.setDefaultListenerMethod("onMessage");
     return adapter;
-  }
-
-  public RedisMessageListenerContainer getContainer() {
-    return container;
-  }
-
-  public void setContainer(RedisMessageListenerContainer container) {
-    this.container = container;
   }
 
 }

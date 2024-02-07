@@ -604,7 +604,7 @@ class InfluxApiDBApiTest {
                 .spo2(rates != null ? rates.getIntValue("spo2", 0) : 0)
                 .gesture(rates != null ? rates.getIntValue("gesture", 0) : 0)
                 .build();
-            byte[] bytes = JavaStructManager.INSTANCE.toBytes(pkg);
+            byte[] bytes = JavaStructManager.get().toBytes(pkg);
 //            log.info("time: {}, data[{}]: {}, {}"
 //                , DateFmtter.fmt(c.getTime())
 //                , bytes.length

@@ -51,9 +51,9 @@ subprojects {
   version = "2.4.0-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_11
+    compatibilityVersion = JavaVersion.VERSION_15
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
-    scriptFile = "${getRootDir()}/gradleScript/base.gradle"
+    scriptFile = "${rootDir}/gradleScript/base.gradle"
 
     groupId = "$group"
     artifactPrefix = ""
@@ -78,21 +78,20 @@ subprojects {
   }
 
   repositories {
-    maven { url("https://maven.aliyun.com/repository/google") }
-    maven { url("https://maven.aliyun.com/repository/central") }
-    maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
-    maven { url("https://maven.aliyun.com/repository/public") }
-    maven { url("https://maven.aliyun.com/repository/jcenter") }
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/release' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url "https://maven.aliyun.com/repository/google" }
+    maven { url "https://maven.aliyun.com/repository/central" }
+    maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+    maven { url "https://maven.aliyun.com/repository/public" }
+    maven { url "https://maven.aliyun.com/repository/jcenter" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/release" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     mavenCentral()
 
     def nexusFile = file("${rootDir}/nexus.properties")
     if (nexusFile.exists() && nexusFile.length() > 0) {
       def props = new Properties()
       props.load(nexusFile.newReader("UTF-8"))
-      //println("props ==>: ${props}")
       maven {
         url = props["repoUrl"]
         allowInsecureProtocol = true

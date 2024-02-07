@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
-public class WebSocketTest {
+class WebSocketTest {
 
   public void setup() {
   }

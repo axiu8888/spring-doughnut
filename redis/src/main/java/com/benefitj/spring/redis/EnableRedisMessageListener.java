@@ -11,10 +11,10 @@ import java.lang.annotation.*;
  * @author dingxiaun
  */
 @Lazy
-@Import(RedisMessageChannelConfiguration.class)
+@Import(RedisMessageListenerConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableRedisMessageChannel {
+public @interface EnableRedisMessageListener {
 }

@@ -14,7 +14,8 @@ ext {
   fastjson2Version = "2.0.45"
   commonsIOVersion = "2.15.1"
   commonsLang3Version = "3.14.0"
-  slf4jVersion = "2.0.11"
+  //slf4jVersion = "2.0.11"
+  slf4jVersion = "1.7.36"
   hutoolVersion = "5.8.25"
   cglibVersion = "3.3.0"
   nettyAllVersion = "4.1.106.Final"
@@ -59,6 +60,8 @@ subprojects {
     artifactPrefix = ""
     artifactId = "${getProject().name}"
     versionId = "${version}"
+
+    springEnv = true
 
     manifestAttributes = [
         "version"   : "$version",

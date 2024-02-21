@@ -34,7 +34,9 @@ afterEvaluate {
   })
 }
 
-trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
+if (!trying({ project.ext.springEnv }, false)) {
+  trying({ project.ext.springEnv = plugins.stream().anyMatch(p -> p.class.simpleName.contains("SpringBootPlugin")) })
+}
 
 java {
   sourceCompatibility = trying({ javaVersion }, JavaVersion.VERSION_17)
@@ -137,9 +139,9 @@ repositories {
   maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
   maven { url("https://maven.aliyun.com/repository/public") }
   maven { url("https://maven.aliyun.com/repository/jcenter") }
-  maven { url 'https://repo.spring.io/milestone' }
-  maven { url 'https://repo.spring.io/release' }
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  maven { url('https://repo.spring.io/milestone') }
+  maven { url('https://repo.spring.io/release') }
+  maven { url('https://oss.sonatype.org/content/repositories/snapshots/') }
   mavenCentral()
 
   trying({
@@ -168,13 +170,10 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   testImplementation "org.projectlombok:lombok:${lombokVersion}"
   testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-  //testImplementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
-  //testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
-
   [
-      "org.slf4j:slf4j-api:${slf4jVersion}",
-      'ch.qos.logback:logback-classic:1.4.14',
+      //"org.slf4j:slf4j-api:${slf4jVersion}",
+      //"org.slf4j:slf4j-log4j12:${slf4jVersion}",
+      //'ch.qos.logback:logback-classic:1.4.14',
       'com.google.code.findbugs:jsr305:3.0.2',
       //"org.jetbrains:annotations:24.1.0",
       "commons-io:commons-io:${commonsIOVersion}",
@@ -186,7 +185,16 @@ dependencies {
       "cglib:cglib:${cglibVersion}",
   ].forEach {
     if (!it.isBlank()) {
-      useApi ? api(it) : implementation(it)
+      if(useApi) {
+        api(it) {
+          exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        }
+
+      } else {
+        implementation(it) {
+          exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        }
+      }
       testImplementation(it)
     }
   }
@@ -200,7 +208,7 @@ dependencies {
   }
 
 
-  if (springEnv) {
+  if (project.ext.springEnv) {
     developmentOnly "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}"
     [
@@ -212,7 +220,14 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
   }
 
-  testImplementation('junit:junit:4.13.2')
+  [
+      "org.junit.platform:junit-platform-launcher:1.10.1",
+      "org.junit.jupiter:junit-jupiter-engine:5.10.1",
+      "org.junit.vintage:junit-vintage-engine:5.10.1",
+  ].forEach {
+    testImplementation(it)
+  }
+
 }
 
 tasks.named('test') {

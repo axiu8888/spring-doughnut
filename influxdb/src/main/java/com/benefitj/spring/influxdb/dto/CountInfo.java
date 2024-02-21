@@ -1,5 +1,7 @@
 package com.benefitj.spring.influxdb.dto;
 
+import com.alibaba.fastjson2.JSONObject;
+
 /**
  * 统计信息
  */
@@ -25,6 +27,10 @@ public class CountInfo {
    * 错误信息
    */
   private String error;
+  /**
+   * 统计详情
+   */
+  private JSONObject details = new JSONObject();
 
   public CountInfo() {
   }
@@ -84,4 +90,11 @@ public class CountInfo {
     return getError() != null;
   }
 
+  public JSONObject getDetails() {
+    return details;
+  }
+
+  public void setDetails(JSONObject details) {
+    this.details = details;
+  }
 }

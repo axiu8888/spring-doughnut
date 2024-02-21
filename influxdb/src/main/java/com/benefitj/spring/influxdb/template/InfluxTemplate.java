@@ -402,14 +402,14 @@ public interface InfluxTemplate {
     // count
     String sql = String.format("SELECT count(%s) AS count %s", column, clause)
         // first
-        + String.format("; SELECT %s AS first %s ORDER BY time ASC LIMIT 1", column, clause)
+        + String.format("; SELECT first(%s) AS first %s ORDER BY time ASC LIMIT 1", column, clause)
         // last
-        + String.format("; SELECT %s AS last %s ORDER BY time DESC LIMIT 1", column, clause);
-    final CountInfo countInfo = new CountInfo();
-    countInfo.setSql(sql);
+        + String.format("; SELECT last(%s) AS last %s ORDER BY time DESC LIMIT 1", column, clause);
+    final CountInfo info = new CountInfo();
+    info.setSql(sql);
     query(db, sql, 100).subscribe(qr -> {
       if (qr.hasError()) {
-        countInfo.setError(qr.getError());
+        info.setError(qr.getError());
         return;
       }
 
@@ -422,21 +422,30 @@ public interface InfluxTemplate {
           .forEach(series -> {
             c.setSeries(series);
             c.setPosition(0);
-            Long count = c.getLong("count");
-            if (count != null) {
-              countInfo.setCount(count);
-            }
-            Object first = c.getValue("first", null);
-            if (first != null) {
-              countInfo.setStartTime(c.getTime());
-            }
-            Object last = c.getValue("last", null);
-            if (last != null) {
-              countInfo.setEndTime(c.getTime());
+            if (column.equalsIgnoreCase("*")) {
+              for (String columnName : c.getColumns()) {
+                if (columnName.equalsIgnoreCase("time")) {
+                  continue;
+                }
+                info.getDetails().put(columnName, c.getValue(columnName, null));
+                if (columnName.startsWith("count")) {
+                  info.setCount(Math.max(c.getLong(columnName, 0L), info.getCount()));
+                } else if (columnName.startsWith("first")) {
+                  if (c.getValue(columnName, null) != null)
+                    info.setStartTime(c.getTime());
+                } else if (columnName.startsWith("last")) {
+                  if (c.getValue(columnName, null) != null)
+                    info.setEndTime(c.getTime());
+                }
+              }
+            } else {
+              info.setCount(Math.max(c.getLong("count", 0L), info.getCount()));
+              if (c.getValue("first", null) != null) info.setStartTime(c.getTime());
+              if (c.getValue("last", null) != null) info.setEndTime(c.getTime());
             }
           });
     });
-    return countInfo;
+    return info;
   }
 
   /**
@@ -855,7 +864,7 @@ public interface InfluxTemplate {
    * get QueryResult.Result list
    */
   default List<QueryResult.Result> getResults(QueryResult result) {
-    if(checkResult(result))
+    if (checkResult(result))
       return result.getResults();
     throw new IllegalStateException(result.getError());
   }

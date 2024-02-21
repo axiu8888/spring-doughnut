@@ -86,7 +86,7 @@ public class ReportExportApp {
     }
 
     for (String measurement : tables) {
-      if (influxTemplate.queryCountInfo(measurement, "package_sn", startTime, endTime).getCount() > 10) {
+      if (influxTemplate.queryCountInfo(measurement, "*", startTime, endTime).getCount() > 10) {
         try (final FileWriterImpl writer = (FileWriterImpl) IWriter.createWriter(dir + measurement + ".json", false);) {
           String sql = "select * from " + measurement + " where"
               + " time >= '" + DateFmtter.fmtUtc(startTime) + "'"

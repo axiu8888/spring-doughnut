@@ -18,6 +18,8 @@ import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
@@ -27,11 +29,14 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * MQTT注册器
  */
 public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implements MetadataHandler, DisposableBean {
+
+  static final Logger log = LoggerFactory.getLogger(MqttMessageMetadataRegistrar.class);
 
   /**
    * 代理
@@ -90,7 +95,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         }
         PahoMqttClient client = new PahoMqttClient(opts, id);
         client.setExecutor(EventLoop.newSingle(false));
-        client.getExecutor().execute(() -> {});
+        client.getExecutor().execute(() -> {
+        });
         // 自动重连
         client.setAutoReconnect(true);
         // 重新连接的间隔
@@ -112,21 +118,33 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
                            MqttCallbackDispatcher dispatcher,
                            MqttMessageListener listener) {
     final SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
-
     MqttMessageSubscriber<MqttMessage> subscriber = (topic, msg) -> {
-      Message<?> message = getMessageConverter().toMessage(topic, msg);
-      invoker.invoke(topic, msg.getPayload(), msg, message, message.getHeaders());
+      if (listener.async()) {
+        EventLoop.asyncIO(() -> {
+          try {
+            Message<?> message = getMessageConverter().toMessage(topic, msg);
+            invoker.invoke(topic, msg.getPayload(), message, msg, message.getHeaders());
+          } catch (Throwable e) {
+            log.error("mqtt error: " + e.getMessage(), e);
+          }
+        });
+      } else {
+        try {
+          Message<?> message = getMessageConverter().toMessage(topic, msg);
+          invoker.invoke(topic, msg.getPayload(), message, msg, message.getHeaders());
+        } catch (Throwable e) {
+          log.error("mqtt error: " + e.getMessage(), e);
+        }
+      }
     };
     // dispatcher.subscribe(topics, subscriber);
-    for (String topic : listener.topics()) {
-      String realTopic = topic.startsWith("${") || topic.startsWith("#{")
-          ? SpringCtxHolder.getEnvProperty(topic)
-          : topic;
-      if (StringUtils.isNotBlank(realTopic)) {
-        topic = realTopic;
-      }
-      dispatcher.subscribe(topic, subscriber);
-    }
+    Stream.of(listener.topics())
+        .map(String::trim)
+        .filter(StringUtils::isNotBlank)
+        .map(topic -> (topic.startsWith("${") || topic.startsWith("#{")) && topic.endsWith("}")
+            ? SpringCtxHolder.getEnvProperty(topic)
+            : topic)
+        .forEach(topic -> dispatcher.subscribe(topic, subscriber));
 
     try {
       if (!client.isConnected()) {

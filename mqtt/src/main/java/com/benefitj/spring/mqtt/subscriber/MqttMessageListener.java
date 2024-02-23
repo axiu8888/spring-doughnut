@@ -38,4 +38,9 @@ public @interface MqttMessageListener {
    */
   String serverURI() default "";
 
+  /**
+   * 是否异步执行
+   */
+  boolean async() default false;
+
 }

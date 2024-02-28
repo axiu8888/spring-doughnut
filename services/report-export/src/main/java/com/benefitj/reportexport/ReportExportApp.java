@@ -57,6 +57,10 @@ public class ReportExportApp {
       EventLoop.asyncIO(() -> System.exit(0), 5000);
       return;
     }
+    if (SpringCtxHolder.getEnvProperty("tables", "").trim().equals("*")) {
+      tables = influxTemplate.getMeasurements().toArray(new String[0]);
+    }
+
     String personName = report.getStr("personName");
     personName = StringUtils.isBlank(personName) ? report.getStr("person_name") : personName;
     personName = StringUtils.isBlank(personName) ? "" : personName;

@@ -1,6 +1,8 @@
 package com.benefitj.spring.listener;
 
 
+import org.springframework.util.function.SingletonSupplier;
+
 import java.util.*;
 
 /**
@@ -8,8 +10,10 @@ import java.util.*;
  */
 public final class AppStateHook {
 
-  public static AppStateHook getInstance() {
-    return Holder.INSTANCE;
+  static final SingletonSupplier<AppStateHook> singleton = SingletonSupplier.of(AppStateHook::new);
+
+  public static AppStateHook get() {
+    return singleton.get();
   }
 
   /**
@@ -18,7 +22,7 @@ public final class AppStateHook {
    * @param listener 监听
    */
   public static void register(AppStateListener listener) {
-    getInstance().put(listener, listener);
+    get().put(listener, listener);
   }
 
   /**
@@ -37,7 +41,7 @@ public final class AppStateHook {
    * @param listener 监听
    */
   public static void registerStart(AppStartListener listener) {
-    getInstance().put(listener, new AppStateListenerWrapper(listener));
+    get().put(listener, new AppStateListenerWrapper(listener));
   }
 
   /**
@@ -46,7 +50,7 @@ public final class AppStateHook {
    * @param listener 监听
    */
   public static void registerStop(AppStopListener listener) {
-    getInstance().put(listener, new AppStateListenerWrapper(listener));
+    get().put(listener, new AppStateListenerWrapper(listener));
   }
 
   /**
@@ -55,15 +59,7 @@ public final class AppStateHook {
    * @param listener 监听
    */
   public static void unregister(Object listener) {
-    getInstance().remove(listener);
-  }
-
-  static class Holder {
-    private static final AppStateHook INSTANCE;
-
-    static {
-      INSTANCE = new AppStateHook();
-    }
+    get().remove(listener);
   }
 
   private final Map<Object, AppStateListener> map = Collections.synchronizedMap(new LinkedHashMap<>());

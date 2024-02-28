@@ -13,8 +13,6 @@ public class AppStateEventAdapter {
 
   static final Logger log = LoggerFactory.getLogger(AppStateEventAdapter.class);
 
-  private AppStateHook registrar = AppStateHook.getInstance();
-
   private List<AppStateListener> listeners;
 
   public AppStateEventAdapter(List<AppStateListener> listeners) {
@@ -25,16 +23,16 @@ public class AppStateEventAdapter {
    * 程序启动
    */
   @EventListener(ApplicationReadyEvent.class)
-  public void onAppStart(ApplicationReadyEvent event) {
-    processAppStart(registrar.listeners(), event);
-    processAppStart(listeners, event);
+  public void onAppStart(ApplicationReadyEvent evt) {
+    processAppStart(AppStateHook.get().listeners(), evt);
+    processAppStart(listeners, evt);
   }
 
-  protected void processAppStart(List<AppStateListener> listeners, ApplicationReadyEvent event) {
+  protected void processAppStart(List<AppStateListener> listeners, ApplicationReadyEvent evt) {
     if (listeners != null && !listeners.isEmpty()) {
       for (AppStateListener l : listeners) {
         try {
-          l.onAppStart(event);
+          l.onAppStart(evt);
         } catch (Exception e) {
           log.error("throws: " + e.getMessage(), e);
         }
@@ -46,9 +44,9 @@ public class AppStateEventAdapter {
    * 程序结束
    */
   @EventListener(ContextClosedEvent.class)
-  public void onAppStop(ContextClosedEvent event) {
-    processAppStop(registrar.listeners(), event);
-    processAppStop(listeners, event);
+  public void onAppStop(ContextClosedEvent evt) {
+    processAppStop(AppStateHook.get().listeners(), evt);
+    processAppStop(listeners, evt);
   }
 
   protected void processAppStop(List<AppStateListener> listeners, ContextClosedEvent event) {

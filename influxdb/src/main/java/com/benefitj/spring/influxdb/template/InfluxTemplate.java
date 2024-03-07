@@ -10,8 +10,8 @@ import com.benefitj.spring.influxdb.InfluxUtils;
 import com.benefitj.spring.influxdb.convert.PointConverter;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
-import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -589,7 +589,7 @@ public interface InfluxTemplate {
    *
    * @param name          名称
    * @param database      数据库
-   * @param selectIntoSQL select into 语句
+   * @param selectIntoSQL select into 语句: select a,b,c from test where time >= now() - 1d into test2
    * @return 返回结果
    */
   default QueryResult createContinuousQuery(String name, String database, String selectIntoSQL) {

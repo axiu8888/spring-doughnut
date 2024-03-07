@@ -18,7 +18,7 @@ import com.benefitj.spring.influxdb.spring.InfluxWriteManagerConfiguration;
 import com.benefitj.spring.influxdb.template.*;
 import com.benefitj.spring.influxdb.write.InfluxWriteManager;
 import com.squareup.moshi.Moshi;
-import io.reactivex.Flowable;
+import io.reactivex.rxjava3.core.Flowable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -256,19 +256,44 @@ class InfluxApiDBApiTest {
   }
 
   /**
+   * 导入 line 文件
+   */
+  @Test
+  void test_delete() {
+    long startTime = TimeUtils.toDate(2000, 2, 10, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 2, 7, 23, 59, 0).getTime();
+    String condition = "";
+    for (String measurement : template.getMeasurements()) {
+      String sql = "delete from " + measurement + " where"
+          + " time >= '" + DateFmtter.fmtUtc(startTime) + "'"
+          + " AND time <= '" + DateFmtter.fmtUtc(endTime) + "'"
+          + StringUtils.getIfBlank(condition, () -> "");
+      List<QueryResult.Result> results = template.postQuery(template.getDatabase(), sql).getResults();
+      System.err.println(sql + "  ==>: \n " + JSON.toJSONString(results));
+    }
+  }
+
+
+  /**
    * 导出 line 文件
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2024, 1, 9, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 1, 9, 23, 59, 0).getTime();
+    long startTime = TimeUtils.toDate(2024, 2, 22, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 2, 23, 23, 59, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
 //    String condition = " AND device_no = '641938001136'";
 //    String condition = " AND (device_id != person_zid AND device_id != '01001080' AND device_id != '01001169' AND device_id != '01001148' AND device_id != '01001149' AND device_id != '01001192') ";
-    String condition = " AND device_id = '01000446'";
+    String condition = " AND (" +
+//        Stream.of("374e0249d96541e292a381ff433e6279", "a8a3954569ca4034a472bae6c70f7fe4", "374e0249d96541e292a381ff433e6279", "d8d4f6ec9936416fb40e4e56853a8eb5")
+        Stream.of("d8d4f6ec9936416fb40e4e56853a8eb5")
+            .distinct()
+            .map(id -> "person_zid = '" + id + "'")
+            .collect(Collectors.joining(" OR "))
+        + ")";
 //    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
@@ -296,6 +321,34 @@ class InfluxApiDBApiTest {
   public static class MeasurementInfo {
     String name;
     Map<String, FieldKey> fieldKeys;
+  }
+
+  /**
+   * 导入 line 文件
+   */
+  @Test
+  void test_loadLines2() {
+//    test_createSubscriptions();
+    List.of(new File("D:/tmp/influxdb").listFiles()).forEach(f -> {
+      IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb3", f.getName()), false);
+      IOUtils.readLines(f, (line, index) -> {
+        writer
+            .writeAndFlush(line
+                //.replaceAll("00000002", "00001154")
+                //.replaceAll("641938000513", "641938001103")
+                //.replaceAll("a8a3954569ca4034a472bae6c70f7fe4", "6cad258502024a35b6295a3f8b4ef4e5")
+            )
+            .writeAndFlush("\n");
+      });
+      writer.flushAndClose();
+    });
+
+    File dir = new File("D:/tmp/influxdb3");
+    upload(template, List.of(dir.listFiles(f -> f.length() > 20
+        //&& f.getName().endsWith(".line")
+        //&& f.getName().endsWith(".point")
+        && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
+    )), true);
   }
 
   /**
@@ -435,7 +488,7 @@ class InfluxApiDBApiTest {
       AtomicLong prev = new AtomicLong(0);
       AtomicLong current = new AtomicLong(0);
       template.write(new ProgressRequestBody(RequestBody.create(line, InfluxTemplate.MEDIA_TYPE_STRING), (totalLength, progress, done) -> {
-        log.info("file[{}], totalLength: {}, progress: {}, precent: {}, done: {}", line, totalLength, progress, progress / totalLength * 100f, done);
+        log.info("file[{}], totalLength: {}, progress: {}, percent: {}, done: {}", line, totalLength, progress, progress * 100f / totalLength, done);
         prev.set(current.get());
         current.set(progress);
       }));
@@ -635,30 +688,5 @@ class InfluxApiDBApiTest {
           }
         });
   }
-
-  @Test
-  void test_Spo2Point() {
-    IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb/tmp2.txt"), false);
-    template.query("select * from hs_oximeter_point where time > now() - 1d")
-        .subscribe(new QueryObserver() {
-          @Override
-          public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
-            writer.write(c.getTime() + " ," + c.getInteger("point") + ", " + DateFmtter.fmtS(c.getTime()));
-            writer.writeAndFlush("\n");
-          }
-        });
-  }
-
-  @Test
-  void test_Spo2Point2() {
-    int[] arr = new int[]{81,79,77,75,72,70,69,67,65,63,60,56,52,48,45,41,37,34,32,29,27,25,22,20,17,15,16,20,27,37,49,59,66,70,71,70,69,67,65,63,61,59,58,57,56,55,53,50,46,42};
-    System.err.println("len: " + arr.length);
-    long time = 1704770480000L;
-    for (int i = 0; i < arr.length; i++) {
-      System.err.println("time: " + DateFmtter.fmtS((time + i * 20L)));
-    }
-
-  }
-
 
 }

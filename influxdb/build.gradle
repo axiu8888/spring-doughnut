@@ -24,18 +24,19 @@ dependencies {
   [
 
       // OkHttp + RxJava + Retrofit
-      "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
+      "io.reactivex.rxjava3:rxjava:${rxJavaVersion}",
       "com.squareup.okhttp3:okhttp:${okHttpVersion}",
       "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
       "com.squareup.retrofit2:retrofit:${retrofitVersion}",
-      "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}",
+      "com.squareup.retrofit2:adapter-rxjava3:${retrofitVersion}",
       "com.squareup.retrofit2:converter-scalars:${retrofitVersion}",
       "com.squareup.retrofit2:converter-moshi:${retrofitVersion}",
       "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
       "com.squareup.retrofit2:converter-jackson:${retrofitVersion}",
 
       // 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
-      'org.msgpack:msgpack-core:0.9.3'
+      'org.msgpack:msgpack-core:0.9.8',
+      'org.msgpack:jackson-dataformat-msgpack:0.9.8',
 
   ].forEach {
     api(it) {

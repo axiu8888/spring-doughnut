@@ -1,7 +1,7 @@
 package com.benefitj.spring.influxdb;
 
 import com.benefitj.spring.influxdb.dto.QueryResult;
-import io.reactivex.Flowable;
+import io.reactivex.rxjava3.core.Flowable;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;

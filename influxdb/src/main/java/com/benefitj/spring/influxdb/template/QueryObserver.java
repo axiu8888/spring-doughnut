@@ -2,7 +2,7 @@ package com.benefitj.spring.influxdb.template;
 
 import com.benefitj.spring.influxdb.InfluxException;
 import com.benefitj.spring.influxdb.dto.QueryResult;
-import io.reactivex.subscribers.DefaultSubscriber;
+import io.reactivex.rxjava3.subscribers.DefaultSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

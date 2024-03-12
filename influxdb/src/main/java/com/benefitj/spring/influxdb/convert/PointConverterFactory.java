@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
 
+import com.benefitj.core.SingletonSupplier;
 import com.benefitj.spring.influxdb.dto.Point;
 
 import java.util.Map;
@@ -11,7 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PointConverterFactory extends AbstractConverterFactory<Point> {
 
-  public static final PointConverterFactory INSTANCE = new PointConverterFactory();
+  static final SingletonSupplier<PointConverterFactory> singleton = SingletonSupplier.of(PointConverterFactory::new);
+
+  public static PointConverterFactory get() {
+    return singleton.get();
+  }
 
   /**
    * converter cache

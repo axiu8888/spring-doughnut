@@ -1,5 +1,7 @@
 package com.benefitj.spring.influxdb.convert;
 
+import com.benefitj.core.SingletonSupplier;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LineProtocolConverterFactory extends AbstractConverterFactory<String> {
 
-  public static final LineProtocolConverterFactory INSTANCE = new LineProtocolConverterFactory();
+  static final SingletonSupplier<LineProtocolConverterFactory> singleton = SingletonSupplier.of(LineProtocolConverterFactory::new);
+
+  public static LineProtocolConverterFactory get() {
+    return singleton.get();
+  }
 
   /**
    * converter cache

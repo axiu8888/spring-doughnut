@@ -209,7 +209,7 @@ dependencies {
 
 
   if (project.ext.springEnv) {
-    developmentOnly "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
+    //developmentOnly "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springbootVersion}"
     [
         "org.springframework.boot:spring-boot-starter:${springbootVersion}",

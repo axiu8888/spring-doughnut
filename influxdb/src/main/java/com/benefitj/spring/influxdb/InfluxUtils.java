@@ -26,11 +26,11 @@ public class InfluxUtils {
   /**
    * point 转换器工厂
    */
-  private static final PointConverterFactory POINT_FACTORY = PointConverterFactory.INSTANCE;
+  private static final PointConverterFactory POINT_FACTORY = PointConverterFactory.get();
   /**
    * line protocol 转换器工厂
    */
-  private static final LineProtocolConverterFactory LINE_FACTORY = LineProtocolConverterFactory.INSTANCE;
+  private static final LineProtocolConverterFactory LINE_FACTORY = LineProtocolConverterFactory.get();
 
   /**
    * 获取point转换器

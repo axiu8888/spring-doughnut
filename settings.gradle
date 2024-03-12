@@ -81,6 +81,7 @@ include(
     ":services:nat-proxy",                       // NAT代理
     ":services:influxdb-tools",                  // InfluxDB工具
     ":services:report-export",                   // 报告导出
+    ":services:collector-relay",                 // 采集器中继座
 )
 
 include ":examples"

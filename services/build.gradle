@@ -14,7 +14,7 @@ subprojects {
         project(":eventbus"),
         project(":spring"),
 
-        'org.springframework.boot:spring-boot-devtools',
+        //'org.springframework.boot:spring-boot-devtools',
 
     ].forEach {
       implementation(it) {

@@ -16,7 +16,6 @@ import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import java.io.*;
@@ -342,23 +341,20 @@ public interface InfluxTemplate {
     long started = System.currentTimeMillis();
     getApi()
         .ping()
-        .subscribe(new SimpleSubscriber<Response<ResponseBody>>() {
-          @Override
-          public void onNext(@NotNull Response<ResponseBody> response) {
-            Headers headers = response.headers();
-            String version = "unknown";
-            for (String name : headers.toMultimap().keySet()) {
-              if (null != name && "X-Influxdb-Version".equalsIgnoreCase(name)) {
-                version = headers.get(name);
-                break;
-              }
+        .subscribe(SimpleSubscriber.create(response -> {
+          Headers headers = response.headers();
+          String version = "unknown";
+          for (String name : headers.toMultimap().keySet()) {
+            if (null != name && "X-Influxdb-Version".equalsIgnoreCase(name)) {
+              version = headers.get(name);
+              break;
             }
-            Pong pong = new Pong();
-            pong.setVersion(version);
-            pong.setResponseTime(System.currentTimeMillis() - started);
-            ref.set(pong);
           }
-        });
+          Pong pong = new Pong();
+          pong.setVersion(version);
+          pong.setResponseTime(System.currentTimeMillis() - started);
+          ref.set(pong);
+        }));
     return ref.get();
   }
 

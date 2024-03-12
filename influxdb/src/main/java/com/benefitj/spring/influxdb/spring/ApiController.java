@@ -117,7 +117,7 @@ public class ApiController {
     } catch (Exception e) {
       throw new IllegalStateException(e);
     } finally {
-      deleteTask.put(dir.getName(), EventLoop.asyncIO(() -> IOUtils.deleteFile(dir), apiOpts.getCacheDuration().getSeconds(), TimeUnit.SECONDS));
+      deleteTask.put(dir.getName(), EventLoop.asyncIO(() -> IOUtils.deleteFiles(dir), apiOpts.getCacheDuration().getSeconds(), TimeUnit.SECONDS));
     }
   }
 
@@ -143,7 +143,7 @@ public class ApiController {
           .map(ApiController::unzip)
           .forEach(template::write);
     } finally {
-      IOUtils.deleteFile(dir);
+      IOUtils.deleteFiles(dir);
     }
   }
 

@@ -38,7 +38,7 @@ public class InfluxConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public PointConverterFactory pointConverterFactory() {
-    return PointConverterFactory.INSTANCE;
+    return PointConverterFactory.get();
   }
 
   /**
@@ -47,7 +47,7 @@ public class InfluxConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public LineProtocolConverterFactory lineProtocolConverterFactory() {
-    return LineProtocolConverterFactory.INSTANCE;
+    return LineProtocolConverterFactory.get();
   }
 
 

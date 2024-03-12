@@ -279,22 +279,22 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2024, 2, 22, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 2, 23, 23, 59, 0).getTime();
+    long startTime = TimeUtils.toDate(2024, 3, 10, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 3, 11, 23, 59, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
 //    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
 //    String condition = " AND device_no = '641938001136'";
 //    String condition = " AND (device_id != person_zid AND device_id != '01001080' AND device_id != '01001169' AND device_id != '01001148' AND device_id != '01001149' AND device_id != '01001192') ";
-    String condition = " AND (" +
-//        Stream.of("374e0249d96541e292a381ff433e6279", "a8a3954569ca4034a472bae6c70f7fe4", "374e0249d96541e292a381ff433e6279", "d8d4f6ec9936416fb40e4e56853a8eb5")
-        Stream.of("d8d4f6ec9936416fb40e4e56853a8eb5")
-            .distinct()
-            .map(id -> "person_zid = '" + id + "'")
-            .collect(Collectors.joining(" OR "))
-        + ")";
-//    String condition = "";
+//    String condition = " AND (" +
+////        Stream.of("374e0249d96541e292a381ff433e6279", "a8a3954569ca4034a472bae6c70f7fe4", "374e0249d96541e292a381ff433e6279", "d8d4f6ec9936416fb40e4e56853a8eb5")
+//        Stream.of("d8d4f6ec9936416fb40e4e56853a8eb5")
+//            .distinct()
+//            .map(id -> "person_zid = '" + id + "'")
+//            .collect(Collectors.joining(" OR "))
+//        + ")";
+    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }

@@ -18,7 +18,7 @@ ext {
   slf4jVersion = "1.7.36"
   hutoolVersion = "5.8.25"
   cglibVersion = "3.3.0"
-  nettyAllVersion = "4.1.106.Final"
+  nettyAllVersion = "4.1.107.Final"
 
   aspectjVersion = "1.9.20"
   swaggerVersion = "3.0.0"

@@ -12,12 +12,12 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableEmitter;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
-import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -30,7 +30,7 @@ public class InfluxTemplateImpl implements InfluxTemplate {
 
   private InfluxOptions options;
   private InfluxApi api;
-  private PointConverterFactory converterFactory = PointConverterFactory.INSTANCE;
+  private PointConverterFactory converterFactory = PointConverterFactory.get();
   private JsonAdapter<QueryResult> jsonAdapter;
 
   public InfluxTemplateImpl() {
@@ -101,7 +101,7 @@ public class InfluxTemplateImpl implements InfluxTemplate {
       JsonAdapter<QueryResult> adapter = getJsonAdapter();
       try (final ResponseBody chunkedBody = response.body();
            final BufferedSource source = chunkedBody.source();) {
-        for (;;) {
+        for (; ; ) {
           QueryResult result = adapter.fromJson(source);
           if (result != null) {
             emitter.onNext(result);
@@ -149,19 +149,25 @@ public class InfluxTemplateImpl implements InfluxTemplate {
 
   protected <V> V execute(Flowable<QueryResult> o, Function<QueryResult, V> mapped) {
     AtomicReference<V> ref = new AtomicReference<>();
-    o.subscribe(new SimpleSubscriber<QueryResult>() {
-      @Override
-      public void onNext(@NotNull QueryResult result) {
+    CountDownLatch latch = new CountDownLatch(1);
+    o.subscribe(SimpleSubscriber.create(result -> {
+      try {
         ref.set(mapped.apply(result));
+      } finally {
+        latch.countDown();
       }
-
-      @Override
-      public void onError(Throwable e) {
+    }, e -> {
+      try {
         QueryResult qr = new QueryResult();
         qr.setError(e.getMessage());
         ref.set(mapped.apply(qr));
+      } finally {
+        latch.countDown();
       }
-    });
+    }));
+    try {
+      latch.await();
+    } catch (Exception ignored) { /* ^_^ */ }
     return ref.get();
   }
 

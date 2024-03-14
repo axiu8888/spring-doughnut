@@ -6,11 +6,12 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.core.file.slicer.FileFactory;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 public interface LineFileFactory extends FileFactory<LineFileWriter> {
 
   @Override
-  LineFileWriter create(File file);
+  LineFileWriter create(File dir, Charset charset);
 
 
   static LineFileFactory newFactory() {
@@ -20,9 +21,9 @@ public interface LineFileFactory extends FileFactory<LineFileWriter> {
   class LineFileFactoryImpl implements LineFileFactory {
 
     @Override
-    public LineFileWriter create(File dir) {
-      String filename = IdUtils.nextId(DateFmtter.fmtNow("yyyyMMdd_HHmmss") +"__", ".line", 15);
-      return new LineFileWriter(IOUtils.createFile(dir, filename));
+    public LineFileWriter create(File dir, Charset charset) {
+      String filename = IdUtils.nextId(DateFmtter.fmtNow("yyyyMMdd__") +"__", ".line", 15);
+      return new LineFileWriter(IOUtils.createFile(dir, filename), charset);
     }
 
   }

@@ -50,15 +50,15 @@ public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements In
    * @return 返回判断结果
    */
   public boolean isWritable() {
-    LineFileWriter writer = getWriter();
-    if (writer == null || writer.length() <= 0) {
+    LineFileWriter w = getWriter();
+    if (w == null || w.length() <= 0) {
       return false;
     }
-    if (writer.length() >= getMaxSize()) {
+    if (w.length() >= getMaxSize()) {
       return true;
     }
     long now = System.currentTimeMillis();
-    return (now - writer.getCreateTime() >= getDelay()) || (now - getLastWriteTime() >= getDelay());
+    return (now - w.getCreateTime() >= getDelay()) || (now - getLastWriteTime() >= getDelay());
   }
 
   public long getDelay() {

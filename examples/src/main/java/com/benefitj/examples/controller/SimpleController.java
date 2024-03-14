@@ -9,7 +9,7 @@ import com.benefitj.event.RawEvent;
 import com.benefitj.examples.vo.IdEvent;
 import com.benefitj.examples.vo.MultipartForm;
 import com.benefitj.spring.ServletUtils;
-import com.benefitj.spring.aop.AopIgnore;
+import com.benefitj.spring.aop.log.HttpLoggingIgnore;
 import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Api(tags = "测试demo")
@@ -45,7 +46,7 @@ public class SimpleController {
   RedisTemplate<String, Object> redisTemplate;
 
   @ApiOperation("限流: 5")
-  @AopRateLimiter(qps = 5)
+  @AopRateLimiter(qps = 5, timeout = 10, timeoutUnit = TimeUnit.SECONDS)
   @GetMapping("rateLimiter")
   public ResponseEntity<?> testRateLimiter(String id) {
     return ResponseEntity.ok("rateLimiter ==>: " + id + "\r\n" + "ip: " + ServletUtils.getIp() + "\n" + JSON.toJSONString(ServletUtils.getHeaderMap()));
@@ -62,7 +63,7 @@ public class SimpleController {
     return ResponseEntity.ok("id ==>: " + id);
   }
 
-  @AopIgnore
+  @HttpLoggingIgnore
   @ApiOperation("忽略EventBus")
   @GetMapping("/notPrint")
   public ResponseEntity<?> notPrint(String id) {
@@ -95,7 +96,6 @@ public class SimpleController {
     }
     return ResponseEntity.ok("上传成功");
   }
-
 
   @ApiOperation("下载文件")
   @GetMapping("/download")

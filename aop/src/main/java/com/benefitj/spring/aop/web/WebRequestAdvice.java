@@ -30,10 +30,7 @@ public class WebRequestAdvice extends AdviceImpl {
   /**
    * 切入点表达式
    */
-  @Pointcut(
-      "!execution(@com.benefitj.spring.aop.AopIgnore * *(..))" // 没有被AopIgnore注解注释
-          + " && ("
-          + " (@annotation(org.springframework.web.bind.annotation.RequestMapping)"
+  @Pointcut("(@annotation(org.springframework.web.bind.annotation.RequestMapping)"
           + " || @annotation(org.springframework.web.bind.annotation.RestController)"
           + " || @annotation(org.springframework.web.bind.annotation.GetMapping)"
           + " || @annotation(org.springframework.web.bind.annotation.PostMapping)"
@@ -46,7 +43,6 @@ public class WebRequestAdvice extends AdviceImpl {
           + " && ("
           + "(@within(com.benefitj.spring.aop.web.AopWebPointCut) && execution(public * *(..)))"// method
           + " || @annotation(com.benefitj.spring.aop.web.AopWebPointCut)"  // class
-          + ")"
           + ")"
   )
   public void pointcut() {

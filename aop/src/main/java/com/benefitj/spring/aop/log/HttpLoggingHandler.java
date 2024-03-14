@@ -56,26 +56,27 @@ public class HttpLoggingHandler implements WebPointCutHandler {
 
   public boolean support(JoinPoint point) {
     Method method = getMethod(point);
-    return method.isAnnotationPresent(HttpLoggingIgnore.class)
-        || method.getDeclaringClass().isAnnotationPresent(HttpLoggingIgnore.class);
+    if (method.isAnnotationPresent(HttpLoggingIgnore.class)) {
+      return false;
+    }
+    return !method.getDeclaringClass().isAnnotationPresent(HttpLoggingIgnore.class);
   }
 
   @Override
   public void doBefore(AopAdvice advice, JoinPoint point) {
     if (support(point)) {
-      return;
-    }
-    HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
-    if (hlc.printable()) {
-      ServletRequestAttributes attrs = getRequestAttributes();
-      if (attrs != null) {
-        try {
-          Map<String, Object> args = getPrintArgs();
-          Method method = checkProxy(((MethodSignature) point.getSignature()).getMethod(), point.getTarget());
-          fillPrintArgs(point, method, attrs, args);
-          hlc.customize(this, args);
-        } finally {
-          getPrintArgsLocal().remove();
+      HttpLoggingCustomizer hlc = getHttpLoggingCustomizer();
+      if (hlc.printable()) {
+        ServletRequestAttributes attrs = getRequestAttributes();
+        if (attrs != null) {
+          try {
+            Map<String, Object> args = getPrintArgs();
+            Method method = checkProxy(((MethodSignature) point.getSignature()).getMethod(), point.getTarget());
+            fillPrintArgs(point, method, attrs, args);
+            hlc.customize(this, args);
+          } finally {
+            getPrintArgsLocal().remove();
+          }
         }
       }
     }

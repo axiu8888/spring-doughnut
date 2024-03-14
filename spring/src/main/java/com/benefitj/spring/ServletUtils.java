@@ -70,6 +70,14 @@ public class ServletUtils {
   }
 
   /**
+   * 获取当前请求路径
+   */
+  public static String getRequestPath() {
+    HttpServletRequest request = getRequest();
+    return request.getContextPath() + request.getRequestURI();
+  }
+
+  /**
    * 获取当前请求的首部
    */
   public static String getHeader(String headerName) {

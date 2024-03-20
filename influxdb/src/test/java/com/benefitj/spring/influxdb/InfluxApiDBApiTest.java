@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -131,6 +132,11 @@ class InfluxApiDBApiTest {
 
     writeManager.write(line);
     writeManager.flush();
+  }
+
+  @Test
+  void testWriteFile() {
+    template.write(new File("D:/tmp/influxdb/hs_alarm.line"));
   }
 
   private String generateLine() {
@@ -279,12 +285,12 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2024, 3, 10, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 3, 11, 23, 59, 0).getTime();
+    long startTime = TimeUtils.toDate(2024, 3, 15, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 3, 16, 23, 59, 0).getTime();
 //    long endTime = TimeUtils.now();
 //    String condition = " AND device_id = '01001049'";
 //    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
-//    String condition = " AND person_zid = 'bb00f55818c54e4380d8f461224413f1'";
+    String condition = " AND (person_zid = 'f89ebf339a33442fbd0cf5764c7868f5' OR patient_id = 'f89ebf339a33442fbd0cf5764c7868f5')";
 //    String condition = " AND device_no = '641938001136'";
 //    String condition = " AND (device_id != person_zid AND device_id != '01001080' AND device_id != '01001169' AND device_id != '01001148' AND device_id != '01001149' AND device_id != '01001192') ";
 //    String condition = " AND (" +
@@ -294,7 +300,7 @@ class InfluxApiDBApiTest {
 //            .map(id -> "person_zid = '" + id + "'")
 //            .collect(Collectors.joining(" OR "))
 //        + ")";
-    String condition = "";
+//    String condition = "";
     File dir = IOUtils.createFile("D:/tmp/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
   }
@@ -687,6 +693,17 @@ class InfluxApiDBApiTest {
             writer.writeAndFlush("\n");
           }
         });
+  }
+
+  @Test
+  void test_write() {
+    String base64 = IOUtils.readFileAsString(new File("D:/tmp/influxdb/base64.txt"));
+    byte[] decode = Base64.getDecoder().decode(base64);
+    String str = new String(decode, StandardCharsets.UTF_8);
+    JSONObject json = JSON.parseObject(str);
+    byte[] pdf = Base64.getDecoder().decode(json.getJSONObject("postDataReport").getString("PDFContent"));
+    IOUtils.write(pdf, new File("D:/tmp/influxdb/test.pdf"), true);
+    log.info("str ==>: {}", str);
   }
 
 }

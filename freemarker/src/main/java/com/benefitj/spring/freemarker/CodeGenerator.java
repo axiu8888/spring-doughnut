@@ -8,8 +8,8 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -83,8 +83,7 @@ public class CodeGenerator {
    */
   public File writeFile(ClassDescriptor descriptor, File javaFile, String ftl) {
     String data = write(ftl, descriptor);
-    FileOutputStream fos = IOUtils.newFOS(javaFile);
-    IOUtils.write(fos, data);
+    IOUtils.write(data.getBytes(StandardCharsets.UTF_8), javaFile, false);
     return javaFile;
   }
 

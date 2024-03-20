@@ -28,7 +28,7 @@ public class InfluxdbToolsApp {
       InfluxOptions opts = SpringCtxHolder.getBean(InfluxOptions.class);
       boolean autoDelete = opts.getApi().isAutoDelete();
       if (autoDelete) {
-        ShutdownHook.register(() -> IOUtils.deleteFile(new File(opts.getApi().getCacheDir())));
+        ShutdownHook.register(() -> IOUtils.deleteFiles(new File(opts.getApi().getCacheDir())));
       }
     });
   }

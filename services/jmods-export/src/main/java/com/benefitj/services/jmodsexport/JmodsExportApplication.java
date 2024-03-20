@@ -95,7 +95,7 @@ public class JmodsExportApplication {
         , mods
     );
     File exportFile = new File(exportDir, exportName);
-    IOUtils.deleteFile(exportFile);
+    IOUtils.deleteFiles(exportFile);
     CmdCall call = CmdExecutor.get().call(cmd, null, exportDir);
     call.setProcess(null);
     System.err.println(JSON.toJSON(call));

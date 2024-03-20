@@ -99,7 +99,7 @@ public class FileController {
       return HttpResult.succeed(results);
     } finally {
       // 强制删除
-      IOUtils.deleteFile(tmpDir, true);
+      IOUtils.deleteFiles(tmpDir);
     }
   }
 

@@ -92,7 +92,7 @@ public class Client extends TcpNettyClient {
 
   @Override
   protected TcpNettyClient useDefaultConfig() {
-    this.autoReconnect(true, 5, TimeUnit.SECONDS);
+    //this.autoReconnect(true, 5, TimeUnit.SECONDS);
     this.remoteAddress(remote);
     this.handler(new ChannelInitializer<Channel>() {
 
@@ -366,24 +366,43 @@ public class Client extends TcpNettyClient {
     public CheFile(File file) {
       super(file);
       this.header = CheHelper.parseHeader(getSource(), true);
+      this.header.setRaw(COPY.copy(this.header.getRaw(), false));
       List<HardwarePackage> list = CheHelper.obtainFirstAndLast(getSource());
       this.firstSn = list.get(0);
       this.lastSn = list.get(1);
 
+      byte[] raw = this.header.getRaw();
       // 包头
-      byte[] headerBytes = COPY.copy(header.getRaw(), 0, wrapPacket(583, (byte) 0x01), 7, header.getRaw().length);
       // 文件长度
-      byte[] snCountBytes = HexUtils.intToBytes((int) (length() / 576) - 1);
-      COPY.copy(snCountBytes, 0, headerBytes, 7 + 0xA0, 4);
+      byte[] snCountBytes = HexUtils.intToBytes((int) length());
+      COPY.copy(snCountBytes, 0, raw, 0xA0, 4);
       // 第一个包序号
       byte[] firstSnBytes = HexUtils.intToBytes(firstSn.getPackageSn());
-      COPY.copy(firstSnBytes, 0, headerBytes, 7 + 0xA0 + 4, 4);
+      COPY.copy(firstSnBytes, 0, raw, 0xA0 + 4, 4);
       // 文件名
       byte[] filenameBytes = getName().getBytes(StandardCharsets.UTF_8);
-      COPY.copy(filenameBytes, 0, headerBytes, 7 + 0xB0, filenameBytes.length);
+      COPY.copy(filenameBytes, 0, raw, 0xB0, filenameBytes.length);
       // 包数量
-      COPY.copy(snCountBytes, 0, headerBytes, 579, 4);
+      COPY.copy(snCountBytes, 0, raw, raw.length - 4, 4);
+      byte[] headerBytes = COPY.copy(raw, 0, wrapPacket(583, (byte) 0x01), 7, raw.length);
       this.cheHeader = checkSum(headerBytes);
+
+      log.info("{}, file.len: {}, sn: {} ~ {}, headerBytes: {}"
+          , file.getName()
+          , file.length()
+          , firstSn.getPackageSn()
+          , lastSn.getPackageSn()
+          , HexUtils.bytesToHex(headerBytes)
+      );
+
+//      if (firstSn.getPackageSn() <= 0 || lastSn.getPackageSn() <= 0) {
+//        log.info("firstSn: {}", JSON.toJSONString(firstSn));
+//        log.info("lastSn: {}", JSON.toJSONString(lastSn));
+//
+//        EventLoop.sleepSecond(1);
+//        System.exit(0);
+//        throw new IllegalStateException("CHE错误");
+//      }
     }
 
     public String getName() {

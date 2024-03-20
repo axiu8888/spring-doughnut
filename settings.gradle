@@ -61,10 +61,10 @@ include ":minio"
  */
 include ":quartz"
 
-/**
- * freemarker
- */
-include ":freemarker"
+///**
+// * freemarker
+// */
+//include ":freemarker"
 
 /**
  * MQTT的权限配置 、 mqtt与eventbus配置使用

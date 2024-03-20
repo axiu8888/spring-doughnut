@@ -113,7 +113,7 @@ public class ReportExportApp {
               });
           writer.flush();
           if (writer.length() < 10) {
-            IOUtils.deleteFile(writer.source());
+            IOUtils.deleteFiles(writer.source());
           }
         }
       }

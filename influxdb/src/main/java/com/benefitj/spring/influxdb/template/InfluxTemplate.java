@@ -403,13 +403,13 @@ public interface InfluxTemplate {
   default CountInfo queryCountInfo(String db, String measurement, String column, long startTime, long endTime, String condition) {
     String utcPattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     String clause = String.format("FROM \"%s\" WHERE time >= '%s' AND time <= '%s' %s"
-        , measurement, DateFmtter.fmtUtc(startTime, utcPattern), DateFmtter.fmtUtc(endTime, utcPattern), (condition != null ? condition : ""));
+        , measurement, DateFmtter.fmtUtc(startTime, utcPattern), DateFmtter.fmtUtc(endTime, utcPattern), (condition != null ? condition.trim() : ""));
     // count
     String sql = String.format("SELECT count(%s) AS count %s", column, clause)
         // first
-        + String.format("; SELECT first(%s) AS first %s ORDER BY time ASC LIMIT 1", column, clause)
+        + String.format(";\nSELECT first(%s) AS first %s ORDER BY time ASC LIMIT 1", column, clause)
         // last
-        + String.format("; SELECT last(%s) AS last %s ORDER BY time DESC LIMIT 1", column, clause);
+        + String.format(";\nSELECT last(%s) AS last %s ORDER BY time DESC LIMIT 1", column, clause);
     final CountInfo info = new CountInfo();
     info.setSql(sql);
     query(db, sql, 100).subscribe(qr -> {

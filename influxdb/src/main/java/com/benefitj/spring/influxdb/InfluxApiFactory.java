@@ -66,7 +66,7 @@ public interface InfluxApiFactory {
           .setLogLevel(HttpLoggingInterceptor.Level.NONE)
           .setGzipEnable(false)
           .addConverterFactories(factory)
-          .addCallAdapterFactoryIfAbsent(RxJava3CallAdapterFactory.create())
+          .addCallAdapterFactoryIfAbsent(RxJava3CallAdapterFactory.createSynchronous())
           .addNetworkInterceptors()
           .build();
     }

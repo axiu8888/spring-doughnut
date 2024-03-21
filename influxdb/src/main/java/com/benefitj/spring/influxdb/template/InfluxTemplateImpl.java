@@ -17,7 +17,6 @@ import retrofit2.Response;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -101,7 +100,7 @@ public class InfluxTemplateImpl implements InfluxTemplate {
       JsonAdapter<QueryResult> adapter = getJsonAdapter();
       try (final ResponseBody chunkedBody = response.body();
            final BufferedSource source = chunkedBody.source();) {
-        for (; ; ) {
+        for (;;) {
           QueryResult result = adapter.fromJson(source);
           if (result != null) {
             emitter.onNext(result);
@@ -149,25 +148,13 @@ public class InfluxTemplateImpl implements InfluxTemplate {
 
   protected <V> V execute(Flowable<QueryResult> o, Function<QueryResult, V> mapped) {
     AtomicReference<V> ref = new AtomicReference<>();
-    CountDownLatch latch = new CountDownLatch(1);
-    o.subscribe(SimpleSubscriber.create(result -> {
-      try {
-        ref.set(mapped.apply(result));
-      } finally {
-        latch.countDown();
-      }
-    }, e -> {
-      try {
-        QueryResult qr = new QueryResult();
-        qr.setError(e.getMessage());
-        ref.set(mapped.apply(qr));
-      } finally {
-        latch.countDown();
-      }
-    }));
-    try {
-      latch.await();
-    } catch (Exception ignored) { /* ^_^ */ }
+    o.subscribe(SimpleSubscriber.create(
+        result -> ref.set(mapped.apply(result))
+        , e -> {
+          QueryResult qr = new QueryResult();
+          qr.setError(e.getMessage());
+          ref.set(mapped.apply(qr));
+        }));
     return ref.get();
   }
 

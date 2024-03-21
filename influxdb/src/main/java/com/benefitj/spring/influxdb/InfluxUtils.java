@@ -75,11 +75,7 @@ public class InfluxUtils {
    * @return 返回转换的对象
    */
   public static <T> T toPoJo(Class<T> type, LineProtocol line) {
-    try {
-      return toPoJo(type.newInstance(), line);
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalArgumentException(e);
-    }
+    return toPoJo(ReflectUtils.newInstance(type), line);
   }
 
   /**
@@ -193,7 +189,7 @@ public class InfluxUtils {
    */
   public static Point.Builder toPointBuilder(LineProtocol protocol) {
     Point.Builder builder = new Point.Builder(protocol.getMeasurement());
-    builder.time(protocol.getTime(), TimeUnit.NANOSECONDS);
+    builder.time(protocol.getTime(), protocol.getTimeUnit());
     builder.tag(protocol.getTags());
     builder.fields(protocol.getFields());
     return builder;

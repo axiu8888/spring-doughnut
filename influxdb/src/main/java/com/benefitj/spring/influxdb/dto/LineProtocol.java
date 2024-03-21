@@ -1,8 +1,10 @@
 package com.benefitj.spring.influxdb.dto;
 
 import com.benefitj.spring.influxdb.InfluxUtils;
+import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +21,11 @@ public class LineProtocol {
    */
   private long time;
   /**
+   * 时间单位
+   */
+  @Builder.Default
+  private TimeUnit timeUnit = TimeUnit.NANOSECONDS;
+  /**
    * TAG
    */
   private Map<String, String> tags;
@@ -28,15 +35,17 @@ public class LineProtocol {
   private Map<String, Object> fields;
 
   public LineProtocol() {
+    this(null, 0L, TimeUnit.NANOSECONDS);
   }
 
-  public LineProtocol(String measurement, long time) {
-    this(measurement, time, new LinkedHashMap<>(), new LinkedHashMap<>());
+  public LineProtocol(String measurement, long time, TimeUnit timeUnit) {
+    this(measurement, time, timeUnit, new HashMap<>(), new HashMap<>());
   }
 
-  public LineProtocol(String measurement, long time, Map<String, String> tags, Map<String, Object> fields) {
+  public LineProtocol(String measurement, long time, TimeUnit timeUnit, Map<String, String> tags, Map<String, Object> fields) {
     this.measurement = measurement;
     this.time = time;
+    this.timeUnit = timeUnit;
     this.tags = tags;
     this.fields = fields;
   }
@@ -57,6 +66,14 @@ public class LineProtocol {
     this.time = time;
   }
 
+  public TimeUnit getTimeUnit() {
+    return timeUnit;
+  }
+
+  public void setTimeUnit(TimeUnit timeUnit) {
+    this.timeUnit = timeUnit;
+  }
+
   public Map<String, String> getTags() {
     return tags;
   }
@@ -71,14 +88,6 @@ public class LineProtocol {
 
   public void setFields(Map<String, Object> values) {
     this.fields = values;
-  }
-
-  public long getTimeAsMilliSeconds() {
-    return TimeUnit.NANOSECONDS.toMillis(this.getTime());
-  }
-
-  public long getTimeAsSeconds() {
-    return TimeUnit.NANOSECONDS.toSeconds(this.getTime());
   }
 
   public Point.Builder toPointBuilder() {
@@ -103,6 +112,7 @@ public class LineProtocol {
     copy.setTags(new LinkedHashMap<>(getTags()));
     copy.setFields(new LinkedHashMap<>(getFields()));
     copy.setTime(getTime());
+    copy.setTimeUnit(getTimeUnit());
     return copy;
   }
 

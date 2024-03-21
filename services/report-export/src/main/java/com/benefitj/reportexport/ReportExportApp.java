@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @EnableInfluxDB
 @SpringBootApplication
@@ -115,8 +116,8 @@ public class ReportExportApp {
                 public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
                   if (opts.type.equalsIgnoreCase("json")) {
                     JSONObject json = new JSONObject(new LinkedList<>());
-                    Map<String, String> tags = new LinkedHashMap<>();
-                    Map<String, Object> fields = new LinkedHashMap<>();
+                    Map<String, String> tags = new HashMap<>();
+                    Map<String, Object> fields = new HashMap<>();
                     for (String column : c.getColumns()) {
                       if (column.equals("time")) continue;
                       if (tagKeys.contains(column)) {
@@ -133,14 +134,13 @@ public class ReportExportApp {
                     json.set("fields", fields);
                     writer.writeAndFlush(json.toString()).writeAndFlush("\n");
                   } else {
-                    LineProtocol lp = new LineProtocol();
-                    lp.setTime(c.getTime());
+                    LineProtocol lp = new LineProtocol(c.getName(), c.getTime(), TimeUnit.MILLISECONDS);
                     lp.getTags().putAll(c.getTags());
                     for (String column : c.getColumns()) {
                       if (column.equals("time")) continue;
                       if (tagKeys.contains(column)) {
                         // TAG
-                        String tagValue = c.getString(column, "");
+                        String tagValue = c.getString(column, null);
                         if (tagValue != null) {
                           lp.getTags().put(column, tagValue);
                         }

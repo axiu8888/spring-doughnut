@@ -3,10 +3,7 @@ package com.benefitj.spring.influxdb.template;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.ShutdownHook;
-import com.benefitj.spring.influxdb.InfluxApi;
-import com.benefitj.spring.influxdb.InfluxOptions;
-import com.benefitj.spring.influxdb.InfluxTimeUtil;
-import com.benefitj.spring.influxdb.InfluxUtils;
+import com.benefitj.spring.influxdb.*;
 import com.benefitj.spring.influxdb.convert.PointConverter;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
@@ -16,6 +13,7 @@ import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 
 import java.io.*;
@@ -137,6 +135,17 @@ public interface InfluxTemplate {
    */
   default <T> void write(final List<T> records) {
     write(wrapBody(String.join("\n", lineProtocol(records))));
+  }
+
+  /**
+   * 写入文件
+   *
+   * @param database        数据库
+   * @param retentionPolicy 缓存策略
+   * @param batchPoints     批量写入的文件
+   */
+  default void write(String database, String retentionPolicy, String ...batchPoints) {
+    write(database, retentionPolicy, getConsistencyLevel(), wrapBody(String.join("\n", batchPoints)));
   }
 
   /**
@@ -502,6 +511,64 @@ public interface InfluxTemplate {
   default List<RetentionPolicy> getRetentionPolicies(String db) {
     QueryResult queryResult = postQuery(db, "SHOW RETENTION POLICIES ON " + db);
     return getConverterFactory().mapperTo(queryResult, RetentionPolicy.class);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  default QueryResult createRetentionPolicy(final String rpName,
+                                            final String database,
+                                            final String duration,
+                                            final String shardDuration,
+                                            final int replicationFactor,
+                                            final boolean isDefault) {
+    Preconditions.checkNonEmptyString(rpName, "retentionPolicyName");
+    Preconditions.checkNonEmptyString(database, "database");
+    Preconditions.checkNonEmptyString(duration, "retentionDuration");
+    Preconditions.checkDuration(duration, "retentionDuration");
+    if (StringUtils.isNotBlank(shardDuration)) {
+      Preconditions.checkDuration(shardDuration, "shardDuration");
+    }
+    Preconditions.checkPositiveNumber(replicationFactor, "replicationFactor");
+
+    StringBuilder queryBuilder = new StringBuilder("CREATE RETENTION POLICY \"");
+    queryBuilder.append(rpName)
+        .append("\" ON \"")
+        .append(database)
+        .append("\" DURATION ")
+        .append(duration)
+        .append(" REPLICATION ")
+        .append(replicationFactor);
+    if (shardDuration != null && !shardDuration.isEmpty()) {
+      queryBuilder.append(" SHARD DURATION ");
+      queryBuilder.append(shardDuration);
+    }
+    if (isDefault) {
+      queryBuilder.append(" DEFAULT");
+    }
+    return postQuery(Query.encode(queryBuilder.toString()));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  default QueryResult createRetentionPolicy(final String rpName,
+                                            final String database,
+                                            final String duration,
+                                            final int replicationFactor,
+                                            final boolean isDefault) {
+    return createRetentionPolicy(rpName, database, duration, null, replicationFactor, isDefault);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  default QueryResult createRetentionPolicy(final String rpName,
+                                            final String database,
+                                            final String duration,
+                                            final String shardDuration,
+                                            final int replicationFactor) {
+    return createRetentionPolicy(rpName, database, duration, shardDuration, replicationFactor, false);
   }
 
   /**

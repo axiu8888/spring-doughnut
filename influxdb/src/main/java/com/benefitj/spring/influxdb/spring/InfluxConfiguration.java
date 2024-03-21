@@ -8,6 +8,7 @@ import com.benefitj.spring.influxdb.dto.QueryResult;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
 import com.benefitj.spring.influxdb.template.InfluxTemplateImpl;
 import com.squareup.moshi.Moshi;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * InfluxTemplate
  */
+@Slf4j
 @EnableConfigurationProperties
 @Configuration
 public class InfluxConfiguration {
@@ -77,17 +79,14 @@ public class InfluxConfiguration {
     template.setConverterFactory(converterFactory);
     template.setOptions(options);
     template.setApi(factory.create(options));
-
     Moshi moshi = new Moshi.Builder().build();
     template.setJsonAdapter(moshi.adapter(QueryResult.class));
-
+    try {
+      template.createDatabase(template.getDatabase());
+    } catch (Exception e) {
+      log.error("throw: " + e.getMessage(), e);
+    }
     return template;
-  }
-
-  @ConditionalOnMissingBean
-  @Bean
-  public InfluxInitializingBean influxInitializingBean(InfluxTemplate template) {
-    return new InfluxInitializingBean(template);
   }
 
   @ConditionalOnWebApplication

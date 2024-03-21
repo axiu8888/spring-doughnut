@@ -18,6 +18,6 @@ public @interface TagNullable {
    *
    * @return 返回是否支持
    */
-  boolean value() default false;
+  boolean value() default true;
 
 }

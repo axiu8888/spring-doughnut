@@ -1,6 +1,6 @@
 package com.benefitj.reportexport;
 
-import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IOUtils;
@@ -55,32 +55,44 @@ public class ReportExportApp {
     long endTime = DateFmtter.parseToLong(opts.endTime);
     String dir = (opts.destDir + "/").replace("\\", "/").replace("//", "/");
 
-    if (StringUtils.isAnyBlank(reportId, reportType)) {
-      System.err.println("错误 ==>: 请配置报告ID和报告类型！");
+    if (StringUtils.isAnyBlank(reportId)) {
+      System.err.println("错误 ==>: 请配置报告ID！");
       EventLoop.asyncIO(() -> System.exit(0), 5000);
       return;
     }
 
-    JSONObject report = mongoTemplate.findById(reportId, JSONObject.class, reportType);
+    JSONObject report = StringUtils.isNotBlank(reportType)
+        ? mongoTemplate.findById(reportId, JSONObject.class, reportType)
+        : null;
     if (report == null) {
-      System.err.println("错误 ==>: 无法查找到对应报告！");
-      EventLoop.asyncIO(() -> System.exit(0), 5000);
-      return;
+      Set<String> collectionNames = mongoTemplate.getCollectionNames();
+      for (String collectionName : collectionNames) {
+        report = mongoTemplate.findById(reportId, JSONObject.class, collectionName);
+        if (report != null) {
+          reportType = collectionName;
+          break;
+        }
+      }
+      if (report == null) {
+        System.err.println("错误 ==>: 无法查找到对应报告！");
+        EventLoop.asyncIO(() -> System.exit(0), 5000);
+        return;
+      }
     }
     if (opts.tables.trim().equals("*")) {
       tables = influxTemplate.getMeasurements().toArray(new String[0]);
     }
 
-    String personName = report.getStr("personName");
-    personName = StringUtils.isBlank(personName) ? report.getStr("person_name") : personName;
+    String personName = report.getString("personName");
+    personName = StringUtils.isBlank(personName) ? report.getString("person_name") : personName;
     personName = StringUtils.isBlank(personName) ? "" : personName;
-    dir = dir + personName + "__" + reportId + "/";
-    String task_startTime = report.getStr("task_startTime");
-    task_startTime = StringUtils.isBlank(task_startTime) ? report.getStr("startTime") : task_startTime;
-    task_startTime = StringUtils.isBlank(task_startTime) ? report.getStr("start_time") : task_startTime;
-    String task_endTime = report.getStr("task_endTime");
-    task_endTime = StringUtils.isBlank(task_endTime) ? report.getStr("endTime") : task_endTime;
-    task_endTime = StringUtils.isBlank(task_endTime) ? report.getStr("end_time") : task_endTime;
+    dir = dir + personName + "__" + reportType + "__"+ reportId + "/";
+    String task_startTime = report.getString("task_startTime");
+    task_startTime = StringUtils.isBlank(task_startTime) ? report.getString("startTime") : task_startTime;
+    task_startTime = StringUtils.isBlank(task_startTime) ? report.getString("start_time") : task_startTime;
+    String task_endTime = report.getString("task_endTime");
+    task_endTime = StringUtils.isBlank(task_endTime) ? report.getString("endTime") : task_endTime;
+    task_endTime = StringUtils.isBlank(task_endTime) ? report.getString("end_time") : task_endTime;
     startTime = StringUtils.isNotBlank(task_startTime) ? DateFmtter.parseToLong(task_startTime) : startTime;
     endTime = StringUtils.isNotBlank(task_endTime) ? DateFmtter.parseToLong(task_endTime) : endTime;
     try (final IWriter w = IWriter.createWriter(IOUtils.createFile(dir + "report.json"), false)) {
@@ -88,10 +100,10 @@ public class ReportExportApp {
     }
 
     String _personZid = personZid;
-    personZid = StringUtils.isBlank(personZid) ? report.getStr("personZid") : personZid;
-    personZid = StringUtils.isBlank(personZid) ? report.getStr("person_zid") : personZid;
-    personZid = StringUtils.isBlank(personZid) ? report.getStr("person_id") : personZid;
-    personZid = StringUtils.isBlank(personZid) ? report.getStr("patient_id") : personZid;
+    personZid = StringUtils.isBlank(personZid) ? report.getString("personZid") : personZid;
+    personZid = StringUtils.isBlank(personZid) ? report.getString("person_zid") : personZid;
+    personZid = StringUtils.isBlank(personZid) ? report.getString("person_id") : personZid;
+    personZid = StringUtils.isBlank(personZid) ? report.getString("patient_id") : personZid;
     personZid = StringUtils.isBlank(personZid) ? _personZid : personZid;
     if (StringUtils.isBlank(personZid)) {
       System.err.println("错误 ==>: 患者ID为空！");
@@ -115,7 +127,7 @@ public class ReportExportApp {
                 @Override
                 public void onSeriesNext(List<Object> values, ValueConverter c, int position) {
                   if (opts.type.equalsIgnoreCase("json")) {
-                    JSONObject json = new JSONObject(new LinkedList<>());
+                    JSONObject json = new JSONObject(new LinkedHashMap<>());
                     Map<String, String> tags = new HashMap<>();
                     Map<String, Object> fields = new HashMap<>();
                     for (String column : c.getColumns()) {
@@ -129,9 +141,9 @@ public class ReportExportApp {
                         fields.put(column, c.getValue(column, null));
                       }
                     }
-                    json.set("time", c.getTime());
-                    json.set("tags", tags);
-                    json.set("fields", fields);
+                    json.put("time", c.getTime());
+                    json.put("tags", tags);
+                    json.put("fields", fields);
                     writer.writeAndFlush(json.toString()).writeAndFlush("\n");
                   } else {
                     LineProtocol lp = new LineProtocol(c.getName(), c.getTime(), TimeUnit.MILLISECONDS);

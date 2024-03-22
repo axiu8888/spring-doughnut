@@ -6,7 +6,10 @@ import com.benefitj.core.IOUtils;
 import com.benefitj.core.SystemProperty;
 import com.benefitj.core.cmd.CmdCall;
 import com.benefitj.core.cmd.CmdExecutor;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
+import com.benefitj.spring.ctx.SpringCtxHolder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @EnableConfigurationProperties
+@EnableSpringCtxInit
 @SpringBootApplication
 public class JmodsExportApplication {
   public static void main(String[] args) {
@@ -29,24 +33,24 @@ public class JmodsExportApplication {
   }
 
 
-  @EventListener
-  public void onAppStart(ApplicationReadyEvent event) {
-    JmodsExportProperty prop = event.getApplicationContext().getBean(JmodsExportProperty.class);
+  @EventListener(ApplicationReadyEvent.class)
+  public void onAppStart() {
+    JmodsExportOptions opts = SpringCtxHolder.getBean(JmodsExportOptions.class);
 
-    if (StringUtils.isAnyBlank(prop.getExportDir())) {
-      shutdown("导出目录不能为空", prop.getErrorDelay());
+    if (StringUtils.isAnyBlank(opts.getExportDir())) {
+      shutdown("导出目录不能为空", opts.getErrorDelay());
       return;
     }
 
     File jdkDir = null;
-    if (StringUtils.isNotBlank(prop.getJdkDir())) {
-      jdkDir = new File(prop.getJdkDir());
+    if (StringUtils.isNotBlank(opts.getJdkDir())) {
+      jdkDir = new File(opts.getJdkDir());
       if (!jdkDir.exists()) {
         jdkDir = null;
       }
 
       if (jdkDir == null && !checkJava()) {
-        shutdown("没有java环境", prop.getErrorDelay());
+        shutdown("没有java环境", opts.getErrorDelay());
         return;
       }
     }
@@ -58,37 +62,37 @@ public class JmodsExportApplication {
         support = version > 1.8;
       } catch (Exception ignore) {}
       if (!support) {
-        shutdown("不支持的Java版本(" + SystemProperty.getJavaVersion() + ")，请指定具体的JDK路径", prop.getErrorDelay());
+        shutdown("不支持的Java版本(" + SystemProperty.getJavaVersion() + ")，请指定具体的JDK路径", opts.getErrorDelay());
         return;
       }
     }
 
-    File exportDir = new File(prop.getExportDir());
+    File exportDir = new File(opts.getExportDir());
 
     List<String> modules;
     if (jdkDir == null) {
       modules = new ArrayList<>();
-      modules.addAll(Arrays.asList(prop.getDefaultJmodes().split(",")));
-      modules.addAll(Arrays.asList(prop.getAddJmodes().split(",")));
+      modules.addAll(Arrays.asList(opts.getDefaultJmodes().split(",")));
+      modules.addAll(Arrays.asList(opts.getAddJmodes().split(",")));
     } else {
       modules = IOUtils.listFiles(new File(jdkDir, "jmods"))
           .stream()
           .map(File::getName)
           .map(name -> name.endsWith(".jmod") ? name.substring(0, name.length() - ".jmod".length()) : name)
           .collect(Collectors.toList());
-      modules.addAll(Arrays.asList(prop.getAddJmodes().split(",")));
+      modules.addAll(Arrays.asList(opts.getAddJmodes().split(",")));
     }
 
-    Set<String> ignoreJmods = new HashSet<>(Arrays.asList(prop.getIgnoreJmods().split(",")));
+    Set<String> ignoreJmods = new HashSet<>(Arrays.asList(opts.getIgnoreJmods().split(",")));
     String mods = modules.stream()
         .filter(StringUtils::isNotBlank)
         .distinct()
         // 忽略JDK的依赖
-        .filter(name -> !prop.isIgnoreJdkJmods() || !name.startsWith("jdk."))
+        .filter(name -> !opts.isIgnoreJdkJmods() || !name.startsWith("jdk."))
         .filter(name -> !ignoreJmods.contains(name))
         .collect(Collectors.joining(","));
 
-    String exportName = prop.getExportName();
+    String exportName = opts.getExportName();
     String cmd = String.format("%s --output %s --add-modules %s"
         , jdkDir != null ? String.format("%s%s%s%sjlink.exe", jdkDir.getAbsolutePath(), File.separator, "bin", File.separator) : "jlink"
         , exportName
@@ -107,7 +111,7 @@ public class JmodsExportApplication {
     System.err.println("----------------------------------------------");
 
     if (!call.isSuccessful() && !exportFile.exists()) {
-      shutdown("导出失败: " + call.getError(), prop.getErrorDelay());
+      shutdown("导出失败: " + call.getError(), opts.getErrorDelay());
       return;
     }
 
@@ -204,42 +208,42 @@ public class JmodsExportApplication {
       ",jdk.zipfs";
 
   @Component
+  @NoArgsConstructor
   @Data
   @ConfigurationProperties(prefix = "jmods")
-  public static class JmodsExportProperty {
-
+  public static class JmodsExportOptions {
     /**
      * JDK的目录
      */
-    private String jdkDir;
+    String jdkDir;
     /**
      * JRE的导出目录
      */
-    private String exportDir = "./";
+    String exportDir = "./";
     /**
      * 导出的JRE目录名称
      */
-    private String exportName = "jre";
+    String exportName = "jre";
     /**
      * 是否忽略JDK模块
      */
-    private boolean ignoreJdkJmods = true;
+    boolean ignoreJdkJmods = true;
     /**
      * 默认模块，${@link #JMODS}
      */
-    private String defaultJmodes = JMODS;
+    String defaultJmodes = JMODS;
     /**
      * 添加的模块
      */
-    private String addJmodes = "";
+    String addJmodes = "";
     /**
      * 忽略的模块
      */
-    private String ignoreJmods = "";
+    String ignoreJmods = "";
     /**
      * 出现错误的延迟关闭时长
      */
-    private int errorDelay = 10;
+    int errorDelay = 10;
   }
 
 }

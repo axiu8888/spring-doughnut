@@ -15,7 +15,7 @@ apply plugin: 'java-library'
 //  lombokVersion = "1.18.30"
 //  guavaVersion = "33.0.0-jre"
 //  caffeineVersion = '3.1.8'
-//  fastjson2Version = "2.0.45"
+//  fastjson2Version = "2.0.47"
 //  commonsIOVersion = "2.15.1"
 //  commonsLang3Version = "3.14.0"
 //  slf4jVersion = "2.0.11"

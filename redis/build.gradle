@@ -12,6 +12,8 @@ dependencies {
       "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
       // redis
       "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}",
+      "org.springframework.boot:spring-boot-starter-integration:${springIntegrationVersion}",
+      "org.springframework.integration:spring-integration-redis:${springIntegrationVersion}",
   ].forEach {
     api(it)
   }

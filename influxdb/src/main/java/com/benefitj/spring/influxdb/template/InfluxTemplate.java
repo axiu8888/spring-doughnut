@@ -144,7 +144,7 @@ public interface InfluxTemplate {
    * @param retentionPolicy 缓存策略
    * @param batchPoints     批量写入的文件
    */
-  default void write(String database, String retentionPolicy, String ...batchPoints) {
+  default void write(String database, String retentionPolicy, String... batchPoints) {
     write(database, retentionPolicy, getConsistencyLevel(), wrapBody(String.join("\n", batchPoints)));
   }
 
@@ -514,7 +514,7 @@ public interface InfluxTemplate {
   }
 
   /**
-   * {@inheritDoc}
+   * 创建保留策略
    */
   default QueryResult createRetentionPolicy(final String rpName,
                                             final String database,
@@ -550,7 +550,7 @@ public interface InfluxTemplate {
   }
 
   /**
-   * {@inheritDoc}
+   * 创建保留策略
    */
   default QueryResult createRetentionPolicy(final String rpName,
                                             final String database,
@@ -561,7 +561,7 @@ public interface InfluxTemplate {
   }
 
   /**
-   * {@inheritDoc}
+   * 创建保留策略
    */
   default QueryResult createRetentionPolicy(final String rpName,
                                             final String database,

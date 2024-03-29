@@ -167,7 +167,7 @@ public class ReportExportApp {
               });
           writer.flush();
           if (writer.length() < 10) {
-            IOUtils.deleteFiles(writer.source());
+            IOUtils.delete(writer.source());
           }
         }
       }

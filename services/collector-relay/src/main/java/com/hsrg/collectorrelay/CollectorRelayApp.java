@@ -33,7 +33,7 @@ public class CollectorRelayApp {
   }
 
   private static void base64ToPdf() {
-    String body = IOUtils.readFileAsString(new File("D:\\home\\znsx\\base64.txt"));
+    String body = IOUtils.readAsString(new File("D:\\home\\znsx\\base64.txt"));
     byte[] decode = Base64.getDecoder().decode(body);
     JSONObject json = JSON.parseObject(new String(decode, StandardCharsets.UTF_8));
     System.err.println(json);

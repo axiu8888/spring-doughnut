@@ -112,7 +112,7 @@ public class ApiController {
       cancelDeleteTimer(timer.getUrl(), timer.getPdf());
       pdf = timer.getPdf();
       if (Boolean.TRUE.equals(force)) {
-        IOUtils.deleteFiles(pdf);
+        IOUtils.delete(pdf);
       }
     } else {
       pdf = new File(cacheDir, IdUtils.uuid() + ".pdf");
@@ -159,7 +159,7 @@ public class ApiController {
       return;
     }
     ScheduledFuture<?> original = EventLoop.single().schedule(() -> {
-      IOUtils.deleteFiles(pdf);
+      IOUtils.delete(pdf);
       deleteTimers.remove(url);
     }, delay, TimeUnit.SECONDS);
     DeleteTimer<?> timer = new DeleteTimer<>(original);

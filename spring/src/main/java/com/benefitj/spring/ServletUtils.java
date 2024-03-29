@@ -378,12 +378,12 @@ public class ServletUtils {
   private static void transferTo(BufferedInputStream bis, RangeSettings settings, BiConsumer<byte[], Integer> consumer) throws IOException {
     long count = 0;
     try {
-      final byte[] buff = new byte[1024 << 4];
+      final byte[] buf = new byte[1024 << 4];
       int len;
       while (count < settings.getContentLength()) {
-        len = bis.read(buff, 0, (int) Math.min(buff.length, settings.getContentLength() - count));
+        len = bis.read(buf, 0, (int) Math.min(buf.length, settings.getContentLength() - count));
         count += len;
-        consumer.accept(buff, len);
+        consumer.accept(buf, len);
       }
     } finally {
       settings.setDownloadLength(count);

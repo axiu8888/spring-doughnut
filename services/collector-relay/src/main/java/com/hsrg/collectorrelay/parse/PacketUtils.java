@@ -572,13 +572,13 @@ public class PacketUtils {
   public static int[] parseIntArray(byte[] data, int start, int end, int bitSize) {
     if (bitSize > 0) {
       int[] array = new int[(end - start) / bitSize];
-      byte[] buff = bitSize > 1 ? getCache(bitSize) : null;
+      byte[] buf = bitSize > 1 ? getCache(bitSize) : null;
       for (int i = 0, j = start; i < array.length; i++, j += bitSize) {
         if (bitSize == 1) {
           array[i] = (data[j + 1] & 0xFF);
         } else {
-          System.arraycopy(data, j, buff, 0, bitSize);
-          array[i] = HexUtils.bytesToInt(buff);
+          System.arraycopy(data, j, buf, 0, bitSize);
+          array[i] = HexUtils.bytesToInt(buf);
         }
       }
       return array;

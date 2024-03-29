@@ -40,9 +40,9 @@ public class CheHelper {
    */
   public static com.hsrg.collectorrelay.parse.CheFileHeader parseHeader(InputStream is) {
     try {
-      byte[] buff = getCache(PACKET_SIZE);
-      is.read(buff);
-      return parseHeader(buff, false);
+      byte[] buf = getCache(PACKET_SIZE);
+      is.read(buf);
+      return parseHeader(buf, false);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
@@ -222,10 +222,10 @@ public class CheHelper {
    * @return 返回解析的包
    */
   public static HardwarePackage getPosition(final RandomAccessFile raf, long position) throws IOException {
-    byte[] buff = getCache(576);
+    byte[] buf = getCache(576);
     raf.seek(position);
-    raf.read(buff);
-    byte[] udp = convertToUdp(buff);
+    raf.read(buf);
+    byte[] udp = convertToUdp(buf);
     return ProcessManager.parse2BasePackage(udp);
   }
 
@@ -257,14 +257,14 @@ public class CheHelper {
                                   BiConsumer<HardwarePackage, RandomAccessFile> consumer,
                                   Predicate<HardwarePackage> interceptor) {
     try (final RandomAccessFile cheRaf = new RandomAccessFile(cheFile, "r");) {
-      byte[] cheBuff = getCache(PACKET_SIZE);
-      cheRaf.read(cheBuff);
+      byte[] buf = getCache(PACKET_SIZE);
+      cheRaf.read(buf);
       long total = 0;
       int len;
-      while ((len = cheRaf.read(cheBuff)) > 0) {
+      while ((len = cheRaf.read(buf)) > 0) {
         total += len;
         TOTAL_COUNTER.set(total);
-        byte[] udp = convertToUdp(cheBuff);
+        byte[] udp = convertToUdp(buf);
         HardwarePackage hp = ProcessManager.parse2BasePackage(udp);
         hp.setRealTime(false);
         if (filter.test(hp)) {
@@ -326,9 +326,9 @@ public class CheHelper {
    */
   public static void parseHardwarePacket(InputStream in, Consumer<HardwarePacket> consumer) {
     try {
-      byte[] buff = getCache(PACKET_SIZE);
-      while (in.read(buff) > 0) {
-        consumer.accept(com.hsrg.collectorrelay.parse.PacketUtils.parse(buff, new HardwarePacket(false)));
+      byte[] buf = getCache(PACKET_SIZE);
+      while (in.read(buf) > 0) {
+        consumer.accept(com.hsrg.collectorrelay.parse.PacketUtils.parse(buf, new HardwarePacket(false)));
       }
     } catch (IOException e) {
       throw new IllegalStateException(e);
@@ -369,9 +369,9 @@ public class CheHelper {
    * @return 返回拷贝的数据
    */
   public static byte[] copy(byte[] data, int start, int size, boolean local) {
-    byte[] buff = local ? getCache(size) : new byte[size];
-    System.arraycopy(data, start, buff, 0, buff.length);
-    return buff;
+    byte[] buf = local ? getCache(size) : new byte[size];
+    System.arraycopy(data, start, buf, 0, buf.length);
+    return buf;
   }
 
 
@@ -516,8 +516,8 @@ public class CheHelper {
     // 包序号
     if (packetSn > 0) {
       // start:
-      byte[] buff = numberToBytes(packetSn, 32, true);
-      System.arraycopy(buff, 0, data, 9, buff.length);
+      byte[] buf = numberToBytes(packetSn, 32, true);
+      System.arraycopy(buf, 0, data, 9, buf.length);
     }
 
     // 修改时间

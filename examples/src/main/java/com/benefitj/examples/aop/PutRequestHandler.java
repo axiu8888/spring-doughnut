@@ -70,12 +70,12 @@ public class PutRequestHandler implements WebPointCutHandler, Function<Method, P
           // ServletRequest/ServletResponse/MultipartFile/InputStream/OutputStream...都不做处理
           try {
             final ServletInputStream in = request.getInputStream();
-            byte[] buff = new byte[(int) contentLengthLong];
-            if (in.read(buff) > 0) {
+            byte[] buf = new byte[(int) contentLengthLong];
+            if (in.read(buf) > 0) {
               prm.getParameters().forEach((index, parameter) -> {
                 if (match(parameter)) {
                   // 拷贝属性值
-                  BeanUtils.copyProperties(JSON.parseObject(buff, args[index].getClass()), args[index]);
+                  BeanUtils.copyProperties(JSON.parseObject(buf, args[index].getClass()), args[index]);
                 }
               });
             }

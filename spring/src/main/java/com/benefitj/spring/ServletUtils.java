@@ -36,6 +36,22 @@ public class ServletUtils {
   public static String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
 
+  /**
+   * 传输文件
+   *
+   * @param src  源文件
+   * @param dest 目标文件
+   * @return 返回目标文件
+   */
+  public static File transferTo(MultipartFile src, File dest) {
+    try {
+      IOUtils.write(src.getInputStream(), dest);
+      return dest;
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   @Nullable
   public static ServletRequestAttributes getRequestAttributes() {
     return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());

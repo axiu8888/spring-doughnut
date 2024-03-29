@@ -52,7 +52,7 @@ subprojects {
   version = "2.4.2-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_15
+    compatibilityVersion = JavaVersion.VERSION_17
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
     scriptFile = "${rootDir}/gradleScript/base.gradle"
 

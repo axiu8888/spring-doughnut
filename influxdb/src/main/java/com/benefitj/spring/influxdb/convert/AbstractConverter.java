@@ -171,7 +171,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
       Object value = ReflectUtils.getFieldValue(columnField.getField(), item);
       // 检查是否允许tag为null，默认不允许
       if (value == null && !columnField.isTagNullable()) {
-        throw new NullPointerException("tag is null.");
+        throw new NullPointerException("tag is null: " + columnField.getColumn());
       }
       if (value != null) {
         builder.tag(tag, (String) value);

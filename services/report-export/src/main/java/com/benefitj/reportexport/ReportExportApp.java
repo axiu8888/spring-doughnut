@@ -74,7 +74,7 @@ public class ReportExportApp {
         }
       }
       if (report == null) {
-        System.err.println("错误 ==>: 无法查找到对应报告！");
+        System.err.println("错误 ==>: 无法查找到对应报告, " + reportId);
         EventLoop.asyncIO(() -> System.exit(0), 5000);
         return;
       }

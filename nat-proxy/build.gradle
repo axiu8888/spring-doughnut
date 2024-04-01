@@ -8,6 +8,7 @@ dependencies {
   [
       project(":spring"),
       "io.netty:netty-all:${nettyAllVersion}",
+      "io.netty:netty-transport-native-epoll:$nettyAllVersion",
   ].forEach {
     api(it)
   }

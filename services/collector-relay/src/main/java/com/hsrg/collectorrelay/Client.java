@@ -17,8 +17,7 @@ import com.hsrg.utils.entity.mongo.HardwarePackage;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +34,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 @Component
+@Slf4j
 public class Client extends TcpNettyClient {
-
-  static final Logger log = LoggerFactory.getLogger("Client");
-
 
   @Autowired
   Options options;
@@ -80,7 +77,12 @@ public class Client extends TcpNettyClient {
 
     String[] ip_port = options.remote.split(":");
     this.remote = new InetSocketAddress(ip_port[0], Integer.parseInt(ip_port[1]));
-    start(f -> log.info("开启代理, local: {}, remote: {}", localAddress(), remoteAddress()));
+    start(f -> {
+      log.info("开启代理, local: {}, remote: {}", localAddress(), remoteAddress());
+      if (!f.isSuccess()) {
+        stop(ff -> System.exit(0)); // 终止
+      }
+    });
   }
 
   @OnAppStop

@@ -124,34 +124,41 @@ public class ApiController {
 
     boolean callAthenaPdf = false;
 
-    String cmd = null;
-    if (!pdf.exists()) {
-      callAthenaPdf = true;
-      AthenapdfCall call = athenapdfHelper.execute(volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
-      if (!call.isSuccessful()) {
-        log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
-            , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());
-        return;
-      }
-      pdf = call.getPdf();
-      cmd = call.getCmd();
-    }
     try {
-      ServletUtils.download(request, response, pdf, filename);
-    } finally {
-      // 最终删除文件
-      scheduleDeleteTimer(url, pdf);
+      String cmd = null;
+      if (!pdf.exists()) {
+        callAthenaPdf = true;
+        AthenapdfCall call = athenapdfHelper.execute(volumeDir, IOUtils.mkDirs(cacheDir), pdf.getName(), url, null);
+        if (!call.isSuccessful()) {
+          log.info("生成PDF失败, filename: {}, destFile: {}, url: {}, \ncmd: {}, \nmsg: {}, error: {}"
+              , filename, pdf.getAbsolutePath(), url, call.getCmd(), call.getMessage(), call.getError());
+          return;
+        }
+        pdf = call.getPdf();
+        cmd = call.getCmd();
+      }
+      try {
+        ServletUtils.download(request, response, pdf, filename);
+      } finally {
+        // 最终删除文件
+        scheduleDeleteTimer(url, pdf);
+      }
+      if (StringUtils.isBlank(cmd)) {
+        cmd = athenapdfHelper.formatCMD(volumeDir, pdf.getName(), url, null);
+      }
+      log.info("{}, size: {}, callAthenaPdf: {}, cmd: {}, 使用时长: {}"
+          , pdf.getAbsolutePath()
+          , pdf.length()
+          , callAthenaPdf
+          , cmd
+          , (System.currentTimeMillis() - start)
+      );
+    } catch (Exception e) {
+      log.info("cmd: {}, throws: {}"
+          , athenapdfHelper.formatCMD(volumeDir, pdf.getName(), url, null)
+          , e.getMessage()
+      );
     }
-    if (StringUtils.isBlank(cmd)) {
-      cmd = athenapdfHelper.formatCMD(volumeDir, pdf.getName(), url, null);
-    }
-    log.info("{}, size: {}, callAthenaPdf: {}, cmd: {}, 使用时长: {}"
-        , pdf.getAbsolutePath()
-        , pdf.length()
-        , callAthenaPdf
-        , cmd
-        , (System.currentTimeMillis() - start)
-    );
   }
 
   protected void scheduleDeleteTimer(final String url, File pdf) {

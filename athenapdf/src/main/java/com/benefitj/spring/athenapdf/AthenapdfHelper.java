@@ -25,7 +25,17 @@ public class AthenapdfHelper extends CmdExecutor {
 
   private final AtomicReference<Boolean> supportDocker = new AtomicReference<>();
 
+  String container = "arachnysdocker/athenapdf";
+
   public AthenapdfHelper() {
+  }
+
+  public String getContainer() {
+    return container;
+  }
+
+  public void setContainer(String container) {
+    this.container = container;
   }
 
   public boolean supportDocker() {
@@ -69,7 +79,7 @@ public class AthenapdfHelper extends CmdExecutor {
     return "docker run --rm --privileged=true"
         + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
         + " -v " + volumeDir + ":/converted/"
-        + " arachnysdocker/athenapdf"
+        + " " + container
         + " athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
         + url
         + " " + filename;

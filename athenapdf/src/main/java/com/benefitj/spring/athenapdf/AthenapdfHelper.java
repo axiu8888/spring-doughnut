@@ -80,7 +80,7 @@ public class AthenapdfHelper extends CmdExecutor {
         + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
         + " -v " + volumeDir + ":/converted/"
         + " " + container
-        + " athenapdf -D 5000 --ignore-gpu-blacklist --no-cache "
+        + " athenapdf -D 5000 --no-sandbox --ignore-gpu-blacklist --no-cache "
         + url
         + " " + filename;
   }

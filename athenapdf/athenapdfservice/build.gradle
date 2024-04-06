@@ -14,6 +14,7 @@ dependencies {
 
   [
       project(":commons"),
+      project(":spring"),
       project(":aop"),
       project(":athenapdf"),
 
@@ -21,10 +22,10 @@ dependencies {
       "io.springfox:springfox-boot-starter:${swaggerVersion}",
       "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
 
-  ].forEach { api(it) }
-
-  implementation(project(":spring")) {
-    exclude module: "spring-boot-starter-security"
+  ].forEach {
+    api(it) {
+      exclude module: "spring-boot-starter-security"
+    }
   }
 
 }

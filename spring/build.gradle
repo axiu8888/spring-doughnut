@@ -10,6 +10,7 @@ dependencies {
       "org.springframework.boot:spring-boot-starter-security:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-web:${springbootVersion}",
       "org.springframework.boot:spring-boot-starter-websocket:${springbootVersion}",
+      "org.springframework.boot:spring-boot-starter-data-mongodb:${springbootVersion}",
 
       // jwt
       "io.jsonwebtoken:jjwt-api:${jjwtVersion}",

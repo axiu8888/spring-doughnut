@@ -1,37 +1,39 @@
 package com.benefitj.examples;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
 import com.benefitj.spring.aop.ratelimiter.EnableRedisRateLimiter;
-import com.benefitj.spring.athenapdf.EnableAthenapdf;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
-import com.benefitj.spring.influxdb.spring.EnableInfluxDB;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageListener;
 import com.benefitj.spring.swagger.EnableSwaggerApi;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
+@EnableSpringCtxInit
 @PropertySource(value = "classpath:/swagger-api-info.properties", encoding = "utf-8")
 @EnableSwaggerApi
 @EnableRedisMessageListener
-@EnableHttpLoggingHandler       // HTTP请求日志
 @EnableRedisRateLimiter         // redis RateLimiter
+@EnableHttpLoggingHandler       // HTTP请求日志
 @EnableEventBusPoster           // eventbus
-@EnableAthenapdf                // PDF
-@EnableInfluxDB                   // InfluxDB
+//@EnableAthenapdf                // PDF
+//@EnableInfluxDB                 // InfluxDB
 @SpringBootApplication
 @Slf4j
 public class SpringbootDoughnutApplication {
@@ -44,32 +46,83 @@ public class SpringbootDoughnutApplication {
         evt -> log.info("app started ..."),
         evt -> log.info("app stopped ...")
     );
+    AppStateHook.registerStart(evt -> onStart(evt));
   }
 
-  @EventListener(ApplicationReadyEvent.class)
-  public void onAppStart() {
-    RedisTemplate<String, Object> redisTemplate = SpringCtxHolder.getBean("redisTemplate");
-//    List<String> keys = keys(redisTemplate, "report:doQuartz:*", 1);
-    List<String> keys = keys(redisTemplate, "collector:bind_record:*", 1);
-    log.info("keys: {}", keys);
+  private static void onStart(ApplicationReadyEvent evt) {
+    log.info("{} start...", evt.getApplicationContext().getApplicationName());
 
-    EventLoop.asyncIO(() -> System.exit(0), 1000);
+    EventLoop.asyncIO(() -> {
+
+      MongoTemplate primaryMongoTemplate = SpringCtxHolder.getBean("primaryMongoTemplate", MongoTemplate.class);
+      log.info("primaryMongoTemplate: {}", primaryMongoTemplate.getCollectionNames());
+      MongoTemplate secondaryMongoTemplate = SpringCtxHolder.getBean("secondaryMongoTemplate", MongoTemplate.class);
+      log.info("secondaryMongoTemplate: {}", secondaryMongoTemplate.getCollectionNames());
+      MongoTemplate tertiaryMongoTemplate = SpringCtxHolder.getBean("tertiaryMongoTemplate", MongoTemplate.class);
+      log.info("tertiaryMongoTemplate: {}", tertiaryMongoTemplate.getCollectionNames());
+
+      log.info("secondary -> primary  ==>: {}", transferTo(secondaryMongoTemplate, primaryMongoTemplate));
+      log.info("tertiary -> primary  ==>: {}", transferTo(tertiaryMongoTemplate, primaryMongoTemplate));
+
+      // 结束...
+      EventLoop.asyncIO(() -> System.exit(0), 1000);
+
+    }, 5, TimeUnit.SECONDS);
   }
-  public List<String> keys(RedisTemplate<String, ?> redisTemplate, String pattern, int size) {
-    ScanOptions options = ScanOptions.scanOptions()
-        .match(pattern)
-        .count(size)
-        .build();
-    List<String> keys = new LinkedList<>();
-    try (Cursor<String> cursor = redisTemplate.scan(options);) {
-      while (cursor.hasNext()) {
-        keys.add(cursor.next());
-        if (keys.size() >= size) {
-          break;
-        }
-      }
-    }
-    return keys;
+
+  static List<List<Object>> transferTo(MongoTemplate from, MongoTemplate to) {
+    List<List<Object>> list = new LinkedList<>();
+    from.getCollectionNames()
+        .forEach(name -> {
+          log.info("[start] from: {}, name: {}", from, name);
+          List<DocumentId> ids = from.find(new BasicQuery("{}"), DocumentId.class, name);
+          log.info("[end] from: {}, name: {}, ids: {}", from, name, ids.stream().map(id -> id._id).toList());
+          ids
+              .stream()
+              .map(id -> id._id)
+              .forEach(id -> {
+                JSONObject json = from.findById(id, JSONObject.class, name);
+                to.save(json, name);
+              });
+          list.add(Arrays.asList(name, ids.size(), ids.stream()
+              .map(r -> r._id)
+              .toList()));
+        });
+    return list;
   }
+
+
+  @Data
+  public static class DocumentId {
+
+    String _id;
+
+  }
+
+//  @EventListener(ApplicationReadyEvent.class)
+//  public void onAppStart() {
+//    RedisTemplate<String, Object> redisTemplate = SpringCtxHolder.getBean("redisTemplate");
+////    List<String> keys = keys(redisTemplate, "report:doQuartz:*", 1);
+//    List<String> keys = keys(redisTemplate, "collector:bind_record:*", 1);
+//    log.info("keys: {}", keys);
+//
+//    EventLoop.asyncIO(() -> System.exit(0), 1000);
+//  }
+//  public List<String> keys(RedisTemplate<String, ?> redisTemplate, String pattern, int size) {
+//    ScanOptions options = ScanOptions.scanOptions()
+//        .match(pattern)
+//        .count(size)
+//        .build();
+//    List<String> keys = new LinkedList<>();
+//    try (Cursor<String> cursor = redisTemplate.scan(options);) {
+//      while (cursor.hasNext()) {
+//        keys.add(cursor.next());
+//        if (keys.size() >= size) {
+//          break;
+//        }
+//      }
+//    }
+//    return keys;
+//  }
 
 }

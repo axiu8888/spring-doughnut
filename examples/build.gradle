@@ -23,7 +23,7 @@ dependencies {
       "org.springframework.boot:spring-boot-starter-web",
       "org.springframework.boot:spring-boot-starter-websocket",
       "org.springframework.boot:spring-boot-starter-data-redis",
-      //"org.springframework.boot:spring-boot-starter-data-mongodb",
+      "org.springframework.boot:spring-boot-starter-data-mongodb",
 
       'org.ehcache:ehcache:3.10.8',
       'org.springframework.boot:spring-boot-starter-cache',

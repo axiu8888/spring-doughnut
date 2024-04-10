@@ -48,8 +48,8 @@ subprojects {
 
   apply plugin: 'java'
 
-  group = "com.benefitj.spring"
-  version = "2.4.2-SNAPSHOT"
+  group = "com.benefitj"
+  version = "2.5.0-SNAPSHOT"
 
   ext {
     compatibilityVersion = JavaVersion.VERSION_11

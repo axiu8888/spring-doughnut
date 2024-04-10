@@ -2,3 +2,20 @@
 ext.useApi = true
 apply from: "${scriptFile}"
 
+dependencies {
+
+  def useLocal = false
+
+  if(useLocal) {
+    compileOnly fileTree(dir: 'libs2/source', include: ['*.jar'])
+    [
+        fileTree(dir: 'libs2', include: ['*.jar']),
+        fileTree(dir: 'libs2/jar', include: ['*.jar'])
+    ].forEach {
+      api(it)
+    }
+  } else {
+    api "com.benefitj:benefitj-commons:2.5.0-SNAPSHOT"
+  }
+
+}

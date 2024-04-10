@@ -36,8 +36,8 @@ ext {
   mybatisPlusVersion = "3.5.4.1"
   pagehelperVersion = "2.0.0"
 
+  props = new Properties()
   try {
-    def props = new Properties()
     props.load(new FileReader("${getRootDir()}/nexus.properties"))
     props.forEach(ext::set)
   } catch (ignored) {/*^_^*/}
@@ -52,7 +52,7 @@ subprojects {
   version = "2.4.2-SNAPSHOT"
 
   ext {
-    compatibilityVersion = JavaVersion.VERSION_17
+    compatibilityVersion = JavaVersion.VERSION_11
     //scriptFile = "https://gitee.com/axiu8888/GradleBuild/raw/main/Java/base.gradle"
     scriptFile = "${rootDir}/buildScript/base.gradle"
 
@@ -91,10 +91,7 @@ subprojects {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     mavenCentral()
 
-    def nexusFile = file("${rootDir}/nexus.properties")
-    if (nexusFile.exists() && nexusFile.length() > 0) {
-      def props = new Properties()
-      props.load(nexusFile.newReader("UTF-8"))
+    try {
       maven {
         url = props["repoUrl"]
         allowInsecureProtocol = true
@@ -103,6 +100,6 @@ subprojects {
           password props["repoPassword"]
         }
       }
-    }
+    } catch (ignored) {/*^_^*/}
   }
 }

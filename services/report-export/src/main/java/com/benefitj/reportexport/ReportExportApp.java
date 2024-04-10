@@ -9,7 +9,7 @@ import com.benefitj.core.file.IWriter;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.influxdb.dto.CountInfo;
 import com.benefitj.spring.influxdb.dto.LineProtocol;
-import com.benefitj.spring.influxdb.spring.EnableInfluxDB;
+import com.benefitj.spring.influxdb.spring.EnableInfluxdb;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
 import com.benefitj.spring.influxdb.template.QueryObserver;
 import com.benefitj.spring.influxdb.template.ValueConverter;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@EnableInfluxDB
+@EnableInfluxdb
 @SpringBootApplication
 @Slf4j
 public class ReportExportApp {

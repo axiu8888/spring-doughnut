@@ -1,5 +1,6 @@
 package com.benefitj.examples;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.aop.log.EnableHttpLoggingHandler;
@@ -46,7 +47,7 @@ public class SpringbootDoughnutApplication {
         evt -> log.info("app started ..."),
         evt -> log.info("app stopped ...")
     );
-    AppStateHook.registerStart(evt -> onStart(evt));
+    //AppStateHook.registerStart(evt -> onStart(evt));
   }
 
   private static void onStart(ApplicationReadyEvent evt) {
@@ -61,8 +62,8 @@ public class SpringbootDoughnutApplication {
       MongoTemplate tertiaryMongoTemplate = SpringCtxHolder.getBean("tertiaryMongoTemplate", MongoTemplate.class);
       log.info("tertiaryMongoTemplate: {}", tertiaryMongoTemplate.getCollectionNames());
 
-      log.info("secondary -> primary  ==>: {}", transferTo(secondaryMongoTemplate, primaryMongoTemplate));
-      log.info("tertiary -> primary  ==>: {}", transferTo(tertiaryMongoTemplate, primaryMongoTemplate));
+      log.info("secondary -> primary  ==>: {}", JSON.toJSONString(transferTo(secondaryMongoTemplate, primaryMongoTemplate)));
+      log.info("tertiary -> primary  ==>: {}", JSON.toJSONString(transferTo(tertiaryMongoTemplate, primaryMongoTemplate)));
 
       // 结束...
       EventLoop.asyncIO(() -> System.exit(0), 1000);

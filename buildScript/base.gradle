@@ -39,8 +39,8 @@ if (!trying({ project.ext.springEnv }, false)) {
 }
 
 java {
-  sourceCompatibility = trying({ javaVersion }, JavaVersion.VERSION_17)
-  targetCompatibility = trying({ javaVersion }, JavaVersion.VERSION_17)
+  sourceCompatibility = trying({ javaVersion }, JavaVersion.VERSION_11)
+  targetCompatibility = trying({ javaVersion }, JavaVersion.VERSION_11)
 }
 
 compileJava {
@@ -221,17 +221,21 @@ dependencies {
   }
 
   [
-      "org.junit.platform:junit-platform-launcher:1.10.1",
-      "org.junit.jupiter:junit-jupiter-engine:5.10.1",
-      "org.junit.vintage:junit-vintage-engine:5.10.1",
+//      'org.junit.jupiter:junit-jupiter-api:5.10.2',
+//      'org.junit.platform:junit-platform-commons:1.5.2',
+//      //"org.junit.jupiter:junit-jupiter-engine:5.10.2",
+//      //"org.junit.vintage:junit-vintage-engine:5.10.2",
+//      //"org.junit.platform:junit-platform-launcher:1.10.2",
   ].forEach {
     testImplementation(it)
   }
 
 }
 
-tasks.named('test') {
-  useJUnitPlatform()
+if (project.ext.springEnv) {
+  tasks.named('test') {
+    useJUnitPlatform()
+  }
 }
 
 afterEvaluate {

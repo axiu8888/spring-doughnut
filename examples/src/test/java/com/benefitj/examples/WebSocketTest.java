@@ -13,7 +13,7 @@ class WebSocketTest {
   }
 
   @Test
-  public void testWebSocketClient() {
+  void testWebSocketClient() {
     final CountDownLatch latch = new CountDownLatch(1);
 
     //URI uri = URI.create("ws://127.0.0.1:80/api/sockets/simple");

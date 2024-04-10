@@ -15,7 +15,9 @@ dependencies {
       api(it)
     }
   } else {
-    api "com.benefitj:benefitj-commons:2.5.0-SNAPSHOT"
+    api("com.benefitj:benefitj-commons:2.5.0-SNAPSHOT") {
+      exclude group: "*"//, module: ""
+    }
   }
 
 }

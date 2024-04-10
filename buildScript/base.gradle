@@ -179,10 +179,10 @@ dependencies {
       "commons-io:commons-io:${commonsIOVersion}",
       "org.apache.commons:commons-lang3:${commonsLang3Version}",
       "com.google.guava:guava:${guavaVersion}",
-      "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}",
+      //"com.github.ben-manes.caffeine:caffeine:${caffeineVersion}",
       "com.alibaba.fastjson2:fastjson2:${fastjson2Version}",
-      "cn.hutool:hutool-all:${hutoolVersion}",
-      "cglib:cglib:${cglibVersion}",
+      //"cn.hutool:hutool-all:${hutoolVersion}",
+      //"cglib:cglib:${cglibVersion}",
   ].forEach {
     if (!it.isBlank()) {
       if(useApi) {

@@ -12,9 +12,10 @@ archivesBaseName = "athenapdfservice"
 
 dependencies {
 
+
+  api(project(":spring")) { exclude group: "*" }
   [
       project(":commons"),
-      project(":spring"),
       project(":aop"),
       project(":athenapdf"),
 
@@ -25,6 +26,14 @@ dependencies {
   ].forEach {
     api(it) {
       exclude module: "spring-boot-starter-security"
+      exclude module: "spring-boot-starter-quartz"
+      exclude group: "cglib"
+      exclude group: "io.minio"
+      exclude group: "io.netty"
+      exclude group: "io.vertx"
+      exclude group: "io.reactivex.rxjava3"
+      exclude group: "com.squareup.retrofit2"
+      exclude group: "com.squareup.okhttp3"
     }
   }
 

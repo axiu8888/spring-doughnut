@@ -4,6 +4,7 @@ package com.benefitj.spring.listener;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationResolver;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * APP状态注解配置
  */
+@EnableSpringCtxInit
 @Configuration
 public class AutoAppStateConfiguration {
 

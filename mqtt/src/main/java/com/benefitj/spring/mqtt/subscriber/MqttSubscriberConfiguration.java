@@ -4,6 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
 import com.benefitj.mqtt.paho.PahoMqttClient;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -18,6 +19,7 @@ import org.springframework.integration.mqtt.support.MqttMessageConverter;
 /**
  * MQTT消息订阅
  */
+@EnableSpringCtxInit
 @Configuration
 public class MqttSubscriberConfiguration {
 

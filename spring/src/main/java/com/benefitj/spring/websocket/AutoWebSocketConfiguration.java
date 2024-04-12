@@ -1,6 +1,7 @@
 package com.benefitj.spring.websocket;
 
 
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -20,6 +21,7 @@ import java.util.Collection;
  */
 @ConditionalOnWebApplication
 @ConditionalOnClass(EnableWebSocket.class)
+@EnableSpringCtxInit
 @EnableWebSocket
 @Configuration
 public class AutoWebSocketConfiguration extends DelegatingWebSocketConfiguration

@@ -46,22 +46,22 @@ public class MqttPublisher implements IMqttPublisher, InitializingBean, Disposab
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(mp::afterPropertiesSet, Exception::printStackTrace));
+    getProxyList().forEach(mp -> CatchUtils.tryThrow(mp::afterPropertiesSet, Throwable::printStackTrace));
   }
 
   @Override
   public void destroy() throws Exception {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(mp::destroy, Exception::printStackTrace));
+    getProxyList().forEach(mp -> CatchUtils.tryThrow(mp::destroy, Throwable::printStackTrace));
   }
 
   @Override
   public void publish(String topic, MqttMessage msg) throws MqttPublishException {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publish(topic, msg), Exception::printStackTrace));
+    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publish(topic, msg), Throwable::printStackTrace));
   }
 
   @Override
   public void publishAsync(String topic, MqttMessage msg) {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publishAsync(topic, msg), Exception::printStackTrace));
+    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publishAsync(topic, msg), Throwable::printStackTrace));
   }
 
 }

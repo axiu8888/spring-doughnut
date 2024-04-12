@@ -4,7 +4,7 @@ apply from: "${scriptFile}"
 
 dependencies {
 
-  def useLocal = false
+  def useLocal = true
 
   if(useLocal) {
     compileOnly fileTree(dir: 'libs2/source', include: ['*.jar'])

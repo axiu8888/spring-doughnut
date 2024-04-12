@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @EnableSpringCtxInit
@@ -87,7 +88,7 @@ public class SpringbootDoughnutApplication {
               });
           list.add(Arrays.asList(name, ids.size(), ids.stream()
               .map(r -> r._id)
-              .toList()));
+              .collect(Collectors.toList())));
         });
     return list;
   }

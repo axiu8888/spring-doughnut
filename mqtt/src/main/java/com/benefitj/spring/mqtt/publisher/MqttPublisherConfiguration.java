@@ -1,5 +1,6 @@
 package com.benefitj.spring.mqtt.publisher;
 
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.mqtt.CommonsMqttConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 /**
  * MQTT
  */
+@EnableSpringCtxInit
 @Configuration
 public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
 

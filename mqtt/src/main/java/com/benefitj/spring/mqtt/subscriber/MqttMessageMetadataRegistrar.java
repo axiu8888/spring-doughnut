@@ -66,9 +66,9 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   }
 
   @Override
-  public void destroy() throws Exception {
-    singleClients.forEach(c -> CatchUtils.tryThrow(c::disconnect, (Consumer<Exception>) Exception::printStackTrace));
-    CatchUtils.tryThrow(getClient()::disconnect, (Consumer<Exception>) Exception::printStackTrace);
+  public void destroy() {
+    singleClients.forEach(c -> CatchUtils.tryThrow(c::disconnect, (Consumer<Throwable>) Throwable::printStackTrace));
+    CatchUtils.tryThrow(getClient()::disconnect, (Consumer<Throwable>) Throwable::printStackTrace);
   }
 
   @Override

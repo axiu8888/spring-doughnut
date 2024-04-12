@@ -134,6 +134,7 @@ configurations {
 }
 
 repositories {
+  mavenLocal()
   maven { url("https://maven.aliyun.com/repository/google") }
   maven { url("https://maven.aliyun.com/repository/central") }
   maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
@@ -146,11 +147,11 @@ repositories {
 
   trying({
     maven {
-      url = project.ext.repoUrl
+      url = props["repoUrl"]
       allowInsecureProtocol = true
       credentials {
-        username project.ext.repoUsername
-        password project.ext.repoPassword
+        username props["repoUsername"]
+        password props["repoPassword"]
       }
     }
   })
@@ -166,16 +167,13 @@ dependencies {
     useApi ? api(it) : implementation(it)
   }
 
-  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+  api "org.projectlombok:lombok:${lombokVersion}"
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  testImplementation "org.projectlombok:lombok:${lombokVersion}"
   testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   [
       //"org.slf4j:slf4j-api:${slf4jVersion}",
-      //"org.slf4j:slf4j-log4j12:${slf4jVersion}",
       //'ch.qos.logback:logback-classic:1.4.14',
       'com.google.code.findbugs:jsr305:3.0.2',
-      //"org.jetbrains:annotations:24.1.0",
       "commons-io:commons-io:${commonsIOVersion}",
       "org.apache.commons:commons-lang3:${commonsLang3Version}",
       "com.google.guava:guava:${guavaVersion}",
@@ -189,7 +187,6 @@ dependencies {
         api(it) {
           exclude group: 'org.slf4j', module: 'slf4j-log4j12'
         }
-
       } else {
         implementation(it) {
           exclude group: 'org.slf4j', module: 'slf4j-log4j12'
@@ -218,16 +215,15 @@ dependencies {
       testImplementation(it)
     }
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
-  }
-
-  [
-//      'org.junit.jupiter:junit-jupiter-api:5.10.2',
-//      'org.junit.platform:junit-platform-commons:1.5.2',
-//      //"org.junit.jupiter:junit-jupiter-engine:5.10.2",
-//      //"org.junit.vintage:junit-vintage-engine:5.10.2",
-//      //"org.junit.platform:junit-platform-launcher:1.10.2",
-  ].forEach {
-    testImplementation(it)
+  } else {
+    [
+        // springboot下，此依赖会导致单元测试无用执行(fix bug)
+        'org.junit.jupiter:junit-jupiter-api:5.10.2',
+        "org.junit.vintage:junit-vintage-engine:5.10.2",
+        "org.junit.platform:junit-platform-launcher:1.10.2",
+    ].forEach {
+      testImplementation(it)
+    }
   }
 
 }

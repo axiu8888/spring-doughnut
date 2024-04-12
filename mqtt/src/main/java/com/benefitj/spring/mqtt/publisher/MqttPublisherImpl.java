@@ -72,7 +72,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
 
   @Override
   public void destroy() throws Exception {
-    getClients().forEach(c -> CatchUtils.tryThrow(c::disconnectForcibly, (Consumer<Exception>) Exception::printStackTrace));
+    getClients().forEach(c -> CatchUtils.tryThrow(c::disconnectForcibly, (Consumer<Throwable>) Throwable::printStackTrace));
   }
 
   @Override

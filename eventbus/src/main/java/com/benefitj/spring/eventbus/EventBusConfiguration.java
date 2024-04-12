@@ -2,10 +2,12 @@ package com.benefitj.spring.eventbus;
 
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.EventWrapper;
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@EnableSpringCtxInit
 @Configuration
 public class EventBusConfiguration {
 

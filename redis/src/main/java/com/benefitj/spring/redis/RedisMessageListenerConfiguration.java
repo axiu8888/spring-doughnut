@@ -1,5 +1,6 @@
 package com.benefitj.spring.redis;
 
+import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,7 @@ import java.util.Map;
 /**
  * redis配置监听配置
  */
+@EnableSpringCtxInit
 @Configuration
 public class RedisMessageListenerConfiguration {
 

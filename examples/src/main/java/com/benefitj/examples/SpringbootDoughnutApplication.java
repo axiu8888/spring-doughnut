@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @EnableHttpLoggingHandler       // HTTP请求日志
 @EnableEventBusPoster           // eventbus
 //@EnableAthenapdf                // PDF
-//@EnableInfluxDB                 // InfluxDB
+//@EnableInfluxdb                 // InfluxDB
 @SpringBootApplication
 @Slf4j
 public class SpringbootDoughnutApplication {

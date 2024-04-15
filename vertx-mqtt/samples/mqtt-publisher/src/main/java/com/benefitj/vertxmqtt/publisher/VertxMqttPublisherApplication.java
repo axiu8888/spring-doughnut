@@ -25,9 +25,8 @@ public class VertxMqttPublisherApplication {
   }
 
   static void appStart() {
-    final EventLoop single = EventLoop.newSingle(false);
     MqttPublisher publisher = SpringCtxHolder.getBean(MqttPublisher.class);
-    single.scheduleAtFixedRate(() -> {
+    EventLoop.main().scheduleAtFixedRate(() -> {
       try {
         log.info("发布消息...");
         publisher.publish("/device/collector/" + "010003b8", DateFmtter.fmtNowS());

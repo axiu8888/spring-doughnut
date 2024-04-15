@@ -3,7 +3,7 @@ package com.benefitj.spring.mqtt.publisher;
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
-import com.benefitj.mqtt.paho.PahoMqttClient;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -35,7 +35,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
   /**
    * 客户端
    */
-  private List<PahoMqttClient> clients;
+  private List<PahoMqttV3Client> clients;
   /**
    * 调度器
    */
@@ -61,9 +61,9 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
   public void afterPropertiesSet() throws Exception {
     String id = IdUtils.nextLowerLetterId(getPrefix(), null, 6);
     int count = getCount();
-    List<PahoMqttClient> clients = new ArrayList<>(count);
+    List<PahoMqttV3Client> clients = new ArrayList<>(count);
     for (int i = 1; i <= count; i++) {
-      PahoMqttClient client = new PahoMqttClient(options, id + "-" + i);
+      PahoMqttV3Client client = new PahoMqttV3Client(options, id + "-" + i);
       client.setExecutor(getExecutor());
       clients.add(client);
     }
@@ -94,7 +94,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
    */
   public IMqttClient getClient() {
     int index = dispatcher.incrementAndGet();
-    PahoMqttClient client = this.clients.get(index % this.clients.size());
+    PahoMqttV3Client client = this.clients.get(index % this.clients.size());
     if (index > 10000) {
       dispatcher.set(this.clients.size());
     }
@@ -114,11 +114,11 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
     getExecutor().execute(() -> consumer.accept(getClient()));
   }
 
-  public List<PahoMqttClient> getClients() {
+  public List<PahoMqttV3Client> getClients() {
     return clients;
   }
 
-  public void setClients(List<PahoMqttClient> clients) {
+  public void setClients(List<PahoMqttV3Client> clients) {
     this.clients = clients;
   }
 

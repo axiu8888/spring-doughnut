@@ -2,8 +2,8 @@ package com.benefitj.spring.mqtt.subscriber;
 
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
-import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
-import com.benefitj.mqtt.paho.PahoMqttClient;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -47,10 +47,10 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean(name = "mqttSubscriber")
   @Bean("mqttSubscriber")
-  public PahoMqttClient mqttSubscriberClient(MqttConnectOptions options,
-                                             @Qualifier("mqttSubscribeDispatcher") MqttCallbackDispatcher dispatcher) {
+  public PahoMqttV3Client mqttSubscriberClient(MqttConnectOptions options,
+                                               @Qualifier("mqttSubscribeDispatcher") PahoMqttV3Dispatcher dispatcher) {
     String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
-    PahoMqttClient client = new PahoMqttClient(options, IdUtils.nextId(prefix, null, 10));
+    PahoMqttV3Client client = new PahoMqttV3Client(options, IdUtils.nextId(prefix, null, 10));
     client.setCallback(dispatcher);
     client.setAutoReconnect(true);
     client.setExecutor(EventLoop.newSingle(false));
@@ -63,8 +63,8 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean(name = "mqttSubscribeDispatcher")
   @Bean("mqttSubscribeDispatcher")
-  public MqttCallbackDispatcher mqttSubscribeDispatcher() {
-    return new MqttCallbackDispatcher();
+  public PahoMqttV3Dispatcher mqttSubscribeDispatcher() {
+    return new PahoMqttV3Dispatcher();
   }
 
   /**
@@ -75,7 +75,7 @@ public class MqttSubscriberConfiguration {
   public MqttMessageMetadataRegistrar mqttMessageListenerRegistrar(MqttConnectOptions options,
                                                                    MqttMessageConverter messageConverter,
                                                                    @Qualifier("mqttSubscriber") IMqttClient client,
-                                                                   @Qualifier("mqttSubscribeDispatcher") MqttCallbackDispatcher dispatcher) {
+                                                                   @Qualifier("mqttSubscribeDispatcher") PahoMqttV3Dispatcher dispatcher) {
     MqttMessageMetadataRegistrar registrar = new MqttMessageMetadataRegistrar(options);
     registrar.setClient(client);
     registrar.setDispatcher(dispatcher);

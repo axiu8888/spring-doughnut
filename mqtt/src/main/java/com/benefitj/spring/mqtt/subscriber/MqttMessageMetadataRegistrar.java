@@ -5,8 +5,8 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.MqttMessageSubscriber;
-import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
-import com.benefitj.mqtt.paho.PahoMqttClient;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
@@ -49,7 +49,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   /**
    * 消息分发器
    */
-  private MqttCallbackDispatcher dispatcher;
+  private PahoMqttV3Dispatcher dispatcher;
   /**
    * 客户端ID前缀
    */
@@ -57,7 +57,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   private MqttMessageConverter messageConverter = new DefaultPahoMessageConverter();
 
-  private final List<PahoMqttClient> singleClients = new CopyOnWriteArrayList<>();
+  private final List<PahoMqttV3Client> singleClients = new CopyOnWriteArrayList<>();
 
   public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
     this.options = options;
@@ -93,16 +93,15 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
           }
           opts.setServerURIs(new String[]{serverURI});
         }
-        PahoMqttClient client = new PahoMqttClient(opts, id);
+        PahoMqttV3Client client = new PahoMqttV3Client(opts, id);
         client.setExecutor(EventLoop.newSingle(false));
-        client.getExecutor().execute(() -> {
-        });
+        client.getExecutor().execute(() -> {/* ^_^ */});
         // 自动重连
         client.setAutoReconnect(true);
         // 重新连接的间隔
         client.setDelay(5000);
         // 消息分发器，自动重连等
-        MqttCallbackDispatcher dispatcher = new MqttCallbackDispatcher();
+        PahoMqttV3Dispatcher dispatcher = new PahoMqttV3Dispatcher();
         client.setCallback(dispatcher);
         // 订阅
         subscribe(metadata, client, dispatcher, listener);
@@ -115,14 +114,14 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   protected void subscribe(AnnotationMetadata metadata,
                            IMqttClient client,
-                           MqttCallbackDispatcher dispatcher,
+                           PahoMqttV3Dispatcher dispatcher,
                            MqttMessageListener listener) {
     final SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
     MqttMessageSubscriber<MqttMessage> subscriber = (topic, msg) -> {
+      Message<?> message = getMessageConverter().toMessage(topic, msg);
       if (listener.async()) {
         EventLoop.asyncIO(() -> {
           try {
-            Message<?> message = getMessageConverter().toMessage(topic, msg);
             invoker.invoke(topic, msg.getPayload(), message, msg, message.getHeaders());
           } catch (Throwable e) {
             log.error("mqtt error: " + e.getMessage(), e);
@@ -130,7 +129,6 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         });
       } else {
         try {
-          Message<?> message = getMessageConverter().toMessage(topic, msg);
           invoker.invoke(topic, msg.getPayload(), message, msg, message.getHeaders());
         } catch (Throwable e) {
           log.error("mqtt error: " + e.getMessage(), e);
@@ -187,11 +185,11 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
     this.prefix = prefix;
   }
 
-  public MqttCallbackDispatcher getDispatcher() {
+  public PahoMqttV3Dispatcher getDispatcher() {
     return dispatcher;
   }
 
-  public void setDispatcher(MqttCallbackDispatcher dispatcher) {
+  public void setDispatcher(PahoMqttV3Dispatcher dispatcher) {
     this.dispatcher = dispatcher;
   }
 

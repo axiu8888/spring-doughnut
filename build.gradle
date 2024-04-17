@@ -9,26 +9,26 @@ ext {
 
   lombokVersion = "1.18.30"
   jacksonVersion = "2.16.1"
-  guavaVersion = "33.0.0-jre"
+  guavaVersion = "33.1.0-jre"
   caffeineVersion = '3.1.8'
-  fastjson2Version = "2.0.47"
-  commonsIOVersion = "2.15.1"
+  fastjson2Version = "2.0.49"
+  commonsIOVersion = "2.16.1"
   commonsLang3Version = "3.14.0"
   //slf4jVersion = "2.0.11"
   slf4jVersion = "1.7.36"
-  hutoolVersion = "5.8.25"
+  hutoolVersion = "5.8.27"
   cglibVersion = "3.3.0"
-  nettyAllVersion = "4.1.107.Final"
+  nettyAllVersion = "4.1.108.Final"
 
   aspectjVersion = "1.9.20"
   swaggerVersion = "3.0.0"
   knife4jVersion = "4.3.0"
   jjwtVersion = "0.12.3"
-  vertxVersion = "4.4.6"
+  vertxVersion = "4.5.7"
 
   rxJavaVersion = '3.1.8'
   okHttpVersion = '4.12.0'
-  retrofitVersion = '2.9.0'
+  retrofitVersion = '2.11.0'
 
   mysqlVersion = "8.2.0"
   postgresqlVersion = "42.6.0"

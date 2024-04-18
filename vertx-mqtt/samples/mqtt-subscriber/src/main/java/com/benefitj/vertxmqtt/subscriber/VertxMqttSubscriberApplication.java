@@ -1,5 +1,6 @@
 package com.benefitj.vertxmqtt.subscriber;
 
+import com.benefitj.core.HexUtils;
 import com.benefitj.mqtt.vertx.client.VertxMqttMessageDispatcher;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
@@ -28,6 +29,8 @@ public class VertxMqttSubscriberApplication {
     // 订阅
     dispatcher.subscribe("/device/collector/#", (topic, message) ->
         log.info("rcv.2, {}, {}", topic, message.payload().toString()));
+    dispatcher.subscribe("hardware/#", (topic, message) ->
+        log.info("rcv.3, {}, {}", topic, HexUtils.bytesToHex(message.payload().getBytes())));
   }
 
 }

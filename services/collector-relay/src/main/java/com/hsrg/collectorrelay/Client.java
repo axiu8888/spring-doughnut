@@ -285,10 +285,8 @@ public class Client extends TcpNettyClient {
 
   }
 
-  private static void cancelTask(ScheduledFuture<?> future) {
-    if (future != null) {
-      future.cancel(true);
-    }
+  private static void cancelTask(ScheduledFuture<?> sf) {
+    EventLoop.cancel(sf);
   }
 
 

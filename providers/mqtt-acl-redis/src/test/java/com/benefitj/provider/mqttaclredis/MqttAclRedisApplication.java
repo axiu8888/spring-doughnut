@@ -23,7 +23,7 @@ public class MqttAclRedisApplication {
     MqttAclStringRedisTemplate redisTemplate = ctx.getBean(MqttAclStringRedisTemplate.class);
 
     // 结束进程
-    EventLoop.io().schedule(() -> {
+    EventLoop.asyncIO(() -> {
 
 //      String username = "test2";
 //      redisTemplate.deleteUsername(username);

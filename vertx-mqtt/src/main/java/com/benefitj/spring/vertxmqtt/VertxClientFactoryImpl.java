@@ -4,6 +4,7 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.mqtt.vertx.client.AutoConnectTimer;
 import com.benefitj.mqtt.vertx.client.VertxMqttClient;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 客户端工厂实现
@@ -58,7 +59,7 @@ public class VertxClientFactoryImpl implements VertxClientFactory {
         .setPassword(property.getPassword())
         .setCleanSession(property.isCleanSession())
         .setWillTopic(property.getWillTopic())
-        .setWillMessage(property.getWillMessage())
+        .setWillMessage(StringUtils.getIfBlank(property.getWillMessage(), () -> ""))
         .setWillFlag(property.isWillFlag())
         .setWillQoS(property.getWillQos())
         .setWillRetain(property.isWillRetain())

@@ -1,8 +1,8 @@
 plugins {
-  id 'org.springframework.boot' version "${springbootVersion}"
-  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'org.springframework.boot' version "$springbootVersion"
+  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
   id 'java'
-//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+  //id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
 }
 
 apply from: "${scriptFile}"
@@ -19,8 +19,8 @@ jar {
 dependencies {
   [
       "org.springframework.boot:spring-boot-starter",
-      "io.netty:netty-transport-native-epoll:$nettyAllVersion",
       "io.netty:netty-all:$nettyAllVersion",
+      "io.netty:netty-transport-native-epoll:$nettyAllVersion",
   ].forEach {
     implementation(it)
   }

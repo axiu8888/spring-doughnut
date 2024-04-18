@@ -103,10 +103,7 @@ public class ApiController {
               }
             });
       } else {
-        ScheduledFuture<?> sf = deleteTask.remove(dir.getName());
-        if (sf != null) {
-          sf.cancel(true);
-        }
+        EventLoop.cancel(deleteTask.remove(dir.getName()));
       }
       if (IOUtils.length(dir, true) > 20) {
         File zip = CompressUtils.zip(dir);

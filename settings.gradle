@@ -1,13 +1,14 @@
 pluginManagement {
   repositories {
+    mavenLocal()
     maven { url("https://maven.aliyun.com/repository/public") }
     maven { url("https://maven.aliyun.com/repository/google") }
     maven { url("https://maven.aliyun.com/repository/central") }
     maven { url("https://maven.aliyun.com/repository/gradle-plugin") }
     maven { url("https://maven.aliyun.com/repository/jcenter") }
-    mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/release' }
+    mavenCentral()
     gradlePluginPortal()
   }
 }
@@ -73,15 +74,15 @@ include(
     ":providers:mqtt-acl-redis",                 // emqx 权限配置
 )
 
-//include(
-//    ":services:jmods-export",                    // 导出执行环境
-//    ":services:mybatisplus",                     // mybatis
-//    ":services:websocket-relay",                 // 代理中继
-//    ":services:file-server",                     // 文件服务
-//    ":services:nat-proxy",                       // NAT代理
-//    ":services:influxdb-tools",                  // InfluxDB工具
-//    ":services:report-export",                   // 报告导出
-//    ":services:collector-relay",                 // 采集器中继座
-//)
+include(
+    ":services:jmods-export",                    // 导出执行环境
+    ":services:mybatisplus",                     // mybatis
+    ":services:websocket-relay",                 // 代理中继
+    ":services:file-server",                     // 文件服务
+    ":services:nat-proxy",                       // NAT代理
+    ":services:influxdb-tools",                  // InfluxDB工具
+    ":services:report-export",                   // 报告导出
+    ":services:collector-relay",                 // 采集器中继座
+)
 
 include ":examples"

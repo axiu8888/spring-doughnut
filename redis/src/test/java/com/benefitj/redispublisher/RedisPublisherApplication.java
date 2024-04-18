@@ -34,7 +34,7 @@ public class RedisPublisherApplication {
 
       // 发送
       StringRedisTemplate redisTemplate = SpringCtxHolder.getBean(StringRedisTemplate.class);
-      EventLoop.io().scheduleAtFixedRate(() -> {
+      EventLoop.asyncIOFixedRate(() -> {
         // 发布消息
         String msg = "now: " + DateFmtter.fmtNow();
         log.info("发布消息: " + msg);

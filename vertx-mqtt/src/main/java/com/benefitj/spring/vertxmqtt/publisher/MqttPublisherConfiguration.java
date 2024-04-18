@@ -23,7 +23,7 @@ public class MqttPublisherConfiguration {
   @ConditionalOnMissingBean(name = "vertx")
   @Bean("vertx")
   public Vertx vertx() {
-    return VertxHolder.getInstance();
+    return VertxHolder.get();
   }
 
   /**

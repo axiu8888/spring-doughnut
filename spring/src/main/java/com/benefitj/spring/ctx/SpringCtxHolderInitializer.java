@@ -16,7 +16,7 @@ import org.springframework.core.annotation.Order;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Lazy(value = false)
-@ConditionalOnMissingBean
+@ConditionalOnMissingBean(SpringCtxHolderInitializer.class)
 @Configuration
 public class SpringCtxHolderInitializer implements ApplicationContextAware, DisposableBean {
 

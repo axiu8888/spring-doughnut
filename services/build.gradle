@@ -7,7 +7,12 @@ subprojects {
   ext.groupId = "${group}"
 
   dependencies {
-
+    [
+        fileTree(dir: 'libs', include: ['*.jar']),
+        fileTree(dir: 'libs/jar', include: ['*.jar'])
+    ].forEach {
+      implementation(it)
+    }
     [
         project(":commons"),
         project(":aop"),

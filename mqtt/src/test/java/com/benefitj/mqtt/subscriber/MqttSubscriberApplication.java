@@ -1,6 +1,6 @@
 package com.benefitj.mqtt.subscriber;
 
-import com.benefitj.mqtt.paho.MqttCallbackDispatcher;
+import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.mqtt.subscriber.EnableMqttSubscriber;
@@ -33,7 +33,7 @@ public class MqttSubscriberApplication {
   public static class Example {
 
     @Autowired
-    private MqttCallbackDispatcher dispatcher;
+    private PahoMqttV3Dispatcher dispatcher;
 
     @MqttMessageListener(
         topics = {

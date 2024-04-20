@@ -15,7 +15,7 @@ import java.util.List;
 public class MqttAclRedisInitializer {
 
   private MqttAclStringRedisTemplate redisTemplate;
-  private MqttAclRedisProperties properties;
+  private MqttAclRedisOptions properties;
 
   public MqttAclRedisInitializer() {
   }
@@ -58,11 +58,11 @@ public class MqttAclRedisInitializer {
     this.redisTemplate = redisTemplate;
   }
 
-  public MqttAclRedisProperties getProperties() {
+  public MqttAclRedisOptions getProperties() {
     return properties;
   }
 
-  public void setProperties(MqttAclRedisProperties properties) {
+  public void setProperties(MqttAclRedisOptions properties) {
     this.properties = properties;
   }
 }

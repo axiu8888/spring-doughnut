@@ -1,9 +1,6 @@
 package com.benefitj.provider.mqttaclredis;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = "spring.mqtt-acl-redis")
-public class MqttAclRedisProperties {
+public class MqttAclRedisOptions {
 
 
   /**

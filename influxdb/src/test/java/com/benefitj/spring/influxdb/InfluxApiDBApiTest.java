@@ -393,7 +393,7 @@ class InfluxApiDBApiTest {
     File lineFile = new File("D:/tmp/influxdb/hs_darma_mattress.line");
 //    String type = "hr";
     String type = "rr";
-    List<Integer> points = IOUtils.readLines(IOUtils.newBufferedReader(lineFile, "UTF-8"))
+    List<Integer> points = IOUtils.readLines(IOUtils.newBufferedReader(lineFile, StandardCharsets.UTF_8))
         .stream()
         .map(InfluxUtils::parseLine)
         .map(line -> JSON.parseObject((String) line.getFields().get(type + "_points"), Integer[].class))
@@ -697,7 +697,7 @@ class InfluxApiDBApiTest {
 
   @Test
   void test_write() {
-    String base64 = IOUtils.readFileAsString(new File("D:/tmp/influxdb/base64.txt"));
+    String base64 = IOUtils.readAsString(new File("D:/tmp/influxdb/base64.txt"));
     byte[] decode = Base64.getDecoder().decode(base64);
     String str = new String(decode, StandardCharsets.UTF_8);
     JSONObject json = JSON.parseObject(str);

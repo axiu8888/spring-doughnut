@@ -216,10 +216,12 @@ dependencies {
     }
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
   } else {
+    def version = "5.10.2"
     [
         // springboot下，此依赖会导致单元测试无用执行(fix bug)
-        'org.junit.jupiter:junit-jupiter-api:5.10.2',
-        "org.junit.vintage:junit-vintage-engine:5.10.2",
+        "org.junit.jupiter:junit-jupiter-api:$version",
+        "org.junit.jupiter:junit-jupiter-engine:$version",
+        "org.junit.vintage:junit-vintage-engine:$version",
         "org.junit.platform:junit-platform-launcher:1.10.2",
     ].forEach {
       testImplementation(it)
@@ -228,10 +230,8 @@ dependencies {
 
 }
 
-if (project.ext.springEnv) {
-  tasks.named('test') {
-    useJUnitPlatform()
-  }
+tasks.named('test') {
+  useJUnitPlatform()
 }
 
 afterEvaluate {

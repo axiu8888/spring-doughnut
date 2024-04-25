@@ -1,3 +1,5 @@
+import java.util.concurrent.Callable
+
 subprojects {
 
   apply plugin: 'java'
@@ -13,22 +15,30 @@ subprojects {
     ].forEach {
       implementation(it)
     }
-    [
-        project(":commons"),
-        project(":aop"),
-        project(":eventbus"),
-        project(":spring"),
 
-        //'org.springframework.boot:spring-boot-devtools',
-
-    ].forEach {
-      implementation(it) {
-        exclude(module: "quartz")
-        exclude group: "io.springfox", module: "springfox-boot-starter"
-        exclude group: "com.github.xiaoymin", module: "knife4j-openapi2-spring-boot-starter"
+    if(trying({project.ext.needParentDeps}, true)) {
+      [
+          project(":commons"),
+          project(":aop"),
+          project(":eventbus"),
+          project(":spring"),
+          //'org.springframework.boot:spring-boot-devtools',
+      ].forEach {
+        implementation(it) {
+          exclude(module: "quartz")
+          exclude group: "io.springfox", module: "springfox-boot-starter"
+          exclude group: "com.github.xiaoymin", module: "knife4j-openapi2-spring-boot-starter"
+        }
       }
     }
-
   }
 
+}
+
+static <T> boolean trying(Callable<T> call, T defaultValue = null) {
+  T v = null
+  try {
+    v = call.call()
+  } catch (Throwable ignored) {}
+  return v == null ? defaultValue : v
 }

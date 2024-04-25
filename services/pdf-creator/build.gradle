@@ -1,0 +1,48 @@
+plugins {
+  id 'org.springframework.boot' version "$springbootVersion"
+  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+  id 'java'
+  //id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
+}
+
+apply from: "${scriptFile}"
+
+ext {
+  needParentDeps = false
+}
+
+description("PDF生成")
+
+group = "pdf-creator"
+version = ''
+
+jar {
+  archivesBaseName = "app"
+}
+
+dependencies {
+  api(project(":spring")) { exclude group: "*" }
+  [
+      project(":commons"),
+      project(":aop"),
+      project(":athenapdf"),
+
+      "org.springframework.boot:spring-boot-starter-web",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+  ].forEach {
+    api(it) {
+      exclude module: "spring-boot-starter-security"
+      exclude module: "spring-boot-starter-quartz"
+      exclude group: "cglib"
+      exclude group: "io.minio"
+      exclude group: "io.netty"
+      exclude group: "io.vertx"
+      exclude group: "io.reactivex.rxjava3"
+      exclude group: "com.squareup.retrofit2"
+      exclude group: "com.squareup.okhttp3"
+    }
+  }
+
+}

@@ -83,6 +83,7 @@ include(
     ":services:influxdb-tools",                  // InfluxDB工具
     ":services:report-export",                   // 报告导出
     ":services:collector-relay",                 // 采集器中继座
+    ":services:pdf-creator",                     // PDF生成
 )
 
 include ":examples"

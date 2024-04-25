@@ -9,7 +9,7 @@ apply from: "${scriptFile}"
 
 description("中继座模拟器")
 
-group = "relay-simulator"
+group = "collector-relay"
 version = ''
 
 jar {

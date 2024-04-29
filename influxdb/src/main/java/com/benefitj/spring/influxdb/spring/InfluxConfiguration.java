@@ -1,6 +1,8 @@
 package com.benefitj.spring.influxdb.spring;
 
+import com.benefitj.core.log.ILogger;
 import com.benefitj.spring.influxdb.InfluxApiFactory;
+import com.benefitj.spring.influxdb.InfluxDBLogger;
 import com.benefitj.spring.influxdb.InfluxOptions;
 import com.benefitj.spring.influxdb.convert.LineProtocolConverterFactory;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
@@ -8,7 +10,6 @@ import com.benefitj.spring.influxdb.dto.QueryResult;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
 import com.benefitj.spring.influxdb.template.InfluxTemplateImpl;
 import com.squareup.moshi.Moshi;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,10 +20,11 @@ import org.springframework.context.annotation.Configuration;
 /**
  * InfluxTemplate
  */
-@Slf4j
 @EnableConfigurationProperties
 @Configuration
 public class InfluxConfiguration {
+
+  final ILogger log = InfluxDBLogger.get();
 
   /**
    * 属性配置

@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb.template;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.DateFmtter;
 import com.benefitj.core.ShutdownHook;
 import com.benefitj.spring.influxdb.*;
@@ -18,11 +19,11 @@ import retrofit2.Response;
 
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -253,6 +254,8 @@ public interface InfluxTemplate {
                      Consumer<Throwable> error) {
     precision = precision != null ? precision : TimeUnit.NANOSECONDS;
     consistency = consistency != null ? consistency : InfluxApi.ConsistencyLevel.ALL;
+    InfluxDBLogger.get().debug("write, db: {}, retentionPolicy: {}, precision: {}, consistency: {}, batchPoints: {}"
+        , db, retentionPolicy, precision, consistency, CatchUtils.ignore(batchPoints::contentLength, -1));
     getApi()
         .writePoints(db, retentionPolicy, InfluxTimeUtil.toTimePrecision(precision), consistency.value(), batchPoints)
         .subscribe(new SimpleSubscriber<Response<ResponseBody>>() {
@@ -387,7 +390,20 @@ public interface InfluxTemplate {
    * @return 返回统计信息
    */
   default CountInfo queryCountInfo(String measurement, String column, long startTime, long endTime) {
-    return queryCountInfo(getDatabase(), measurement, column, startTime, endTime, null);
+    return queryCountInfo(measurement, column, startTime, endTime, null);
+  }
+
+  /**
+   * 统计
+   *
+   * @param measurement 表
+   * @param column      列
+   * @param startTime   开始时间
+   * @param endTime     结束时间
+   * @return 返回统计信息
+   */
+  default CountInfo queryCountInfo(String measurement, String column, long startTime, long endTime, String condition) {
+    return queryCountInfo(getDatabase(), measurement, column, startTime, endTime, condition);
   }
 
   /**
@@ -960,7 +976,7 @@ public interface InfluxTemplate {
    * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
    */
   default boolean export(File out, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
-    try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out), StandardCharsets.UTF_8));) {
+    try (final BufferedWriter writer = new BufferedWriter(new FileWriter(out));) {
       return export(writer, measurement, chunkSize, startTime, endTime, condition);
     } catch (IOException e) {
       throw new IllegalStateException(e);
@@ -996,6 +1012,38 @@ public interface InfluxTemplate {
    * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
    */
   default boolean export(Writer out, String db, String retentionPolicy, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
+    return export((queryResult, fieldKeyMap) -> InfluxUtils.writeLines(out, queryResult, fieldKeyMap), db, retentionPolicy, measurement, chunkSize, startTime, endTime, condition);
+  }
+
+  /**
+   * 导出成文件
+   *
+   * @param consumer    处理
+   * @param measurement 表名
+   * @param chunkSize   块大小，即每次分批给多少条数据
+   * @param startTime   开始时间
+   * @param endTime     结束时间
+   * @param condition   条件：AND deviceId = '123456' AND status = 1
+   * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
+   */
+  default boolean export(BiConsumer<QueryResult, Map<String, FieldKey>> consumer, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
+    return export(consumer, getDatabase(), getRetentionPolicy(), measurement, chunkSize, startTime, endTime, condition);
+  }
+
+  /**
+   * 导出成文件
+   *
+   * @param consumer        处理
+   * @param db              数据库
+   * @param retentionPolicy 策略
+   * @param measurement     表名
+   * @param chunkSize       块大小，即每次分批给多少条数据
+   * @param startTime       开始时间
+   * @param endTime         结束时间
+   * @param condition       条件：AND deviceId = '123456' AND status = 1
+   * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
+   */
+  default boolean export(BiConsumer<QueryResult, Map<String, FieldKey>> consumer, String db, String retentionPolicy, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
     Map<String, FieldKey> fieldKeyMap = getFieldKeyMap(db, retentionPolicy, measurement, true);
     if (fieldKeyMap.isEmpty()) {
       return false;
@@ -1009,14 +1057,7 @@ public interface InfluxTemplate {
     );
     AtomicReference<Throwable> error = new AtomicReference<>();
     Disposable disposable = query(db, sql, chunkSize)
-        .subscribe(queryResult -> {
-          List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
-          out.write(points.stream()
-              .map(Point::lineProtocol)
-              .collect(Collectors.joining("\n")));
-          out.write("\n");
-          out.flush();
-        }, error::set);
+        .subscribe(queryResult -> consumer.accept(queryResult, fieldKeyMap), error::set);
     ShutdownHook.register(disposable::dispose);
     if (error.get() != null) {
       throw new IllegalStateException(error.get());

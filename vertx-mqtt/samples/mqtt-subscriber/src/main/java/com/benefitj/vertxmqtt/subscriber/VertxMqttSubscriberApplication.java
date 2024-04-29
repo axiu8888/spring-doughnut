@@ -1,7 +1,7 @@
 package com.benefitj.vertxmqtt.subscriber;
 
+import com.benefit.vertx.mqtt.client.VertxMqttMessageDispatcher;
 import com.benefitj.core.HexUtils;
-import com.benefitj.mqtt.vertx.client.VertxMqttMessageDispatcher;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.vertxmqtt.subscriber.EnableMqttSubscriber;

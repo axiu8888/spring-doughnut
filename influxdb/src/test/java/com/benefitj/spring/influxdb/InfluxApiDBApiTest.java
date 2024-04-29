@@ -6,6 +6,8 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.benefitj.core.*;
 import com.benefitj.core.file.FileWriterImpl;
 import com.benefitj.core.file.IWriter;
+import com.benefitj.core.log.Slf4jLevel;
+import com.benefitj.core.log.Slf4jLogger;
 import com.benefitj.http.ProgressRequestBody;
 import com.benefitj.javastruct.JavaStructManager;
 import com.benefitj.spring.BeanHelper;
@@ -71,6 +73,7 @@ class InfluxApiDBApiTest {
 
   @BeforeEach
   public void setUp() {
+    InfluxDBLogger.set(Slf4jLogger.newProxy(log, Slf4jLevel.INFO));
   }
 
   @AfterEach
@@ -285,12 +288,12 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2024, 3, 15, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 3, 16, 23, 59, 0).getTime();
+    long startTime = TimeUtils.toDate(2024, 4, 25, 0, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 4, 25, 23, 59, 59).getTime();
 //    long endTime = TimeUtils.now();
-//    String condition = " AND device_id = '01001049'";
-//    String condition = " AND patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d'";
-    String condition = " AND (person_zid = 'f89ebf339a33442fbd0cf5764c7868f5' OR patient_id = 'f89ebf339a33442fbd0cf5764c7868f5')";
+    String condition = " AND device_id = '01001064'";
+//    String condition = " AND patient_id = 'ef372fd4b5254bf58828cc297a0efc61'";
+//    String condition = " AND (person_zid = 'f89ebf339a33442fbd0cf5764c7868f5' OR patient_id = 'f89ebf339a33442fbd0cf5764c7868f5')";
 //    String condition = " AND device_no = '641938001136'";
 //    String condition = " AND (device_id != person_zid AND device_id != '01001080' AND device_id != '01001169' AND device_id != '01001148' AND device_id != '01001149' AND device_id != '01001192') ";
 //    String condition = " AND (" +
@@ -315,7 +318,7 @@ class InfluxApiDBApiTest {
             .build())
         .forEach(measurementInfo -> {
           File line = IOUtils.createFile(dir, measurementInfo.name + ".line");
-          template.export(line, measurementInfo.name, 5000, startTime, endTime, condition);
+          template.export(line, measurementInfo.name, 1000, startTime, endTime, condition);
           if (line.length() <= 20) {
             line.delete(); // 没有数据，删除空文件
           }
@@ -332,7 +335,7 @@ class InfluxApiDBApiTest {
   /**
    * 导入 line 文件
    */
-  @Test
+  //@Test
   void test_loadLines2() {
 //    test_createSubscriptions();
     List.of(new File("D:/tmp/influxdb").listFiles()).forEach(f -> {
@@ -370,7 +373,8 @@ class InfluxApiDBApiTest {
         && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
     );
     assert lines != null;
-    upload(template, Arrays.asList(lines), true);
+    //upload(template, Arrays.asList(lines), true);
+    upload(template, Arrays.asList(lines), false);
   }
 
   /**
@@ -706,4 +710,85 @@ class InfluxApiDBApiTest {
     log.info("str ==>: {}", str);
   }
 
+
+//  @Test
+//  void test_parse() {
+//    List<JSONObject> list = IOUtils.readLines(new File("D:/tmp/cache/data.txt"))
+//        .stream()
+//        .map(line -> line.split("\t"))
+//        .map(arr -> new JSONObject(){{
+//          put("patientId", arr[0]);
+//          put("personName", arr[1]);
+//          put("itemId", arr[2]);
+//          put("createTime", arr[3]);
+//          put("recipelId", arr[4]);
+//          put("status", arr[5]);
+//          put("startTime", arr[6]);
+//          put("endTime", arr.length >= 8 ? arr[7] : null);
+//        }})
+//        .collect(Collectors.toList());
+//    log.info(" ==>: \n{}", JSON.toJSONString(list));
+//
+//    for (JSONObject json : list) {
+//      File dir = IOUtils.mkDirs("D:/tmp/cache/data/" + json.getString("personName"));
+//      log.info("dir: {}, json: {}", dir, json.toJSONString());
+//      long startTime = DateFmtter.parseToLong(json.getString("startTime"), "yyyy-MM-dd HH:mm:ss.SSS");
+//      long endTime = "finish".equalsIgnoreCase(json.getString("status"))
+//          ? DateFmtter.parseToLong(json.getString("endTime"), "yyyy-MM-dd HH:mm:ss.SSS")
+//          : DateFmtter.now();
+//      String condition = " AND person_zid = '" + json.getString("patientId") + "'";
+//
+//      File wave = IOUtils.createFile(dir, "生理信号.line");
+//      try {
+//        IWriter writer = IWriter.createWriter(wave, false);
+//        template.export((queryResult, fieldKeyMap) -> {
+//          List<JSONObject> points = InfluxUtils.toPoint(queryResult, fieldKeyMap)
+//              .stream()
+//              .map(p -> {
+//                JSONObject pjson = new JSONObject();
+//                pjson.put("time", p.getTime().longValue());
+//                pjson.put("patient_id", p.getTags().get("person_zid"));
+//                pjson.put("device_id", p.getTags().get("device_id"));
+//                pjson.putAll(p.getFields());
+//                return pjson;
+//              })
+//              .collect(Collectors.toList());
+//          points.forEach(p -> writer.writeAndFlush(p.toJSONString()).writeAndFlush("\n"));
+//        }, "hs_wave_package", 100, startTime, endTime, condition);
+//        IOUtils.closeQuietly(writer);
+//      } finally {
+//        if (wave.length() <= 20) wave.delete(); // 没有数据，删除空文件
+//      }
+//
+//      File trend = IOUtils.createFile(dir, "趋势数据.line");
+//      try {
+//        IWriter writer = IWriter.createWriter(trend, false);
+//        template.export((queryResult, fieldKeyMap) -> {
+//          List<JSONObject> points = InfluxUtils.toPoint(queryResult, fieldKeyMap)
+//              .stream()
+//              .map(p -> {
+//                JSONObject pjson = new JSONObject();
+//                pjson.put("time", p.getTime().longValue());
+//                pjson.put("patient_id", p.getTags().get("person_zid"));
+//                pjson.put("device_id", p.getTags().get("device_id"));
+//                pjson.putAll(p.getFields());
+//                return pjson;
+//              })
+//              .collect(Collectors.toList());
+//          points.forEach(p -> writer.writeAndFlush(p.toJSONString()).writeAndFlush("\n"));
+//        }, "hs_all_rates", 1000, startTime, endTime, condition);
+//      } finally {
+//        if (trend.length() <= 20) trend.delete(); // 没有数据，删除空文件
+//      }
+//    }
+//  }
+
+  @Test
+  void test_count() {
+    long startTime = TimeUtils.toTime(2024, 4, 25);
+    long endTime = TimeUtils.toTime(2024, 4, 26);
+    String condition = "AND (ecg_conn_state = '0' OR ecg_lead_state = 0 OR resp_conn_state = 0)";
+    CountInfo info = template.queryCountInfo("hs_wave_package", "ecg_points", startTime, endTime, " AND patient_id = '23dfdebf4302482fa4f75c38046eb4d9' " + condition);
+    log.info("info ==>:\n\n{}\n", JSON.toJSONString(info, JSONWriter.Feature.PrettyFormat));
+  }
 }

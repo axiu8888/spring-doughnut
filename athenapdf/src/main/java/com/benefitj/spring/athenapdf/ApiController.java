@@ -4,7 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
-import com.benefitj.core.concurrent.CancelableScheduledFuture;
+import com.benefitj.core.concurrent.CancelableFuture;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import io.swagger.annotations.Api;
@@ -187,7 +187,7 @@ public class ApiController {
   }
 
 
-  static class DeleteTimer<V> extends CancelableScheduledFuture<V> {
+  static class DeleteTimer<V> extends CancelableFuture<V> {
 
     public DeleteTimer(ScheduledFuture<V> original) {
       super(original);

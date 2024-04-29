@@ -1,7 +1,7 @@
 package com.benefitj.spring.vertxmqtt.server;
 
-import com.benefitj.mqtt.vertx.VertxHolder;
-import com.benefitj.mqtt.vertx.server.*;
+import com.benefit.vertx.VertxHolder;
+import com.benefit.vertx.mqtt.server.*;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
 import io.vertx.core.Vertx;
@@ -34,7 +34,7 @@ public class MqttServerConfiguration {
   /**
    * MQTT消息处理
    */
-  @ConfigurationProperties
+  @ConfigurationProperties(prefix = "spring.mqtt.server")
   @ConditionalOnMissingBean
   @Bean
   public MqttServerOptions mqttServerOptions() {

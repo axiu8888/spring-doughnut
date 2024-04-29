@@ -1,6 +1,6 @@
 package com.benefitj.spring.vertxmqtt.publisher;
 
-import com.benefitj.mqtt.vertx.VertxHolder;
+import com.benefit.vertx.VertxHolder;
 import com.benefitj.spring.listener.AppStateListener;
 import com.benefitj.spring.listener.AppStateListenerWrapper;
 import com.benefitj.spring.vertxmqtt.MqttClientProperty;

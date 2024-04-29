@@ -1,0 +1,63 @@
+plugins {
+  id 'org.springframework.boot' version "$springbootVersion"
+  id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "$springExperimentalAotVersion"
+}
+
+apply from: "${scriptFile}"
+
+dependencies {
+
+  [
+      project(":quartz"),
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+      "org.springframework.boot:spring-boot-starter-web" ,
+      "org.springframework.boot:spring-boot-starter-websocket" ,
+      "org.springframework.boot:spring-boot-starter-data-jpa" ,
+
+      "com.github.jsqlparser:jsqlparser:4.5",
+      "com.github.pagehelper:pagehelper:5.3.2",
+      "com.baomidou:mybatis-plus-boot-starter:${mybatisPlusVersion}",
+      // "com.baomidou:mybatis-plus-generator:${mybatisPlusVersion}",
+      // “com.baomidou:mybatis-plus-extension:${mybatisPlusVersion}",
+      // "com.baomidou:dynamic-datasource-spring-boot-starter:3.6.1",
+
+      // 'com.h2database:h2:1.4.200',
+      //"com.mysql:mysql-connector-j:${mysqlVersion}",
+      "com.alibaba:druid-spring-boot-starter:${druidVersion}",
+      "org.postgresql:postgresql:${postgresqlVersion}",
+
+      // swagger-ui
+      "io.springfox:springfox-boot-starter:3.0.0",
+      'com.github.xiaoymin:knife4j-spring-ui:3.0.3',
+
+  ].forEach {
+    implementation(it)
+  }
+
+//  // springboot admin 管理
+//  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//  implementation 'de.codecentric:spring-boot-admin-starter-server:2.7.13'
+//  implementation 'de.codecentric:spring-boot-admin-starter-client:2.7.13'
+//  implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+}
+
+def file = new File(obtainResources(sourceSets), "version.properties")
+file.text = "version=v1.0-${new Date().format('yyMMdd_HHmm')}"
+
+/**
+ * 查找 resources 目录
+ */
+static String obtainResources(def sourceSets) {
+  return sourceSets.main.resources.srcDirs
+      .stream()
+      .filter { it -> it.getName().equalsIgnoreCase("resources") }
+      .findFirst()
+      .orElse(sourceSets.main.resources.srcDirs[0])
+      .getAbsolutePath()
+}

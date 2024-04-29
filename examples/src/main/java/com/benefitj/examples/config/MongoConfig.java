@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @EnableConfigurationProperties
-@Configuration
+//@Configuration
 public class MongoConfig {
 
   @ConfigurationProperties(prefix = "mongodb.primary")

@@ -25,7 +25,7 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
                                       HttpServletResponse response,
                                       AuthenticationException e) throws IOException {
     String error = e.getMessage();
-    log.info("认证失败: {}", error);
+    log.warn("认证失败: {}", error);
     HttpStatus status = HttpStatus.UNAUTHORIZED;
     ServletUtils.write(response, status.value(), StringUtils.getIfBlank(error, status::getReasonPhrase));
   }

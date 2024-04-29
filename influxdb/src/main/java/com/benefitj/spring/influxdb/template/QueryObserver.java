@@ -170,4 +170,18 @@ public abstract class QueryObserver
     this.onSeriesComplete(series, c);
     c.setPosition(index);
   }
+
+  public static QueryObserver create(QueryObserverConsumer consumer) {
+    return new QueryObserver() {
+      @Override
+      public void onSeriesNext(List<Object> values, ValueConverter converter, int position) {
+        consumer.accept(values, converter, position);
+      }
+    };
+  }
+
+  public interface QueryObserverConsumer {
+
+    void accept(List<Object> values, ValueConverter converter, int position);
+  }
 }

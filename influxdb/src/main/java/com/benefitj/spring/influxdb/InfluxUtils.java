@@ -10,7 +10,9 @@ import com.benefitj.spring.influxdb.convert.PointConverter;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
 import com.benefitj.spring.influxdb.dto.*;
 
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -411,6 +413,48 @@ public class InfluxUtils {
   }
 
   /**
+   * 写入行数据
+   *
+   * @param out 输出
+   * @param queryResult 查询结果
+   * @param fieldKeyMap 字段
+   */
+  public static void writeLines(OutputStream out, QueryResult queryResult, Map<String, FieldKey> fieldKeyMap) {
+    try {
+      List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
+      String lines = points.stream()
+          .map(Point::lineProtocol)
+          .collect(Collectors.joining("\n"));
+      out.write(lines.getBytes(StandardCharsets.UTF_8));
+      out.write("\n".getBytes(StandardCharsets.UTF_8));
+      out.flush();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 写入行数据
+   *
+   * @param out 输出
+   * @param queryResult 查询结果
+   * @param fieldKeyMap 字段
+   */
+  public static void writeLines(Writer out, QueryResult queryResult, Map<String, FieldKey> fieldKeyMap) {
+    try {
+      List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
+      String lines = points.stream()
+          .map(Point::lineProtocol)
+          .collect(Collectors.joining("\n"));
+      out.write(lines);
+      out.write("\n");
+      out.flush();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
    * 是否不为空
    */
   public static boolean isNoneBlank(final CharSequence... cs) {
@@ -444,5 +488,4 @@ public class InfluxUtils {
     }
     return true;
   }
-
 }

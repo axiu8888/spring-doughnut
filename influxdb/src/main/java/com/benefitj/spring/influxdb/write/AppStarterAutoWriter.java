@@ -1,9 +1,10 @@
 package com.benefitj.spring.influxdb.write;
 
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.log.ILogger;
+import com.benefitj.spring.influxdb.InfluxDBLogger;
 import com.benefitj.spring.influxdb.InfluxOptions;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
@@ -15,8 +16,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * 程序启动时自动上传InfluxDB的行协议文件的监听
  */
-@Slf4j
 public class AppStarterAutoWriter {
+
+  final ILogger log = InfluxDBLogger.get();
 
   InfluxTemplate template;
 
@@ -84,7 +86,7 @@ public class AppStarterAutoWriter {
   protected void uploadFile(File file, List<String> ignoreDirs) {
     if (file.isFile() && file.length() > 0
         && file.getName().endsWith(options.getWriter().getSuffix())) {
-      log.info("上传文件, name: {}, path: {}, length: {}MB", file.getName(),
+      log.debug("上传文件, name: {}, path: {}, length: {}MB", file.getName(),
           file.getAbsolutePath(), String.format("%.2f", ((file.length() * 1.0f) / (1024 << 10))));
       getTemplate().write(file);
       file.delete();

@@ -35,7 +35,7 @@ public class InfluxWriteManagerConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public LineFileListener lineFileListener(InfluxTemplate template) {
-    return LineFileListener.newLineFileListener(template);
+    return LineFileListener.create(template);
   }
 
   /**

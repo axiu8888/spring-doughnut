@@ -1,6 +1,8 @@
 package com.benefitj.spring.influxdb.template;
 
+import com.benefitj.core.log.ILogger;
 import com.benefitj.spring.influxdb.InfluxApi;
+import com.benefitj.spring.influxdb.InfluxDBLogger;
 import com.benefitj.spring.influxdb.InfluxException;
 import com.benefitj.spring.influxdb.InfluxOptions;
 import com.benefitj.spring.influxdb.convert.PointConverterFactory;
@@ -26,6 +28,8 @@ import java.util.function.Function;
  * @author DINGXIUAN
  */
 public class InfluxTemplateImpl implements InfluxTemplate {
+
+  final ILogger log = InfluxDBLogger.get();
 
   private InfluxOptions options;
   private InfluxApi api;
@@ -72,16 +76,20 @@ public class InfluxTemplateImpl implements InfluxTemplate {
 
   @Override
   public Flowable<QueryResult> query(String db, String query, int chunkSize, String params) {
-    return execute(getApi().query(db, query, chunkSize, params));
+      return params == null
+          ? execute(getApi().query(db, query, chunkSize))
+          : execute(getApi().query(db, query, chunkSize, params));
   }
 
   @Override
   public QueryResult postQuery(String query) {
+    log.debug("postQuery, query: {}", query);
     return execute(getApi().postQuery(query), r -> r);
   }
 
   @Override
   public QueryResult postQuery(String db, String query) {
+    log.debug("postQuery, db: {}, query: {}", db, query);
     return execute(getApi().postQuery(db, query), r -> r);
   }
 

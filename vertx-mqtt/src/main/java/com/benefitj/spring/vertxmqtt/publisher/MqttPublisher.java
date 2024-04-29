@@ -1,7 +1,7 @@
 package com.benefitj.spring.vertxmqtt.publisher;
 
 
-import com.benefitj.mqtt.vertx.client.VertxMqttClient;
+import com.benefit.vertx.mqtt.client.VertxMqttClient;
 
 /**
  * MQTT发布客户端

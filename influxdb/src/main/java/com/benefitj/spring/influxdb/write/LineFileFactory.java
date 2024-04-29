@@ -15,10 +15,10 @@ public interface LineFileFactory extends FileFactory<LineFileWriter> {
 
 
   static LineFileFactory newFactory() {
-    return new LineFileFactoryImpl();
+    return new Impl();
   }
 
-  class LineFileFactoryImpl implements LineFileFactory {
+  class Impl implements LineFileFactory {
 
     @Override
     public LineFileWriter create(File dir, Charset charset) {

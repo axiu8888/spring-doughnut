@@ -2,8 +2,9 @@ package com.benefitj.spring.influxdb.write;
 
 import com.benefitj.core.Utils;
 import com.benefitj.core.file.slicer.FileListener;
+import com.benefitj.core.log.ILogger;
+import com.benefitj.spring.influxdb.InfluxDBLogger;
 import com.benefitj.spring.influxdb.template.InfluxTemplate;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
@@ -13,20 +14,21 @@ public interface LineFileListener extends FileListener<LineFileWriter> {
   void onHandle(LineFileWriter lineFileWriter, File file);
 
 
-  static LineFileListener newLineFileListener(InfluxTemplate template) {
-    return new LineFileListenerImpl(template);
+  static LineFileListener create(InfluxTemplate template) {
+    return new Impl(template);
   }
 
 
   /**
    * 上传到InfluxDB
    */
-  @Slf4j
-  class LineFileListenerImpl implements LineFileListener {
+  class Impl implements LineFileListener {
+
+    final ILogger log = InfluxDBLogger.get();
 
     InfluxTemplate template;
 
-    public LineFileListenerImpl(InfluxTemplate template) {
+    public Impl(InfluxTemplate template) {
       this.template = template;
     }
 

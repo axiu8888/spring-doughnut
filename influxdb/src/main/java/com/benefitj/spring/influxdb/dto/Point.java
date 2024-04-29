@@ -45,12 +45,20 @@ public class Point {
   public Point() {
   }
 
+  public String getMeasurement() {
+    return measurement;
+  }
+
   /**
    * @param measurement
    *            the measurement to set
    */
   public void setMeasurement(final String measurement) {
     this.measurement = measurement;
+  }
+
+  public Number getTime() {
+    return time;
   }
 
   /**
@@ -74,6 +82,10 @@ public class Point {
    */
   public Map<String, String> getTags() {
     return this.tags;
+  }
+
+  public TimeUnit getPrecision() {
+    return precision;
   }
 
   /**

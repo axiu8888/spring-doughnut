@@ -11,13 +11,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * redis通道消息订阅
  */
 @Profile("sub")
+@ActiveProfiles("sub")
 @EnableRedisMessageListener
 @SpringBootApplication
+@Slf4j
 public class RedisSubscriberApplication {
   public static void main(String[] args) {
     SpringApplication.run(RedisSubscriberApplication.class, args);
@@ -28,7 +31,6 @@ public class RedisSubscriberApplication {
   }
 
 
-  @Slf4j
   @Component
   public static class RedisChannel {
 

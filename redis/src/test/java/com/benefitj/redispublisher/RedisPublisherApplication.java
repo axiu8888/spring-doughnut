@@ -5,6 +5,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageListener;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 @Profile("pub")
 @EnableRedisMessageListener
 @SpringBootApplication
+@Slf4j
 public class RedisPublisherApplication {
   public static void main(String[] args) {
     SpringApplication.run(RedisPublisherApplication.class, args);
@@ -28,7 +30,6 @@ public class RedisPublisherApplication {
   static {
     EventLoop.main().execute(() -> {});
     AppStateHook.registerStart(e -> {
-      final Logger log = LoggerFactory.getLogger(RedisPublisherApplication.class);
       // 启动主线程，防止程序自动自动退出
       EventLoop.main().execute(() -> log.info("{} start...", SpringCtxHolder.getAppName()));
 

@@ -88,9 +88,17 @@ public class ServletUtils {
   /**
    * 获取当前请求路径
    */
-  public static String getRequestPath() {
+  public static String getPath() {
     HttpServletRequest request = getRequest();
     return request.getContextPath() + request.getRequestURI();
+  }
+
+  /**
+   * 获取当前请求路径
+   */
+  public static String getFullPath() {
+    HttpServletRequest request = getRequest();
+    return request.getContextPath() + request.getRequestURI() + "?" + request.getQueryString();
   }
 
   /**

@@ -1,21 +1,33 @@
 package com.benefitj.spring.vertxmqtt.publisher;
 
 import com.benefit.vertx.VertxHolder;
-import com.benefitj.spring.listener.AppStateListener;
-import com.benefitj.spring.listener.AppStateListenerWrapper;
-import com.benefitj.spring.vertxmqtt.MqttClientProperty;
-import com.benefitj.spring.vertxmqtt.VertxClientFactory;
+import com.benefit.vertx.mqtt.client.VertxMqttClient;
+import com.benefitj.spring.listener.EnableAppStateListener;
+import com.benefitj.spring.vertxmqtt.MqttClientOptions;
+import com.benefitj.spring.vertxmqtt.VertxMqttClientFactory;
 import io.vertx.core.Vertx;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MQTT 消息发布
  */
+@EnableAppStateListener
 @Configuration
 public class MqttPublisherConfiguration {
+
+  /**
+   * MQTT客户端数量
+   */
+  @Value("#{@environment['spring.mqtt.publish.count'] ?: 1}")
+  Integer count;
 
   /**
    * vertx
@@ -23,16 +35,17 @@ public class MqttPublisherConfiguration {
   @ConditionalOnMissingBean(name = "vertx")
   @Bean("vertx")
   public Vertx vertx() {
-    return VertxHolder.get();
+    return VertxHolder.getVertx();
   }
 
   /**
    * 配置
    */
-  @ConditionalOnMissingBean
-  @Bean
-  public MqttClientProperty mqttClientProperty() {
-    return new MqttClientProperty();
+  @ConfigurationProperties(prefix = "spring.mqtt.publish")
+  @ConditionalOnMissingBean(name = "mqttPublishOptions")
+  @Bean("mqttPublishOptions")
+  public MqttClientOptions mqttPublisherOptions() {
+    return new MqttClientOptions();
   }
 
   /**
@@ -40,19 +53,15 @@ public class MqttPublisherConfiguration {
    */
   @ConditionalOnMissingBean(name = "mqttPublisher")
   @Bean("mqttPublisher")
-  public MqttPublisher mqttPublisher(MqttClientProperty property) {
-    VertxClientFactory factory = VertxClientFactory.newFactory(MqttPublisher.class);
-    return (MqttPublisher) factory.create(property);
-  }
-
-  /**
-   * MQTT订阅开关
-   */
-  @ConditionalOnMissingBean(name = "mqttSubscribeSwitcher")
-  @Bean("mqttSubscribeSwitcher")
-  public AppStateListener mqttSubscribeSwitcher(@Qualifier("vertx") Vertx vertx,
-                                                @Qualifier("mqttPublisher") MqttPublisher publisher) {
-    return new AppStateListenerWrapper(e -> vertx.deployVerticle(publisher), e -> publisher.stop());
+  public MqttPublisher mqttPublisher(@Qualifier("vertx") Vertx vertx,
+                                     @Qualifier("mqttPublishOptions") MqttClientOptions options) {
+    VertxMqttClientFactory<VertxMqttClient> factory = VertxMqttClientFactory.newFactory(VertxMqttClient.class);
+    List<VertxMqttClient> clients = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      clients.add(factory.create(options));
+    }
+    clients.forEach(vertx::deployVerticle);
+    return MqttPublisher.create(clients);
   }
 
 }

@@ -4,6 +4,7 @@ import com.benefit.vertx.VertxHolder;
 import com.benefit.vertx.mqtt.server.*;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
+import com.benefitj.spring.listener.EnableAppStateListener;
 import io.vertx.core.Vertx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Lazy;
  * MQTT 服务端
  */
 @EnableConfigurationProperties
+@EnableAppStateListener
 @Configuration
 public class MqttServerConfiguration {
 
@@ -28,7 +30,7 @@ public class MqttServerConfiguration {
   @ConditionalOnMissingBean(name = "vertx")
   @Bean("vertx")
   public Vertx vertx() {
-    return VertxHolder.get();
+    return VertxHolder.getVertx();
   }
 
   /**

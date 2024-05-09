@@ -1,6 +1,6 @@
 package com.benefitj.vertxmqtt.publisher;
 
-import com.benefitj.core.DateFmtter;
+import com.benefit.vertx.mqtt.client.VertxMqttClient;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
@@ -26,13 +26,19 @@ public class VertxMqttPublisherApplication {
 
   static void appStart() {
     MqttPublisher publisher = SpringCtxHolder.getBean(MqttPublisher.class);
-    EventLoop.main().scheduleAtFixedRate(() -> {
-      try {
-        log.info("发布消息...");
-        publisher.publish("/device/collector/" + "010003b8", DateFmtter.fmtNowS());
-      } catch (Exception e) {
-        log.info("throw: {}", e.getMessage());
-      }
-    }, 1, 5, TimeUnit.SECONDS);
+//    EventLoop.main().scheduleAtFixedRate(() -> {
+//      try {
+//        log.info("发布消息...");
+//        publisher.publish("/device/collector/" + "010003b8", DateFmtter.fmtNowS());
+//      } catch (Exception e) {
+//        log.info("throw: {}", e.getMessage());
+//      }
+//    }, 1, 5, TimeUnit.SECONDS);
+
+    VertxMqttClient client = publisher.getClient();
+    EventLoop.asyncIOFixedRate(() -> {
+      log.info("{}:{}  ==>:  {}", client.getHost(), client.getPort(), client.isConnected());
+    }, 1, 1, TimeUnit.SECONDS);
+
   }
 }

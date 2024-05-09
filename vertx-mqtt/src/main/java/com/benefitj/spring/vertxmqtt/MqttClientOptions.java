@@ -1,12 +1,8 @@
 package com.benefitj.spring.vertxmqtt;
 
-import io.vertx.mqtt.MqttClientOptions;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.util.concurrent.TimeUnit;
 
-@ConfigurationProperties(prefix = "spring.mqtt.client")
-public class MqttClientProperty {
+public class MqttClientOptions {
 
   /**
    * 远程主机地址
@@ -31,7 +27,7 @@ public class MqttClientProperty {
   /**
    * 是否清理 session，默认清理
    */
-  private boolean cleanSession = MqttClientOptions.DEFAULT_CLEAN_SESSION;
+  private boolean cleanSession = io.vertx.mqtt.MqttClientOptions.DEFAULT_CLEAN_SESSION;
   /**
    * 遗嘱的主题
    */
@@ -43,15 +39,15 @@ public class MqttClientProperty {
   /**
    * 是否启用遗嘱，默认不起用
    */
-  private boolean willFlag = MqttClientOptions.DEFAULT_WILL_FLAG;
+  private boolean willFlag = io.vertx.mqtt.MqttClientOptions.DEFAULT_WILL_FLAG;
   /**
    * 遗嘱的服务质量，默认0
    */
-  private int willQos = MqttClientOptions.DEFAULT_WILL_QOS;
+  private int willQos = io.vertx.mqtt.MqttClientOptions.DEFAULT_WILL_QOS;
   /**
    * 遗嘱是否保留，默认false
    */
-  private boolean willRetain = MqttClientOptions.DEFAULT_WILL_RETAIN;
+  private boolean willRetain = io.vertx.mqtt.MqttClientOptions.DEFAULT_WILL_RETAIN;
   /**
    * 是否自动保持存活，默认启用
    */
@@ -59,7 +55,7 @@ public class MqttClientProperty {
   /**
    * 保持存活的间隔，默认30秒
    */
-  private int keepAliveInterval = MqttClientOptions.DEFAULT_KEEP_ALIVE_INTERVAL;
+  private int keepAliveInterval = io.vertx.mqtt.MqttClientOptions.DEFAULT_KEEP_ALIVE_INTERVAL;
   /**
    * 队列中最多缓存发送的数量，默认30
    */
@@ -67,11 +63,11 @@ public class MqttClientProperty {
   /**
    * 最大消息大小，默认-1，不受限
    */
-  private int maxMessageSize = MqttClientOptions.DEFAULT_MAX_MESSAGE_SIZE;
+  private int maxMessageSize = io.vertx.mqtt.MqttClientOptions.DEFAULT_MAX_MESSAGE_SIZE;
   /**
    * 确认超时时长，默认-1，不超时
    */
-  private int ackTimeout = MqttClientOptions.DEFAULT_ACK_TIMEOUT;
+  private int ackTimeout = io.vertx.mqtt.MqttClientOptions.DEFAULT_ACK_TIMEOUT;
 
   /**
    * 自动重连

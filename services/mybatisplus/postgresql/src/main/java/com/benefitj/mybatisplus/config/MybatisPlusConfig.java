@@ -29,10 +29,10 @@ public class MybatisPlusConfig {
   public FieldValueFiller insertFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
     map.putIfAbsent("createTime", (NullValueFieldValueCreator) target -> new Date());
-//    map.putIfAbsent("createBy", (NullValueFieldValueCreator) target -> {
-//      JwtToken token = JwtTokenManager.currentToken(true);
-//      return token != null ? token.getUserId() : null;
-//    });
+    //map.putIfAbsent("createBy", (NullValueFieldValueCreator) target -> {
+    //  JwtToken token = JwtTokenManager.currentToken(true);
+    //  return token != null ? token.getUserId() : null;
+    //});
     map.putIfAbsent("orgId", (NullValueFieldValueCreator) target -> JwtTokenManager.currentOrgId());
     map.putIfAbsent("active", (NullValueFieldValueCreator) target -> true);
     return new SimpleFieldValueFiller(map, Collections.singletonList(SqlCommandType.INSERT));
@@ -43,10 +43,10 @@ public class MybatisPlusConfig {
   public FieldValueFiller updateFiller() {
     Map<String, FieldValueCreator> map = new ConcurrentHashMap<>(10);
     map.putIfAbsent("updateTime", (NullValueFieldValueCreator) target -> new Date());
-//    map.putIfAbsent("updateBy", (NullValueFieldValueCreator) target -> {
-//      JwtToken token = JwtTokenManager.currentToken(true);
-//      return token != null ? token.getUserId() : null;
-//    });
+    //map.putIfAbsent("updateBy", (NullValueFieldValueCreator) target -> {
+    //  JwtToken token = JwtTokenManager.currentToken(true);
+    //  return token != null ? token.getUserId() : null;
+    //});
     return new SimpleFieldValueFiller(map, Collections.singletonList(SqlCommandType.UPDATE));
   }
 

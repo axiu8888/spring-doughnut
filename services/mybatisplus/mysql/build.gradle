@@ -26,10 +26,10 @@ dependencies {
       // “com.baomidou:mybatis-plus-extension:${mybatisPlusVersion}",
       // "com.baomidou:dynamic-datasource-spring-boot-starter:3.6.1",
 
+      "com.alibaba:druid-spring-boot-starter:${druidVersion}",
       // 'com.h2database:h2:1.4.200',
       "com.mysql:mysql-connector-j:${mysqlVersion}",
-      "com.alibaba:druid-spring-boot-starter:${druidVersion}",
-      "org.postgresql:postgresql:${postgresqlVersion}",
+      //"org.postgresql:postgresql:${postgresqlVersion}",
 
       // swagger-ui
       "io.springfox:springfox-boot-starter:3.0.0",

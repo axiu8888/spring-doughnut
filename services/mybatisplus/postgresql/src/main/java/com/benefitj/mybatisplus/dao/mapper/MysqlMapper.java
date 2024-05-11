@@ -3,8 +3,7 @@ package com.benefitj.mybatisplus.dao.mapper;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.benefitj.mybatisplus.entity.HsReportTaskEntity;
-import com.benefitj.mybatisplus.entity.mysql.RecipelItem;
+import com.benefitj.mybatisplus.entity.mysql.HsReportTaskEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -18,10 +17,34 @@ import java.util.List;
  */
 @DS("mysql")
 @Mapper
-public interface MysqlReportTaskMapper extends BaseMapper<HsReportTaskEntity> {
+public interface MysqlMapper extends BaseMapper<HsReportTaskEntity> {
 
+  /**
+   * 查询经销商和医院
+   *
+   * @param id 经销商/医院 ID
+   * @return 返回查询的机构
+   */
+  @Select("<script>" +
+      "SELECT ho.*\n" +
+      "FROM HS_ORG AS ho\n" +
+      "WHERE 1=1\n" +
+      "\tAND ho.auto_code LIKE CONCAT((SELECT auto_code FROM HS_ORG WHERE zid = #{id}), '%')\n" +
+      "\tAND ho.org_type IN ( 'hospital', 'distributor' )\n" +
+      "ORDER BY ho.auto_code ASC"
+      + "</script>")
+  List<JSONObject> selectOrgList(@Param("id") String id);
+
+  /**
+   * 按照reportDate、机构ID、报告类型统计报告
+   *
+   * @param items     报告类型
+   * @param startDate 开始的日期
+   * @param endDate   结束的日志
+   * @return 返回统计的结果
+   */
   @Select("<script>\n" +
-      "SELECT hrt.orgId, MAX(ho.org_name) AS orgName, MAX(ho.auto_code) AS auto_code, hrt.report_date, COUNT(DISTINCT hrt.zid) AS count\n" +
+      "SELECT hrt.org_zid AS orgId, MAX(ho.org_name) AS orgName, MAX(ho.auto_code) AS orgCode, hrt.report_date AS reportDate, COUNT(DISTINCT hrt.zid) AS count\n" +
       "FROM HS_REPORT_TASK AS hrt\n" +
       "\tLEFT JOIN HS_PERSON AS hp ON hp.zid = hrt.person_zid\n" +
       "\tLEFT JOIN HS_INPATIENT AS hi ON hi.person_zid = hp.zid\n" +
@@ -36,8 +59,8 @@ public interface MysqlReportTaskMapper extends BaseMapper<HsReportTaskEntity> {
       "GROUP BY hrt.org_zid, hrt.report_date\n" +
       "ORDER BY hrt.report_date DESC, hrt.org_zid ASC\n" +
       "</script>")
-  List<JSONObject> selectByItems(@Param("items") RecipelItem[] items,
-                                 @Param("startDate") Date startDate,
-                                 @Param("endDate") Date endDate);
+  List<JSONObject> countByItems(@Param("items") String[] items,
+                                @Param("startDate") Date startDate,
+                                @Param("endDate") Date endDate);
 
 }

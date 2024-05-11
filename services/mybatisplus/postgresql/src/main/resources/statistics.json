@@ -1,0 +1,17 @@
+{
+  //"outDir": "./statistics/",
+  "outDir": "D:/tmp/cache/statistics/",
+  // 开始的日期
+  "startDate": "2020-01-01",
+  // 结束的日期
+  "endDate": null,
+  // 查询的分类
+  "category": {
+    // 监护
+    //"custody": ["hrv","mse","jsyl","activity","physical","sleepStageAhi","sleepAhi","holter"],
+    // 康复评估
+    "pr": ["smwt","smst"],
+    // 问卷
+    "question": ["cat","sgrq","sds","sas","psqi","mna","adl","fim","gad","phq","mmrc","nrs","hamd","hama","gds","hads","act","hds","sf36","ftnd","e5q5d5l","rsps"],
+  }
+}

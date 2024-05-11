@@ -31,10 +31,6 @@ dependencies {
       "com.mysql:mysql-connector-j:${mysqlVersion}",
       //"org.postgresql:postgresql:${postgresqlVersion}",
 
-      // swagger-ui
-      "io.springfox:springfox-boot-starter:3.0.0",
-      'com.github.xiaoymin:knife4j-spring-ui:3.0.3',
-
       // jwt
       "io.jsonwebtoken:jjwt-api:${jjwtVersion}",
       "io.jsonwebtoken:jjwt-impl:${jjwtVersion}",

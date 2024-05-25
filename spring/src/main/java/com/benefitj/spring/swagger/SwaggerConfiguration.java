@@ -28,8 +28,10 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -141,8 +143,18 @@ public class SwaggerConfiguration {
           .filter(ia -> !ia.isLoopbackAddress())
           .filter(ia -> !ia.isLinkLocalAddress())
           .filter(ia -> !ia.isMCNodeLocal())
+          .filter(ia -> ia instanceof Inet4Address)
           .map(InetAddress::getHostAddress)
+          .sorted((o1, o2) -> {
+            if (o1.startsWith("192")) {
+              return o2.startsWith("192")
+                  ? o1.split("\\.")[3].compareTo(o2.split("\\.")[3])
+                  : -1;
+            }
+            return -o1.compareTo(o2);
+          })
           .collect(Collectors.toList());
+      log.info("ips ==>: {}", ips);
       String ip = ips.get(0);//InetAddress.getLocalHost().getHostAddress();
       String port = SpringCtxHolder.getServerPort();
       String ctxPath = SpringCtxHolder.getServerContextPath();

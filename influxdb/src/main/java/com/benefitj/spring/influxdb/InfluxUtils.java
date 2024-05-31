@@ -190,8 +190,18 @@ public class InfluxUtils {
    * @return return Point
    */
   public static Point.Builder toPointBuilder(LineProtocol protocol) {
+    return toPointBuilder(protocol, protocol.getTimeUnit());
+  }
+
+  /**
+   * 转换成 Point
+   *
+   * @param protocol 行协议
+   * @return return Point
+   */
+  public static Point.Builder toPointBuilder(LineProtocol protocol, TimeUnit timeUnit) {
     Point.Builder builder = new Point.Builder(protocol.getMeasurement());
-    builder.time(protocol.getTime(), protocol.getTimeUnit());
+    builder.time(protocol.getTime(), timeUnit);
     builder.tag(protocol.getTags());
     builder.fields(protocol.getFields());
     return builder;
@@ -204,7 +214,7 @@ public class InfluxUtils {
    * @return return Point
    */
   public static Point toPoint(LineProtocol protocol) {
-    return toPointBuilder(protocol).build();
+    return toPointBuilder(protocol, protocol.getTimeUnit()).build();
   }
 
   /**
@@ -290,12 +300,24 @@ public class InfluxUtils {
    * @return 返回行协议对象
    */
   public static LineProtocol parseLine(String line) {
+    return parseLine(line, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * 解析行协议
+   *
+   * @param line     数据行
+   * @param timeUnit 时间单位
+   * @return 返回行协议对象
+   */
+  public static LineProtocol parseLine(String line, TimeUnit timeUnit) {
     if (isBlank(line)) {
       throw new IllegalArgumentException("数据不能为空");
     }
-    LineProtocol lineProtocol = new LineProtocol();
-    lineProtocol.setTags(new LinkedHashMap<>());
-    lineProtocol.setFields(new LinkedHashMap<>());
+    LineProtocol lp = new LineProtocol();
+    lp.setTags(new LinkedHashMap<>());
+    lp.setFields(new LinkedHashMap<>());
+    lp.setTimeUnit(timeUnit);
     // 引号
     boolean hasSingleQuote = false, hasDoubleQuote = false, escape = false;
     int stage = 0;
@@ -318,25 +340,25 @@ public class InfluxUtils {
             // 0 =>: tag和字段的分割
             switch (stage) {
               case 0:
-                lineProtocol.setMeasurement(line.substring(startAt, i));
+                lp.setMeasurement(line.substring(startAt, i));
                 stage++;// tag
                 break;
               case 1: {
                 String str = line.substring(startAt, i);
                 if (isNotBlank(str)) {
                   String[] splits = str.split("=");
-                  lineProtocol.getTags().put(splits[0], splits[1]);
+                  lp.getTags().put(splits[0], splits[1]);
                 }
               }
               break;
               case 2: {
                 String str = line.substring(startAt, i);
                 String[] splits = str.split("=");
-                lineProtocol.getFields().put(splits[0], parseValue(splits[1]));
+                lp.getFields().put(splits[0], parseValue(splits[1]));
               }
               break;
               case 3:
-                lineProtocol.setTime(Long.parseLong(line.substring(startAt)));
+                lp.setTime(Long.parseLong(line.substring(startAt)));
                 break;
             }
             stage = stage + (ch == ' ' ? 1 : 0);
@@ -354,11 +376,15 @@ public class InfluxUtils {
     }
     int spaceLastIndexOf = line.lastIndexOf(" ");
     if (spaceLastIndexOf >= 0) {
-      lineProtocol.setTime(Long.parseLong(line.substring(spaceLastIndexOf).trim()));
+      try {
+        lp.setTime(Long.parseLong(line.substring(spaceLastIndexOf).trim()) / timeUnit.toNanos(1));
+      } catch (Exception e) {
+        throw new IllegalStateException(String.format("行协议解析时间戳失败: %s, %s", line, e.getMessage()));
+      }
     } else {
       throw new IllegalStateException("缺少时间戳");
     }
-    return lineProtocol;
+    return lp;
   }
 
   /**
@@ -415,7 +441,7 @@ public class InfluxUtils {
   /**
    * 写入行数据
    *
-   * @param out 输出
+   * @param out         输出
    * @param queryResult 查询结果
    * @param fieldKeyMap 字段
    */
@@ -436,7 +462,7 @@ public class InfluxUtils {
   /**
    * 写入行数据
    *
-   * @param out 输出
+   * @param out         输出
    * @param queryResult 查询结果
    * @param fieldKeyMap 字段
    */

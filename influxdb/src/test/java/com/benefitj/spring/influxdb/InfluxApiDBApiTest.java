@@ -139,7 +139,7 @@ class InfluxApiDBApiTest {
 
   @Test
   void testWriteFile() {
-    template.write(new File("D:/tmp/influxdb/hs_alarm.line"));
+    template.write(new File("D:/tmp/cache/influxdb/hs_alarm.line"));
   }
 
   private String generateLine() {
@@ -191,7 +191,7 @@ class InfluxApiDBApiTest {
 
   @Test
   void testQueryChunk() {
-    IWriter writer = IWriter.createWriter("D:/tmp/influxdb/" + IdUtils.uuid() + ".line", false);
+    IWriter writer = IWriter.createWriter("D:/tmp/cache/influxdb/" + IdUtils.uuid() + ".line", false);
     template.query("SELECT * FROM hs_wave_package WHERE time >= 1d GROUP BY person_zid LIMIT 100;", 10)
         .subscribe(new QueryObserver() {
           @Override
@@ -288,10 +288,10 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_exportLines() {
-    long startTime = TimeUtils.toDate(2024, 4, 25, 0, 0, 0).getTime();
-    long endTime = TimeUtils.toDate(2024, 4, 25, 23, 59, 59).getTime();
+    long startTime = TimeUtils.toDate(2024, 5, 31, 20, 0, 0).getTime();
+    long endTime = TimeUtils.toDate(2024, 6, 1, 23, 59, 59).getTime();
 //    long endTime = TimeUtils.now();
-    String condition = " AND device_id = '01001064'";
+    String condition = " AND patient_id = '0343b92e17444b2386756649e55c816c'";
 //    String condition = " AND patient_id = 'ef372fd4b5254bf58828cc297a0efc61'";
 //    String condition = " AND (person_zid = 'f89ebf339a33442fbd0cf5764c7868f5' OR patient_id = 'f89ebf339a33442fbd0cf5764c7868f5')";
 //    String condition = " AND device_no = '641938001136'";
@@ -304,8 +304,9 @@ class InfluxApiDBApiTest {
 //            .collect(Collectors.joining(" OR "))
 //        + ")";
 //    String condition = "";
-    File dir = IOUtils.createFile("D:/tmp/influxdb", true);
+    File dir = IOUtils.createFile("D:/tmp/cache/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
+
   }
 
   void exportAll(InfluxTemplate template, File dir, long startTime, long endTime, String condition, Predicate<String> measurementFilter) {
@@ -335,38 +336,10 @@ class InfluxApiDBApiTest {
   /**
    * 导入 line 文件
    */
-  //@Test
-  void test_loadLines2() {
-//    test_createSubscriptions();
-    List.of(new File("D:/tmp/influxdb").listFiles()).forEach(f -> {
-      IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb3", f.getName()), false);
-      IOUtils.readLines(f, (line, index) -> {
-        writer
-            .writeAndFlush(line
-                //.replaceAll("00000002", "00001154")
-                //.replaceAll("641938000513", "641938001103")
-                //.replaceAll("a8a3954569ca4034a472bae6c70f7fe4", "6cad258502024a35b6295a3f8b4ef4e5")
-            )
-            .writeAndFlush("\n");
-      });
-      writer.flushAndClose();
-    });
-
-    File dir = new File("D:/tmp/influxdb3");
-    upload(template, List.of(dir.listFiles(f -> f.length() > 20
-        //&& f.getName().endsWith(".line")
-        //&& f.getName().endsWith(".point")
-        && (f.getName().endsWith(".line") || f.getName().endsWith(".point"))
-    )), true);
-  }
-
-  /**
-   * 导入 line 文件
-   */
   @Test
   void test_loadLines() {
 //    test_createSubscriptions();
-    File dir = new File("D:/tmp/influxdb");
+    File dir = new File("D:/tmp/cache/influxdb");
     File[] lines = dir.listFiles(f -> f.length() > 20
         //&& f.getName().endsWith(".line")
         //&& f.getName().endsWith(".point")
@@ -394,7 +367,7 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_parseLine2() {
-    File lineFile = new File("D:/tmp/influxdb/hs_darma_mattress.line");
+    File lineFile = new File("D:/tmp/cache/influxdb/hs_darma_mattress.line");
 //    String type = "hr";
     String type = "rr";
     List<Integer> points = IOUtils.readLines(IOUtils.newBufferedReader(lineFile, StandardCharsets.UTF_8))
@@ -415,7 +388,7 @@ class InfluxApiDBApiTest {
    */
   @Test
   void test_WaveToPoints() {
-    File dir = IOUtils.createFile("D:/tmp/influxdb", true);
+    File dir = IOUtils.createFile("D:/tmp/cache/influxdb", true);
 
     InfluxOptions srcOptions = BeanHelper.copy(options);
     srcOptions.setUrl("http://39.98.251.12:58086");
@@ -683,7 +656,7 @@ class InfluxApiDBApiTest {
 
   @Test
   void test_Spo2() {
-    IWriter writer = IWriter.createWriter(new File("D:/tmp/influxdb/tmp.txt"), false);
+    IWriter writer = IWriter.createWriter(new File("D:/tmp/cache/influxdb/tmp.txt"), false);
     template.query("select * from hs_oximeter_package where time > now() - 1d")
         .subscribe(new QueryObserver() {
           JSONObject json = new JSONObject(new LinkedHashMap());
@@ -701,12 +674,12 @@ class InfluxApiDBApiTest {
 
   @Test
   void test_write() {
-    String base64 = IOUtils.readAsString(new File("D:/tmp/influxdb/base64.txt"));
+    String base64 = IOUtils.readAsString(new File("D:/tmp/cache/influxdb/base64.txt"));
     byte[] decode = Base64.getDecoder().decode(base64);
     String str = new String(decode, StandardCharsets.UTF_8);
     JSONObject json = JSON.parseObject(str);
     byte[] pdf = Base64.getDecoder().decode(json.getJSONObject("postDataReport").getString("PDFContent"));
-    IOUtils.write(pdf, new File("D:/tmp/influxdb/test.pdf"), true);
+    IOUtils.write(pdf, new File("D:/tmp/cache/influxdb/test.pdf"), true);
     log.info("str ==>: {}", str);
   }
 

@@ -202,9 +202,18 @@ public class InfluxUtils {
   public static Point.Builder toPointBuilder(LineProtocol protocol, TimeUnit timeUnit) {
     Point.Builder builder = new Point.Builder(protocol.getMeasurement());
     builder.time(protocol.getTime(), timeUnit);
-    builder.tag(protocol.getTags());
-    builder.fields(protocol.getFields());
+    ifNotNull(protocol.getTags(), builder.getTags());
+    ifNotNull(protocol.getFields(), builder.getFields());
     return builder;
+  }
+
+  static <K, V> Map<K, V> ifNotNull(Map<K, V> src, Map<K, V> dest) {
+    src.forEach((k, v) -> {
+      if (k != null && v != null) {
+        dest.put(k, v);
+      }
+    });
+    return dest;
   }
 
   /**

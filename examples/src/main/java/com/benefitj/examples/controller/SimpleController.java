@@ -17,6 +17,7 @@ import com.benefitj.spring.mvc.query.PageBody;
 import com.benefitj.spring.mvc.query.PageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -135,10 +136,33 @@ public class SimpleController {
     String value = body.getString("value");
     redisTemplate.opsForValue()
         .set(key, value);
-    return new JSONObject(){{
+    return new JSONObject() {{
       put("code", 200);
       put("msg", "success");
     }};
+  }
+
+  @ApiOperation("测试electron流上传")
+  @PostMapping("/uploadStream")
+  public JSONObject testUploadStream(HttpServletRequest request,
+                                     @ApiParam("文件名") @RequestParam String filename) throws IOException {
+    File dest = IOUtils.createFile("D:/tmp/cache/" + filename);
+    try {
+      ServletInputStream in = request.getInputStream();
+      IOUtils.write(in, dest);
+      return new JSONObject() {{
+        put("code", 200);
+        put("msg", "success");
+        put("data", new JSONObject(){{
+          put("path", dest.getAbsolutePath().replace("\\", "/"));
+          put("size", dest.length());
+        }});
+      }};
+    } finally {
+      if (dest.length() <= 0) {
+        IOUtils.delete(dest);
+      }
+    }
   }
 
 }

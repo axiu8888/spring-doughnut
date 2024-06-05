@@ -123,6 +123,26 @@ public class ServletUtils {
   }
 
   /**
+   * 是否为请求体数据
+   */
+  public static boolean isMultiPart() {
+    return isMultiPart(getRequest());
+  }
+
+  /**
+   * 是否为请求体数据
+   */
+  public static boolean isMultiPart(HttpServletRequest request) {
+    String contentType = request.getHeader("content-type");
+    return StringUtils.isNotBlank(contentType) && contentType.startsWith("multipart/form-data; boundary=");
+  }
+
+//  public static String getContentDisposition(HttpServletRequest request) {
+//    Enumeration<String> headers = request.getHeaders("Content-Disposition");
+//    return headers
+//  }
+
+  /**
    * 获取当前请求的IP地址
    *
    * @return 返回IP地址

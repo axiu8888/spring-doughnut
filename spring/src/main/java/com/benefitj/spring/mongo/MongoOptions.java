@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * mongo 配置
@@ -95,7 +96,7 @@ public class MongoOptions {
         .stream()
         .map(uri -> uri.split(":"))
         .map(uri -> new ServerAddress(uri[0], Integer.parseInt(uri[1])))
-        .toList();
+        .collect(Collectors.toList());
     MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
     settingsBuilder
         .applyToClusterSettings(b -> {

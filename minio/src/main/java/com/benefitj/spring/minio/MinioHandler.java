@@ -1,4 +1,4 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import java.util.function.Consumer;
 

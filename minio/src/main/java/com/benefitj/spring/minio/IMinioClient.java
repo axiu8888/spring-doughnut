@@ -1,4 +1,4 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import com.benefitj.core.local.LocalCache;
 import io.minio.*;

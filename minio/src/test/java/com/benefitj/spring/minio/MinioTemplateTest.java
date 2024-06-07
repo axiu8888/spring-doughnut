@@ -1,12 +1,12 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import com.alibaba.fastjson2.JSON;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
-import com.benefitj.minio.dto.ItemEntity;
-import com.benefitj.minio.dto.LifecycleRuleEntity;
-import com.benefitj.minio.spring.MinioConfiguration;
+import com.benefitj.spring.minio.dto.ItemEntity;
+import com.benefitj.spring.minio.dto.LifecycleRuleEntity;
+import com.benefitj.spring.minio.spring.MinioConfiguration;
 import io.minio.*;
 import io.minio.messages.*;
 import lombok.extern.slf4j.Slf4j;

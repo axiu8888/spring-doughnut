@@ -1,4 +1,4 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import io.minio.messages.RetentionDuration;
 import io.minio.messages.RetentionDurationUnit;

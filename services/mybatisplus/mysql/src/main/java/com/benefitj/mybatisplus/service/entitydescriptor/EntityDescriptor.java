@@ -83,7 +83,7 @@ public class EntityDescriptor {
   }
 
   public <T> T newEntity() {
-    return (T) Instantiator.INSTANCE.create(getEntityType());
+    return Instantiator.get().create((Class<T>) getEntityType());
   }
 }
 

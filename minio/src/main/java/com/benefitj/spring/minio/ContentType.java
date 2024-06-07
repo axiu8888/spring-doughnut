@@ -1,4 +1,4 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import org.apache.commons.lang3.StringUtils;
 

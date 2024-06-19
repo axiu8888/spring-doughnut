@@ -74,7 +74,7 @@ public class MqttPublisherApplication {
               .message(DateFmtter.fmtNowS())
               .build());
         } catch (Exception e) {
-          log.info("throw: {}", e.getMessage());
+          log.error("throw: " + e.getMessage(), e);
         }
       }, 1, 5, TimeUnit.SECONDS);
     }

@@ -1,8 +1,8 @@
 package com.benefitj.spring.mqtt.event;
 
 import com.benefitj.core.ReflectUtils;
+import com.benefitj.mqtt.IMqttPublisher;
 import com.benefitj.mqtt.MqttTopic;
-import com.benefitj.spring.mqtt.publisher.IMqttPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
 
 @Component
 public class EventPublisher {
@@ -45,17 +46,14 @@ public class EventPublisher {
     EventDescriptor descriptor = findDescriptor(msg.getClass());
     byte[] payload = descriptor.convert(msg);
     List<String> topics = descriptor.getTopics(msg);
-    for (String topic : topics) {
-      getPublisher().publish(topic, payload);
-    }
+    getPublisher().publish(topics.toArray(String[]::new), payload);
   }
 
   protected EventDescriptor findDescriptor(Class<?> type) {
     EventDescriptor descriptor = getDescriptors().get(type);
-    if (descriptor != null) {
-      return descriptor;
-    }
-    return this.getDescriptors().computeIfAbsent(type, this::resolve);
+    return descriptor != null
+        ? descriptor
+        : this.getDescriptors().computeIfAbsent(type, this::resolve);
   }
 
   /**
@@ -97,7 +95,7 @@ public class EventPublisher {
         .addAll(descriptor.getSplicers()
             .values()
             .stream()
-            .map(splicers -> splicerToTopic(splicers))
+            .map(this::splicerToTopic)
             .collect(Collectors.toList()));
 
     EventConverter converter = getConverters()

@@ -2,6 +2,7 @@ package com.benefitj.spring.mqtt.publisher;
 
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.ProxyUtils;
+import com.benefitj.mqtt.IMqttPublisher;
 import com.benefitj.spring.BeanHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -56,7 +57,7 @@ public class MqttPublisher implements IMqttPublisher, InitializingBean, Disposab
 
   @Override
   public void publish(String topic, MqttMessage msg) throws MqttPublishException {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publish(topic, msg), Throwable::printStackTrace));
+    getProxyList().forEach(mp -> mp.publish(topic, msg));
   }
 
   @Override

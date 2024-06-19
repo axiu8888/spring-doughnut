@@ -1,6 +1,5 @@
 package com.benefitj.spring.mqtt.subscriber;
 
-import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
@@ -15,6 +14,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * MQTT消息订阅
@@ -52,9 +53,10 @@ public class MqttSubscriberConfiguration {
     String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
     PahoMqttV3Client client = new PahoMqttV3Client(options, IdUtils.nextId(prefix, null, 10));
     client.setCallback(dispatcher);
-    client.setAutoReconnect(true);
-    client.setExecutor(EventLoop.newSingle(false));
-    client.getExecutor().execute(() -> {});
+    client.setAutoConnectTimer(timer -> {
+      timer.setAutoConnect(true);
+      timer.setPeriod(5, TimeUnit.SECONDS);
+    });
     return client;
   }
 

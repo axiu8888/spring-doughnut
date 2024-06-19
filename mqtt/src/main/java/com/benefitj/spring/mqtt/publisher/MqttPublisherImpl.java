@@ -3,6 +3,8 @@ package com.benefitj.spring.mqtt.publisher;
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
+import com.benefitj.core.functions.StreamBuilder;
+import com.benefitj.mqtt.IMqttPublisher;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -63,9 +66,10 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
     int count = getCount();
     List<PahoMqttV3Client> clients = new ArrayList<>(count);
     for (int i = 1; i <= count; i++) {
-      PahoMqttV3Client client = new PahoMqttV3Client(options, id + "-" + i);
-      client.setExecutor(getExecutor());
-      clients.add(client);
+      clients.add(StreamBuilder.of(new PahoMqttV3Client(options, id + "-" + i))
+          .handle(c -> c.setAutoConnectTimer(timer -> timer.setAutoConnect(true).setPeriod(5, TimeUnit.SECONDS)))
+          .handle(PahoMqttV3Client::connect)
+          .get());
     }
     this.setClients(Collections.unmodifiableList(clients));
   }

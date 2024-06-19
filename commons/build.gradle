@@ -7,10 +7,10 @@ dependencies {
   def useLocal = true
 
   if(useLocal) {
-    compileOnly fileTree(dir: 'libs2/source', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs/source', include: ['*.jar'])
     [
-        fileTree(dir: 'libs2', include: ['*.jar']),
-        fileTree(dir: 'libs2/jar', include: ['*.jar'])
+        fileTree(dir: 'libs', include: ['*.jar']),
+        fileTree(dir: 'libs/jar', include: ['*.jar'])
     ].forEach {
       api(it)
     }

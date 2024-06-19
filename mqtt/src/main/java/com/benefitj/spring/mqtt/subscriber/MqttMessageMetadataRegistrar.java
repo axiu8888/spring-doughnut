@@ -28,6 +28,7 @@ import org.springframework.messaging.Message;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -83,7 +84,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         if (StringUtils.isNotBlank(listener.serverURI())) {
           String serverURI;
           try {
-            new URI(listener.serverURI());
+            new URI(listener.serverURI()).getHost().startsWith("tcp");
             serverURI = listener.serverURI();
           } catch (Exception e) {
             serverURI = SpringCtxHolder.getEnvProperty(listener.serverURI());
@@ -94,12 +95,8 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
           opts.setServerURIs(new String[]{serverURI});
         }
         PahoMqttV3Client client = new PahoMqttV3Client(opts, id);
-        client.setExecutor(EventLoop.newSingle(false));
-        client.getExecutor().execute(() -> {/* ^_^ */});
         // 自动重连
-        client.setAutoReconnect(true);
-        // 重新连接的间隔
-        client.setAutoConnectDelay(5000);
+        client.setAutoConnectTimer(timer -> timer.setAutoConnect(true).setPeriod(5, TimeUnit.SECONDS));
         // 消息分发器，自动重连等
         PahoMqttV3Dispatcher dispatcher = new PahoMqttV3Dispatcher();
         client.setCallback(dispatcher);
@@ -136,13 +133,19 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
       }
     };
     // dispatcher.subscribe(topics, subscriber);
-    Stream.of(listener.topics())
+    String[] topics = Stream.of(listener.topics())
         .map(String::trim)
         .filter(StringUtils::isNotBlank)
-        .map(topic -> (topic.startsWith("${") || topic.startsWith("#{")) && topic.endsWith("}")
-            ? SpringCtxHolder.getEnvProperty(topic)
-            : topic)
-        .forEach(topic -> dispatcher.subscribe(topic, subscriber));
+        .map(String::trim)
+        .map(topic -> SpringCtxHolder.matchPlaceHolder(topic) ? SpringCtxHolder.getEnvProperty(topic) : topic)
+        .toArray(String[]::new);
+    for (int i = 0; i < topics.length; i++) {
+      if (StringUtils.isBlank(topics[i])) {
+        throw new IllegalArgumentException((invoker.getBean().getClass().getName() + "." + invoker.getMethod().getName())
+            + ", topic不能为空: " + listener.topics()[i]);
+      }
+    }
+    dispatcher.subscribe(topics, subscriber);
 
     try {
       if (!client.isConnected()) {

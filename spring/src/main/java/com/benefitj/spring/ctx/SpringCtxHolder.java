@@ -27,6 +27,9 @@ public class SpringCtxHolder {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
+
+  public static final String PLACEHOLER_REGEX = "^\\$\\{.*\\}$|^#\\{.*\\}$";
+
   /**
    * Spring的ApplicationContext对象
    */
@@ -74,8 +77,8 @@ public class SpringCtxHolder {
    * 加载class
    *
    * @param className 全类名
+   * @param <T>       类
    * @return 返回加载的类
-   * @param <T> 类
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> loadClass(String className) {
@@ -181,7 +184,7 @@ public class SpringCtxHolder {
    */
   public static String getEnvProperty(String key, String defaultValue) {
     String newKey = key.trim();
-    if ((newKey.startsWith("#{") || newKey.startsWith("${")) && newKey.endsWith("}")) {
+    if (matchPlaceHolder(newKey)) {
       newKey = newKey.substring(2, newKey.length() - 1);
       if (newKey.contains("@environment[")) {
         int startAt = newKey.indexOf("'", newKey.indexOf("@environment[")) + 1;
@@ -231,6 +234,13 @@ public class SpringCtxHolder {
    */
   public static String getServerContextPath() {
     return getEnvProperty("server.servlet.context-path");
+  }
+
+  /**
+   * 是否匹配差值规则
+   */
+  public static boolean matchPlaceHolder(String key) {
+    return key.matches(PLACEHOLER_REGEX);
   }
 
 }

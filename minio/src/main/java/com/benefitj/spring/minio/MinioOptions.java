@@ -1,4 +1,4 @@
-package com.benefitj.minio;
+package com.benefitj.spring.minio;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 

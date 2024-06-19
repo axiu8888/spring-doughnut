@@ -1,6 +1,6 @@
 package com.benefitj.fileserver;
 
-import com.benefitj.minio.spring.EnableMinio;
+import com.benefitj.spring.minio.spring.EnableMinio;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

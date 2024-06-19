@@ -1,7 +1,7 @@
 package com.benefitj.spring.vertxmqtt.publisher;
 
 
-import com.benefit.vertx.mqtt.client.VertxMqttClient;
+import com.benefitj.vertx.mqtt.client.VertxMqttClient;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

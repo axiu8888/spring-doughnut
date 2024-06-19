@@ -1,11 +1,11 @@
 package com.benefitj.vertxmqtt.publisher;
 
-import com.benefit.vertx.mqtt.client.VertxMqttClient;
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.vertxmqtt.publisher.EnableMqttPublisher;
 import com.benefitj.spring.vertxmqtt.publisher.MqttPublisher;
+import com.benefitj.vertx.mqtt.client.VertxMqttClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

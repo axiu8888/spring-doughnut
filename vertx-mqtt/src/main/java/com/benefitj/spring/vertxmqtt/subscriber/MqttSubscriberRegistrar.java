@@ -1,11 +1,11 @@
 package com.benefitj.spring.vertxmqtt.subscriber;
 
-import com.benefit.vertx.mqtt.client.VertxMqttMessageDispatcher;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
+import com.benefitj.vertx.mqtt.client.VertxMqttMessageDispatcher;
 
 import java.util.List;
 

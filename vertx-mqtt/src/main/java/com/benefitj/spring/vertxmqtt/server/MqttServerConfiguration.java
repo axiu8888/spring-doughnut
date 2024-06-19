@@ -1,10 +1,10 @@
 package com.benefitj.spring.vertxmqtt.server;
 
-import com.benefit.vertx.VertxHolder;
-import com.benefit.vertx.mqtt.server.*;
 import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.listener.AppStateListener;
 import com.benefitj.spring.listener.EnableAppStateListener;
+import com.benefitj.vertx.VertxHolder;
+import com.benefitj.vertx.mqtt.server.*;
 import io.vertx.core.Vertx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

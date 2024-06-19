@@ -99,7 +99,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         // 自动重连
         client.setAutoReconnect(true);
         // 重新连接的间隔
-        client.setDelay(5000);
+        client.setAutoConnectDelay(5000);
         // 消息分发器，自动重连等
         PahoMqttV3Dispatcher dispatcher = new PahoMqttV3Dispatcher();
         client.setCallback(dispatcher);

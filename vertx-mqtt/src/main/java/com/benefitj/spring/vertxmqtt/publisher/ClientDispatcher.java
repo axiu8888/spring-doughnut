@@ -1,6 +1,7 @@
 package com.benefitj.spring.vertxmqtt.publisher;
 
-import com.benefit.vertx.mqtt.client.VertxMqttClient;
+
+import com.benefitj.vertx.mqtt.client.VertxMqttClient;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

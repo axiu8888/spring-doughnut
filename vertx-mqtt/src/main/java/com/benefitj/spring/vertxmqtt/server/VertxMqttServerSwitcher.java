@@ -1,7 +1,7 @@
 package com.benefitj.spring.vertxmqtt.server;
 
-import com.benefit.vertx.mqtt.server.VertxMqttServer;
 import com.benefitj.spring.listener.AppStateListener;
+import com.benefitj.vertx.mqtt.server.VertxMqttServer;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

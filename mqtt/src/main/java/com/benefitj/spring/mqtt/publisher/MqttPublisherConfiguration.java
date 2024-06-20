@@ -2,6 +2,7 @@ package com.benefitj.spring.mqtt.publisher;
 
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.mqtt.CommonsMqttConfiguration;
+import com.benefitj.spring.mqtt.MqttOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,10 +46,10 @@ public class MqttPublisherConfiguration extends CommonsMqttConfiguration {
   @Primary
   @ConditionalOnMissingBean(name = "mqttPublisher")
   @Bean("mqttPublisher")
-  public MqttPublisher mqttPublisher(MqttConnectOptions options) {
-    String[] URIs = StringUtils.isBlank(serverURIs) ? options.getServerURIs() : serverURIs.split(",");
+  public MqttPublisher mqttPublisher(MqttOptions options) {
+    String[] serverURIs = StringUtils.getIfBlank(this.serverURIs, options::getServerURIs).split(",");
     String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
-    return new MqttPublisher(URIs, options, prefix, clientCount);
+    return new MqttPublisher(serverURIs, options, prefix, clientCount);
   }
 
 }

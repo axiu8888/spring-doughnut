@@ -3,9 +3,9 @@ package com.benefitj.spring.mqtt.publisher;
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
-import com.benefitj.core.functions.StreamBuilder;
 import com.benefitj.mqtt.IMqttPublisher;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
+import com.benefitj.spring.mqtt.MqttOptions;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -26,7 +26,10 @@ import java.util.function.Consumer;
  */
 public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, DisposableBean {
 
-  private MqttConnectOptions options;
+  /**
+   * 连接配置
+   */
+  private MqttOptions options;
   /**
    * 前缀
    */
@@ -46,15 +49,15 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
 
   private final AtomicInteger dispatcher = new AtomicInteger();
 
-  public MqttPublisherImpl(MqttConnectOptions options) {
+  public MqttPublisherImpl(MqttOptions options) {
     this(options, "mqtt-publisher-");
   }
 
-  public MqttPublisherImpl(MqttConnectOptions options, String prefix) {
+  public MqttPublisherImpl(MqttOptions options, String prefix) {
     this(options, prefix, 1);
   }
 
-  public MqttPublisherImpl(MqttConnectOptions options, String prefix, int count) {
+  public MqttPublisherImpl(MqttOptions options, String prefix, int count) {
     this.options = options;
     this.prefix = prefix;
     this.count = count;
@@ -62,14 +65,18 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    String id = IdUtils.nextLowerLetterId(getPrefix(), null, 6);
+    MqttConnectOptions mcOpts = options.toMqttConnectOptions();
+    String prefix = getPrefix() + IdUtils.uuid(0, 10) + "-";
     int count = getCount();
     List<PahoMqttV3Client> clients = new ArrayList<>(count);
     for (int i = 1; i <= count; i++) {
-      clients.add(StreamBuilder.of(new PahoMqttV3Client(options, id + "-" + i))
-          .handle(c -> c.setAutoConnectTimer(timer -> timer.setAutoConnect(true).setPeriod(5, TimeUnit.SECONDS)))
-          .handle(PahoMqttV3Client::connect)
-          .get());
+      PahoMqttV3Client client = new PahoMqttV3Client(mcOpts, prefix + i);
+      client.setAutoConnectTimer(timer -> timer
+          .setAutoConnect(options.isAutoReconnect())
+          .setPeriod(options.getReconnectDelay(), TimeUnit.SECONDS)
+      );
+      EventLoop.asyncIO(client::connect);
+      clients.add(client);
     }
     this.setClients(Collections.unmodifiableList(clients));
   }

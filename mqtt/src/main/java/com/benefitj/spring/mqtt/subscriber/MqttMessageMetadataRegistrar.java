@@ -7,12 +7,12 @@ import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.mqtt.MqttMessageSubscriber;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
-import com.benefitj.spring.BeanHelper;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.annotation.AnnotationResolverImpl;
 import com.benefitj.spring.annotation.MetadataHandler;
 import com.benefitj.spring.ctx.SpringCtxHolder;
+import com.benefitj.spring.mqtt.MqttOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -42,7 +42,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   /**
    * 代理
    */
-  private MqttConnectOptions options;
+  private MqttOptions options;
   /**
    * 默认的订阅客户端
    */
@@ -60,7 +60,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
 
   private final List<PahoMqttV3Client> singleClients = new CopyOnWriteArrayList<>();
 
-  public MqttMessageMetadataRegistrar(MqttConnectOptions options) {
+  public MqttMessageMetadataRegistrar(MqttOptions options) {
     this.options = options;
     this.setMetadataHandler(this);
     this.setResolver(new AnnotationResolverImpl(MqttMessageListener.class));
@@ -78,13 +78,13 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
       MqttMessageListener listener = metadata.getFirstAnnotation(MqttMessageListener.class);
       if (listener.singleClient() || StringUtils.isNotBlank(listener.serverURI())) {
         // 单独的客户端
-        String prefix = StringUtils.isNotBlank(listener.clientIdPrefix()) ? listener.clientIdPrefix() : getPrefix();
+        String prefix = StringUtils.getIfBlank(listener.clientIdPrefix(), this::getPrefix);
         String id = IdUtils.nextLowerLetterId(prefix, null, 12);
-        MqttConnectOptions opts = BeanHelper.copy(getOptions());
+        MqttConnectOptions opts = getOptions().toMqttConnectOptions();
         if (StringUtils.isNotBlank(listener.serverURI())) {
           String serverURI;
           try {
-            new URI(listener.serverURI()).getHost().startsWith("tcp");
+            new URI(listener.serverURI()).getHost().startsWith("tcp:");
             serverURI = listener.serverURI();
           } catch (Exception e) {
             serverURI = SpringCtxHolder.getEnvProperty(listener.serverURI());
@@ -96,7 +96,9 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         }
         PahoMqttV3Client client = new PahoMqttV3Client(opts, id);
         // 自动重连
-        client.setAutoConnectTimer(timer -> timer.setAutoConnect(true).setPeriod(5, TimeUnit.SECONDS));
+        client.setAutoConnectTimer(timer -> timer
+            .setAutoConnect(getOptions().isAutoReconnect())
+            .setPeriod(getOptions().getReconnectDelay(), TimeUnit.SECONDS));
         // 消息分发器，自动重连等
         PahoMqttV3Dispatcher dispatcher = new PahoMqttV3Dispatcher();
         client.setCallback(dispatcher);
@@ -156,11 +158,11 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   }
 
 
-  public MqttConnectOptions getOptions() {
+  public MqttOptions getOptions() {
     return options;
   }
 
-  public void setOptions(MqttConnectOptions options) {
+  public void setOptions(MqttOptions options) {
     this.options = options;
   }
 

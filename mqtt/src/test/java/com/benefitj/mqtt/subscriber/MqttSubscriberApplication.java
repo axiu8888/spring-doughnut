@@ -1,5 +1,6 @@
 package com.benefitj.mqtt.subscriber;
 
+import com.benefitj.core.EventLoop;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.listener.OnAppStart;
@@ -25,6 +26,7 @@ public class MqttSubscriberApplication {
   }
 
   static {
+    AppStateHook.registerStart((evt) -> EventLoop.main().execute(() -> {}));
     AppStateHook.registerStart((evt) -> log.info("app start..."));
     AppStateHook.registerStop((evt) -> log.info("app stop..."));
   }

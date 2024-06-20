@@ -11,7 +11,6 @@ import com.benefitj.spring.mqtt.event.EventTopic;
 import com.benefitj.spring.mqtt.event.TopicPlaceholder;
 import com.benefitj.spring.mqtt.publisher.EnableMqttPublisher;
 import com.benefitj.spring.mqtt.publisher.MqttPublisher;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -87,7 +86,6 @@ public class MqttPublisherApplication {
 
   @SuperBuilder
   @NoArgsConstructor
-  @AllArgsConstructor
   @Data
   @EventTopic("/event/#{deviceId}/#{type}/#{flag2}")
   //@EventTopic("/event/#{deviceId}/#{type}")
@@ -96,21 +94,21 @@ public class MqttPublisherApplication {
      * 设备ID
      */
     @TopicPlaceholder(name = "deviceId")
-    private String deviceId;
+    String deviceId;
     /**
      * 类型
      */
     @TopicPlaceholder(name = "type")
-    private String type;
+    String type;
     /**
      * 标记
      */
     @TopicPlaceholder(name = "flag2")
-    private String flag;
+    String flag;
     /**
      * 消息
      */
-    private String message;
+    String message;
 
   }
 

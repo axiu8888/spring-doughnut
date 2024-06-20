@@ -4,6 +4,7 @@ import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Dispatcher;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
+import com.benefitj.spring.mqtt.MqttOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -48,15 +49,16 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean(name = "mqttSubscriber")
   @Bean("mqttSubscriber")
-  public PahoMqttV3Client mqttSubscriberClient(MqttConnectOptions options,
+  public PahoMqttV3Client mqttSubscriberClient(MqttOptions options,
                                                @Qualifier("mqttSubscribeDispatcher") PahoMqttV3Dispatcher dispatcher) {
-    String prefix = StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-";
-    PahoMqttV3Client client = new PahoMqttV3Client(options, IdUtils.nextId(prefix, null, 10));
+    String prefix = StringUtils.getIfBlank(clientIdPrefix, () -> appName + "-publisher-");
+    MqttConnectOptions mcOpts = options.toMqttConnectOptions();
+    PahoMqttV3Client client = new PahoMqttV3Client(mcOpts, prefix + IdUtils.uuid(0, 10));
     client.setCallback(dispatcher);
-    client.setAutoConnectTimer(timer -> {
-      timer.setAutoConnect(true);
-      timer.setPeriod(5, TimeUnit.SECONDS);
-    });
+    client.setAutoConnectTimer(timer -> timer
+        .setAutoConnect(options.isAutoReconnect())
+        .setPeriod(options.getReconnectDelay(), TimeUnit.SECONDS)
+    );
     return client;
   }
 
@@ -74,7 +76,7 @@ public class MqttSubscriberConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
-  public MqttMessageMetadataRegistrar mqttMessageListenerRegistrar(MqttConnectOptions options,
+  public MqttMessageMetadataRegistrar mqttMessageListenerRegistrar(MqttOptions options,
                                                                    MqttMessageConverter messageConverter,
                                                                    @Qualifier("mqttSubscriber") IMqttClient client,
                                                                    @Qualifier("mqttSubscribeDispatcher") PahoMqttV3Dispatcher dispatcher) {
@@ -82,7 +84,7 @@ public class MqttSubscriberConfiguration {
     registrar.setClient(client);
     registrar.setDispatcher(dispatcher);
     registrar.setMessageConverter(messageConverter);
-    registrar.setPrefix(StringUtils.isNotBlank(clientIdPrefix) ? clientIdPrefix : appName + "-publisher-");
+    registrar.setPrefix(StringUtils.getIfBlank(clientIdPrefix, () -> appName + "-publisher-"));
     return registrar;
   }
 

@@ -209,14 +209,14 @@ public class SpringCtxHolder {
    * 获取App名称
    */
   public static String getAppName() {
-    return getEnvProperty("spring.application.name");
+    return getEnvProperty("spring.application.name", "");
   }
 
   /**
    * 获取服务器端口
    */
   public static String getServerPort() {
-    return getEnvProperty("server.port");
+    return getEnvProperty("server.port", "8080");
   }
 
   /**
@@ -233,7 +233,7 @@ public class SpringCtxHolder {
    * 获取服务器上下文地址
    */
   public static String getServerContextPath() {
-    return getEnvProperty("server.servlet.context-path");
+    return getEnvProperty("server.servlet.context-path", "");
   }
 
   /**

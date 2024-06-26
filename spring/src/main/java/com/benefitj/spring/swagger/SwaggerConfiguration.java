@@ -159,7 +159,7 @@ public class SwaggerConfiguration {
       String port = SpringCtxHolder.getServerPort();
       String ctxPath = SpringCtxHolder.getServerContextPath();
       String path = Utils.isEndWiths(ctxPath, "/") ? ctxPath.substring(0, ctxPath.length() - 1) : ctxPath;
-      String swaggerBaseUrl = SpringCtxHolder.getEnvProperty("springfox.documentation.swagger-ui.base-url");
+      String swaggerBaseUrl = SpringCtxHolder.getEnvProperty("springfox.documentation.swagger-ui.base-url", "");
       swaggerBaseUrl = Utils.withs(swaggerBaseUrl, "/", "/");
       String address = ip + ":" + port + path;
       log.info("\n---------------------------------------------------------------------------------\n\t" +

@@ -81,9 +81,7 @@ public interface VertxMqttClientFactory<T extends VertxMqttClient> {
     MqttClientOptions.AutoReconnect reconnect = options.getAutoReconnect();
     client.setRemoteAddress(options.getHost(), options.getPort())
         .setAutoConnectTimer(new AutoConnectTimer()
-            .setPeriod(reconnect.getPeriod())
-            .setUnit(reconnect.getTimeUnit())
-            .setAutoConnect(reconnect.isAuto()));
+            .setAutoConnect(reconnect.isAuto(), reconnect.getInterval()));
     client.getOptions()
         .setClientId(IdUtils.nextLetterId(options.getClientIdPrefix(), null, 10))
         .setUsername(options.getUsername())

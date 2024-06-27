@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttMessageConverter;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * MQTT消息订阅
@@ -55,10 +55,7 @@ public class MqttSubscriberConfiguration {
     MqttConnectOptions mcOpts = options.toMqttConnectOptions();
     PahoMqttV3Client client = new PahoMqttV3Client(mcOpts, prefix + IdUtils.uuid(0, 10));
     client.setCallback(dispatcher);
-    client.setAutoConnectTimer(timer -> timer
-        .setAutoConnect(options.isAutoReconnect())
-        .setPeriod(options.getReconnectDelay(), TimeUnit.SECONDS)
-    );
+    client.setAutoConnectTimer(timer -> timer.setAutoConnect(options.isAutoReconnect(), Duration.ofSeconds(options.getReconnectDelay())));
     return client;
   }
 

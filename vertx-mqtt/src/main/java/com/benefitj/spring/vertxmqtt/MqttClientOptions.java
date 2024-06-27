@@ -1,6 +1,6 @@
 package com.benefitj.spring.vertxmqtt;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class MqttClientOptions {
 
@@ -215,31 +215,11 @@ public class MqttClientOptions {
     /**
      * 重连间隔
      */
-    private int period = 30;
-    /**
-     * 重连的时间单位
-     */
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
+    private Duration interval = Duration.ofSeconds(30);
     /**
      * 是否自动重连
      */
     private boolean auto = true;
-
-    public int getPeriod() {
-      return period;
-    }
-
-    public void setPeriod(int period) {
-      this.period = period;
-    }
-
-    public TimeUnit getTimeUnit() {
-      return timeUnit;
-    }
-
-    public void setTimeUnit(TimeUnit timeUnit) {
-      this.timeUnit = timeUnit;
-    }
 
     public boolean isAuto() {
       return auto;
@@ -248,6 +228,15 @@ public class MqttClientOptions {
     public void setAuto(boolean auto) {
       this.auto = auto;
     }
+
+    public Duration getInterval() {
+      return interval;
+    }
+
+    public void setInterval(Duration interval) {
+      this.interval = interval;
+    }
+
   }
 
 

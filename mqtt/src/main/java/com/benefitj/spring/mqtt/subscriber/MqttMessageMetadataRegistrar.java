@@ -26,6 +26,7 @@ import org.springframework.integration.mqtt.support.MqttMessageConverter;
 import org.springframework.messaging.Message;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -96,9 +97,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         }
         PahoMqttV3Client client = new PahoMqttV3Client(opts, id);
         // 自动重连
-        client.setAutoConnectTimer(timer -> timer
-            .setAutoConnect(getOptions().isAutoReconnect())
-            .setPeriod(getOptions().getReconnectDelay(), TimeUnit.SECONDS));
+        client.setAutoConnectTimer(timer -> timer.setAutoConnect(getOptions().isAutoReconnect(), Duration.ofSeconds(getOptions().getReconnectDelay())));
         // 消息分发器，自动重连等
         PahoMqttV3Dispatcher dispatcher = new PahoMqttV3Dispatcher();
         client.setCallback(dispatcher);

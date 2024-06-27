@@ -19,4 +19,9 @@ public @interface RedisMessageListener {
    */
   String[] value();
 
+  /**
+   * 是否异步执行
+   */
+  boolean async() default false;
+
 }

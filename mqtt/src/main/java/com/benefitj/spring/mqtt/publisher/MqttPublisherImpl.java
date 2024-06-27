@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,10 +72,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
     List<PahoMqttV3Client> clients = new ArrayList<>(count);
     for (int i = 1; i <= count; i++) {
       PahoMqttV3Client client = new PahoMqttV3Client(mcOpts, prefix + i);
-      client.setAutoConnectTimer(timer -> timer
-          .setAutoConnect(options.isAutoReconnect())
-          .setPeriod(options.getReconnectDelay(), TimeUnit.SECONDS)
-      );
+      client.setAutoConnectTimer(timer -> timer.setAutoConnect(options.isAutoReconnect(), Duration.ofSeconds(options.getReconnectDelay())));
       EventLoop.asyncIO(client::connect);
       clients.add(client);
     }

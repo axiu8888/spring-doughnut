@@ -1,8 +1,6 @@
 
 package com.benefitj.spring.redis;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import java.util.concurrent.TimeUnit;
@@ -12,8 +10,6 @@ import java.util.concurrent.locks.Lock;
  * redis分布式锁
  */
 public class RedisLock {
-
-  protected final Logger log = LoggerFactory.getLogger(getClass());
 
   private static final long DEFAULT_EXPIRE_UNUSED = 60000L;
 
@@ -60,7 +56,7 @@ public class RedisLock {
       lock.unlock();
       redisLockRegistry.expireUnusedOlderThan(expireUnused);
     } catch (Exception e) {
-      log.error("分布式锁 [{}] 释放异常", lockKey, e);
+      throw new IllegalStateException(e.getMessage(), e);
     }
   }
 

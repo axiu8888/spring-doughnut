@@ -1,5 +1,6 @@
 package com.benefitj.spring.redis;
 
+import com.benefitj.core.EventLoop;
 import com.benefitj.core.executable.SimpleMethodInvoker;
 import com.benefitj.spring.annotation.AnnotationBeanProcessor;
 import com.benefitj.spring.annotation.AnnotationMetadata;
@@ -39,17 +40,17 @@ public class RedisMessageListenerRegistrar extends AnnotationBeanProcessor imple
         continue;
       }
 
-      MessageListenerAdapter adapter = createAdapter(metadata);
+      MessageListenerAdapter adapter = createAdapter(metadata, rmc);
       for (String channel : channels) {
         if (StringUtils.isBlank(channel)) {
           throw new IllegalArgumentException(
               "redis channel不能为空: " + metadata.getBean().getClass() + "." + metadata.getMethod().getName());
         }
         channel = channel.trim();
-        if ((channel.startsWith("${") || channel.startsWith("#{")) && channel.endsWith("}")) {
+        if (SpringCtxHolder.matchPlaceHolder(channel)) {
           channel = SpringCtxHolder.getEnvProperty(channel);
           if (StringUtils.isBlank(channel)) {
-            throw new IllegalStateException("redis channel不能为空: " + channel);
+            throw new IllegalArgumentException("redis channel不能为空: " + channel);
           }
           for (String subChannel : channel.split(",")) {
             if (StringUtils.isNoneBlank(subChannel)) {
@@ -69,11 +70,17 @@ public class RedisMessageListenerRegistrar extends AnnotationBeanProcessor imple
    * @param metadata 注解的信息
    * @return 返回适配器
    */
-  protected MessageListenerAdapter createAdapter(AnnotationMetadata metadata) {
+  protected MessageListenerAdapter createAdapter(AnnotationMetadata metadata, RedisMessageListener rmc) {
     SimpleMethodInvoker invoker = new SimpleMethodInvoker(metadata.getBean(), metadata.getMethod());
     MessageListenerAdapter adapter = new MessageListenerAdapter();
     // 代理对象
-    adapter.setDelegate((MessageListener) (message, pattern) -> invoker.invoke(message, pattern, new String(pattern)));
+    adapter.setDelegate((MessageListener) (message, pattern) -> {
+      if (rmc.async()) {
+        EventLoop.asyncIO(() -> invoker.invoke(message, pattern, pattern != null ? new String(pattern) : ""));
+      } else {
+        invoker.invoke(message, pattern, pattern != null ? new String(pattern) : "");
+      }
+    });
     // 代理方法
     adapter.setDefaultListenerMethod("onMessage");
     return adapter;

@@ -1,5 +1,6 @@
 package com.benefitj.spring.quartz;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.IdUtils;
 import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.ctx.SpringCtxHolder;
@@ -265,7 +266,7 @@ public class QuartzUtils {
         scheduler.start();
       }
     } catch (SchedulerException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 }

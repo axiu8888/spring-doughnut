@@ -1,9 +1,6 @@
 package com.hsrg.collectorrelay.parse;
 
-import com.benefitj.core.ByteArrayCopy;
-import com.benefitj.core.DateFmtter;
-import com.benefitj.core.IOUtils;
-import com.benefitj.core.TimeUtils;
+import com.benefitj.core.*;
 import com.hsrg.collectorrelay.parse.bean.HardwarePacket;
 import com.hsrg.utils.entity.mongo.HardwarePackage;
 import com.hsrg.utils.hardware.parse.ProcessManager;
@@ -44,7 +41,7 @@ public class CheHelper {
       is.read(buf);
       return parseHeader(buf, false);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -70,7 +67,7 @@ public class CheHelper {
       cheRaf.readFully(bytes);
       return parseHeader(bytes, hasRaw);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -160,7 +157,7 @@ public class CheHelper {
         return packages;
       }
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -210,7 +207,7 @@ public class CheHelper {
     try (final RandomAccessFile raf = new RandomAccessFile(cheFile, "r")) {
       return getPosition(raf, position);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -275,7 +272,7 @@ public class CheHelper {
         }
       }
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     } finally {
       TOTAL_COUNTER.remove();
     }
@@ -299,7 +296,7 @@ public class CheHelper {
       fis.read(getCache(PACKET_SIZE));
       parseCheFile(cheFile, hp -> true, (hp, raf) -> consumer.accept(hp), hp -> false);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -314,7 +311,7 @@ public class CheHelper {
       fis.read(getCache(PACKET_SIZE));
       parseHardwarePacket(fis, consumer);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -331,7 +328,7 @@ public class CheHelper {
         consumer.accept(com.hsrg.collectorrelay.parse.PacketUtils.parse(buf, new HardwarePacket(false)));
       }
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -619,7 +616,7 @@ public class CheHelper {
         out.flush();
       }
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -629,7 +626,7 @@ public class CheHelper {
         destFile.getParentFile().mkdirs();
         return destFile.createNewFile();
       } catch (IOException e) {
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(CatchUtils.findRoot(e));
       }
     }
     return true;

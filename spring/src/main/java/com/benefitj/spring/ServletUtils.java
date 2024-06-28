@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.http.ContentType;
@@ -48,7 +49,7 @@ public class ServletUtils {
       IOUtils.write(src.getInputStream(), dest);
       return dest;
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -249,7 +250,7 @@ public class ServletUtils {
     try {
       return IOUtils.readFully(request.getInputStream()).toByteArray();
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -272,7 +273,7 @@ public class ServletUtils {
     try {
       return IOUtils.readFully(request.getInputStream()).toString(characterEncoding);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -301,7 +302,7 @@ public class ServletUtils {
     try {
       write(response.getOutputStream(), body);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
     return response;
   }
@@ -316,7 +317,7 @@ public class ServletUtils {
       out.write(body);
       out.flush();
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -333,7 +334,7 @@ public class ServletUtils {
     try {
       IOUtils.write(file, response.getOutputStream(), false);
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

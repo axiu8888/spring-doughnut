@@ -1,6 +1,7 @@
 package com.benefitj.mybatisplus.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.mybatisplus.dao.mapper.SysJobMapper;
 import com.benefitj.mybatisplus.entity.SysJob;
 import com.benefitj.spring.BeanHelper;
@@ -91,7 +92,7 @@ public class SysJobService extends ServiceBase<SysJob, SysJobMapper> {
         return updateById(existJob);
       } catch (Exception e) {
         scheduler.resumeTrigger(QuartzUtils.triggerKey(existJob));
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(CatchUtils.findRoot(e));
       }
     }
     return false;

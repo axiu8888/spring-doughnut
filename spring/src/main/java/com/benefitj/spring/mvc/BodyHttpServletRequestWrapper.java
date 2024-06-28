@@ -2,6 +2,7 @@ package com.benefitj.spring.mvc;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.spring.ServletUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +68,7 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
     try {
       getStream().setNewInput(content.getBytes(getCharacterEncoding()));
     } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

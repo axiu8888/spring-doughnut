@@ -1,6 +1,7 @@
 package com.benefitj.examples.aop;
 
 import com.alibaba.fastjson2.JSON;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.spring.aop.AopAdvice;
 import com.benefitj.spring.aop.web.WebPointCutHandler;
 import org.aspectj.lang.JoinPoint;
@@ -80,7 +81,7 @@ public class PutRequestHandler implements WebPointCutHandler, Function<Method, P
               });
             }
           } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(CatchUtils.findRoot(e));
           }
         } else {
           // 数据太大，处理不了

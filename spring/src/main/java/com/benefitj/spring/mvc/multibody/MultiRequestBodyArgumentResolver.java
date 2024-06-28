@@ -3,6 +3,7 @@ package com.benefitj.spring.mvc.multibody;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.PrimitiveType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +85,7 @@ public class MultiRequestBodyArgumentResolver implements HandlerMethodArgumentRe
         jsonBody = IOUtils.toString(req.getReader());
         webRequest.setAttribute(JSON_BODY_ATTRIBUTE, jsonBody, NativeWebRequest.SCOPE_REQUEST);
       } catch (IOException e) {
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(CatchUtils.findRoot(e));
       }
     }
     return jsonBody;

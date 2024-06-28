@@ -1,5 +1,6 @@
 package com.benefitj.spring.influxdb.convert;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.influxdb.dto.Point;
 
@@ -149,7 +150,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
       try {
         TIME_METHOD.get().invoke(builder, timestamp, converter.getTimestampUnit());
       } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(CatchUtils.findRoot(e));
       }
     } else {
       try {
@@ -160,7 +161,7 @@ public abstract class AbstractConverter<T, U> implements Converter<T, U> {
           TIME_METHOD.set(method);
           method.invoke(builder, timestamp, converter.getTimestampUnit());
         } catch (Exception ee) {
-          throw new IllegalStateException(ee);
+          throw new IllegalStateException(CatchUtils.findRoot(ee));
         }
       }
     }

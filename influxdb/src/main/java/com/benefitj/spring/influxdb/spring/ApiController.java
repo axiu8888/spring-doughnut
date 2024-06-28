@@ -112,7 +112,7 @@ public class ApiController {
         FileCopy.cut(zip, new File(dir, zip.getName()));
       }
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     } finally {
       deleteTask.put(dir.getName(), EventLoop.asyncIO(() -> IOUtils.delete(dir), apiOpts.getCacheDuration().getSeconds(), TimeUnit.SECONDS));
     }

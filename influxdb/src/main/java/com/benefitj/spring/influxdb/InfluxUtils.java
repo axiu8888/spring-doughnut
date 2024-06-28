@@ -1,6 +1,7 @@
 package com.benefitj.spring.influxdb;
 
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.spring.influxdb.annotation.Column;
 import com.benefitj.spring.influxdb.annotation.ColumnIgnore;
@@ -464,7 +465,7 @@ public class InfluxUtils {
       out.write("\n".getBytes(StandardCharsets.UTF_8));
       out.flush();
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -485,7 +486,7 @@ public class InfluxUtils {
       out.write("\n");
       out.flush();
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

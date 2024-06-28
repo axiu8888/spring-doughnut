@@ -225,12 +225,12 @@ public interface InfluxTemplate {
         try {
           throw new IllegalStateException(response.errorBody().string());
         } catch (IOException e) {
-          throw new IllegalStateException(e);
+          throw new IllegalStateException(CatchUtils.findRoot(e));
         }
       }
     }, error::set);
     if (error.get() != null) {
-      throw new IllegalStateException(error.get());
+      throw new IllegalStateException(CatchUtils.findRoot(error.get()));
     }
   }
 
@@ -979,7 +979,7 @@ public interface InfluxTemplate {
     try (final BufferedWriter writer = new BufferedWriter(new FileWriter(out));) {
       return export(writer, measurement, chunkSize, startTime, endTime, condition);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -1060,7 +1060,7 @@ public interface InfluxTemplate {
         .subscribe(queryResult -> consumer.accept(queryResult, fieldKeyMap), error::set);
     ShutdownHook.register(disposable::dispose);
     if (error.get() != null) {
-      throw new IllegalStateException(error.get());
+      throw new IllegalStateException(CatchUtils.findRoot(error.get()));
     }
     return true;
   }

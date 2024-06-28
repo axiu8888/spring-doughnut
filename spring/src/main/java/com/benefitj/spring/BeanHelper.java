@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import com.benefitj.core.CatchUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -34,7 +35,7 @@ public class BeanHelper {
       }
       return (T) klass.newInstance();
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

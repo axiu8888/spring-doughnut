@@ -1,6 +1,7 @@
 
 package com.benefitj.spring.redis;
 
+import com.benefitj.core.CatchUtils;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class RedisLock {
       lock.unlock();
       redisLockRegistry.expireUnusedOlderThan(expireUnused);
     } catch (Exception e) {
-      throw new IllegalStateException(e.getMessage(), e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

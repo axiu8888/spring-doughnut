@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import com.benefitj.core.CatchUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ public class JsonUtils {
     try {
       return getMapper().writeValueAsString(o);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -54,7 +55,7 @@ public class JsonUtils {
     try {
       return getMapper().writeValueAsBytes(o);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -67,7 +68,7 @@ public class JsonUtils {
     try {
       getMapper().writeValue(w, o);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -80,7 +81,7 @@ public class JsonUtils {
     try {
       getMapper().writeValue(out, o);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -96,7 +97,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -112,7 +113,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -128,7 +129,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -144,7 +145,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -160,7 +161,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -176,7 +177,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(json, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -192,7 +193,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(r, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 
@@ -208,7 +209,7 @@ public class JsonUtils {
     try {
       return getMapper().readValue(in, type);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

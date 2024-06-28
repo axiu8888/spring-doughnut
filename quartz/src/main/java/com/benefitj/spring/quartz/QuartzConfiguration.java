@@ -1,5 +1,6 @@
 package com.benefitj.spring.quartz;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.spring.quartz.worker.QuartzWorkerManager;
 import com.benefitj.spring.quartz.worker.QuartzWorkerProcessor;
 import org.quartz.*;
@@ -40,7 +41,7 @@ public class QuartzConfiguration {
     try {
       return new QuartzStdSchedulerFactory(properties);
     } catch (SchedulerException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
 

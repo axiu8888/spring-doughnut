@@ -1,5 +1,6 @@
 package com.benefitj.provider.mqttaclredis;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.spring.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,7 @@ public class MqttAclRedisInitializer {
           }
         }
       } catch (Exception e) {
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(CatchUtils.findRoot(e));
       }
     }
   }

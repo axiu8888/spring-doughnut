@@ -31,7 +31,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 

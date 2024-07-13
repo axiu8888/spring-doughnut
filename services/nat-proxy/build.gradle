@@ -13,18 +13,14 @@ group = "nat-proxy"
 version = ''
 
 jar {
-  archivesBaseName = "nat-proxy"
+  archivesBaseName = "app"
 }
 
 dependencies {
   [
       //project(":all"),
       project(":nat-proxy"),
-
-      "org.springframework.boot:spring-boot-starter-web",
-      //"org.springframework.boot:spring-boot-starter-websocket",
-      "io.springfox:springfox-boot-starter:${swaggerVersion}",
-      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+      "org.springframework.boot:spring-boot-starter",
   ].forEach {
     implementation(it)
   }

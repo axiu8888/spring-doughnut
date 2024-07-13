@@ -1,19 +1,21 @@
 package com.benefitj.natproxy.tcpudp;
 
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.log.ILogger;
+import com.benefitj.natproxy.NatLogger;
 import com.benefitj.natproxy.ProxySwitcher;
 import com.benefitj.spring.listener.OnAppStart;
 import com.benefitj.spring.listener.OnAppStop;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 public class TcpUdpProxySwitcher implements ProxySwitcher {
 
-   TcpUdpOptions options;
-   TcpUdpProxyServer server;
+  final ILogger log = NatLogger.get();
+
+  TcpUdpOptions options;
+  TcpUdpProxyServer server;
 
   public TcpUdpProxySwitcher(TcpUdpOptions options, TcpUdpProxyServer server) {
     this.options = options;
@@ -24,9 +26,8 @@ public class TcpUdpProxySwitcher implements ProxySwitcher {
   @Override
   public void startServer() {
     try {
-      if (!options.isEnable()) {
-        return;
-      }
+      if (!options.isEnable()) return;
+
       Integer port = options.getPort();
       if (port == null) {
         throw new IllegalStateException("本地监听端口不能为空!");

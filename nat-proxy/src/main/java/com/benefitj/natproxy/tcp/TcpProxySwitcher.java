@@ -1,14 +1,16 @@
 package com.benefitj.natproxy.tcp;
 
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.log.ILogger;
+import com.benefitj.natproxy.NatLogger;
 import com.benefitj.natproxy.ProxySwitcher;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 public class TcpProxySwitcher implements ProxySwitcher {
+
+  final ILogger log = NatLogger.get();
 
   TcpOptions options;
   TcpProxyServer server;
@@ -21,9 +23,8 @@ public class TcpProxySwitcher implements ProxySwitcher {
   @Override
   public void startServer() {
     try {
-      if (!options.isEnable()) {
-        return;
-      }
+      if (!options.isEnable()) return;
+
       Integer port = options.getPort();
       if (port == null) {
         throw new IllegalStateException("本地监听端口不能为空!");

@@ -9,12 +9,15 @@ name=$(echo $appname|cut -d ' ' -f1)
 confName=$(ls | grep .properties | sort -rn)
 confFile=$(echo $confName|cut -d ' ' -f1)
 
-echo "cmd: ./jre/bin/java -jar $name -Duser.timezone=GMT+08 --spring.config.location=$confFile >> ./logs/$(echo "$name" | cut -f 1 -d '.').log"
+#echo "cmd: ./jre/bin/java -jar $name -Duser.timezone=GMT+08 --spring.config.location=$confFile >> ./logs/$(echo "$name" | cut -f 1 -d '.').log"
 
-mkdir -p ./logs 
+mkdir -p ./logs
 
 ./jre/bin/java -jar \
-  $name \
   -Duser.timezone=GMT+08 \
+  $name \
   --spring.config.location=$confFile \
-  >> ./logs/$(echo "$name" | cut -f 1 -d '.').log
+  >> ./logs/trace.log \
+  2>&1 &
+#  >> ./logs/$(echo "$name" | cut -f 1 -d '.').log \
+

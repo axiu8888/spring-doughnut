@@ -1,8 +1,8 @@
 package com.benefitj.natproxy.tcpudp;
 
 import com.benefitj.spring.listener.AppStateListener;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,13 +11,14 @@ import org.springframework.context.annotation.Lazy;
 /**
  * TCP转UDP代理配置
  */
+@ConditionalOnProperty(prefix = "tcp-udp", value = "enable", matchIfMissing = false)
 @Configuration
 public class TcpUdpConfiguration {
 
   /**
    * 配置
    */
-  @ConditionalOnBean
+  @ConditionalOnMissingBean
   @Bean
   @ConfigurationProperties(prefix = "tcp-udp")
   public TcpUdpOptions tcpUdpOptions() {
@@ -27,7 +28,7 @@ public class TcpUdpConfiguration {
   /**
    * TCP-UDP服务端
    */
-  @ConditionalOnBean
+  @ConditionalOnMissingBean
   @Bean
   public TcpUdpProxyServer tcpUdpProxyServer(TcpUdpOptions options) {
     return new TcpUdpProxyServer(options);
@@ -36,7 +37,7 @@ public class TcpUdpConfiguration {
   /**
    * 开关
    */
-  @ConditionalOnBean
+  @ConditionalOnMissingBean
   @Bean
   public TcpUdpProxySwitcher tcpProxySwitcher(TcpUdpOptions options, TcpUdpProxyServer server) {
     return new TcpUdpProxySwitcher(options, server);

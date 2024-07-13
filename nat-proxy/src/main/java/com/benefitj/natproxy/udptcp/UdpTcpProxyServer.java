@@ -2,7 +2,10 @@ package com.benefitj.natproxy.udptcp;
 
 import com.benefitj.core.HexUtils;
 import com.benefitj.netty.client.TcpNettyClient;
-import com.benefitj.netty.handler.*;
+import com.benefitj.netty.handler.ActiveHandler;
+import com.benefitj.netty.handler.IdleStateEventHandler;
+import com.benefitj.netty.handler.InboundHandler;
+import com.benefitj.netty.handler.ShutdownEventHandler;
 import com.benefitj.netty.server.UdpNettyServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -12,7 +15,6 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;

@@ -1,26 +1,25 @@
 package com.benefitj.natproxy.udp;
 
 import com.benefitj.spring.listener.AppStateListener;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * UDP代理配置
  */
-@Lazy(value = false)
+@ConditionalOnProperty(prefix = "udp", value = "enable", matchIfMissing = false)
 @Configuration
 public class UdpConfiguration {
 
   /**
    * 配置
    */
-  @ConditionalOnBean
-  @Bean
   @ConfigurationProperties(prefix = "udp")
+  @ConditionalOnMissingBean
+  @Bean
   public UdpOptions udpOptions() {
     return new UdpOptions();
   }
@@ -28,7 +27,7 @@ public class UdpConfiguration {
   /**
    * UDP服务端
    */
-  @ConditionalOnBean
+  @ConditionalOnMissingBean
   @Bean
   public UdpProxyServer udpProxyServer(UdpOptions options) {
     return new UdpProxyServer(options);
@@ -37,7 +36,7 @@ public class UdpConfiguration {
   /**
    * 开关
    */
-  @ConditionalOnBean
+  @ConditionalOnMissingBean
   @Bean
   public UdpProxySwitcher udpProxySwitcher(UdpOptions options, UdpProxyServer server) {
     return new UdpProxySwitcher(options, server);
@@ -46,7 +45,6 @@ public class UdpConfiguration {
   /**
    * UDP代理启动和停止
    */
-  @Lazy(value = false)
   @ConditionalOnMissingBean(name = "udpProxyListener")
   @Bean(name = "udpProxyListener")
   public AppStateListener udpProxyListener(UdpProxySwitcher switcher) {

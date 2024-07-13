@@ -47,7 +47,7 @@ public class OgnlTest  {
   public void testProperties() throws OgnlException {
     OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
     Object node = Ognl.parseExpression("base-url=http://#remote-address:80/api/");
-    context.put("remote-address", "192.168.1.198");
+    context.put("remote", "192.168.1.198");
 
     Object root = null;
     System.err.println("node: " + Ognl.getValue(node, context, root));;

@@ -1,6 +1,9 @@
 package com.benefitj.spring.influxdb.write;
 
 import com.benefitj.core.EventLoop;
+import com.benefitj.core.IOUtils;
+import com.benefitj.core.TimeUtils;
+import com.benefitj.core.Utils;
 import com.benefitj.core.log.ILogger;
 import com.benefitj.spring.influxdb.InfluxDBLogger;
 import com.benefitj.spring.influxdb.InfluxOptions;
@@ -9,8 +12,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,80 +35,46 @@ public class AppStarterAutoWriter {
 
   @EventListener(ApplicationReadyEvent.class)
   public void onAppStart() {
-    InfluxOptions.Writer writer = options.getWriter();
-    if (writer.isAutoUpload()) {
-      EventLoop.asyncIO(() -> {
-        File cacheDir = new File(writer.getCacheDir());
-        long before = TimeUnit.MINUTES.toMillis(10);
-        checkAndUploadFile(cacheDir, before, Collections.emptyList());
-      });
-    }
-  }
-
-  /**
-   * 检查并上传文件
-   *
-   * @param file       文件
-   * @param before     某个时间之前的数据
-   * @param ignoreDirs 忽略的文件或目录
-   */
-  protected void checkAndUploadFile(File file, long before, List<String> ignoreDirs) {
-    if (file == null || !file.exists()) {
-      return;
-    }
-
-    if (file.isDirectory()) {
-      File[] files = file.listFiles();
-      if (files != null && files.length > 0) {
-        for (File tmpFile : files) {
-          if (tmpFile.isDirectory()) {
-            checkAndUploadFile(tmpFile, before, ignoreDirs);
-          } else {
-            if (tmpFile.lastModified() >= before) {
-              uploadFile(tmpFile, ignoreDirs);
+    InfluxOptions.Writer optWriter = getOptions().getWriter();
+    final File cacheDir = new File(new File(optWriter.getCacheDir())
+        .getAbsolutePath()
+        .replace("\\", "/")
+        .replace("./", "/")
+        .replace("//", "/")
+    );
+    if (optWriter.isAutoUpload()) {
+      long before = TimeUnit.MINUTES.toMillis(5);
+      EventLoop.asyncIOFixedRate(() -> {
+        if (cacheDir.getFreeSpace() <= 50 * IOUtils.MB) return; // 磁盘空间不足50MB，则不上传数据
+        File[] lines = cacheDir.listFiles(f -> f.length() > 0 // 长度大于0
+            && !f.getName().startsWith("backup_") // 过滤掉备份数据
+            && !f.getName().startsWith("err_") // 过滤掉错误数据
+            && f.getName().endsWith(optWriter.getSuffix()) // line文件
+            && TimeUtils.diffNow(f.lastModified()) >= before // 最近更新的时间超过10分钟
+        );
+        if (lines != null) {
+          for (File line : lines) {
+            try {
+              log.info("自动上传line文件, name: {}, length: {}", line.getName(), Utils.fmtMB(line.length(), "0.00MB"));
+              getTemplate().write(line);
+              line.delete();
+            } catch (Exception e) {
+              log.error("AutoUploadLineFile error!", e);
             }
           }
         }
-      } else if (!isIgnoreDir(file, ignoreDirs)) {
-        // 删除空目录
-        file.delete();
-      }
-    } else {
-      uploadFile(file, Collections.emptyList());
+      }, 1, 1, TimeUnit.MINUTES);
     }
-  }
 
-  /**
-   * 检查并上传文件
-   *
-   * @param file       文件
-   * @param ignoreDirs 忽略的文件或目录
-   */
-  protected void uploadFile(File file, List<String> ignoreDirs) {
-    if (file.isFile() && file.length() > 0
-        && file.getName().endsWith(options.getWriter().getSuffix())) {
-      log.debug("上传文件, name: {}, path: {}, length: {}MB", file.getName(),
-          file.getAbsolutePath(), String.format("%.2f", ((file.length() * 1.0f) / (1024 << 10))));
-      getTemplate().write(file);
-      file.delete();
-
-      File dir = file.getParentFile();
-      if (dir.length() == 0 && !isIgnoreDir(dir, ignoreDirs)) {
-        dir.delete();
+    // 检测磁盘空间
+    EventLoop.asyncIOFixedRate(() -> {
+      if (cacheDir.getFreeSpace() <= IOUtils.ofGB(1)) {
+        log.error("磁盘空间不足1GB: {}", Utils.fmtGB(cacheDir.getFreeSpace(), "0.0000GB"));
       }
-    }
+    }, 1, 1, TimeUnit.MINUTES);
+
   }
 
-  /**
-   * 是忽略文件
-   *
-   * @param dir        文件
-   * @param ignoreDirs 忽略的文件
-   * @return 返回是否为忽略
-   */
-  public boolean isIgnoreDir(File dir, List<String> ignoreDirs) {
-    return ignoreDirs.stream().anyMatch(ignoreDir -> dir.getName().equals(ignoreDir));
-  }
 
   public InfluxTemplate getTemplate() {
     return template;

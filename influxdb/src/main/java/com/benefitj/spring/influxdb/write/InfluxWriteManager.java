@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit;
 public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements InitializingBean {
 
   /**
-   * 延迟上传的时长，默认5分钟
+   * 延迟上传的时长，默认1分钟
    */
-  private long delay = 5 * 60_000;
+  private long delay = 60_000L;
 
   public InfluxWriteManager(File cacheDir) {
-    this(cacheDir, 50 * Utils.MB);
+    this(cacheDir, 30 * Utils.MB);
   }
 
   public InfluxWriteManager(File cacheDir, long maxSize) {
@@ -29,19 +29,15 @@ public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements In
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    if (getFileFactory() == null) {
-      throw new IllegalStateException("未设置文件工厂");
-    }
-    if (getFileListener() == null) {
-      throw new IllegalStateException("未设置文件监听");
-    }
+    if (getFileFactory() == null) throw new IllegalStateException("未设置文件工厂");
+    if (getFileListener() == null) throw new IllegalStateException("未设置文件监听");
 
     // 检查是否写入数据
     EventLoop.asyncIOFixedRate(() -> {
-      if (isWritable()) {
+      if (isFlushNow()) {
         flush();
       }
-    }, 3, 1, TimeUnit.SECONDS);
+    }, 3, 2, TimeUnit.SECONDS);
   }
 
   /**
@@ -49,14 +45,10 @@ public class InfluxWriteManager extends FileSlicer<LineFileWriter> implements In
    *
    * @return 返回判断结果
    */
-  public boolean isWritable() {
+  public boolean isFlushNow() {
     LineFileWriter w = getWriter();
-    if (w == null || w.length() <= 0) {
-      return false;
-    }
-    if (w.length() >= getMaxSize()) {
-      return true;
-    }
+    if (w == null || w.length() <= 0) return false;
+    if (w.length() >= getMaxSize()) return true;
     long now = System.currentTimeMillis();
     return (now - w.getCreateTime() >= getDelay()) || (now - getLastWriteTime() >= getDelay());
   }

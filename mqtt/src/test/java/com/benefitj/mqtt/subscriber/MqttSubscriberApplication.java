@@ -44,7 +44,8 @@ public class MqttSubscriberApplication {
             "#{@environment['topic3'] ?: '/test3'}",
         },
         clientIdPrefix = "mqtt-subscriber-",
-        serverURI = "spring.mqtt.custom.serverURIs"
+        serverURI = "${spring.mqtt.custom.serverURIs}",
+        async = true
     )
     public void onMessage(String topic, byte[] payload) {
       log.info("1. {}, payload: {}", topic, new String(payload));

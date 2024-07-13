@@ -96,10 +96,10 @@ public class InfluxOptions {
     @Builder.Default
     Integer delay = 5 * 60;
     /**
-     * 缓存目录：默认当前目录下的 ./tmp/influxdb
+     * 缓存目录：默认当前目录下的 ./lines
      */
     @Builder.Default
-    String cacheDir = "./tmp/influxdb";
+    String cacheDir = "./lines";
     /**
      * 是否自动上传，默认false
      */

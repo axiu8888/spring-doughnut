@@ -4,7 +4,7 @@ import com.benefitj.core.EventLoop;
 import com.benefitj.core.HexUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.IdUtils;
-import com.benefitj.core.concurrent.CancelableFuture;
+import com.benefitj.core.concurrent.IScheduledFuture;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import io.swagger.annotations.Api;
@@ -187,10 +187,10 @@ public class ApiController {
   }
 
 
-  static class DeleteTimer<V> extends CancelableFuture<V> {
+  static class DeleteTimer<V> extends IScheduledFuture.Impl<V> {
 
-    public DeleteTimer(ScheduledFuture<V> original) {
-      super(original);
+    public DeleteTimer(ScheduledFuture<V> raw) {
+      super(raw);
     }
 
     public String getUrl() {
@@ -208,6 +208,7 @@ public class ApiController {
     public void setPdf(File pdf) {
       this.setAttribute("pdf", pdf);
     }
+
   }
 
 }

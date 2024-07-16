@@ -4,6 +4,7 @@ import com.benefitj.core.CatchUtils;
 import com.benefitj.core.EventLoop;
 import com.benefitj.core.IdUtils;
 import com.benefitj.mqtt.IMqttPublisher;
+import com.benefitj.mqtt.paho.MqttPahoClientException;
 import com.benefitj.mqtt.paho.v3.PahoMqttV3Client;
 import com.benefitj.spring.mqtt.MqttOptions;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -15,17 +16,17 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
  * MQTT发送端
  */
-public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, DisposableBean {
+public class SingleMqttPublisher implements IMqttPublisher, InitializingBean, DisposableBean {
 
   /**
    * 连接配置
@@ -50,15 +51,15 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
 
   private final AtomicInteger dispatcher = new AtomicInteger();
 
-  public MqttPublisherImpl(MqttOptions options) {
+  public SingleMqttPublisher(MqttOptions options) {
     this(options, "mqtt-publisher-");
   }
 
-  public MqttPublisherImpl(MqttOptions options, String prefix) {
+  public SingleMqttPublisher(MqttOptions options, String prefix) {
     this(options, prefix, 1);
   }
 
-  public MqttPublisherImpl(MqttOptions options, String prefix, int count) {
+  public SingleMqttPublisher(MqttOptions options, String prefix, int count) {
     this.options = options;
     this.prefix = prefix;
     this.count = count;
@@ -85,17 +86,27 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
   }
 
   @Override
-  public void publish(String topic, MqttMessage msg) throws MqttPublishException {
+  public void publish(Collection<String> topics, MqttMessage msg) {
     try {
-      getClient().publish(topic, msg);
+      for (String topic : topics) {
+        getClient().publish(topic, msg);
+      }
     } catch (MqttException e) {
-      throw new MqttPublishException(e);
+      throw new MqttPahoClientException(e);
     }
   }
 
   @Override
-  public void publishAsync(String topic, MqttMessage msg) {
-    getExecutor().execute(() -> publish(topic, msg));
+  public void publishAsync(Collection<String> topics, MqttMessage msg) {
+    getExecutor().execute(() -> {
+      try {
+        for (String topic : topics) {
+          getClient().publish(topic, msg);
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
   }
 
   /**
@@ -104,7 +115,7 @@ public class MqttPublisherImpl implements IMqttPublisher, InitializingBean, Disp
   public IMqttClient getClient() {
     int index = dispatcher.incrementAndGet();
     PahoMqttV3Client client = this.clients.get(index % this.clients.size());
-    if (index > 10000) {
+    if (index > 10_000_000) {
       dispatcher.set(this.clients.size());
     }
     return client;

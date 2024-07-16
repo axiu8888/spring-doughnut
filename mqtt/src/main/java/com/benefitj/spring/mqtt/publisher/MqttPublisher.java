@@ -11,6 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +30,7 @@ public class MqttPublisher implements IMqttPublisher, InitializingBean, Disposab
         .map(uris -> {
           MqttOptions copy = BeanHelper.copy(options);
           copy.setServerURIs(uris);
-          return new MqttPublisherImpl(options, prefix, count);
+          return new SingleMqttPublisher(options, prefix, count);
         })
         .collect(Collectors.toList()));
   }
@@ -38,8 +39,8 @@ public class MqttPublisher implements IMqttPublisher, InitializingBean, Disposab
     return proxy;
   }
 
-  public List<MqttPublisherImpl> getProxyList() {
-    return (List<MqttPublisherImpl>) proxy;
+  public List<SingleMqttPublisher> getProxyList() {
+    return (List<SingleMqttPublisher>) proxy;
   }
 
   @Override
@@ -53,13 +54,13 @@ public class MqttPublisher implements IMqttPublisher, InitializingBean, Disposab
   }
 
   @Override
-  public void publish(String topic, MqttMessage msg) throws MqttPublishException {
-    getProxyList().forEach(mp -> mp.publish(topic, msg));
+  public void publish(Collection<String> topics, MqttMessage msg) {
+    getProxyList().forEach(mp -> mp.publish(topics, msg));
   }
 
   @Override
-  public void publishAsync(String topic, MqttMessage msg) {
-    getProxyList().forEach(mp -> CatchUtils.tryThrow(() -> mp.publishAsync(topic, msg), Throwable::printStackTrace));
+  public void publishAsync(Collection<String> topics, MqttMessage msg) {
+    getProxyList().forEach(mp -> mp.publishAsync(topics, msg));
   }
 
 }

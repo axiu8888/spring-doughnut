@@ -1,9 +1,6 @@
 package com.benefitj.spring.athenapdf;
 
-import com.benefitj.core.EventLoop;
-import com.benefitj.core.HexUtils;
-import com.benefitj.core.IOUtils;
-import com.benefitj.core.IdUtils;
+import com.benefitj.core.*;
 import com.benefitj.core.concurrent.IScheduledFuture;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.aop.web.AopWebPointCut;
@@ -187,10 +184,17 @@ public class ApiController {
   }
 
 
-  static class DeleteTimer<V> extends IScheduledFuture.Impl<V> {
+  static class DeleteTimer<V> extends IScheduledFuture.Impl<V> implements AttributeMap {
+
+    final Map<String, Object> attrs = new ConcurrentHashMap<>();
 
     public DeleteTimer(ScheduledFuture<V> raw) {
       super(raw);
+    }
+
+    @Override
+    public Map<String, Object> attrs() {
+      return attrs;
     }
 
     public String getUrl() {

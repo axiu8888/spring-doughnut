@@ -1,7 +1,7 @@
 package com.benefitj.spring.quartz.worker;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.benefitj.core.executable.MethodInvokerImpl;
+import com.benefitj.core.executable.MethodInvoker;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 
 import java.lang.reflect.Method;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class QuartzWorkerInvoker extends MethodInvokerImpl {
+public class QuartzWorkerInvoker extends MethodInvoker.Impl {
 
   private String name;
   private AnnotationMetadata metadata;

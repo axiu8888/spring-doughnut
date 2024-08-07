@@ -223,9 +223,9 @@ public interface InfluxTemplate {
     write(db, retentionPolicy, precision, consistency, batchPoints, response -> {
       if (!response.isSuccessful()) {
         try {
-          throw new IllegalStateException(response.errorBody().string());
+          error.set(new InfluxException(response.errorBody().string()));
         } catch (IOException e) {
-          throw new IllegalStateException(CatchUtils.findRoot(e));
+          error.set(CatchUtils.findRoot(e));
         }
       }
     }, error::set);

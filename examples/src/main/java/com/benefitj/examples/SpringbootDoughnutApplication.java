@@ -14,7 +14,10 @@ import org.springframework.context.annotation.PropertySource;
 
 
 @EnableSpringCtxInit
-@PropertySource(value = "classpath:/swagger-api-info.properties", encoding = "utf-8")
+@PropertySource(value = {
+    "classpath:/swagger-api-info.properties",
+//    "classpath:/mongodb.properties",
+}, encoding = "utf-8")
 @EnableSwaggerApi
 @EnableRedisMessageListener
 @EnableRedisRateLimiter         // redis RateLimiter
@@ -86,16 +89,16 @@ public class SpringbootDoughnutApplication {
 //    String _id;
 //
 //  }
-
+//
 //  @EventListener(ApplicationReadyEvent.class)
 //  public void onAppStart() {
 //    RedisTemplate<String, Object> redisTemplate = SpringCtxHolder.getBean("redisTemplate");
-////    List<String> keys = keys(redisTemplate, "report:doQuartz:*", 1);
 //    List<String> keys = keys(redisTemplate, "collector:bind_record:*", 1);
 //    log.info("keys: {}", keys);
 //
 //    EventLoop.asyncIO(() -> System.exit(0), 1000);
 //  }
+//
 //  public List<String> keys(RedisTemplate<String, ?> redisTemplate, String pattern, int size) {
 //    ScanOptions options = ScanOptions.scanOptions()
 //        .match(pattern)

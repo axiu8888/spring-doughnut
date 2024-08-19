@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -111,7 +112,7 @@ public class UdpTcpProxyServer extends UdpNettyServer {
                   (rhandler, rctx, rmsg) -> onSendResponse(realityChannel, rhandler, rctx, rmsg)))
               .group(group)
               .remoteAddress(addr)
-              .autoReconnect(ops.getAutoReconnect(), ops.getReconnectDelay(), TimeUnit.SECONDS)
+              .autoReconnect(ops.getAutoReconnect(), Duration.ofSeconds(ops.getReconnectDelay()))
               .start(f ->
                   log.info("[udp-tcp] client shadow started, reality: {}, shadow: {}, success: {}"
                       , realityChannel.remoteAddress(), addr, f.isSuccess())

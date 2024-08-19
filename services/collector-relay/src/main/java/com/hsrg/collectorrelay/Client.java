@@ -184,7 +184,7 @@ public class Client extends TcpNettyClient {
                 } else {
                   if (taskRef.get() == null) {
                     taskRef.set(EventLoop.asyncIO(() -> {
-                      EventLoop.sleepMillis(10);
+                      EventLoop.sleep(10);
                       while (taskRef.get() != null && ch.isActive()) {
                         CheFile cf = sendBody(ch);
                         if (cf != null) {
@@ -232,7 +232,7 @@ public class Client extends TcpNettyClient {
                 }
                 // 结束
                 cancelTask(taskRef.getAndSet(null));
-                EventLoop.sleepMillis(10); // 等待结束
+                EventLoop.sleep(10); // 等待结束
                 CheFile remove = ches.remove(0);
                 File removeFile = remove.getSource();
                 File dest = new File(removeFile.getParentFile(), removeFile.getName().replace(".CHE", ".HEX"));

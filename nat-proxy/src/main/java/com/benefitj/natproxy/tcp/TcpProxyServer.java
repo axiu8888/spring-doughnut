@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +73,12 @@ public class TcpProxyServer extends TcpNettyServer {
             .addLast(InboundHandler.newByteBufHandler((handler, ctx, msg) -> {
               List<TcpClient> clients = ctx.channel().attr(clientsKey).get();
               if (clients != null && !clients.isEmpty()) {
-                clients.forEach(c -> c.useServeChannel(ch2 -> onSendRequest(ch2, handler, ctx, msg.copy())));
+                clients.forEach(c -> {
+                  Channel ch2 = c.getMainChannel();
+                  if (ch2 != null) {
+                    onSendRequest(ch2, handler, ctx, msg.copy());
+                  }
+                });
               } else {
                 int size = Math.min(msg.readableBytes(), ops.getPrintRequestSize());
                 log.warn("tcp clients is empty, clientAddr: {}, remotes: {}, data: {}"
@@ -117,7 +123,7 @@ public class TcpProxyServer extends TcpNettyServer {
                   (rhandler, rctx, rmsg) -> onSendResponse(realityChannel, rhandler, rctx, rmsg)))
               .group(group)
               .remoteAddress(addr)
-              .autoReconnect(ops.isAutoReconnect(), ops.getReconnectDelay(), TimeUnit.SECONDS)
+              .autoReconnect(ops.isAutoReconnect(), Duration.ofSeconds(ops.getReconnectDelay()))
               .start(f ->
                   log.info("[tcp] client shadow started, reality: {}, shadow: {}, success: {}"
                       , realityChannel.remoteAddress(), addr, f.isSuccess())

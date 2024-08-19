@@ -70,7 +70,12 @@ public class TcpUdpProxyServer extends TcpNettyServer {
             .addLast(InboundHandler.newByteBufHandler((handler, ctx, msg) -> {
               List<TcpUdpClient> clients = ctx.channel().attr(clientsKey).get();
               if (clients != null && !clients.isEmpty()) {
-                clients.forEach(c -> c.useServeChannel(ch2 -> onSendRequest(ch2, handler, ctx, msg.copy())));
+                clients.forEach(c -> {
+                  Channel ch2 = c.getMainChannel();
+                  if (ch2 != null) {
+                    onSendRequest(ch2, handler, ctx, msg.copy());
+                  }
+                });
               } else {
                 int size = Math.min(msg.readableBytes(), ops.getPrintRequestSize());
                 log.warn("[tcp-udp] clients is empty, clientAddr: {}, remotes: {}, data: {}"

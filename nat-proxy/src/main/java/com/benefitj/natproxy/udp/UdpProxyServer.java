@@ -134,7 +134,7 @@ public class UdpProxyServer extends UdpNettyServer {
     if (clients != null) {
       clients.forEach(c -> {
         try {
-          c.closeServeChannel();
+          c.closeMainChannel();
         } catch (Exception ignore) {
           /* ! */
         } finally {

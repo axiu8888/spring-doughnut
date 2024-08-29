@@ -95,6 +95,10 @@ public class HttpLoggingHandler implements WebPointCutHandler {
       for (int i = 0; i < parameters.length; i++) {
         Object arg = args[i];
         Parameter parameter = parameters[i];
+        if (parameter.isAnnotationPresent(HttpLoggingIgnore.class)) {
+          argsMap.put(parameter.getName(), "[ignored]");
+          continue;
+        }
         if (arg instanceof ServletRequest) {
           argsMap.put(parameter.getName(), "[ServletRequest]");
         } else if (arg instanceof ServletResponse) {

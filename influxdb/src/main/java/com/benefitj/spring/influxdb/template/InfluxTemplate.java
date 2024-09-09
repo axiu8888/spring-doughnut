@@ -877,7 +877,7 @@ public interface InfluxTemplate {
    * @return return field key map
    */
   default Map<String, FieldKey> getFieldKeyMap(String db, String retentionPolicy, String measurement, boolean containTags) {
-    final String sql = "SHOW FIELD KEYS FROM \"" + retentionPolicy + "\".\"" + measurement + "\"";
+    final String sql = "SHOW FIELD KEYS FROM \"" + retentionPolicy + "\".\"" + retentionPolicy + "\".\"" + measurement + "\"";
     QueryResult queryResult = postQuery(db, sql);
     List<FieldKey> fieldKeys = getObjectsStream(queryResult)
         .flatMap(values -> {
@@ -943,8 +943,13 @@ public interface InfluxTemplate {
    * get QueryResult.Result list
    */
   default List<QueryResult.Result> getResults(QueryResult result) {
-    if (checkResult(result))
-      return result.getResults();
+    if (checkResult(result)) {
+      List<QueryResult.Result> results = result.getResults();
+      if (results.size() == 1 && results.get(0).hasError()) {
+        throw new IllegalStateException(results.get(0).getError());
+      }
+      return results;
+    }
     throw new IllegalStateException(result.getError());
   }
 

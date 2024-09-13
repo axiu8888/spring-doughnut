@@ -1,9 +1,11 @@
 package com.benefitj.spring.minio;
 
 import com.alibaba.fastjson2.JSON;
+import com.benefitj.core.DateFmtter;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
+import com.benefitj.spring.minio.builder.LifecycleRuleBuilder;
 import com.benefitj.spring.minio.dto.ItemEntity;
 import com.benefitj.spring.minio.dto.LifecycleRuleEntity;
 import com.benefitj.spring.minio.spring.MinioConfiguration;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -37,20 +40,15 @@ class MinioTemplateTest {
   @Autowired
   MinioTemplate template;
 
-  @BeforeEach
-  void setUp() {
-  }
-
-  @AfterEach
-  void tearDown() {
-  }
+//  final String bucketName = "test";
+  final String bucketName = "hsrg";
 
   /**
    * MD5
    */
   @Test
   void test_md5() throws IOException {
-    ClassPathResource resource = new ClassPathResource("nginx-80.conf");
+    ClassPathResource resource = new ClassPathResource("application.properties");
     File file = resource.getFile();
     log.info("MD5 ==>: {}", MinioUtils.md5(file));
   }
@@ -60,7 +58,7 @@ class MinioTemplateTest {
    */
   @Test
   void test_bucketExists() {
-    boolean bucketExists = template.bucketExists("test");
+    boolean bucketExists = template.bucketExists(bucketName);
     log.info("bucketExists ==>: {}", bucketExists);
   }
 
@@ -69,15 +67,17 @@ class MinioTemplateTest {
    */
   @Test
   void test_listBuckets() {
-    MinioResult<List<Bucket>> result = template.listBuckets();
-    if (result.isSuccessful()) {
-      log.info("listBuckets ==>: {}", result.getData()
-          .stream()
-          .map(bucket -> String.format("[%s]", bucket.name() + ", " + bucket.creationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
-          .collect(Collectors.toList()));
-    } else {
-      log.info("获取失败：{}", result.getMessage());
-    }
+    template.listBuckets()
+        .promise()
+        .then((result, data) -> {
+          log.info("listBuckets ==>: {}", result.getData()
+              .stream()
+              .map(bucket -> String.format("[%s]", bucket.name() + ", " + DateFmtter.fmt(bucket.creationDate().toInstant().toEpochMilli())))
+              .collect(Collectors.toList()));
+        })
+        .error((result, error) -> {
+          log.info("获取失败：{}", error.getMessage());
+        });
   }
 
   /**
@@ -85,7 +85,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_makeBucket() {
-    String bucketName = "test";
     template.makeBucket(bucketName);
     log.info("make bucket, [{}] bucketExists ==>: {}", bucketName, template.bucketExists(bucketName));
   }
@@ -93,52 +92,56 @@ class MinioTemplateTest {
   @Test
   void test_setBucketTags() {
     // 一个桶设置
-    String bucketName = "test";
-    MinioResult<Boolean> r = template.setBucketTags(
-        Utils.mapOf(Pair.of("Author", "dxa")
-            //, Pair.of("Description", CodecUtils.encodeURL("测试"))
-        ), bucketName);
-    if (r.isSuccessful()) {
-      log.info("------------------------ 设置桶的标签 ------------------------");
-      log.info("设置结果: {}, error: {}", r.isSuccessful(), r.getMessage());
-    } else {
-      log.info("请求失败: {}", r.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.setBucketTags(
+            Utils.mapOf(Pair.of("Author", "dxa")
+                //, Pair.of("Description", CodecUtils.encodeURL("测试"))
+            ), bucketName)
+        .promise()
+        .then((r, data) -> {
+          log.info("------------------------ 设置桶的标签 ------------------------");
+          log.info("设置结果: {}, error: {}", r.isSuccessful(), r.getMessage());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   @Test
   void test_addBucketTags() {
-    String bucketName = "test";
-    MinioResult<Boolean> r = template.addBucketTags(Utils.mapOf(Pair.of("Author2", "dxa2")), bucketName);
-    if (r.isSuccessful()) {
-      log.info("------------------------ 添加桶的标签 ------------------------");
-      log.info("tags: {}", r.getData());
-    } else {
-      log.info("请求失败: {}", r.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.addBucketTags(Utils.mapOf(Pair.of("Author", "dxa")), bucketName)
+        .promise()
+        .then((r, data) -> {
+          log.info("------------------------ 添加桶的标签 ------------------------");
+          log.info("tags: {}", r.getData());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   @Test
   void test_getBucketTags() {
-    String bucketName = "test";
-    MinioResult<Map<String, String>> r = template.getBucketTags(bucketName);
-    if (r.isSuccessful()) {
-      log.info("------------------------ 获取桶的标签 ------------------------");
-      log.info("tags: {}", r.getData());
-    } else {
-      log.info("请求失败: {}", r.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.getBucketTags(bucketName)
+        .promise()
+        .then((r, data) -> {
+          log.info("------------------------ 获取桶的标签 ------------------------");
+          log.info("tags: {}", r.getData());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   @Test
   void test_deleteBucketTags() {
-    String bucketName = "test";
-    MinioResult<Boolean> r = template.deleteBucketTags(bucketName);
     log.info("------------------------ 删除桶的标签 ------------------------");
-    log.info("result: {}", r.getData());
+    template.deleteBucketTags(bucketName)
+        .promise()
+        .then((r, data) -> log.info("result: {}", r.getData()))
+        .error((result, error) -> log.info("error: {}", error.getMessage()));
   }
 
   /**
@@ -146,7 +149,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_setBucketVersioning() {
-    String bucketName = "test";
     MinioResult result = template.setBucketVersioning(VersioningConfiguration.Status.SUSPENDED, false, bucketName);
     log.info("设置versioning状态：{}, msg: {}", result.isSuccessful(), result.getMessage());
     log.info("test_setBucketVersioning bucket, [{}] config ==>: {}", bucketName, template.getBucketVersioning(bucketName).getData().status());
@@ -157,7 +159,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_setBucketReplication() {
-//    String bucketName = "test";
 //    MinioResult result = template.setBucketReplication(null, Arrays.asList(
 //        new ReplicationRule(
 //        )
@@ -171,7 +172,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_getBucketLifecycle() {
-    String bucketName = "test";
     MinioResult<LifecycleConfiguration> result = template.getBucketLifecycle(bucketName);
     log.info("getBucketLifecycle bucket, [{}], success: {}, msg: {}, config ==>: {}"
         , bucketName
@@ -183,12 +183,49 @@ class MinioTemplateTest {
     );
   }
 
+  @Test
+  void test_setBucketLifecycle() {
+    // 定义生命周期规则 XML
+    String lifecycleConfig =
+        "<LifecycleConfiguration>" +
+            "  <Rule>" +
+            "    <ID>ExpireLogs</ID>" +
+            "    <Prefix>logs/</Prefix>" +   // 设置前缀，例如 'logs/'
+            "    <Status>Enabled</Status>" +
+            "    <Expiration>" +
+            "      <Days>0</Days>" +         // 0 天意味着立即删除
+            "      <ExpiredObjectDeleteMarker>true</ExpiredObjectDeleteMarker>" +
+            "    </Expiration>" +
+            "    <AbortIncompleteMultipartUpload>" +
+            "      <DaysAfterInitiation>1</DaysAfterInitiation>" + // 1 天后清理未完成的 multipart upload
+            "    </AbortIncompleteMultipartUpload>" +
+            "  </Rule>" +
+            "</LifecycleConfiguration>";
+
+    new LifecycleConfiguration(Arrays.asList(LifecycleRuleBuilder.builder()
+            .setId("Expire_R_Peaks")
+            .setAbortIncompleteMultipartUpload(1)
+            .setStatus(true)
+            .setExpiration(ZonedDateTime.now(), 1, true)
+//            .setFilter(null, "", )
+            .toRule()
+    ));
+
+//    // 设置生命周期策略
+//    template.setBucketLifecycle(
+//        SetBucketLifecycleArgs.builder()
+//            .bucket("my-bucket") // 替换为你的 bucket 名称
+//            .config(new LifecycleConfiguration(Arrays.asList(new LifecycleRule(lifecycleConfig))))
+//            .build()
+//    );
+  }
+
+
   /**
    * 删除桶
    */
   @Test
   void test_removeBucket() {
-    String bucketName = "test";
     boolean removeBucket = template.removeBucket(RemoveBucketArgs.builder(), bucketName, true);
     log.info("remove bucket, [{}], removeBucket: {} bucketExists ==>: {}"
         , bucketName, removeBucket, template.bucketExists(bucketName));
@@ -196,7 +233,6 @@ class MinioTemplateTest {
 
   @Test
   void test_delete() {
-    String bucketName = "test";
     MinioResult<List<DeleteError>> result = template.removeObjects(bucketName, item -> item.objectName().startsWith("测试/tmp"));
     log.info("remove bucket, [{}], removeBucket: {} bucketExists ==>: {}"
         , bucketName, result, template.bucketExists(bucketName));
@@ -207,7 +243,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_uploadObject() throws IOException {
-    String bucketName = "test";
     ClassPathResource resource = new ClassPathResource("nginx-80.conf");
     File file = resource.getFile();
     String prefix = "/测试/";
@@ -223,7 +258,7 @@ class MinioTemplateTest {
       );
     } else {
       log.info("请求失败 ==>: {}", result.getMessage());
-      //result.getError().printStackTrace();
+      //error.printStackTrace();
     }
   }
 
@@ -233,29 +268,30 @@ class MinioTemplateTest {
   @Deprecated
   @Test
   void test_uploadObjects() {
-    String bucketName = "test";
     File dir = new File("D:/tmp/");
-    String prefix = "/测试/";
+    String prefix = "/SQL/";
     List<SnowballObject> objects = MinioUtils.listObjects(dir, prefix, MinioUtils::snowballObject);
-    MinioResult<ObjectWriteResponse> result = template.uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
-            .objects(objects)
-            .userMetadata(MinioUtils.mapOf(Pair.of("Author", "dxa"),
-                Pair.of("description", MinioUtils.encodeURL("测试"))))
-            .tags(MinioUtils.mapOf(Pair.of("type", "test")))
-            .compression(true)
-        , bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 上传对象 ------------------------");
-      ObjectWriteResponse response = result.getData();
-      log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
-          , response.etag()
-          , response.versionId()
-          , response.headers()
-      );
-    } else {
-      log.info("请求失败 ==>: {}", result.getMessage());
-      result.getError().printStackTrace();
-    }
+    template.uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
+                .objects(objects)
+                .userMetadata(MinioUtils.mapOf(Pair.of("Author", "dxa"),
+                    Pair.of("description", MinioUtils.encodeURL("测试"))))
+                .tags(MinioUtils.mapOf(Pair.of("type", "test")))
+                .compression(true)
+            , bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 上传对象 ------------------------");
+          ObjectWriteResponse response = result.getData();
+          log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
+              , response.etag()
+              , response.versionId()
+              , response.headers()
+          );
+        })
+        .error((result, error) -> {
+          log.info("请求失败 ==>: {}", result.getMessage());
+          error.printStackTrace();
+        });
   }
 
   /**
@@ -263,27 +299,28 @@ class MinioTemplateTest {
    */
   @Test
   void test_putObject() throws IOException {
-    String bucketName = "test";
-    ClassPathResource resource = new ClassPathResource("nginx-80.conf");
+    ClassPathResource resource = new ClassPathResource("application.properties");
     File file = resource.getFile();
     String objectName = "测试/" + file.getName();
-    MinioResult<ObjectWriteResponse> result = template.putObject(PutObjectArgs.builder()
-            .contentType(ContentType.get(file.getName()))
-            .stream(Files.newInputStream(file.toPath()), file.length(), PutObjectArgs.MIN_MULTIPART_SIZE)
-            .userMetadata(MinioUtils.getFileMetadata(file))
-        , objectName, bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 上传对象 ------------------------");
-      ObjectWriteResponse response = result.getData();
-      log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
-          , response.etag()
-          , response.versionId()
-          , response.headers()
-      );
-    } else {
-      log.info("请求失败 ==>: {}", result.getMessage());
-      result.getError().printStackTrace();
-    }
+    template.putObject(PutObjectArgs.builder()
+                .contentType(ContentType.get(file.getName()))
+                .stream(Files.newInputStream(file.toPath()), file.length(), PutObjectArgs.MIN_MULTIPART_SIZE)
+                .userMetadata(MinioUtils.getFileMetadata(file))
+            , objectName, bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 上传对象 ------------------------");
+          ObjectWriteResponse response = result.getData();
+          log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
+              , response.etag()
+              , response.versionId()
+              , response.headers()
+          );
+        })
+        .error((result, error) -> {
+          log.info("请求失败 ==>: {}", result.getMessage());
+          error.printStackTrace();
+        });
   }
 
   /**
@@ -291,25 +328,25 @@ class MinioTemplateTest {
    */
   @Test
   void test_putObjects() {
-    String bucketName = "test";
     File dir = new File("D:/tmp/");
     String prefix = "/测试/";
     List<PutObjectArgs.Builder> builders = MinioUtils.listObjects(dir, prefix, MinioUtils::putObjectArgs);
-    MinioResult<List<ObjectWriteResponse>> result = template.putObjects(builders, bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 上传对象 ------------------------");
-      List<ObjectWriteResponse> responses = result.getData();
-      responses.forEach(response -> {
-        log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
-            , response.etag()
-            , response.versionId()
-            , response.headers()
-        );
-      });
-    } else {
-      log.info("请求失败 ==>: {}", result.getMessage());
-      result.getError().printStackTrace();
-    }
+    template.putObjects(builders, bucketName).promise()
+        .then((result, data) -> {
+          log.info("------------------------ 上传对象 ------------------------");
+          List<ObjectWriteResponse> responses = result.getData();
+          responses.forEach(response -> {
+            log.info("response ==>\n etag: {}, \n versionId: {}, \n headers: {}"
+                , response.etag()
+                , response.versionId()
+                , response.headers()
+            );
+          });
+        })
+        .error((result, error) -> {
+          log.info("请求失败 ==>: {}", result.getMessage());
+          error.printStackTrace();
+        });
   }
 
   /**
@@ -317,19 +354,20 @@ class MinioTemplateTest {
    */
   @Test
   void test_listObjects() {
-    String bucketName = "test";
-    MinioResult<List<Item>> result = template.listObjects(true, bucketName);
-    if (result.isSuccessful()) {
-      List<ItemEntity> list = result.getData()
-          .stream()
-          .filter(Objects::nonNull)
-          .map(ItemEntity::from)
-          .collect(Collectors.toList());
-      log.info("全部的文件：{}, msg: {}", JSON.toJSONString(list), result.getMessage());
-    } else {
-      log.info("请求失败 ==>: {}", result.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.listObjects(true, bucketName)
+        .promise()
+        .then((result, data) -> {
+          List<ItemEntity> list = result.getData()
+              .stream()
+              .filter(Objects::nonNull)
+              .map(ItemEntity::from)
+              .collect(Collectors.toList());
+          log.info("全部的文件：{}, msg: {}", JSON.toJSONString(list), result.getMessage());
+        })
+        .error((result, error) -> {
+          log.info("请求失败 ==>: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   /**
@@ -337,32 +375,33 @@ class MinioTemplateTest {
    */
   @Test
   void test_statObject() {
-    String bucketName = "test";
+    log.info("\n----------------------------------------\n");
     String prefix = "/测试/";
     String objectName = prefix + "nginx-80.conf";
-    MinioResult<StatObjectResponse> result = template.statObject(objectName, bucketName);
-    log.info("\n----------------------------------------\n");
-    if (result.isSuccessful()) {
-      log.info("------------------------ 查询对象信息 ------------------------");
-      StatObjectResponse response = result.getData();
-      log.info("bucket: {}", response.bucket());
-      log.info("object: {}", response.object());
-      log.info("etag: {}", response.etag());
-      log.info("region: {}", response.region());
-      log.info("deleteMarker: {}", response.deleteMarker());
-      log.info("lastModified: {}", response.lastModified());
-      log.info("legalHold: {}", response.legalHold());
-      log.info("retentionMode: {}", response.retentionMode());
-      log.info("retentionRetainUntilDate: {}", response.retentionRetainUntilDate());
-      log.info("contentType: {}", response.contentType());
-      log.info("size: {}", response.size());
-      log.info("userMetadata: {}", response.userMetadata());
-      log.info("versionId: {}", response.versionId());
-      log.info("headers: {}", response.headers());
-    } else {
-      log.info("请求失败: {}", result.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.statObject(objectName, bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 查询对象信息 ------------------------");
+          StatObjectResponse response = result.getData();
+          log.info("bucket: {}", response.bucket());
+          log.info("object: {}", response.object());
+          log.info("etag: {}", response.etag());
+          log.info("region: {}", response.region());
+          log.info("deleteMarker: {}", response.deleteMarker());
+          log.info("lastModified: {}", response.lastModified());
+          log.info("legalHold: {}", response.legalHold());
+          log.info("retentionMode: {}", response.retentionMode());
+          log.info("retentionRetainUntilDate: {}", response.retentionRetainUntilDate());
+          log.info("contentType: {}", response.contentType());
+          log.info("size: {}", response.size());
+          log.info("userMetadata: {}", response.userMetadata());
+          log.info("versionId: {}", response.versionId());
+          log.info("headers: {}", response.headers());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
     log.info("\n----------------------------------------\n");
   }
 
@@ -371,25 +410,26 @@ class MinioTemplateTest {
    */
   @Test
   void test_getObject() throws UnsupportedEncodingException {
-    String bucketName = "test";
     String prefix = "/测试/";
     String objectName = prefix + "nginx-80.conf";
-    MinioResult<GetObjectResponse> result = template.getObject(GetObjectArgs.builder()
-            .offset(0L)
-            .length(100L)
-        , objectName, bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 获取对象 ------------------------");
-      GetObjectResponse response = result.getData();
-      log.info("bytes: {}", IOUtils.readFully(response).toString(StandardCharsets.UTF_8.name()));
-      log.info("bucket: {}", response.bucket());
-      log.info("object: {}", response.object());
-      log.info("region: {}", response.region());
-      log.info("headers: {}", response.headers());
-    } else {
-      log.info("请求失败: {}", result.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.getObject(GetObjectArgs.builder()
+                .offset(0L)
+                .length(100L)
+            , objectName, bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 获取对象 ------------------------");
+          GetObjectResponse response = result.getData();
+          log.info("bytes: {}", IOUtils.readAsString(response, StandardCharsets.UTF_8));
+          log.info("bucket: {}", response.bucket());
+          log.info("object: {}", response.object());
+          log.info("region: {}", response.region());
+          log.info("headers: {}", response.headers());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   /**
@@ -398,7 +438,6 @@ class MinioTemplateTest {
   @Test
   void test_downloadObject() {
     log.info("------------------------ 下载对象 ------------------------");
-    String bucketName = "test";
     String prefix = "/测试/";
     String objectName = prefix + "nginx-80.conf";
     File file = IOUtils.createFile("D:/tmp/nginx-80.conf");
@@ -415,7 +454,6 @@ class MinioTemplateTest {
   @Test
   void test_removeObject() {
     log.info("------------------------ 移除对象 ------------------------");
-    String bucketName = "test";
     String objectName = "copy_nginx-80.conf";
     log.info("移除对象: {}, {}, {}", bucketName, objectName, template.removeObject(objectName, bucketName));
   }
@@ -425,7 +463,6 @@ class MinioTemplateTest {
    */
   @Test
   void test_copyObject() {
-    String bucketName = "test";
     String prefix = "/测试/";
     String srcName = prefix + "nginx-80.conf";
     String objectName = prefix + "copy_nginx-80.conf";
@@ -433,20 +470,22 @@ class MinioTemplateTest {
         .object(srcName) // 源对象
         .bucket(bucketName) // 源对象的桶
         .build();
-    MinioResult<ObjectWriteResponse> result = template.copyObject(source, objectName, Directive.COPY, bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 拷贝对象 ------------------------");
-      ObjectWriteResponse response = result.getData();
-      log.info("bucket: {}", response.bucket());
-      log.info("object: {}", response.object());
-      log.info("etag: {}", response.etag());
-      log.info("region: {}", response.region());
-      log.info("versionId: {}", response.versionId());
-      log.info("headers: {}", response.headers());
-    } else {
-      log.info("请求失败: {}", result.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.copyObject(source, objectName, Directive.COPY, bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 拷贝对象 ------------------------");
+          ObjectWriteResponse response = result.getData();
+          log.info("bucket: {}", response.bucket());
+          log.info("object: {}", response.object());
+          log.info("etag: {}", response.etag());
+          log.info("region: {}", response.region());
+          log.info("versionId: {}", response.versionId());
+          log.info("headers: {}", response.headers());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   /**
@@ -455,65 +494,67 @@ class MinioTemplateTest {
   @Test
   void test_composeObject() {
     // 把 nginx-80.conf 和 copy_nginx-80.conf 合并到 compose_nginx-80.conf
-    String bucketName = "test";
     String objectName = "compose_nginx-80.conf";
-    MinioResult<ObjectWriteResponse> result = template.composeObject(ComposeObjectArgs.builder()
-        , objectName
-        , Arrays.asList(
-            ComposeSource.builder().object("nginx-80.conf").bucket(bucketName).build(),
-            ComposeSource.builder().object("copy_nginx-80.conf").bucket(bucketName).build()
-        )
-        , bucketName);
-    if (result.isSuccessful()) {
-      log.info("------------------------ 合并对象 ------------------------");
-      ObjectWriteResponse response = result.getData();
-      log.info("bucket: {}", response.bucket());
-      log.info("object: {}", response.object());
-      log.info("etag: {}", response.etag());
-      log.info("region: {}", response.region());
-      log.info("versionId: {}", response.versionId());
-      log.info("headers: {}", response.headers());
-    } else {
-      log.info("请求失败: {}", result.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.composeObject(ComposeObjectArgs.builder()
+            , objectName
+            , Arrays.asList(
+                ComposeSource.builder().object("nginx-80.conf").bucket(bucketName).build(),
+                ComposeSource.builder().object("copy_nginx-80.conf").bucket(bucketName).build()
+            )
+            , bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 合并对象 ------------------------");
+          ObjectWriteResponse response = result.getData();
+          log.info("bucket: {}", response.bucket());
+          log.info("object: {}", response.object());
+          log.info("etag: {}", response.etag());
+          log.info("region: {}", response.region());
+          log.info("versionId: {}", response.versionId());
+          log.info("headers: {}", response.headers());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   @Test
   void test_setObjectTags() {
-    String bucketName = "test";
     String objectName = "nginx-80.conf";
-    MinioResult<Boolean> r = template.setObjectTags(objectName
-        , MinioUtils.mapOf(Pair.of("Author", "dxa"), Pair.of("Description", MinioUtils.encodeURL("测试")))
-        , bucketName);
-    if (r.isSuccessful()) {
-      log.info("------------------------ 设置对象标签 ------------------------");
-      log.info("设置结果: {}, error: {}", r.isSuccessful(), r.getMessage());
-    } else {
-      log.info("请求失败: {}", r.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.setObjectTags(objectName
+            , MinioUtils.mapOf(Pair.of("Author", "dxa"), Pair.of("Description", MinioUtils.encodeURL("测试")))
+            , bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 设置对象标签 ------------------------");
+          log.info("设置结果: {}, error: {}", result.isSuccessful(), result.getMessage());
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
   @Test
   void test_getObjectTags() {
-    String bucketName = "test";
     String objectName = "nginx-80.conf";
-    MinioResult<Tags> r = template.getObjectTags(objectName, bucketName);
-    if (r.isSuccessful()) {
-      log.info("------------------------ 获取对象标签 ------------------------");
-      Tags tags = r.getData();
-      Map<String, String> map = tags.get();
-      log.info("tags: {}", map);
-    } else {
-      log.info("请求失败: {}", r.getMessage());
-      //result.getError().printStackTrace();
-    }
+    template.getObjectTags(objectName, bucketName)
+        .promise()
+        .then((result, data) -> {
+          log.info("------------------------ 获取对象标签 ------------------------");
+          Tags tags = result.getData();
+          Map<String, String> map = tags.get();
+          log.info("tags: {}", map);
+        })
+        .error((result, error) -> {
+          log.info("请求失败: {}", result.getMessage());
+          //error.printStackTrace();
+        });
   }
 
 //  @Test
 //  void test_setBucketPolicy() {
-//    String bucketName = "test";
 //    template.setBucketPolicy(MinIOUtils.setBucketPolicy(bucketName, ""));
 //    log.info("make bucket, [{}] bucketExists ==>: {}", bucketName, template.bucketExists(bucketName));
 //  }

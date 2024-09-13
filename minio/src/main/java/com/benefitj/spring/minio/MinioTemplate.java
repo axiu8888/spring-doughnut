@@ -931,8 +931,51 @@ public class MinioTemplate {
     return getClient().removeResult();
   }
 
-  // setBucketLifecycle ...
-  // deleteBucketLifecycle ...
+  /**
+   * 设置桶的生命周期配置
+   *
+   * @param bucketName 桶
+   * @return 返回结果
+   */
+  public MinioResult<LifecycleConfiguration> setBucketLifecycle(List<LifecycleRule> rules, String bucketName) {
+    return setBucketLifecycle(SetBucketLifecycleArgs.builder().config(new LifecycleConfiguration(rules)), bucketName);
+  }
+
+  /**
+   * 设置桶的生命周期配置
+   *
+   * @param builder    Builder参数
+   * @param bucketName 桶
+   * @return 返回结果
+   */
+  public MinioResult<LifecycleConfiguration> setBucketLifecycle(SetBucketLifecycleArgs.Builder builder,
+                                                                @Nonnull String bucketName) {
+    getClient().setBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
+    return getClient().removeResult();
+  }
+
+  /**
+   * 获取桶的生命周期配置
+   *
+   * @param bucketName 桶
+   * @return 返回结果
+   */
+  public MinioResult<LifecycleConfiguration> deleteBucketLifecycle(String bucketName) {
+    return deleteBucketLifecycle(DeleteBucketLifecycleArgs.builder(), bucketName);
+  }
+
+  /**
+   * 获取桶的生命周期配置
+   *
+   * @param builder    Builder参数
+   * @param bucketName 桶
+   * @return 返回结果
+   */
+  public MinioResult<LifecycleConfiguration> deleteBucketLifecycle(DeleteBucketLifecycleArgs.Builder builder,
+                                                                   @Nonnull String bucketName) {
+    getClient().deleteBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
+    return getClient().removeResult();
+  }
 
   /**
    * 获取桶的生命周期配置
@@ -1356,15 +1399,6 @@ public class MinioTemplate {
     getClient().uploadSnowballObjects(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
-
-
-  // TODO ----
-  // TODO ----
-  // TODO ----
-  // TODO ----
-  // TODO ----
-  // TODO ----
-
 
   /**
    * 添加桶的标签

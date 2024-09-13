@@ -5,8 +5,6 @@ import com.benefitj.core.CodecUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.functions.Pair;
 import com.benefitj.core.functions.StreamBuilder;
-import com.benefitj.core.local.LocalCache;
-import com.benefitj.core.local.LocalCacheFactory;
 import com.benefitj.frameworks.cglib.CGLibMethodInvoker;
 import com.benefitj.frameworks.cglib.CGLibProxy;
 import io.minio.*;
@@ -68,12 +66,10 @@ public class MinioUtils {
    */
   public static <T> T newProxy(@Nullable Class<?> superclass, @Nonnull Class<?>[] interfaces, @Nonnull Object[] objects) {
     final Map<Method, CGLibMethodInvoker> invokers = new ConcurrentHashMap<>(20);
-    final LocalCache<MinioResult> localResult = LocalCacheFactory.newCache(() -> MinioResult.fail("FAIL"));
+    ResultCache cache = ResultCache.create();
     return CGLibProxy.newProxy(superclass, interfaces, (obj, method, args, proxy) -> {
-      if (method.getName().equals("getLocalResult")) {
-        return localResult;
-      }
-      MinioResult result = localResult.get();
+      if (method.getDeclaringClass().isAssignableFrom(ResultCache.class)) return proxy.invoke(cache, args);
+      MinioResult result = cache.getResult();
       try {
         CGLibMethodInvoker invoker = invokers.get(method);
         if (invoker == null) {
@@ -84,7 +80,7 @@ public class MinioUtils {
         result.setCode(200);
         result.setMessage("SUCCESS");
         return returnValue;
-      } catch (Exception e) {
+      } catch (Throwable e) {
         //throw new MinioException(e.getMessage());
         result.setCode(400);
         result.setMessage(e.getMessage());

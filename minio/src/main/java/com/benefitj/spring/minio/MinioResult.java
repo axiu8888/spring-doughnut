@@ -1,5 +1,7 @@
 package com.benefitj.spring.minio;
 
+import java.util.function.BiConsumer;
+
 public class MinioResult<T> {
 
   public static <T> MinioResult<T> succeed(T data) {
@@ -89,4 +91,31 @@ public class MinioResult<T> {
     handler.accept(this);
     return this;
   }
+
+  public Promise<T> promise() {
+    return new Promise<>(this);
+  }
+
+  public static class Promise<T> {
+
+    final MinioResult<T> result;
+
+    public Promise(MinioResult<T> result) {
+      this.result = result;
+    }
+
+    public Promise<T> then(BiConsumer<MinioResult<T>, T> consumer) {
+      if (result.isSuccessful())
+        consumer.accept(result, result.getData());
+      return this;
+    }
+
+    public Promise<T> error(BiConsumer<MinioResult<T>, Throwable> consumer) {
+      if (!result.isSuccessful())
+        consumer.accept(result, result.getError());
+      return this;
+    }
+
+  }
+
 }

@@ -29,7 +29,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -77,7 +76,7 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
   public void handle(List<AnnotationMetadata> metadatas) {
     for (AnnotationMetadata metadata : metadatas) {
       MqttMessageListener listener = metadata.getFirstAnnotation(MqttMessageListener.class);
-      if (listener.singleClient() || StringUtils.isNotBlank(listener.serverURI())) {
+      if (listener.isNewClient() || StringUtils.isNotBlank(listener.serverURI())) {
         // 单独的客户端
         String prefix = StringUtils.getIfBlank(listener.clientIdPrefix(), this::getPrefix);
         String id = IdUtils.nextLowerLetterId(prefix, null, 12);
@@ -103,7 +102,9 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
         client.setCallback(dispatcher);
         // 订阅
         subscribe(metadata, client, dispatcher, listener);
-        singleClients.add(client);
+        if (!singleClients.contains(client)) {
+          singleClients.add(client);
+        }
       } else {
         subscribe(metadata, getClient(), getDispatcher(), listener);
       }
@@ -146,14 +147,15 @@ public class MqttMessageMetadataRegistrar extends AnnotationBeanProcessor implem
             + ", topic不能为空: " + listener.topics()[i]);
       }
     }
-    dispatcher.subscribe(topics, subscriber);
-
-    try {
-      if (!client.isConnected()) {
-        // 连接客户端
-        client.connect();
-      }
-    } catch (MqttException ignore) {/* ~  */ }
+    EventLoop.asyncIO(() -> {
+      dispatcher.subscribe(topics, subscriber);
+      try {
+        if (!client.isConnected()) {
+          // 连接客户端
+          client.connect();
+        }
+      } catch (MqttException ignore) {/* ~  */}
+    }, listener.startupDelay());
   }
 
 

@@ -29,9 +29,9 @@ public @interface MqttMessageListener {
   String clientIdPrefix() default "";
 
   /**
-   * 是否为单个客户端
+   * 是否为新客户端，不是的话就用系统默认的客户端
    */
-  boolean singleClient() default false;
+  boolean isNewClient() default false;
 
   /**
    * 自定义的服务端地址
@@ -42,5 +42,10 @@ public @interface MqttMessageListener {
    * 是否异步执行
    */
   boolean async() default false;
+
+  /**
+   * 延迟订阅事件
+   */
+  int startupDelay() default 0;
 
 }

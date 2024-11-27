@@ -3,7 +3,7 @@ package com.benefitj.spring;
 import com.benefitj.core.CatchUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.io.*;
 import java.lang.ref.SoftReference;
@@ -13,17 +13,17 @@ import java.lang.ref.SoftReference;
  */
 public class JsonUtils {
 
-  private static final ThreadLocal<SoftReference<ObjectMapper>> mapperCache =
-      ThreadLocal.withInitial(() -> new SoftReference<>(new ObjectMapper()));
+  private static final ThreadLocal<SoftReference<JsonMapper>> mapperCache =
+      ThreadLocal.withInitial(() -> new SoftReference<>(new JsonMapper()));
 
   /**
    * 获取Mapper
    */
-  public static ObjectMapper getMapper() {
-    ObjectMapper mapper = mapperCache.get().get();
+  public static JsonMapper getMapper() {
+    JsonMapper mapper = mapperCache.get().get();
     if (mapper == null) {
       synchronized (JsonUtils.class) {
-        mapper = new ObjectMapper();
+        mapper = new JsonMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapperCache.set(new SoftReference<>(mapper));
       }
@@ -38,8 +38,20 @@ public class JsonUtils {
    * @return 返回转换后的json
    */
   public static String toJson(Object o) {
+    return toJson(o, false);
+  }
+
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   * @return 返回转换后的json
+   */
+  public static String toJson(Object o, boolean pretty) {
     try {
-      return getMapper().writeValueAsString(o);
+      return pretty
+          ? getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(o)
+          : getMapper().writeValueAsString(o);
     } catch (IOException e) {
       throw new IllegalStateException(CatchUtils.findRoot(e));
     }
@@ -52,8 +64,20 @@ public class JsonUtils {
    * @return 返回转换后的json
    */
   public static byte[] toJsonBytes(Object o) {
+    return toJsonBytes(o, false);
+  }
+
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   * @return 返回转换后的json
+   */
+  public static byte[] toJsonBytes(Object o, boolean pretty) {
     try {
-      return getMapper().writeValueAsBytes(o);
+      return pretty
+          ? getMapper().writerWithDefaultPrettyPrinter().writeValueAsBytes(o)
+          : getMapper().writeValueAsBytes(o);
     } catch (IOException e) {
       throw new IllegalStateException(CatchUtils.findRoot(e));
     }
@@ -65,8 +89,21 @@ public class JsonUtils {
    * @param o 对象
    */
   public static void toJson(Writer w, Object o) {
+    toJson(w, o, false);
+  }
+
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   */
+  public static void toJson(Writer w, Object o, boolean pretty) {
     try {
-      getMapper().writeValue(w, o);
+      if (pretty) {
+        getMapper().writerWithDefaultPrettyPrinter().writeValue(w, o);
+      } else {
+        getMapper().writeValue(w, o);
+      }
     } catch (IOException e) {
       throw new IllegalStateException(CatchUtils.findRoot(e));
     }
@@ -78,8 +115,21 @@ public class JsonUtils {
    * @param o 对象
    */
   public static void toJson(OutputStream out, Object o) {
+    toJson(out, o, false);
+  }
+
+  /**
+   * 转换成JSON
+   *
+   * @param o 对象
+   */
+  public static void toJson(OutputStream out, Object o, boolean pretty) {
     try {
-      getMapper().writeValue(out, o);
+      if (pretty) {
+        getMapper().writerWithDefaultPrettyPrinter().writeValue(out, o);
+      } else {
+        getMapper().writeValue(out, o);
+      }
     } catch (IOException e) {
       throw new IllegalStateException(CatchUtils.findRoot(e));
     }

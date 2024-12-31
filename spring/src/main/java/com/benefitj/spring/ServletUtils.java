@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -80,6 +81,27 @@ public class ServletUtils {
   }
 
   /**
+   * 获取请求属性
+   *
+   * @param attr 属性
+   * @return 返回属性对象
+   */
+  public static <T> T getRequestAttribute(String attr) {
+    return getRequestAttribute(getRequest(), attr);
+  }
+
+  /**
+   * 获取请求属性
+   *
+   * @param request 请求
+   * @param attr    属性
+   * @return 返回属性对象
+   */
+  public static <T> T getRequestAttribute(HttpServletRequest request, String attr) {
+    return (T) request.getAttribute(attr);
+  }
+
+  /**
    * 获取当前请求的参数
    */
   public static Map<String, String[]> getParameterMap() {
@@ -121,6 +143,25 @@ public class ServletUtils {
    */
   public static Map<String, String> getHeaderMap(HttpServletRequest request) {
     return Utils.toMap(request.getHeaderNames(), request::getHeader);
+  }
+
+  /**
+   * 解析 Basic token
+   * 格式： Authorization: Basic base64encode(username:password)
+   *
+   * @param token token
+   * @return 返回解析后的数据
+   */
+  public static String[] parseBasicToken(String token) {
+    if (StringUtils.isNotBlank(token)) {
+      if (token.startsWith("Basic ") || token.startsWith("basic ")) {
+        token = token.substring("Basic ".length());
+      }
+      byte[] decode = Base64.getDecoder().decode(token.trim());
+      String str = new String(decode, StandardCharsets.UTF_8);
+      return str.split(":");
+    }
+    return null;
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 
 
 @Slf4j
-class JsonUtilsTest {
+class SpringUtilsTest {
 
   @BeforeEach
   void setUp() {
@@ -27,6 +28,12 @@ class JsonUtilsTest {
       put("key3", "value3");
       put("key4", "value4");
     }}, true));
+  }
+
+  @Test
+  void test_parseToken() {
+    String[] result = ServletUtils.parseBasicToken("Basic Y3diVGVzdDpoc3JnODg4QA==");
+    log.info("{}", JSON.toJSONString(result));
   }
 
 }

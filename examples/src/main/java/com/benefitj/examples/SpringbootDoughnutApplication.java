@@ -19,8 +19,8 @@ import org.springframework.context.annotation.PropertySource;
 //    "classpath:/mongodb.properties",
 }, encoding = "utf-8")
 @EnableSwaggerApi
-@EnableRedisMessageListener
-@EnableRedisRateLimiter         // redis RateLimiter
+//@EnableRedisMessageListener
+//@EnableRedisRateLimiter         // redis RateLimiter
 @EnableHttpLoggingHandler       // HTTP请求日志
 @EnableEventBusPoster           // eventbus
 //@EnableAthenapdf                // PDF

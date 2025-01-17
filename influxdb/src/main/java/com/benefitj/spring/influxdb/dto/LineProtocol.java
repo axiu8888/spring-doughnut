@@ -90,6 +90,14 @@ public class LineProtocol {
     this.fields = values;
   }
 
+  public long getTimeAsMilliSeconds() {
+    return getTimeUnit().toMillis(this.getTime());
+  }
+
+  public long getTimeAsSeconds() {
+    return getTimeUnit().toSeconds(this.getTime());
+  }
+
   public Point.Builder toPointBuilder() {
     return InfluxUtils.toPointBuilder(this);
   }

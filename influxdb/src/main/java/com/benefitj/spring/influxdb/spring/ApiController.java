@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +51,7 @@ import java.util.stream.Stream;
 @RequestMapping("/influxdb")
 public class ApiController {
 
+  private static final Logger log = LoggerFactory.getLogger(ApiController.class);
   @Autowired
   protected InfluxOptions options;
 
@@ -122,8 +126,9 @@ public class ApiController {
   @PostMapping(value = "/load")
   public void load(HttpServletRequest request,
                    HttpServletResponse response,
+                   @ApiParam("文件") MultipartFile[] files,
                    @ApiParam("数据库配置") @QueryBody Options options) {
-    MultipartFile[] files = options.getFiles();
+    //MultipartFile[] files = options.getFiles();
     if (files == null || files.length == 0) {
       throw new IllegalStateException("缺少导入的文件");
     }
@@ -133,12 +138,19 @@ public class ApiController {
     try {
       Stream.of(files)
           .map(mf -> {
-            File dest = IOUtils.createFile(dir, mf.getOriginalFilename());
-            CatchUtils.tryThrow(() -> mf.transferTo(dest));
-            return dest;
+            try {
+              File dest = IOUtils.createFile(dir, mf.getOriginalFilename());
+              IOUtils.write(mf.getInputStream(), dest);
+              return dest;
+            } catch (IOException e) {
+              throw new IllegalStateException(e);
+            }
           })
           .map(ApiController::unzip)
           .forEach(template::write);
+    } catch (Throwable e) {
+      log.error("throw: " + e.getMessage(), e);
+      throw e;
     } finally {
       IOUtils.delete(dir);
     }
@@ -195,8 +207,8 @@ public class ApiController {
     @ApiModelProperty("存储策略，默认 autogen")
     String retentionPolicy = "autogen";
 
-    @ApiModelProperty("文件")
-    MultipartFile[] files;
+//    @ApiModelProperty("文件")
+//    MultipartFile[] files;
   }
 
 

@@ -77,8 +77,8 @@ public class AthenapdfHelper extends CmdExecutor {
   public String formatCMD(String volumeDir, String filename, String url, @Nullable String network) {
     filename = (filename.endsWith(".pdf") ? filename : filename + ".pdf");
     return "docker run --rm --privileged=true"
-        + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
         + " -v " + volumeDir + ":/converted/"
+        + " -e TZ=\"Asia/Shanghai\" " + (network != null ? network : "")
         + " " + container
         + " athenapdf -D 5000 --no-sandbox --ignore-gpu-blacklist --no-cache "
         + url

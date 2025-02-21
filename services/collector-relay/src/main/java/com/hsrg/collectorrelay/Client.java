@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -67,7 +68,7 @@ public class Client extends TcpNettyClient {
         })
         .sorted(File::compareTo)
         .map(CheFile::new)
-        .toList());
+        .collect(Collectors.toList()));
 
     if (ches.isEmpty()) {
       log.info("缺少CHE文件，3秒后结束程序!");

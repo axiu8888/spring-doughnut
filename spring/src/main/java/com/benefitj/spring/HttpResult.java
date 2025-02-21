@@ -1,5 +1,6 @@
 package com.benefitj.spring;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -105,6 +106,11 @@ public class HttpResult<T> {
         .build();
   }
 
+  /**
+   * 当前时间戳
+   */
+  @Builder.Default
+  long timestamp = System.currentTimeMillis();
   /**
    * 状态码
    */

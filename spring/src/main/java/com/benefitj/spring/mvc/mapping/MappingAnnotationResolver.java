@@ -94,7 +94,8 @@ public class MappingAnnotationResolver extends AnnotationResolverImpl {
 
   protected ApiDescriptor resolveApi(MappingAnnotationMetadata metadata, String[] baseUrls, Annotation annotation) {
     if (annotation instanceof RequestMapping) {
-      return resolveApi(metadata, baseUrls, ((RequestMapping) annotation).value(), ((RequestMapping) annotation).method());
+      RequestMethod[] methods = ((RequestMapping) annotation).method();
+      return resolveApi(metadata, baseUrls, ((RequestMapping) annotation).value(), methods.length > 0 ? methods : RequestMethod.values());
     } else if (annotation instanceof GetMapping) {
       return resolveApi(metadata, baseUrls, ((GetMapping) annotation).value(), RequestMethod.GET);
     } else if (annotation instanceof PostMapping) {

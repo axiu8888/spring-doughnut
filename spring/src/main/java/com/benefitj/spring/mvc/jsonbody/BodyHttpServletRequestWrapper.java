@@ -1,4 +1,4 @@
-package com.benefitj.spring.mvc;
+package com.benefitj.spring.mvc.jsonbody;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
@@ -146,11 +147,14 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
       getInput().reset();
     }
 
-    public JSONObject toJson() {
-      String str = IOUtils.readFully(getInput()).toString();
-      return StringUtils.isNotBlank(str) ? JSON.parseObject(str) : new JSONObject();
+    public JSONObject toJson(JsonBodyProcessor processor) {
+      return processor.process(getInput());
     }
+  }
 
+  public static JSONObject convert(InputStream in) {
+    String str = IOUtils.readFully(in).toString();
+    return StringUtils.isNotBlank(str) ? JSON.parseObject(str) : new JSONObject();
   }
 
 }

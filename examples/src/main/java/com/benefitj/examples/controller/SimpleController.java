@@ -3,6 +3,7 @@ package com.benefitj.examples.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.IOUtils;
+import com.benefitj.core.IdUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.event.EventBusPoster;
 import com.benefitj.event.RawEvent;
@@ -13,6 +14,7 @@ import com.benefitj.spring.aop.log.HttpLoggingIgnore;
 import com.benefitj.spring.aop.ratelimiter.AopRateLimiter;
 import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.spring.eventbus.event.NameEvent;
+import com.benefitj.spring.mvc.jsonbody.JsonBodyRequest;
 import com.benefitj.spring.mvc.query.PageBody;
 import com.benefitj.spring.mvc.query.PageRequest;
 import io.swagger.annotations.Api;
@@ -142,6 +144,7 @@ public class SimpleController {
     }};
   }
 
+  @JsonBodyRequest
   @ApiOperation("测试electron流上传")
   @PostMapping("/uploadStream")
   public JSONObject testUploadStream(HttpServletRequest request,
@@ -163,6 +166,12 @@ public class SimpleController {
         IOUtils.delete(dest);
       }
     }
+  }
+
+  @PostMapping(value = "/write", consumes = {"application/octet-stream;charset=UTF-8"})
+  public void write(HttpServletRequest request) throws IOException {
+    ServletInputStream in = request.getInputStream();
+    IOUtils.write(in, IOUtils.createFile("D:/tmp/cache/znsx/temp", IdUtils.uuid() +".line"));
   }
 
 }

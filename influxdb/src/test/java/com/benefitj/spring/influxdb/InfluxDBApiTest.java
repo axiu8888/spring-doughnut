@@ -52,7 +52,7 @@ import java.util.stream.Stream;
     InfluxWriteManagerConfiguration.class
 })
 @Slf4j
-class InfluxApiDBApiTest {
+class InfluxDBApiTest {
 
   @Autowired
   InfluxTemplate template;
@@ -125,6 +125,31 @@ class InfluxApiDBApiTest {
             log.info("result ===>: \n{}\n", JSON.toJSONString(result));
           }
         });
+  }
+
+  @Test
+  void testQuery3() {
+    File dir = new File("./build/influxdb/");
+    log.info("dir -->: {}", dir.getAbsolutePath());
+    template.query("SELECT *  FROM hs_wave_package WHERE time >= '2024-01-01T00:00:00Z' AND time < now() ORDER BY time DESC LIMIT 10")
+        .subscribe(new SimpleSubscriber<QueryResult>() {
+          @Override
+          public void onNext(QueryResult result) {
+            log.info("result ===>: \n{}\n", JSON.toJSONString(result));
+            IOUtils.write(JSON.toJSONString(result, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "QueryResult.json")));
+            Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap(template.getDatabase(), template.getRetentionPolicy(), "hs_wave_package", true);
+            log.info("fieldKeyMap ===>: \n{}\n", JSON.toJSONString(fieldKeyMap));
+            IOUtils.write(JSON.toJSONString(fieldKeyMap, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "fieldKeyMap.json")));
+            List<Point> points = InfluxUtils.toPoint(result, fieldKeyMap, true);
+            log.info("points ===>: \n{}\n", JSON.toJSONString(points));
+            IOUtils.write(JSON.toJSONString(points, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "points.json")));
+          }
+        });
+  }
+
+  void test_influxdb() {
+    File dir = new File("D:/tmp/cache/influxdb/");
+
   }
 
   @Test

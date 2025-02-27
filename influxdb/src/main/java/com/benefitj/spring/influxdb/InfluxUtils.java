@@ -235,6 +235,17 @@ public class InfluxUtils {
    * @return return Point
    */
   public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fieldKeys) {
+    return toPoint(result, fieldKeys, false);
+  }
+
+  /**
+   * 转换成 Point
+   *
+   * @param result    query result
+   * @param fieldKeys field keys
+   * @return return Point
+   */
+  public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fieldKeys, boolean ignoreUnknown) {
     return result.getResults()
         .stream()
         .flatMap(r -> {
@@ -249,6 +260,7 @@ public class InfluxUtils {
             column = columns.get(i);
             final FieldKey fieldKey = fieldKeys.get(column);
             if (fieldKey == null) {
+              if (ignoreUnknown) continue;
               throw new IllegalArgumentException("Not found column[\"" + column + "\"]");
             }
             fieldKey.setIndex(i);

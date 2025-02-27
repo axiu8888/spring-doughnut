@@ -877,29 +877,23 @@ public interface InfluxTemplate {
    * @return return field key map
    */
   default Map<String, FieldKey> getFieldKeyMap(String db, String retentionPolicy, String measurement, boolean containTags) {
-    final String sql = "SHOW FIELD KEYS FROM \"" + retentionPolicy + "\".\"" + retentionPolicy + "\".\"" + measurement + "\"";
+    final String sql = "SHOW FIELD KEYS FROM \"" + retentionPolicy + "\".\"" + measurement + "\"";
     QueryResult queryResult = postQuery(db, sql);
     List<FieldKey> fieldKeys = getObjectsStream(queryResult)
-        .flatMap(values -> {
-          FieldKey ifk = new FieldKey.Builder()
-              .setColumn((String) values.get(0))
-              .setFieldType(FieldKey.getFieldType((String) values.get(1)))
-              .build();
-          return Stream.of(ifk);
-        })
+        .flatMap(values -> Stream.of(new FieldKey.Builder()
+            .setColumn((String) values.get(0))
+            .setFieldType(FieldKey.getFieldType((String) values.get(1)))
+            .build()))
         .collect(Collectors.toList());
 
     if (containTags) {
       List<String> tagKeys = getTagKeys(db, measurement);
       fieldKeys.addAll(tagKeys.stream()
-          .flatMap(tag -> {
-            FieldKey FieldKey = new FieldKey.Builder()
-                .setColumn(tag)
-                .setFieldType(String.class)
-                .setTag(true)
-                .build();
-            return Stream.of(FieldKey);
-          })
+          .flatMap(tag -> Stream.of(new FieldKey.Builder()
+              .setColumn(tag)
+              .setFieldType(String.class)
+              .setTag(true)
+              .build()))
           .collect(Collectors.toList()));
     }
 

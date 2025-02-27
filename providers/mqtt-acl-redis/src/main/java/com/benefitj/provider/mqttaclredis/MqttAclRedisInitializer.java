@@ -16,14 +16,14 @@ import java.util.List;
 public class MqttAclRedisInitializer {
 
   private MqttAclStringRedisTemplate redisTemplate;
-  private MqttAclRedisOptions properties;
+  private MqttAclRedisOptions options;
 
   public MqttAclRedisInitializer() {
   }
 
   @EventListener
   public void onAppStart(ApplicationReadyEvent event) {
-    String path = properties.getInitFile();
+    String path = options.getInitFile();
     if (StringUtils.isNotBlank(path)) {
       File file = new File(path);
       if (!file.exists() || file.length() < 2) {
@@ -59,11 +59,11 @@ public class MqttAclRedisInitializer {
     this.redisTemplate = redisTemplate;
   }
 
-  public MqttAclRedisOptions getProperties() {
-    return properties;
+  public MqttAclRedisOptions getOptions() {
+    return options;
   }
 
-  public void setProperties(MqttAclRedisOptions properties) {
-    this.properties = properties;
+  public void setOptions(MqttAclRedisOptions options) {
+    this.options = options;
   }
 }

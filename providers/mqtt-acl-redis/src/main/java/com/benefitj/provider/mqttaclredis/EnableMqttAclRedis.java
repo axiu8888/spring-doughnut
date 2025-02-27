@@ -7,8 +7,8 @@ import java.lang.annotation.*;
 /**
  * MQTT ACL redis配置
  */
-@Inherited
 @Import(MqttAclRedisConfiguration.class)
+@Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

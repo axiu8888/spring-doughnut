@@ -14,25 +14,25 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 public class MqttAclRedisConfiguration {
 
   @ConfigurationProperties(prefix = "spring.mqtt-acl.redis")
-  @Bean("mqttAclRedisProperties")
-  public MqttAclRedisOptions mqttAclRedisProperties() {
+  @Bean
+  public MqttAclRedisOptions mqttAclRedisOptions() {
     return new MqttAclRedisOptions();
   }
 
   /**
    * 创建MQTT ACL的 StringRedisTemplate
    *
-   * @param properties 配置
+   * @param options 配置
    * @return 返回 StringRedisTemplate
    */
   @ConditionalOnMissingBean(name = "mqttAclStringRedisTemplate")
   @Bean("mqttAclStringRedisTemplate")
-  public MqttAclStringRedisTemplate mqttAclStringRedisTemplate(MqttAclRedisOptions properties) {
+  public MqttAclStringRedisTemplate mqttAclStringRedisTemplate(MqttAclRedisOptions options) {
     RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-    conf.setHostName(properties.getHost());
-    conf.setPort(properties.getPort());
-    conf.setPassword(properties.getPassword());
-    conf.setDatabase(properties.getDatabase());
+    conf.setHostName(options.getHost());
+    conf.setPort(options.getPort());
+    conf.setPassword(options.getPassword());
+    conf.setDatabase(options.getDatabase());
     LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(conf);
     connectionFactory.afterPropertiesSet();
     MqttAclStringRedisTemplate stringRedisTemplate = new MqttAclStringRedisTemplate();
@@ -46,10 +46,10 @@ public class MqttAclRedisConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public MqttAclRedisInitializer mqttAclRedisInitializer(MqttAclStringRedisTemplate template,
-                                                         MqttAclRedisOptions properties) {
+                                                         MqttAclRedisOptions options) {
     MqttAclRedisInitializer initializer = new MqttAclRedisInitializer();
     initializer.setRedisTemplate(template);
-    initializer.setProperties(properties);
+    initializer.setOptions(options);
     return initializer;
   }
 

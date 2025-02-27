@@ -2,7 +2,6 @@ package com.benefitj.provider.mqttaclredis;
 
 public class MqttAclRedisOptions {
 
-
   /**
    * Database index used by the connection factory.
    */

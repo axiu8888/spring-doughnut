@@ -97,7 +97,7 @@ public class ApiController {
             .filter(name -> measurementList.isEmpty() || measurementList.contains(name))
             .map(name -> MeasurementInfo.builder()
                 .name(name)
-                .fieldKeys(template.getFieldKeyMap(name, true))
+                .fieldKeys(template.getFieldKeys(name, true))
                 .build())
             .forEach(measurementInfo -> {
               File line = IOUtils.createFile(dir, measurementInfo.name + ".line");

@@ -230,22 +230,22 @@ public class InfluxUtils {
   /**
    * 转换成 Point
    *
-   * @param result    query result
-   * @param fieldKeys field keys
+   * @param result query result
+   * @param fields field keys
    * @return return Point
    */
-  public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fieldKeys) {
-    return toPoint(result, fieldKeys, false);
+  public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fields) {
+    return toPoint(result, fields, false);
   }
 
   /**
    * 转换成 Point
    *
-   * @param result    query result
-   * @param fieldKeys field keys
+   * @param result query result
+   * @param fields field keys
    * @return return Point
    */
-  public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fieldKeys, boolean ignoreUnknown) {
+  public static List<Point> toPoint(QueryResult result, Map<String, FieldKey> fields, boolean ignoreUnknown) {
     return result.getResults()
         .stream()
         .flatMap(r -> {
@@ -253,12 +253,11 @@ public class InfluxUtils {
           return series != null ? series.stream() : Stream.empty();
         })
         .flatMap(series -> {
-          fieldKeys.forEach((name, field) -> field.setIndex(-1)); // // 重置
+          fields.forEach((name, field) -> field.setIndex(-1)); // // 重置
           List<String> columns = series.getColumns();
-          String column;
           for (int i = 0; i < columns.size(); i++) {
-            column = columns.get(i);
-            final FieldKey fieldKey = fieldKeys.get(column);
+            String column = columns.get(i);
+            FieldKey fieldKey = fields.get(column);
             if (fieldKey == null) {
               if (ignoreUnknown) continue;
               throw new IllegalArgumentException("Not found column[\"" + column + "\"]");
@@ -268,7 +267,7 @@ public class InfluxUtils {
           final List<Point> points = new LinkedList<>();
           List<List<Object>> values = series.getValues();
           for (List<Object> value : values) {
-            points.add(toPoint(series.getName(), fieldKeys, value));
+            points.add(toPoint(series.getName(), fields, value));
           }
           return points.stream();
         })
@@ -279,13 +278,13 @@ public class InfluxUtils {
    * 转换成 Point
    *
    * @param measurement MEASUREMENT
-   * @param fieldKeys   field keys
+   * @param fields      field keys
    * @param values      values
    * @return return Point
    */
-  public static Point toPoint(String measurement, Map<String, FieldKey> fieldKeys, List<Object> values) {
+  public static Point toPoint(String measurement, Map<String, FieldKey> fields, List<Object> values) {
     final Point.Builder builder = Point.measurement(measurement);
-    for (FieldKey fieldKey : fieldKeys.values()) {
+    for (FieldKey fieldKey : fields.values()) {
       if (fieldKey.getIndex() >= 0) {
         String column = fieldKey.getColumn();
         Object value = values.get(fieldKey.getIndex());
@@ -465,11 +464,11 @@ public class InfluxUtils {
    *
    * @param out         输出
    * @param queryResult 查询结果
-   * @param fieldKeyMap 字段
+   * @param fields      字段
    */
-  public static void writeLines(OutputStream out, QueryResult queryResult, Map<String, FieldKey> fieldKeyMap) {
+  public static void writeLines(OutputStream out, QueryResult queryResult, Map<String, FieldKey> fields) {
     try {
-      List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
+      List<Point> points = toPoint(queryResult, fields);
       String lines = points.stream()
           .map(Point::lineProtocol)
           .collect(Collectors.joining("\n"));
@@ -486,11 +485,11 @@ public class InfluxUtils {
    *
    * @param out         输出
    * @param queryResult 查询结果
-   * @param fieldKeyMap 字段
+   * @param fields      字段
    */
-  public static void writeLines(Writer out, QueryResult queryResult, Map<String, FieldKey> fieldKeyMap) {
+  public static void writeLines(Writer out, QueryResult queryResult, Map<String, FieldKey> fields) {
     try {
-      List<Point> points = InfluxUtils.toPoint(queryResult, fieldKeyMap);
+      List<Point> points = toPoint(queryResult, fields);
       String lines = points.stream()
           .map(Point::lineProtocol)
           .collect(Collectors.joining("\n"));

@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -116,7 +117,7 @@ class InfluxDBApiTest {
 
   @Test
   void testQuery2() {
-    Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap("hs_wave_package", true);
+    Map<String, FieldKey> fieldKeyMap = template.getFieldKeys("hs_wave_package", true);
     log.info("fieldKeyMap ==>: \n{}\n", JSON.toJSONString(fieldKeyMap));
     template.query("SELECT *  FROM hs_wave_package WHERE patient_id = '0ad66d27dd4f4bd3a8d836dc0977b85d' order by time desc limit 10")
         .subscribe(new SimpleSubscriber<QueryResult>() {
@@ -131,25 +132,47 @@ class InfluxDBApiTest {
   void testQuery3() {
     File dir = new File("./build/influxdb/");
     log.info("dir -->: {}", dir.getAbsolutePath());
-    template.query("SELECT *  FROM hs_wave_package WHERE time >= '2024-01-01T00:00:00Z' AND time < now() ORDER BY time DESC LIMIT 10")
-        .subscribe(new SimpleSubscriber<QueryResult>() {
-          @Override
-          public void onNext(QueryResult result) {
-            log.info("result ===>: \n{}\n", JSON.toJSONString(result));
-            IOUtils.write(JSON.toJSONString(result, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "QueryResult.json")));
-            Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap(template.getDatabase(), template.getRetentionPolicy(), "hs_wave_package", true);
-            log.info("fieldKeyMap ===>: \n{}\n", JSON.toJSONString(fieldKeyMap));
-            IOUtils.write(JSON.toJSONString(fieldKeyMap, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "fieldKeyMap.json")));
-            List<Point> points = InfluxUtils.toPoint(result, fieldKeyMap, true);
-            log.info("points ===>: \n{}\n", JSON.toJSONString(points));
-            IOUtils.write(JSON.toJSONString(points, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, "points.json")));
-          }
-        });
+    BiConsumer<String, Object> writeFile = (filename, value) -> {
+      IOUtils.write(JSON.toJSONString(value, JSONWriter.Feature.PrettyFormat).getBytes(StandardCharsets.UTF_8), IOUtils.createFile(new File(dir, filename + ".json")));
+      log.info("{} ===>: \n{}\n", filename, JSON.toJSONString(value));
+    };
+    writeFile.accept("fieldKeys1", template.getFieldKeys("hs_wave_package", false));
+    writeFile.accept("tagKeys", template.getTagKeys("hs_wave_package"));
+    template.query("SELECT *  FROM hs_wave_package WHERE time >= '2024-08-01T00:00:00Z' AND time < now() LIMIT 100")
+        .subscribe(SimpleSubscriber.create(result -> {
+          writeFile.accept("queryResult", result);
+          Map<String, FieldKey> fieldKeys = template.getFieldKeys("hs_wave_package", true);
+          writeFile.accept("fieldKeys2", fieldKeys);
+          List<Point> points = InfluxUtils.toPoint(result, fieldKeys, false);
+          writeFile.accept("points", points);
+        }));
   }
 
-  void test_influxdb() {
-    File dir = new File("D:/tmp/cache/influxdb/");
-
+  @Test
+  void testQuery4() {
+    QueryResult queryResult = JSON.parseObject(IOUtils.readAsString(new File("./build/influxdb/QueryResult.json")), QueryResult.class);
+    queryResult
+        .getResults()
+        .stream()
+        .map(r -> StringUtils.isBlank(r.getError()) ? r.getSeries() : null)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .forEach(s -> {
+          List<JSONObject> jsonList = s.getValues()
+              .stream()
+              .map(values -> {
+                List<String> columns = s.getColumns();
+                JSONObject json = new JSONObject();
+                for (int i = 0; i < values.size(); i++) {
+                  String key = columns.get(i);
+                  Object value = values.get(i);
+                  json.put(key, value);
+                }
+                return json;
+              })
+              .collect(Collectors.toList());
+          log.info("jsonList ===>: \n{}\n", JSON.toJSONString(jsonList));
+        });
   }
 
   @Test
@@ -265,7 +288,7 @@ class InfluxDBApiTest {
 
   @Test
   void testMeasurementInfo() {
-    Map<String, FieldKey> fieldKeyMap = template.getFieldKeyMap("hs_wave_package", true);
+    Map<String, FieldKey> fieldKeyMap = template.getFieldKeys("hs_wave_package", true);
     log.info("fieldKeyMap: \n{}", JSON.toJSONString(fieldKeyMap, JSONWriter.Feature.PrettyFormat));
   }
 
@@ -340,7 +363,7 @@ class InfluxDBApiTest {
         .filter(measurementFilter) // 不保存波形趋势
         .map(name -> MeasurementInfo.builder()
             .name(name)
-            .fieldKeys(template.getFieldKeyMap(name, true))
+            .fieldKeys(template.getFieldKeys(name, true))
             .build())
         .forEach(measurementInfo -> {
           File line = IOUtils.createFile(dir, measurementInfo.name + ".line");

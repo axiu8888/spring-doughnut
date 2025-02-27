@@ -840,8 +840,8 @@ public interface InfluxTemplate {
    * @param measurement     measurement
    * @return return field key map
    */
-  default Map<String, FieldKey> getFieldKeyMap(String retentionPolicy, String measurement) {
-    return getFieldKeyMap(getDatabase(), retentionPolicy, measurement);
+  default Map<String, FieldKey> getFieldKeys(String retentionPolicy, String measurement) {
+    return getFieldKeys(getDatabase(), retentionPolicy, measurement);
   }
 
   /**
@@ -852,8 +852,8 @@ public interface InfluxTemplate {
    * @param measurement     measurement
    * @return return field key map
    */
-  default Map<String, FieldKey> getFieldKeyMap(String db, String retentionPolicy, String measurement) {
-    return getFieldKeyMap(db, retentionPolicy, measurement, true);
+  default Map<String, FieldKey> getFieldKeys(String db, String retentionPolicy, String measurement) {
+    return getFieldKeys(db, retentionPolicy, measurement, true);
   }
 
   /**
@@ -863,8 +863,8 @@ public interface InfluxTemplate {
    * @param containTags contains tag
    * @return return field key map
    */
-  default Map<String, FieldKey> getFieldKeyMap(String measurement, boolean containTags) {
-    return getFieldKeyMap(getDatabase(), getRetentionPolicy(), measurement, containTags);
+  default Map<String, FieldKey> getFieldKeys(String measurement, boolean containTags) {
+    return getFieldKeys(getDatabase(), getRetentionPolicy(), measurement, containTags);
   }
 
   /**
@@ -876,44 +876,32 @@ public interface InfluxTemplate {
    * @param containTags     contains tag
    * @return return field key map
    */
-  default Map<String, FieldKey> getFieldKeyMap(String db, String retentionPolicy, String measurement, boolean containTags) {
+  default Map<String, FieldKey> getFieldKeys(String db, String retentionPolicy, String measurement, boolean containTags) {
     final String sql = "SHOW FIELD KEYS FROM \"" + retentionPolicy + "\".\"" + measurement + "\"";
     QueryResult queryResult = postQuery(db, sql);
     List<FieldKey> fieldKeys = getObjectsStream(queryResult)
-        .flatMap(values -> Stream.of(new FieldKey.Builder()
+        .flatMap(values -> Stream.of(FieldKey.builder()
             .setColumn((String) values.get(0))
             .setFieldType(FieldKey.getFieldType((String) values.get(1)))
             .build()))
         .collect(Collectors.toList());
-
+    if (fieldKeys.isEmpty()) return Collections.emptyMap();//空字段
+    final Map<String, FieldKey> map = new ConcurrentHashMap<>();
+    fieldKeys.add(FieldKey.tag("time"));//添加时间字段
+    fieldKeys.forEach(kf -> map.put(kf.getAlias(), kf));
     if (containTags) {
-      List<String> tagKeys = getTagKeys(db, measurement);
-      fieldKeys.addAll(tagKeys.stream()
-          .flatMap(tag -> Stream.of(new FieldKey.Builder()
-              .setColumn(tag)
-              .setFieldType(String.class)
-              .setTag(true)
-              .build()))
-          .collect(Collectors.toList()));
+      getTagKeys(db, measurement)
+          .stream()
+          .map(tag -> FieldKey.tag(tag, map.containsKey(tag) ? tag + "_1" : null))
+          .forEach(fk -> {
+            map.put(fk.getAlias(), fk);
+            //如果tag和普通字段重复，将普通字段改为tag
+            if (map.containsKey(fk.getColumn())) {
+              map.get(fk.getColumn()).setTag(true);
+            }
+          });
     }
-
-    if (!fieldKeys.isEmpty()) {
-      fieldKeys.add(new FieldKey.Builder()
-          .setColumn("time")
-          .setFieldType(String.class)
-          .setTag(true)
-          .setTimestamp(true)
-          .build());
-    }
-
-    if (fieldKeys.isEmpty()) {
-      return Collections.emptyMap();
-    }
-    final Map<String, FieldKey> fieldKeyMap = new ConcurrentHashMap<>();
-    for (FieldKey FieldKey : fieldKeys) {
-      fieldKeyMap.put(FieldKey.getColumn(), FieldKey);
-    }
-    return fieldKeyMap;
+    return map;
   }
 
 
@@ -1043,7 +1031,7 @@ public interface InfluxTemplate {
    * @return 是否导出成功，如果不存在，导出则为false，否则为true，或抛出异常
    */
   default boolean export(BiConsumer<QueryResult, Map<String, FieldKey>> consumer, String db, String retentionPolicy, String measurement, int chunkSize, Long startTime, Long endTime, String condition) {
-    Map<String, FieldKey> fieldKeyMap = getFieldKeyMap(db, retentionPolicy, measurement, true);
+    Map<String, FieldKey> fieldKeyMap = getFieldKeys(db, retentionPolicy, measurement, true);
     if (fieldKeyMap.isEmpty()) {
       return false;
     }

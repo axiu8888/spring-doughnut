@@ -1,5 +1,7 @@
 package com.benefitj.spring.influxdb.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 字段
  */
@@ -13,10 +15,6 @@ public class FieldKey {
    */
   private boolean tag = false;
   /**
-   * 值的下标
-   */
-  private int index = -1;
-  /**
    * 是否为时间戳
    */
   private boolean timestamp = false;
@@ -24,15 +22,36 @@ public class FieldKey {
    * field class type
    */
   private Class<?> fieldType;
+  /**
+   * 字段别名(查询时的别名)
+   */
+  private String alias;
+  /**
+   * 值的下标
+   */
+  private int index = -1;
 
   public FieldKey() {
   }
 
   public FieldKey(String column, boolean tag, int index) {
+    this(column, column, tag, index);
+  }
+
+  public FieldKey(String alias, String column, boolean tag, int index) {
+    this.alias = alias;
     this.column = column;
     this.tag = tag;
     this.index = index;
     this.timestamp = "time".equals(getColumn());
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   public String getColumn() {
@@ -123,14 +142,40 @@ public class FieldKey {
     }
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static FieldKey tag(String name) {
+    return tag(name, null);
+  }
+
+  public static FieldKey tag(String name, String alias) {
+    return builder()
+        .setColumn(name)
+        .setFieldType(String.class)
+        .setTag(true)
+        .setAlias(alias)
+        .build();
+  }
+
   public static final class Builder {
+    private String alias;
     private String column;
     private boolean tag;
     private int index;
-    private boolean timestamp;
     private Class<?> fieldType;
 
     public Builder() {
+    }
+
+    public String getAlias() {
+      return alias;
+    }
+
+    public Builder setAlias(String alias) {
+      this.alias = alias;
+      return this;
     }
 
     public Builder setColumn(String column) {
@@ -148,24 +193,20 @@ public class FieldKey {
       return this;
     }
 
-    public Builder setTimestamp(boolean timestamp) {
-      this.timestamp = timestamp;
-      return this;
-    }
-
     public Builder setFieldType(Class<?> fieldType) {
       this.fieldType = fieldType;
       return this;
     }
 
     public FieldKey build() {
-      FieldKey fieldKey = new FieldKey();
-      fieldKey.setColumn(column);
-      fieldKey.setTag(tag);
-      fieldKey.setIndex(index);
-      fieldKey.setTimestamp(timestamp);
-      fieldKey.setFieldType(fieldType);
-      return fieldKey;
+      FieldKey fk = new FieldKey();
+      fk.setColumn(column);
+      fk.setTag(tag);
+      fk.setAlias(StringUtils.isNotBlank(alias) ? alias : column);
+      fk.setIndex(index);
+      fk.setTimestamp("time".equals(column));
+      fk.setFieldType(fieldType);
+      return fk;
     }
   }
 }

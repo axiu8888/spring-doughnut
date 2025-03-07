@@ -78,6 +78,7 @@ include(
     ":services:jmods-export",                    // 导出执行环境
     ":services:mybatisplus:mysql",               // mybatis: mysql
     ":services:mybatisplus:postgresql",          // mybatis: postgresql
+    ":services:mybatisplus:data-platform",       // mybatis: 数据平台
     ":services:websocket-relay",                 // 代理中继
     ":services:file-server",                     // 文件服务
     ":services:nat-proxy",                       // NAT代理

@@ -1,0 +1,7 @@
+${AnsiColor.BRIGHT_BLUE}
+
+
+
+${AnsiColor.CYAN}
+Powered by axiu8888
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}

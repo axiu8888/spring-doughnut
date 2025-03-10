@@ -20,6 +20,11 @@ dependencies {
       "io.springfox:springfox-boot-starter:${swaggerVersion}",
       "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
 
+      // 动态数据源
+      "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}",
+      //"com.mysql:mysql-connector-j:${mysqlVersion}",//mysql
+      //"org.postgresql:postgresql:${postgresqlVersion}",//postgresql
+
   ].forEach {
     compileOnly(it)
     testImplementation(it)

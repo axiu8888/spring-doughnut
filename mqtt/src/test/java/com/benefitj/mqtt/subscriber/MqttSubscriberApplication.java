@@ -40,10 +40,11 @@ public class MqttSubscriberApplication {
     @MqttMessageListener(
         topics = {
             "/device/#",
+            "save/real/#",
             "#{topic2}",
             "#{@environment['topic3'] ?: '/test3'}",
         },
-        clientIdPrefix = "mqtt-subscriber-",
+        clientIdPrefix = "mqtt332-subscriber-",
         serverURI = "${spring.mqtt.custom.serverURIs}",
         async = true
     )

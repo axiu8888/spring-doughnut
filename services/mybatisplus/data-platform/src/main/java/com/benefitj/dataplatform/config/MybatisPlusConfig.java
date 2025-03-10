@@ -1,16 +1,14 @@
 package com.benefitj.dataplatform.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.benefitj.spring.datasource.DataSourceRouter;
 import com.benefitj.spring.datasource.DynamicRoutingDataSource;
 import com.github.pagehelper.PageInterceptor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -25,24 +23,17 @@ import java.util.Map;
 @Configuration
 public class MybatisPlusConfig {
 
-  @ConfigurationProperties(prefix = "spring.datasource.druid")
-  @ConditionalOnMissingBean
-  @Bean
-  public DruidDataSource druidDataSource() {
-    return DruidDataSourceBuilder.create().build();
-  }
-
   /**
    * 多数据源动态切换
    */
   @ConditionalOnMissingBean
   @Bean
-  public DataSourceRouter dataSourceRouter(DruidDataSource druidDataSource) {
+  public DataSourceRouter dataSourceRouter(@Qualifier("druidDataSource") DruidDataSource druidDataSource) {
     return new DataSourceRouter() {
       @Override
       public DataSource route(Map<String, Object> args) {
-
-        return null;
+        // 动态切换数据源
+        return druidDataSource;
       }
     };
   }
@@ -50,7 +41,8 @@ public class MybatisPlusConfig {
   /**
    * 动态数据源切换
    */
-  @ConditionalOnMissingBean
+  @Primary
+  //@ConditionalOnMissingBean
   @Bean
   public DataSource dynamicDataSource(DataSourceRouter router) {
     return new DynamicRoutingDataSource(router);

@@ -1,5 +1,7 @@
 package com.benefitj.dataplatform.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +23,17 @@ import javax.sql.DataSource;
 public class DruidConfiguration {
 
   @Value("#{@environment['spring.datasource.druid.loginUsername'] ?: 'admin'}")
-  private String loginUsername;
+  String loginUsername;
   @Value("#{@environment['spring.datasource.druid.loginPassword'] ?: '123456'}")
-  private String loginPassword;
+  String loginPassword;
+
+
+  //@ConfigurationProperties(prefix = "spring.datasource.primary")
+  @ConditionalOnMissingBean(name = "druidDataSource")
+  @Bean(name = "druidDataSource")
+  public DruidDataSource druidDataSource() {
+    return DruidDataSourceBuilder.create().build();
+  }
 
   /**
    * 事务管理

@@ -1,4 +1,4 @@
-package com.benefitj.dataplatform.utils;
+package com.benefitj.dataplatform.pg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

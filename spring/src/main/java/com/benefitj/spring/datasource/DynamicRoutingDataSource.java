@@ -43,7 +43,10 @@ public class DynamicRoutingDataSource extends AbstractDataSource {
   public Connection getConnection(String username, String password) throws SQLException {
     Map<String, Object> args = StringUtils.isAllBlank(username, password) ? EMPTY : null;
     DataSource dataSource = getRouter().route(args);
-    return dataSource.getConnection(username, password);
+    if (StringUtils.isAllBlank(username, password))
+      return dataSource.getConnection();
+    else
+      return dataSource.getConnection(username, password);
   }
 
 }

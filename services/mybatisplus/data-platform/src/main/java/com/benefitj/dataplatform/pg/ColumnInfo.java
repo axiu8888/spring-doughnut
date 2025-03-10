@@ -1,6 +1,7 @@
 package com.benefitj.dataplatform.pg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -141,4 +142,8 @@ public class ColumnInfo {
 
   @JsonProperty("is_updatable")
   private String isUpdatable;
+
+  @ApiModelProperty("注释")
+  @JsonProperty("comment")
+  private String comment;
 }

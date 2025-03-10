@@ -1,8 +1,10 @@
 package com.benefitj.dataplatform.pg;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
 
 public interface DatabaseHelper {
 
@@ -10,6 +12,29 @@ public interface DatabaseHelper {
    * 数据库连接
    */
   Connection getConnection();
+
+  /**
+   * 创建 Statement
+   */
+  default Statement createStatement() {
+    try {
+      return getConnection().createStatement();
+    } catch (SQLException e) {
+      throw new MySQLException(e);
+    }
+  }
+
+  /**
+   * 创建 PreparedStatement
+   */
+  default PreparedStatement prepareStatement(String sql) {
+    try {
+      return getConnection().prepareStatement(sql);
+    } catch (SQLException e) {
+      throw new MySQLException(e);
+    }
+  }
+
 
   /**
    * 判断数据库是否存在
@@ -34,6 +59,11 @@ public interface DatabaseHelper {
   /**
    * 获取表名和字段
    */
-  Map<String, List<ColumnInfo>> getTables();
+  List<TableInfo> getTables();
+
+  /**
+   * 获取表的注释
+   */
+  String getTableComment(String tableName);
 
 }

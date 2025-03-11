@@ -1,7 +1,9 @@
 package com.benefitj.dataplatform;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.IOUtils;
+import com.benefitj.dataplatform.pg.ColumnInfo;
 import com.benefitj.dataplatform.pg.PostgreHelper;
 import com.benefitj.dataplatform.pg.TableInfo;
 import com.benefitj.spring.JsonUtils;
@@ -17,6 +19,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @EnableAppStateListener
@@ -34,6 +37,11 @@ public class DataPlatformApp {
   }
 
   public static void appStart() {
+    DataSource dataSource = SpringCtxHolder.getBean(DataSource.class);
+
+  }
+
+  public static void appStart2() {
     try {
       log.info("appStart -------------------------------------------------------> start");
       // 数据库连接信息，请根据实际情况修改
@@ -56,7 +64,7 @@ public class DataPlatformApp {
             "salary NUMERIC(10, 2)";
         // 动态生成 CREATE TABLE 语句
         String createTableSQL = "CREATE TABLE " + tableName + " (" + tableStructure + ")";
-        try (Statement statement = pgHelper.createStatement()) {
+        try (Statement statement = pgHelper.createStatement(pgHelper.getConnection())) {
           // 执行创建表的 SQL 语句
           statement.executeUpdate(createTableSQL);
           System.err.println("创建表成功: " + tableName);
@@ -93,6 +101,19 @@ public class DataPlatformApp {
       List<TableInfo> tables = pgHelper.getTables();
       IOUtils.write(JsonUtils.toJsonBytes(tables, true), IOUtils.createFile("D:/develop/.tmp/cache/tables.json"));
       //log.info("tables ==>: \n{}", JSON.toJSONString(tables));
+
+      List<TableInfo> newTables = tables.stream()
+          .map(t -> {
+            log.info("1. {}, {}", t.getName(), JSON.toJSONString(t));
+            if (!t.getName().equalsIgnoreCase("employees")) return t;
+            JSONObject comments = pgHelper.getColumnComments(t.getName(), t.getColumns().stream().map(ColumnInfo::getColumnName).toArray(String[]::new));
+            t.getColumns().forEach(c -> c.setComment(comments.getString(c.getColumnName())));
+            log.info("2. {}, {}", t.getName(), JSON.toJSONString(t));
+            return t;
+          })
+          .collect(Collectors.toList());
+      IOUtils.write(JsonUtils.toJsonBytes(newTables, true), IOUtils.createFile("D:/develop/.tmp/cache/new_tables.json"));
+
     } catch (Exception e) {
       log.error("throws ==>: " + e.getStackTrace(), e);
     } finally {

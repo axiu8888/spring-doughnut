@@ -1,10 +1,13 @@
 package com.benefitj.dataplatform.pg;
 
+import com.alibaba.fastjson2.JSONObject;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 
 public interface DatabaseHelper {
 
@@ -16,9 +19,9 @@ public interface DatabaseHelper {
   /**
    * 创建 Statement
    */
-  default Statement createStatement() {
+  default Statement createStatement(Connection conn) {
     try {
-      return getConnection().createStatement();
+      return conn.createStatement();
     } catch (SQLException e) {
       throw new MySQLException(e);
     }
@@ -27,7 +30,7 @@ public interface DatabaseHelper {
   /**
    * 创建 PreparedStatement
    */
-  default PreparedStatement prepareStatement(String sql) {
+  default PreparedStatement prepareStatement(Connection conn, String sql) {
     try {
       return getConnection().prepareStatement(sql);
     } catch (SQLException e) {
@@ -65,5 +68,14 @@ public interface DatabaseHelper {
    * 获取表的注释
    */
   String getTableComment(String tableName);
+
+  /**
+   * 获取表字段的注释
+   *
+   * @param tableName 表名
+   * @param columns 字段名
+   * @return 返回查询到的字段注释
+   */
+  JSONObject getColumnComments(String tableName, String ...columns);
 
 }

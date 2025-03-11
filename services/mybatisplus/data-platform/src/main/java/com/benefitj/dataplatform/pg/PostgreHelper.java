@@ -53,9 +53,9 @@ public class PostgreHelper implements DatabaseHelper {
 
   @Override
   public boolean existDatabase(String dbName) {
-    try (PreparedStatement stmt = prepareStatement("SELECT 1 FROM pg_database WHERE datname = ?")) {
+    try (final PreparedStatement stmt = prepareStatement(getConnection(), "SELECT 1 FROM pg_database WHERE datname = ?")) {
       stmt.setString(1, dbName);
-      try (ResultSet rs = stmt.executeQuery()) {
+      try (final ResultSet rs = stmt.executeQuery()) {
         return rs.next();
       }
     } catch (SQLException e) {
@@ -65,7 +65,7 @@ public class PostgreHelper implements DatabaseHelper {
 
   @Override
   public boolean createDatabase(String dbName) {
-    try (Statement stmt = createStatement()) {
+    try (final Statement stmt = createStatement(getConnection())) {
       // 创建数据库的 SQL 命令
       stmt.executeUpdate("CREATE DATABASE " + dbName);
       return true;
@@ -76,8 +76,8 @@ public class PostgreHelper implements DatabaseHelper {
 
   @Override
   public List<String> getDatabases() {
-    // 创建 Statement 对象
-    try (Statement stmt = createStatement();
+    Connection conn = getConnection();
+    try (final Statement stmt = createStatement(conn);
          ResultSet rs = stmt.executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false")) {
       // 执行查询
       List<String> databases = new LinkedList<>();
@@ -90,11 +90,12 @@ public class PostgreHelper implements DatabaseHelper {
 
   @Override
   public boolean existTable(String tableName) {
+    Connection conn = getConnection();
     String schemaName = getSchemaName(); // 默认模式是 public
-    try (PreparedStatement stmt = prepareStatement("SELECT 1 FROM pg_tables WHERE tablename = ? AND schemaname = ?")) {
+    try (final PreparedStatement stmt = prepareStatement(conn, "SELECT 1 FROM pg_tables WHERE tablename = ? AND schemaname = ?")) {
       stmt.setString(1, tableName);
       stmt.setString(2, schemaName);
-      try (ResultSet rs = stmt.executeQuery()) {
+      try (final ResultSet rs = stmt.executeQuery()) {
         return rs.next();
       }
     } catch (SQLException e) {
@@ -104,19 +105,21 @@ public class PostgreHelper implements DatabaseHelper {
 
   @Override
   public List<TableInfo> getTables() {
-    String schemaName = getSchemaName();
     // 查询 public schema 下的所有表
-    try (Statement stmt = createStatement();
-         ResultSet rs = stmt.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = '" + schemaName + "';")) {
+    String schemaName = getSchemaName();
+    Connection conn = getConnection();
+    try (final Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT table_name" + " FROM information_schema.tables" + " WHERE table_schema = '"+ schemaName +"';")) {
       List<TableInfo> tables = new LinkedList<>();
       while (rs.next()) {
         String tableName = rs.getString("table_name");
         // 查询该表的所有字段及其数据类型
-        try (PreparedStatement pstmt = prepareStatement("SELECT * FROM information_schema.columns WHERE table_schema = '" + schemaName + "' AND table_name = ?")) {
-          pstmt.setString(1, tableName);
-          try (ResultSet crs = pstmt.executeQuery();) {
+        try (final PreparedStatement pstmt = conn.prepareStatement("SELECT *" + " FROM information_schema.columns" + " WHERE table_schema = ? AND table_name = ?")) {
+          pstmt.setString(1, schemaName);
+          pstmt.setString(2, tableName);
+          List<ColumnInfo> columns = new LinkedList<>();
+          try (final ResultSet crs = pstmt.executeQuery();) {
             ResultSetMetaData metaData = crs.getMetaData();
-            List<ColumnInfo> columns = new LinkedList<>();
             while (crs.next()) {
               JSONObject json = new JSONObject();
               int columnCount = metaData.getColumnCount();
@@ -125,11 +128,25 @@ public class PostgreHelper implements DatabaseHelper {
               }
               columns.add(json.toJavaObject(ColumnInfo.class));
             }
-            tables.add(TableInfo.builder()
-                .name(tableName)
-                .columns(columns)
-                .build());
           }
+          /* -- 此处有问题，暂时注释掉
+          // 查询列注释
+          try (final PreparedStatement cpstmt = prepareStatement(conn, "SELECT col_description(?::regclass, ?)")) {
+            for (ColumnInfo column : columns) {
+              cpstmt.setString(1, schemaName + "." + tableName);
+              cpstmt.setInt(2, column.getOrdinalPosition());
+              try (final ResultSet crs2 = cpstmt.executeQuery()) {
+                if (crs2.next()) {
+                  column.setComment(crs2.getString(1));
+                }
+              }
+            }
+          }
+          */
+          tables.add(TableInfo.builder()
+              .name(tableName)
+              .columns(columns)
+              .build());
         }
       }
       return tables;
@@ -137,70 +154,55 @@ public class PostgreHelper implements DatabaseHelper {
       throw new MySQLException(e);
     }
   }
-//  @Override
-//  public List<TableInfo> getTables() { // 要查询的表名称和模式名称
-//    String schemaName = getSchemaName(); // 默认模式是 public
-//    // 查询 public schema 下的所有表
-//    try (Statement stmt = createStatement();
-//         ResultSet rs = stmt.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = '" + schemaName + "';")) {
-//      List<TableInfo> tables = new LinkedList<>();
-//      while (rs.next()) {
-//        String tableName = rs.getString("table_name");
-//        TableInfo table;
-//        // 查询该表的所有字段及其数据类型
-//        try (PreparedStatement pstmt = prepareStatement("SELECT * FROM information_schema.columns WHERE table_schema = '" + schemaName + "' AND table_name = ?")) {
-//          pstmt.setString(1, tableName);
-//          try (ResultSet crs = pstmt.executeQuery();) {
-//            ResultSetMetaData metaData = crs.getMetaData();
-//            List<ColumnInfo> columns = new LinkedList<>();
-//            while (crs.next()) {
-//              JSONObject json = new JSONObject();
-//              int columnCount = metaData.getColumnCount();
-//              for (int i = 1; i <= columnCount; i++) {
-//                json.put(metaData.getColumnName(i), crs.getObject(i));
-//              }
-//
-//              columns.add(json.toJavaObject(ColumnInfo.class));
-//            }
-//            tables.add(table = TableInfo.builder()
-//                .name(tableName)
-//                .columns(columns)
-//                .build());
-//          }
-//        }
-//
-//        log.info("table[{}] -->: {}", table.getName(), JSON.toJSONString(table));
-//      }
-//
-////      for (TableInfo table : tables) {
-////        // 查询列注释
-////        try (PreparedStatement cpstmt = prepareStatement("SELECT col_description(?::regclass, ?)")) {
-////          for (ColumnInfo column : table.getColumns()) {
-////            cpstmt.setString(1, schemaName + "." + table.getName());
-////            cpstmt.setInt(2, column.getOrdinalPosition());
-////            try (ResultSet crs2 = cpstmt.executeQuery()) {
-////              if (crs2.next()) {
-////                column.setComment(crs2.getString(1));
-////              }
-////            }
-////          }
-////        }
-////      }
-//      return tables;
-//    } catch (SQLException e) {
-//      throw new MySQLException(e);
-//    }
-//  }
 
   @Override
   public String getTableComment(String tableName) {
-    String schemaName = "public"; // 默认模式是 public
-    try (PreparedStatement statement = prepareStatement("SELECT obj_description(?::regclass, 'pg_class')")) {
-      statement.setString(1, schemaName + "." + tableName);
-      try (ResultSet rs = statement.executeQuery()) {
+    String schemaName = getSchemaName(); // 默认模式是 public
+    try (final PreparedStatement pstmt = prepareStatement(getConnection(), "SELECT obj_description(?::regclass, 'pg_class')")) {
+      pstmt.setString(1, schemaName + "." + tableName);
+      try (final ResultSet rs = pstmt.executeQuery()) {
         if (rs.next()) return rs.getString(1);
       }
       return null;
+    } catch (SQLException e) {
+      throw new MySQLException(e);
+    }
+  }
+
+  @Override
+  public JSONObject getColumnComments(String tableName, String ...columns) {
+    JSONObject commentJson = new JSONObject(columns.length);
+    String schemaName = getSchemaName(); // 默认模式是 public
+    Connection conn = getConnection();
+    // 获取表的列信息
+    String sql = "SELECT column_name, ordinal_position FROM information_schema.columns WHERE table_schema = ? AND table_name = ? AND column_name IN(?)";
+    try (final PreparedStatement pstmt = prepareStatement(conn, sql)) {
+      pstmt.setString(1, schemaName);
+      pstmt.setString(2, tableName);
+      //pstmt.setString(3, "'" + String.join("', '", columns) + "'");
+      try (ResultSet rs = pstmt.executeQuery()) {
+        while (rs.next()) {
+          String columnName = rs.getString("column_name");
+          int columnNumber = rs.getInt("ordinal_position");
+          if (columnName == null) {
+            continue;
+          }
+          // 查询列注释
+          try (PreparedStatement cpsmt = conn.prepareStatement("SELECT col_description(?::regclass, ?)")) {
+            cpsmt.setString(1, schemaName + "." + tableName);
+            cpsmt.setInt(2, columnNumber);
+            try (ResultSet crs = cpsmt.executeQuery()) {
+              if (crs.next()) {
+                String comment = crs.getString(1);
+                commentJson.put(columnName, comment);
+              } else {
+                commentJson.put(columnName, "");
+              }
+            }
+          }
+        }
+      }
+      return commentJson;
     } catch (SQLException e) {
       throw new MySQLException(e);
     }

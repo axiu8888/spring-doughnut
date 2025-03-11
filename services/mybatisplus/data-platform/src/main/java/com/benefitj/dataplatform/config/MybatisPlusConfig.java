@@ -42,8 +42,8 @@ public class MybatisPlusConfig {
    * 动态数据源切换
    */
   @Primary
-  //@ConditionalOnMissingBean
-  @Bean
+  //@ConditionalOnMissingBean(name="dataSource")
+  @Bean("dataSource")
   public DataSource dynamicDataSource(DataSourceRouter router) {
     return new DynamicRoutingDataSource(router);
   }

@@ -23,10 +23,12 @@ dependencies {
       "org.springframework.boot:spring-boot-starter-web",
       "org.springframework.boot:spring-boot-starter-websocket",
       "org.springframework.boot:spring-boot-starter-data-redis",
-      //"org.springframework.boot:spring-boot-starter-data-mongodb",
+      "org.springframework.boot:spring-boot-starter-data-mongodb",
 
       // elasticsearch
       'org.springframework.boot:spring-boot-starter-data-elasticsearch',
+      'jakarta.json:jakarta.json-api:2.1.3',
+
 
       'org.ehcache:ehcache:3.10.8',
       'org.springframework.boot:spring-boot-starter-cache',

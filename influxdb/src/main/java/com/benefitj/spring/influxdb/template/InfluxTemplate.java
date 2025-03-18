@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 
 import java.io.*;
-import java.lang.annotation.RetentionPolicy;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -514,7 +513,7 @@ public interface InfluxTemplate {
    *
    * @return return retention policies
    */
-  default List<RetentionPolicy> getRetentionPolicies() {
+  default List<InfluxRetentionPolicy> getRetentionPolicies() {
     return getRetentionPolicies(getDatabase());
   }
 
@@ -524,9 +523,9 @@ public interface InfluxTemplate {
    * @param db database name
    * @return return retention policies
    */
-  default List<RetentionPolicy> getRetentionPolicies(String db) {
+  default List<InfluxRetentionPolicy> getRetentionPolicies(String db) {
     QueryResult queryResult = postQuery(db, "SHOW RETENTION POLICIES ON " + db);
-    return getConverterFactory().mapperTo(queryResult, RetentionPolicy.class);
+    return getConverterFactory().mapperTo(queryResult, InfluxRetentionPolicy.class);
   }
 
   /**
@@ -672,10 +671,13 @@ public interface InfluxTemplate {
    * @return 返回结果
    */
   default QueryResult createContinuousQuery(String name, String database, String selectIntoSQL) {
-    return postQuery("CREATE CONTINUOUS QUERY \"" + name + "\" ON \"" + database + "\"\n"
-        + "BEGIN\n"
+    String sql = " CREATE CONTINUOUS QUERY \"" + name + "\""
+        + "\nON \"" + database + "\"\n"
+        + " BEGIN\n"
         + selectIntoSQL
-        + "END\n");
+        + " \nEND";
+    String newSql = String.join(" ", sql.split("\n"));
+    return postQuery(newSql);
   }
 
   /**
@@ -949,6 +951,47 @@ public interface InfluxTemplate {
   default List<QueryResult.Result> getResults(String db, String query) {
     QueryResult queryResult = postQuery(db, query);
     return getResults(queryResult);
+  }
+
+  /**
+   * 创建持续保留策略
+   * CREATE RETENTION POLICY "rp_2w" ON "test_db" DURATION 2w REPLICATION 1;
+   *
+   * @param db       数据库
+   * @param rpName   保留策略名称
+   * @param duration 保留时长
+   * @return 返回创建结果，如果是null，表示已存在，不需要创建
+   */
+  default QueryResult createRPIfNotExist(String db, String rpName, String duration) {
+    final Map<String, InfluxRetentionPolicy> map = new LinkedHashMap<>();
+    getRetentionPolicies(db).forEach(rp -> map.put(rp.getName(), rp)); // 查询保留策略
+    if (map.containsKey(rpName)) return null;
+    // 创建保留策略
+    return createRetentionPolicy(
+        rpName,   // 保留策略名称
+        db, // 数据库名称
+        duration, // 数据持久化时间
+        1, // 复制片，如果是集群，可以拷贝多份
+        false // 是否为数据库默认的策略
+    );
+  }
+
+  /**
+   * 创建持续查询
+   *
+   * @param db 数据库
+   * @param selectSql SQL ->
+   *                  SELECT a, b, b
+   *                  INTO 'rp'.'table'
+   *                  GROUP BY time(1h), tag1, tag2
+   * @param cqName 持续查询名称
+   * @return 返回创建结果，如果是null，表示已存在，不需要创建
+   */
+  default QueryResult createCQIfNotExist(String db, String cqName, String selectSql) {
+    final Map<String, ContinuousQuery> map = new LinkedHashMap<>();
+    getContinuousQueries(db).forEach(cq -> map.put(cq.getName(), cq));
+    if (map.containsKey(cqName)) return null;// 已经存在此名称的持续查询
+    return createContinuousQuery(cqName, db, selectSql);
   }
 
   /**

@@ -18,6 +18,9 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -288,7 +291,7 @@ public interface InfluxTemplate {
    * @return 返回查询结果
    */
   default Flowable<QueryResult> query(String db, final String query) {
-    return query(db, query, 1000);
+    return getApi().query(db, query);
   }
 
   /**
@@ -475,7 +478,7 @@ public interface InfluxTemplate {
    * @return result
    */
   default QueryResult createDatabase(String database) {
-    return postQuery(Query.encode("CREATE DATABASE \"" + database + "\""));
+    return postQuery("CREATE DATABASE \"" + database + "\"");
   }
 
   /**
@@ -561,7 +564,7 @@ public interface InfluxTemplate {
     if (isDefault) {
       queryBuilder.append(" DEFAULT");
     }
-    return postQuery(Query.encode(queryBuilder.toString()));
+    return postQuery(queryBuilder.toString());
   }
 
   /**
@@ -671,13 +674,13 @@ public interface InfluxTemplate {
    * @return 返回结果
    */
   default QueryResult createContinuousQuery(String name, String database, String selectIntoSQL) {
-    String sql = " CREATE CONTINUOUS QUERY \"" + name + "\""
-        + "\nON \"" + database + "\"\n"
-        + " BEGIN\n"
-        + selectIntoSQL
-        + " \nEND";
-    String newSql = String.join(" ", sql.split("\n"));
-    return postQuery(newSql);
+    String sql = "CREATE CONTINUOUS QUERY \"" + name + "\""
+        + "\nON \"" + database + "\""
+        + "\nBEGIN"
+        + "\n" + (selectIntoSQL)
+        + "\nEND";
+    String newSql = String.join(" ", sql.split("\n")).replace("\t", " ").replace("  ", " ");
+    return postQuery(database, newSql);
   }
 
   /**
@@ -987,11 +990,14 @@ public interface InfluxTemplate {
    * @param cqName 持续查询名称
    * @return 返回创建结果，如果是null，表示已存在，不需要创建
    */
-  default QueryResult createCQIfNotExist(String db, String cqName, String selectSql) {
+  default boolean createCQIfNotExist(String db, String cqName, String selectSql) {
     final Map<String, ContinuousQuery> map = new LinkedHashMap<>();
     getContinuousQueries(db).forEach(cq -> map.put(cq.getName(), cq));
-    if (map.containsKey(cqName)) return null;// 已经存在此名称的持续查询
-    return createContinuousQuery(cqName, db, selectSql);
+    if (map.containsKey(cqName)) return true;// 已经存在此名称的持续查询
+    QueryResult qr = createContinuousQuery(cqName, db, selectSql);
+    if (qr.hasError())
+      throw new IllegalStateException(qr.getError());
+    return true;
   }
 
   /**
@@ -1093,6 +1099,22 @@ public interface InfluxTemplate {
       throw new IllegalStateException(CatchUtils.findRoot(error.get()));
     }
     return true;
+  }
+
+  default String encodeQuery(String query) {
+    try {
+      return URLEncoder.encode(query, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      return query;
+    }
+  }
+
+  default String decodeQuery(String query) {
+    try {
+      return URLDecoder.decode(query, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      return query;
+    }
   }
 
 }

@@ -19,6 +19,9 @@ import retrofit2.Response;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -83,14 +86,16 @@ public class InfluxTemplateImpl implements InfluxTemplate {
 
   @Override
   public QueryResult postQuery(String query) {
+    query = decodeQuery(query);
     log.debug("postQuery, query: {}", query);
-    return execute(getApi().postQuery(query), r -> r);
+    return execute(getApi().postQuery(URLEncoder.encode(query, StandardCharsets.UTF_8)), r -> r);
   }
 
   @Override
   public QueryResult postQuery(String db, String query) {
+    query = decodeQuery(query);
     log.debug("postQuery, db: {}, query: {}", db, query);
-    return execute(getApi().postQuery(db, query), r -> r);
+    return execute(getApi().postQuery(db, URLEncoder.encode(query, StandardCharsets.UTF_8)), r -> r);
   }
 
   protected Flowable<QueryResult> execute(Flowable<Response<ResponseBody>> query) {

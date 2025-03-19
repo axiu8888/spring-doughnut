@@ -24,7 +24,7 @@ public interface InfluxApiFactory {
 
   //String APPLICATION_MSGPACK = "application/x-msgpack";
   //MediaType MEDIA_TYPE_STRING = MediaType.parse("text/plain");
-  //String SHOW_DATABASE_COMMAND_ENCODED = com.benefitj.influxdb.dto.Query.encode("SHOW DATABASES");
+  //String SHOW_DATABASE_COMMAND_ENCODED = encodeQuery("SHOW DATABASES");
 
   static InfluxApiFactory newInstance() {
     return new InfluxApiFactoryImpl();

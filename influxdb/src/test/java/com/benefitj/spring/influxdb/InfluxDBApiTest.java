@@ -111,11 +111,16 @@ class InfluxDBApiTest {
 
   @Test
   void testCreateCQ() {
-    QueryResult qr = template.createCQIfNotExist(template.getDatabase(), "cq_measure_hours", "\tSELECT first(package_sn) AS first_sn\n" +
-        "\tINTO \"autogen\".\"hs_measure_hours\"\n" +
-        "\tFROM \"hs_base_package\"\n" +
-        "\tGROUP BY time(1h), person_zid, device_id");
-    log.info("result ===>: {}", JSON.toJSONString(qr));
+    boolean result = template.createCQIfNotExist(template.getDatabase(), "cq_measure_hours",
+        "SELECT " +
+            "first(package_sn) AS first_sn" +
+            ", last(package_sn) AS last_sn" +
+            ", DATE_FORMAT(time, '%Y-%m-%d') AS day" +
+//            ", DATE_FORMAT(time, '%H') AS hour " +
+            "\nINTO \"autogen\".\"hs_measure_hours\"" +
+            "\nFROM \"hs_base_package\"" +
+            "\nGROUP BY time(1h), person_zid, device_id");
+    log.info("result ===>: {}", JSON.toJSONString(result));
   }
 
   @Test

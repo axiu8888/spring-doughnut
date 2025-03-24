@@ -11,6 +11,9 @@ import com.benefitj.spring.ctx.SpringCtxHolder;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.listener.EnableAppStateListener;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
@@ -37,8 +40,24 @@ public class DataPlatformApp {
   }
 
   public static void appStart() {
-    DataSource dataSource = SpringCtxHolder.getBean(DataSource.class);
+    try {
+      DataSource dataSource = SpringCtxHolder.getBean(DataSource.class);
+      DSLContext ctx = DSL.using(dataSource.getConnection(), SQLDialect.POSTGRES);
 
+      ctx.select()
+          .from(DSL.table("his_cpet_records"))
+          //.where(DSL.field("name").eq(name))
+          .orderBy(OrderField.DESC)
+          .fetch()
+          .forEach(record -> {
+            System.out.println("Name: " + record.get("name"));
+            System.out.println("Age: " + record.get("age"));
+          });
+
+
+    } catch (Exception e) {
+      log.error("throw: " + e, e);
+    }
   }
 
   public static void appStart2() {

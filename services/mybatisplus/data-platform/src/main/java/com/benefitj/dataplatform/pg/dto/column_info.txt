@@ -1,0 +1,47 @@
+字段名                          解释                            示例                     备注
+table_catalog                  数据库名                        support                  表所在的数据库名
+table_schema                   模式名（Schema）                public                   表所在的模式（通常为public）
+table_name                     表名                            test                    表的名称
+column_name                    列名                            id                      列的名称
+primary_key                    是否为主键                    true 或 false               如果为主键，则为 true
+ordinal_position               列在表中的位置（序号）            1                        从 1 开始的索引
+column_default                 列的默认值                    CURRENT_TIMESTAMP          如果列有默认值，显示默认值
+is_nullable                    列是否允许为 NULL                YES 或 NO                是否允许为空
+data_type                      列的数据类型                    integer                   数据类型（如 integer, varchar）
+character_maximum_length       字符最大长度                    32                        对于字符串类型（如 varchar），最大长度
+character_octet_length         字符最大长度（以字节计）          128                       多字节字符时的长度
+numeric_precision              数值精度（有效位数）              32                       对于数值类型，表示有效位数
+numeric_precision_radix        数值进制                        2                        通常为 2（二进制）或 10（十进制）
+numeric_scale                  数值的小数位数                   0                        表示小数部分的位数
+datetime_precision             时间精度                        6                        对于时间类型，表示秒的小数位数
+interval_type                  间隔类型                        NULL                     如果是间隔（INTERVAL）类型，显示具体间隔类型
+interval_precision             间隔精度                        NULL                     间隔类型的精度
+character_set_catalog          字符集所属数据库                 NULL                     通常为 NULL（PostgreSQL 默认不设置）
+character_set_schema           字符集所属模式                   NULL                     通常为 NULL
+character_set_name             字符集名称                      UTF8                      通常为 UTF8 或 SQL_ASCII
+collation_catalog              排序规则所属数据库                NULL                     如果设置了排序规则，显示所属数据库
+collation_schema               排序规则所属模式                  NULL                     如果设置了排序规则，显示所属模式
+collation_name                 排序规则名称                    NULL                      如果设置了排序规则，显示名称
+domain_catalog                 域所属数据库                    NULL                      如果列是基于域（DOMAIN），显示所属数据库
+domain_schema                  域所属模式                      NULL                      如果列是基于域（DOMAIN），显示所属模式
+domain_name                    域名称                         NULL                      如果列是基于域（DOMAIN），显示域名称
+udt_catalog                    UDT（用户定义类型）所属数据库      support                   如果列是 UDT 类型，显示所属数据库
+udt_schema                     UDT 所属模式                    pg_catalog                如果列是 UDT 类型，显示所属模式
+udt_name                       UDT 名称                        varchar                  如果列是 UDT 类型，显示类型名称
+scope_catalog                  作用域所属数据库                 NULL                      用于引用类型，PostgreSQL 通常不设置
+scope_schema                   作用域所属模式                   NULL                      用于引用类型，PostgreSQL 通常不设置
+scope_name                     作用域名称                      NULL                      用于引用类型，PostgreSQL 通常不设置
+maximum_cardinality            最大基数                        NULL                     对于数组类型，表示最大长度
+dtd_identifier                 DTD 标识符                       1                       标识列的唯一编号
+is_self_referencing            是否为自引用                      NO                      如果为自引用列，则为 YES
+is_identity                    是否为 IDENTITY 列               NO                      如果是 IDENTITY 列，则为 YES
+identity_generation            IDENTITY 列的生成类型            NULL                     ALWAYS 或 BY DEFAULT
+identity_start                 IDENTITY 的起始值                NULL                    IDENTITY 列的初始值
+identity_increment             IDENTITY 的增量                NULL                      IDENTITY 列的增量
+identity_maximum               IDENTITY 的最大值                NULL                    IDENTITY 列的最大值
+identity_minimum               IDENTITY 的最小值                NULL                    IDENTITY 列的最小值
+identity_cycle                 是否循环使用IDENTITY值            NO                       如果为 YES，达到最大值时会重置
+is_generated                   是否为生成列                     NEVER                    如果是生成列，则显示 ALWAYS
+generation_expression          生成表达式                       NULL                    生成列的表达式
+is_updatable                   列是否可更新                      YES                     如果列允许更新，则为 YES
+comment                        列的注释                         主键                     列的注释信息

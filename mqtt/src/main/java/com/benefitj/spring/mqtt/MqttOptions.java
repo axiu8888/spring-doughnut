@@ -2,9 +2,11 @@ package com.benefitj.spring.mqtt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.*;
 
@@ -63,6 +65,14 @@ public class MqttOptions {
    * 主题
    */
   private Will will = new Will();
+  /**
+   * 订阅配置
+   */
+  private Properties subscriber = new Properties();
+  /**
+   * 发布配置
+   */
+  private Properties publisher = new Properties();
 
   public int getKeepalive() {
     return keepalive;
@@ -160,6 +170,22 @@ public class MqttOptions {
     this.will = will;
   }
 
+  public Properties getSubscriber() {
+    return subscriber;
+  }
+
+  public void setSubscriber(Properties subscriber) {
+    this.subscriber = subscriber;
+  }
+
+  public Properties getPublisher() {
+    return publisher;
+  }
+
+  public void setPublisher(Properties publisher) {
+    this.publisher = publisher;
+  }
+
   public static class Will {
 
     private String topic;
@@ -224,10 +250,14 @@ public class MqttOptions {
     if (StringUtils.isNotBlank(will.getPayload())) {
       connectOptions.setWill(will.getTopic(), will.getPayload().getBytes(StandardCharsets.UTF_8), will.getQos(), will.isRetained());
     }
-    connectOptions.setAutomaticReconnect(false); // 不自动重连，使用自定义的自动重连
-    connectOptions.setMaxReconnectDelay(options.getReconnectDelay() * 1000);
     // 最大发送数量
     connectOptions.setMaxInflight(options.getMaxInflight());
+    connectOptions.setAutomaticReconnect(false); // 不自动重连，使用自定义的自动重连
+    try {
+      connectOptions.setMaxReconnectDelay(options.getReconnectDelay() * 1000);
+    } catch (Error err) {
+      LoggerFactory.getLogger("MQTT").warn("PahoMQTT error: " + err.getMessage());
+    }
     return connectOptions;
   }
 }

@@ -26,21 +26,12 @@ public class TcpUdpConfiguration {
   }
 
   /**
-   * TCP-UDP服务端
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public TcpUdpProxyServer tcpUdpProxyServer(TcpUdpOptions options) {
-    return new TcpUdpProxyServer(options);
-  }
-
-  /**
    * 开关
    */
   @ConditionalOnMissingBean
   @Bean
-  public TcpUdpProxySwitcher tcpProxySwitcher(TcpUdpOptions options, TcpUdpProxyServer server) {
-    return new TcpUdpProxySwitcher(options, server);
+  public TcpUdpProxySwitcher tcpProxySwitcher(TcpUdpOptions options) {
+    return new TcpUdpProxySwitcher(options);
   }
 
   /**

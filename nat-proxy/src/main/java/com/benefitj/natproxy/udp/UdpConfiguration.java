@@ -25,21 +25,12 @@ public class UdpConfiguration {
   }
 
   /**
-   * UDP服务端
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public UdpProxyServer udpProxyServer(UdpOptions options) {
-    return new UdpProxyServer(options);
-  }
-
-  /**
    * 开关
    */
   @ConditionalOnMissingBean
   @Bean
-  public UdpProxySwitcher udpProxySwitcher(UdpOptions options, UdpProxyServer server) {
-    return new UdpProxySwitcher(options, server);
+  public UdpProxySwitcher udpProxySwitcher(UdpOptions options) {
+    return new UdpProxySwitcher(options);
   }
 
   /**

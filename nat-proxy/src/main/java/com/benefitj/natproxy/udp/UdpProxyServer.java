@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Component
 public class UdpProxyServer extends UdpNettyServer {
 
-  private UdpOptions options;
+  private UdpOptions.SubOptions options;
   /**
    * 远程主机地址
    */
@@ -45,7 +45,7 @@ public class UdpProxyServer extends UdpNettyServer {
   private final AttributeKey<EventLoopGroup> groupKey = AttributeKey.valueOf("groupKey");
 
   @Autowired
-  public UdpProxyServer(UdpOptions options) {
+  public UdpProxyServer(UdpOptions.SubOptions options) {
     this.options = options;
     this.remotes = Collections.synchronizedList(Arrays.stream(getOptions().getRemotes())
         .filter(StringUtils::isNotBlank)
@@ -56,7 +56,7 @@ public class UdpProxyServer extends UdpNettyServer {
 
   @Override
   public UdpNettyServer useDefaultConfig() {
-    UdpOptions ops = getOptions();
+    UdpOptions.SubOptions ops = getOptions();
     this.useLinuxNativeEpoll(false);
     this.childHandler(new ChannelInitializer<Channel>() {
       @Override
@@ -214,11 +214,11 @@ public class UdpProxyServer extends UdpNettyServer {
     return super.stop(listeners);
   }
 
-  public UdpOptions getOptions() {
+  public UdpOptions.SubOptions getOptions() {
     return options;
   }
 
-  public void setOptions(UdpOptions options) {
+  public void setOptions(UdpOptions.SubOptions options) {
     this.options = options;
   }
 

@@ -1,0 +1,1 @@
+netstat -ano | findstr ":7012" | findstr "UDP"

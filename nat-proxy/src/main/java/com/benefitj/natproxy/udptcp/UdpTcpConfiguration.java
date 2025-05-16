@@ -26,21 +26,12 @@ public class UdpTcpConfiguration {
   }
 
   /**
-   * UDP-TCP服务端
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public UdpTcpProxyServer udpTcpProxyServer(UdpTcpOptions options) {
-    return new UdpTcpProxyServer(options);
-  }
-
-  /**
    * 开关
    */
   @ConditionalOnMissingBean
   @Bean
-  public UdpTcpProxySwitcher udpTcpProxySwitcher(UdpTcpOptions options, UdpTcpProxyServer server) {
-    return new UdpTcpProxySwitcher(options, server);
+  public UdpTcpProxySwitcher udpTcpProxySwitcher(UdpTcpOptions options) {
+    return new UdpTcpProxySwitcher(options);
   }
 
   /**

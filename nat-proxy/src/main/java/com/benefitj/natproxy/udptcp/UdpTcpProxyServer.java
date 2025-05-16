@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Component
 public class UdpTcpProxyServer extends UdpNettyServer {
 
-  private UdpTcpOptions options;
+  private UdpTcpOptions.SubOptions options;
   /**
    * 远程主机地址
    */
@@ -42,7 +42,7 @@ public class UdpTcpProxyServer extends UdpNettyServer {
    */
   private final AttributeKey<List<UdpTcpClient>> clientsKey = AttributeKey.valueOf("clientsKey");
 
-  public UdpTcpProxyServer(UdpTcpOptions options) {
+  public UdpTcpProxyServer(UdpTcpOptions.SubOptions options) {
     this.options = options;
     this.remotes = Collections.synchronizedList(Arrays.stream(getOptions().getRemotes())
         .filter(StringUtils::isNotBlank)
@@ -53,7 +53,7 @@ public class UdpTcpProxyServer extends UdpNettyServer {
 
   @Override
   public UdpNettyServer useDefaultConfig() {
-    UdpTcpOptions ops = getOptions();
+    UdpTcpOptions.SubOptions ops = getOptions();
     this.useLinuxNativeEpoll(false);
     this.childHandler(new ChannelInitializer<Channel>() {
       @Override
@@ -103,7 +103,7 @@ public class UdpTcpProxyServer extends UdpNettyServer {
   protected void onClientChannelActive(Channel realityChannel) {
     if (!realityChannel.hasAttr(clientsKey)) {
       // 创建UDP客户端
-      final UdpTcpOptions ops = getOptions();
+      final UdpTcpOptions.SubOptions ops = getOptions();
       NioEventLoopGroup group = new NioEventLoopGroup(1);
       List<UdpTcpClient> clients = this.remotes.stream()
           .map(addr -> (UdpTcpClient) new UdpTcpClient()
@@ -218,11 +218,11 @@ public class UdpTcpProxyServer extends UdpNettyServer {
     return super.stop(listeners);
   }
 
-  public UdpTcpOptions getOptions() {
+  public UdpTcpOptions.SubOptions getOptions() {
     return options;
   }
 
-  public void setOptions(UdpTcpOptions options) {
+  public void setOptions(UdpTcpOptions.SubOptions options) {
     this.options = options;
   }
 

@@ -5,6 +5,7 @@ import com.benefitj.core.SingletonSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
@@ -163,6 +164,20 @@ public class SpringCtxHolder {
    */
   public static Environment getEnvironment() {
     return getCtx().getEnvironment();
+  }
+
+  /**
+   * 绑定配置
+   *
+   * @param prefix 前缀
+   * @param clazz  class类
+   * @return 返回绑定的配置
+   */
+  public static <T> T bind(String prefix, Class<T> clazz) {
+    Environment env = getEnvironment();
+    return Binder.get(env)
+        .bind(prefix, clazz)
+        .orElse(null);
   }
 
   /**

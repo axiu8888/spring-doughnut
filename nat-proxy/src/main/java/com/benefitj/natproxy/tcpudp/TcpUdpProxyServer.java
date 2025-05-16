@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 public class TcpUdpProxyServer extends TcpNettyServer {
 
-  private TcpUdpOptions options;
+  private TcpUdpOptions.SubOptions options;
   /**
    * 远程主机地址
    */
@@ -40,7 +40,7 @@ public class TcpUdpProxyServer extends TcpNettyServer {
    */
   private final AttributeKey<List<TcpUdpClient>> clientsKey = AttributeKey.valueOf("clientsKey");
 
-  public TcpUdpProxyServer(TcpUdpOptions options) {
+  public TcpUdpProxyServer(TcpUdpOptions.SubOptions options) {
     this.options = options;
     this.remotes = Collections.synchronizedList(Arrays.stream(getOptions().getRemotes())
         .filter(StringUtils::isNotBlank)
@@ -55,7 +55,7 @@ public class TcpUdpProxyServer extends TcpNettyServer {
     this.childHandler(new ChannelInitializer<Channel>() {
       @Override
       protected void initChannel(Channel ch) throws Exception {
-        final TcpUdpOptions ops = getOptions();
+        final TcpUdpOptions.SubOptions ops = getOptions();
         ch.pipeline()
             .addLast(ShutdownEventHandler.INSTANCE)
             .addLast(IdleStateEventHandler.newIdle(ops.getReaderTimeout(), ops.getWriterTimeout(), 0, TimeUnit.SECONDS))
@@ -209,11 +209,11 @@ public class TcpUdpProxyServer extends TcpNettyServer {
     return super.stop(listeners);
   }
 
-  public TcpUdpOptions getOptions() {
+  public TcpUdpOptions.SubOptions getOptions() {
     return options;
   }
 
-  public void setOptions(TcpUdpOptions options) {
+  public void setOptions(TcpUdpOptions.SubOptions options) {
     this.options = options;
   }
 

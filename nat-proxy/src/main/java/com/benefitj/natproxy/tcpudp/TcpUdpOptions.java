@@ -11,7 +11,18 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class TcpUdpOptions extends ProxyOptions {
+@EqualsAndHashCode(callSuper = true)
+public class TcpUdpOptions extends ProxyOptions<TcpUdpOptions.SubOptions> {
+
+
+
+  @SuperBuilder
+  @NoArgsConstructor
+  @Data
+  @EqualsAndHashCode(callSuper = true)
+  public static class SubOptions extends ProxyOptions.Sub {
+
+  }
+
 }

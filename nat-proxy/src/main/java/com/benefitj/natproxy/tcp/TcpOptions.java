@@ -12,23 +12,31 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class TcpOptions extends ProxyOptions {
-  /**
-   * 是否自动重连，对于部分连接，重连可能会导致错误
-   */
-  @Builder.Default
-  boolean autoReconnect = false;
-  /**
-   * 自动重连的时间
-   */
-  @Builder.Default
-  Integer reconnectDelay = 3;
-  /**
-   * 是否快速失败
-   */
-  @Builder.Default
-  boolean fastFailover = false;
+@EqualsAndHashCode(callSuper = true)
+public class TcpOptions extends ProxyOptions<TcpOptions.SubOptions> {
+
+
+  @SuperBuilder
+  @NoArgsConstructor
+  @Data
+  @EqualsAndHashCode(callSuper = true)
+  public static class SubOptions extends Sub {
+    /**
+     * 是否自动重连，对于部分连接，重连可能会导致错误
+     */
+    @Builder.Default
+    boolean autoReconnect = false;
+    /**
+     * 自动重连的时间
+     */
+    @Builder.Default
+    Integer reconnectDelay = 3;
+    /**
+     * 是否快速失败
+     */
+    @Builder.Default
+    boolean fastFailover = false;
+  }
 
 }

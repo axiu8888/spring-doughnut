@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  */
 public class TcpProxyServer extends TcpNettyServer {
 
-  private TcpOptions options;
+  private TcpOptions.SubOptions options;
   /**
    * 远程主机地址
    */
@@ -43,7 +43,7 @@ public class TcpProxyServer extends TcpNettyServer {
    */
   private final AttributeKey<List<TcpClient>> clientsKey = AttributeKey.valueOf("clientsKey");
 
-  public TcpProxyServer(TcpOptions options) {
+  public TcpProxyServer(TcpOptions.SubOptions options) {
     this.options = options;
     this.remotes = Collections.synchronizedList(Arrays.stream(getOptions().getRemotes())
         .filter(StringUtils::isNotBlank)
@@ -58,7 +58,7 @@ public class TcpProxyServer extends TcpNettyServer {
     this.childHandler(new ChannelInitializer<Channel>() {
       @Override
       protected void initChannel(Channel ch) throws Exception {
-        final TcpOptions ops = TcpProxyServer.this.options;
+        final TcpOptions.SubOptions ops = TcpProxyServer.this.options;
         ch.pipeline()
             .addLast(ShutdownEventHandler.INSTANCE)
             .addLast(IdleStateEventHandler.newIdle(ops.getReaderTimeout(), ops.getWriterTimeout(), 0, TimeUnit.SECONDS))
@@ -109,7 +109,7 @@ public class TcpProxyServer extends TcpNettyServer {
     if (!realityChannel.hasAttr(clientsKey)) {
       // 创建TCP客户端
       NioEventLoopGroup group = new NioEventLoopGroup(1);
-      TcpOptions ops = this.getOptions();
+      TcpOptions.SubOptions ops = this.getOptions();
       List<TcpClient> clients = this.remotes.stream()
           .map(addr -> (TcpClient) new TcpClient()
               .setActiveHandler(ops.isFastFailover() ?
@@ -221,11 +221,11 @@ public class TcpProxyServer extends TcpNettyServer {
     return super.stop(listeners);
   }
 
-  public TcpOptions getOptions() {
+  public TcpOptions.SubOptions getOptions() {
     return options;
   }
 
-  public void setOptions(TcpOptions options) {
+  public void setOptions(TcpOptions.SubOptions options) {
     this.options = options;
   }
 

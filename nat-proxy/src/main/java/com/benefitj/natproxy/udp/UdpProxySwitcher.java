@@ -6,6 +6,8 @@ import com.benefitj.natproxy.NatLogger;
 import com.benefitj.natproxy.ProxySwitcher;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class UdpProxySwitcher implements ProxySwitcher {
@@ -13,36 +15,39 @@ public class UdpProxySwitcher implements ProxySwitcher {
   final ILogger log = NatLogger.get();
 
 
-  UdpOptions options;
-  UdpProxyServer server;
+  final List<UdpProxyServer> servers = new LinkedList<>();
+  final UdpOptions options;
 
-  public UdpProxySwitcher(UdpOptions options, UdpProxyServer server) {
+  public UdpProxySwitcher(UdpOptions options) {
     this.options = options;
-    this.server = server;
   }
 
   @Override
   public void startServer() {
     try {
       if (!options.isEnable()) return;
-      Integer port = options.getPort();
-      if (port == null) {
-        throw new IllegalStateException("本地监听端口不能为空!");
-      }
+      for (UdpOptions.SubOptions so : options.getProxy()) {
+        Integer port = so.getPort();
+        if (port == null) {
+          throw new IllegalStateException("本地监听端口不能为空!");
+        }
 
-      String[] remotes = options.getRemotes();
-      if (remotes == null || remotes.length < 1) {
-        throw new IllegalStateException("远程主机地址不能为空!");
-      }
+        String[] remotes = so.getRemotes();
+        if (remotes == null || remotes.length < 1) {
+          throw new IllegalStateException("远程主机地址不能为空!");
+        }
 
-      server.localAddress(port);
-      server.start(f ->
-          log.info("udp proxy started, local port: {}, remotes: {}, success: {}"
-              , options.getPort()
-              , Arrays.toString(remotes)
-              , f.isSuccess()
-          )
-      );
+        UdpProxyServer server = new UdpProxyServer(so);
+        server.localAddress(port);
+        server.start(f ->
+            log.info("udp proxy started, local port: {}, remotes: {}, success: {}"
+                , so.getPort()
+                , Arrays.toString(remotes)
+                , f.isSuccess()
+            )
+        );
+        this.servers.add(server);
+      }
     } catch (Exception e) {
       log.error("throws: " + e.getMessage(), e);
       // 5秒后停止
@@ -57,13 +62,19 @@ public class UdpProxySwitcher implements ProxySwitcher {
       if (!options.isEnable()) {
         return;
       }
-      server.stop(f ->
-          log.info("udp proxy stopped, local port: {}, remotes: {}, success: {}"
-              , options.getPort()
-              , Arrays.toString(options.getRemotes())
-              , f.isSuccess()
-          )
-      );
+      for (UdpProxyServer server : servers) {
+        try {
+          server.stop(f ->
+              log.info("udp proxy stopped, local port: {}, remotes: {}, success: {}"
+                  , server.getOptions().getPort()
+                  , Arrays.toString(server.getOptions().getRemotes())
+                  , f.isSuccess()
+              )
+          );
+        } catch (Exception e) {
+          log.error("UDP[" + server.getOptions().getPort() +"] throws: " + e.getMessage(), e);
+        }
+      }
     } catch (Exception e) {
       log.error("throws: " + e.getMessage(), e);
       System.exit(0);

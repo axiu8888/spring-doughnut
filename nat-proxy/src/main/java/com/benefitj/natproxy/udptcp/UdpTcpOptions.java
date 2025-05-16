@@ -12,17 +12,26 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UdpTcpOptions extends ProxyOptions {
-  /**
-   * 是否自动重连，对于部分连接，重连可能会导致错误
-   */
-  @Builder.Default
-  Boolean autoReconnect = false;
-  /**
-   * 自动重连的时间
-   */
-  @Builder.Default
-  Integer reconnectDelay = 3;
+@EqualsAndHashCode(callSuper = true)
+public class UdpTcpOptions extends ProxyOptions<UdpTcpOptions.SubOptions> {
+
+
+  @SuperBuilder
+  @NoArgsConstructor
+  @Data
+  @EqualsAndHashCode(callSuper = true)
+  public static class SubOptions extends ProxyOptions.Sub {
+    /**
+     * 是否自动重连，对于部分连接，重连可能会导致错误
+     */
+    @Builder.Default
+    Boolean autoReconnect = false;
+    /**
+     * 自动重连的时间
+     */
+    @Builder.Default
+    Integer reconnectDelay = 3;
+  }
+
 }

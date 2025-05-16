@@ -26,21 +26,12 @@ public class TcpConfiguration {
   }
 
   /**
-   * TCP服务端
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public TcpProxyServer tcpProxyServer(TcpOptions options) {
-    return new TcpProxyServer(options);
-  }
-
-  /**
    * 开关
    */
   @ConditionalOnMissingBean
   @Bean
-  public TcpProxySwitcher tcpProxySwitcher(TcpOptions options, TcpProxyServer server) {
-    return new TcpProxySwitcher(options, server);
+  public TcpProxySwitcher tcpProxySwitcher(TcpOptions options) {
+    return new TcpProxySwitcher(options);
   }
 
   /**

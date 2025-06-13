@@ -1,5 +1,7 @@
 package com.benefitj.spring;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.CatchUtils;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
@@ -17,12 +19,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Servlet工具
@@ -102,13 +105,6 @@ public class ServletUtils {
   }
 
   /**
-   * 获取当前请求的参数
-   */
-  public static Map<String, String[]> getParameterMap() {
-    return getRequest().getParameterMap();
-  }
-
-  /**
    * 获取当前请求路径
    */
   public static String getPath() {
@@ -179,10 +175,117 @@ public class ServletUtils {
     return StringUtils.isNotBlank(contentType) && contentType.startsWith("multipart/form-data; boundary=");
   }
 
-//  public static String getContentDisposition(HttpServletRequest request) {
-//    Enumeration<String> headers = request.getHeaders("Content-Disposition");
-//    return headers
-//  }
+  /**
+   * 获取当前请求的参数
+   */
+  public static Map<String, String[]> getParameterMap() {
+    return getParameterMap(getRequest());
+  }
+
+  /**
+   * 获取当前请求的参数
+   */
+  public static Map<String, String[]> getParameterMap(HttpServletRequest request) {
+    return request.getParameterMap();
+  }
+
+  /**
+   * 将请求的参数转换为JSON
+   */
+  public static JSONObject parametersToJSON(HttpServletRequest request) {
+    return parametersToJSON(getParameterMap(request));
+  }
+
+  /**
+   * 将请求的参数转换为JSON
+   */
+  public static JSONObject parametersToJSON(Map<String, String[]> map) {
+    JSONObject json = new JSONObject(new LinkedHashMap<>());
+    map.forEach((k, v) -> {
+      if (v == null) json.put(k, null);
+      else if (v.length == 1) json.put(k, v[0]);
+      else if (v.length > 1) json.put(k, JSON.parseArray(JSON.toJSONString(v)));
+    });
+    return json;
+  }
+
+  /**
+   * 获取当前请求的 parts
+   */
+  public static Map<String, List<Part>> getParts() {
+    return getParts(getRequest());
+  }
+
+  public static InputStream getInputStream(Part part) {
+    try {
+      return part.getInputStream();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 获取当前请求的 parts
+   */
+  public static Map<String, List<Part>> getParts(HttpServletRequest request) {
+    try {
+      if (!isMultiPart(request)) return new LinkedHashMap<>();
+      final Map<String, List<Part>> map = new LinkedHashMap<>();
+      for (Part part : request.getParts()) {
+        List<Part> values = map.get(part.getName());
+        if (values == null) map.put(part.getName(), values = new ArrayList<>());
+        values.add(part);
+      }
+      return map;
+    } catch (Throwable e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * 获取当前请求的 parts 转换为表单的数据
+   */
+  public static Map<String, List<String>> getForms() {
+    return getForms(getRequest());
+  }
+
+  /**
+   * 获取当前请求的 parts 转换为表单的数据
+   */
+  public static Map<String, List<String>> getForms(HttpServletRequest request) {
+    final Map<String, List<String>> map = new LinkedHashMap<>();
+    getParts(request).forEach((name, parts) -> {
+      List<String> values = parts.stream()
+          .filter(part -> StringUtils.isBlank(part.getSubmittedFileName()))
+          .map(part -> IOUtils.readAsString(getInputStream(part), StandardCharsets.UTF_8))
+          .collect(Collectors.toList());
+      if (!values.isEmpty()) map.put(name, values);
+    });
+    return map;
+  }
+
+  /**
+   * 获取当前请求上传的文件
+   */
+  public static Map<String, List<MultipartFile>> getFiles() {
+    return getFiles(getRequest());
+  }
+
+  /**
+   * 获取当前请求上传的文件
+   */
+  public static Map<String, List<MultipartFile>> getFiles(HttpServletRequest request) {
+    final Map<String, List<MultipartFile>> map = new LinkedHashMap<>();
+    getParts(request).forEach((name, parts) -> {
+      List<MultipartFile> values = parts
+          .stream()
+          .filter(part -> StringUtils.isNotBlank(part.getSubmittedFileName()))
+          .map(StandardMultipartFile::new)
+          .collect(Collectors.toList());
+      if (!values.isEmpty()) map.put(name, values);
+    });
+    return map;
+  }
 
   /**
    * 获取当前请求的IP地址
@@ -662,4 +765,66 @@ public class ServletUtils {
   }
 
 
+  static class StandardMultipartFile implements MultipartFile, Serializable {
+
+    private final Part part;
+
+    public StandardMultipartFile(Part part) {
+      this.part = part;
+    }
+
+    @Override
+    public String getName() {
+      return this.part.getName();
+    }
+
+    @Override
+    public String getOriginalFilename() {
+      return this.part.getSubmittedFileName();
+    }
+
+    @Override
+    public String getContentType() {
+      return this.part.getContentType();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return (this.part.getSize() == 0);
+    }
+
+    @Override
+    public long getSize() {
+      return this.part.getSize();
+    }
+
+    @Override
+    public byte[] getBytes() throws IOException {
+      return IOUtils.readAsBytes(this.part.getInputStream());
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+      return this.part.getInputStream();
+    }
+
+    @Override
+    public void transferTo(File dest) throws IOException, IllegalStateException {
+      this.part.write(dest.getPath());
+      if (dest.isAbsolute() && !dest.exists()) {
+        // Servlet 3.0 Part.write is not guaranteed to support absolute file paths:
+        // may translate the given path to a relative location within a temp dir
+        // (e.g. on Jetty whereas Tomcat and Undertow detect absolute paths).
+        // At least we offloaded the file from memory storage; it'll get deleted
+        // from the temp dir eventually in any case. And for our user's purposes,
+        // we can manually copy it to the requested location as a fallback.
+        IOUtils.write(this.part.getInputStream(), Files.newOutputStream(dest.toPath()));
+      }
+    }
+
+    @Override
+    public void transferTo(Path dest) throws IOException, IllegalStateException {
+      IOUtils.write(this.part.getInputStream(), Files.newOutputStream(dest));
+    }
+  }
 }

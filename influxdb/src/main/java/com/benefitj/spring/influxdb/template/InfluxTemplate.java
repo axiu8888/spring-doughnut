@@ -482,6 +482,28 @@ public interface InfluxTemplate {
   }
 
   /**
+   * 获取数据库（默认全部）
+   */
+  default List<String> showDatabases() {
+    return showDatabases(false);
+  }
+
+  /**
+   * 获取数据库
+   *
+   * @param owner 是否仅获取自己的
+   * @return 返回数据库
+   */
+  default List<String> showDatabases(boolean owner) {
+    return getObjectsStream(postQuery("SHOW DATABASES"))
+        .flatMap(Collection::stream)
+        .map(String::valueOf)
+        .filter(db -> !db.startsWith("_internal"))
+        .filter(db -> !owner || db.startsWith(getDatabase()))
+        .collect(Collectors.toList());
+  }
+
+  /**
    * 获取全部的持续查询
    */
   default List<ContinuousQuery> getContinuousQueries() {
@@ -1085,11 +1107,11 @@ public interface InfluxTemplate {
       return false;
     }
     String clause = (""
-        + (startTime != null ? "time >= '" + DateFmtter.fmtUtcS(startTime) + "'" : "")
-        + (endTime != null ? "AND time <= '" + DateFmtter.fmtUtcS(endTime) + "'" : "")
+        + (startTime != null ? " AND time >= '" + DateFmtter.fmtUtcS(startTime) + "'" : "")
+        + (endTime != null ? " AND time <= '" + DateFmtter.fmtUtcS(endTime) + "'" : "")
         + condition).trim();
     String sql = "SELECT * FROM \"" + measurement + "\" " + String.join(" ",
-        clause.isEmpty() ? clause : (clause.startsWith("WHERE") || clause.startsWith("where") ? clause : "WHERE " + clause)
+        clause.isEmpty() ? clause : (clause.startsWith("WHERE") || clause.startsWith("where") ? clause : "WHERE 1=1 " + clause)
     );
     AtomicReference<Throwable> error = new AtomicReference<>();
     Disposable disposable = query(db, sql, chunkSize)

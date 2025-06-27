@@ -3,6 +3,8 @@ package com.benefitj.examples.controller;
 
 import com.benefitj.core.EventLoop;
 import com.benefitj.spring.aop.web.AopWebPointCut;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+@Api(tags = "测试SSE")
 @AopWebPointCut
 @RestController
 @RequestMapping("/sse")
@@ -42,6 +45,8 @@ public class SSEController implements InitializingBean, DisposableBean {
     EventLoop.cancel(taskRef.getAndSet(null));
   }
 
+
+  @ApiOperation("连接SSE")
   // 客户端连接端点
   @GetMapping(path = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter connect(@ApiParam("请求ID") String id) {

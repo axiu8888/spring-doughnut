@@ -149,7 +149,7 @@ public class SimpleController {
   @PostMapping("/uploadStream")
   public JSONObject testUploadStream(HttpServletRequest request,
                                      @ApiParam("文件名") @RequestParam String filename) throws IOException {
-    File dest = IOUtils.createFile("D:/tmp/cache/" + filename);
+    File dest = IOUtils.createFile("D:/cache/.tmp/" + filename);
     try {
       ServletInputStream in = request.getInputStream();
       IOUtils.write(in, dest);
@@ -171,7 +171,7 @@ public class SimpleController {
   @PostMapping(value = "/write", consumes = {"application/octet-stream;charset=UTF-8"})
   public void write(HttpServletRequest request) throws IOException {
     ServletInputStream in = request.getInputStream();
-    IOUtils.write(in, IOUtils.createFile("D:/tmp/cache/znsx/temp", IdUtils.uuid() +".line"));
+    IOUtils.write(in, IOUtils.createFile("D:/cache/.tmp/znsx/temp", IdUtils.uuid() +".line"));
   }
 
 }

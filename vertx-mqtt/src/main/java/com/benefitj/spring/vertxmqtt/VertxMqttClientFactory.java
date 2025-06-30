@@ -4,6 +4,8 @@ import com.benefitj.core.AutoConnectTimer;
 import com.benefitj.core.IdUtils;
 import com.benefitj.core.ReflectUtils;
 import com.benefitj.vertx.mqtt.client.VertxMqttClient;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.SocketAddress;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -79,7 +81,8 @@ public interface VertxMqttClientFactory<T extends VertxMqttClient> {
   static <T extends VertxMqttClient> T setup(T client,
                                              MqttClientOptions options) {
     MqttClientOptions.AutoReconnect reconnect = options.getAutoReconnect();
-    client.setRemoteAddress(options.getHost(), options.getPort())
+    client
+        .remoteAddress(SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
         .setAutoConnectTimer(new AutoConnectTimer()
             .setAutoConnect(reconnect.isAuto(), reconnect.getInterval()));
     client.getOptions()
@@ -88,7 +91,7 @@ public interface VertxMqttClientFactory<T extends VertxMqttClient> {
         .setPassword(options.getPassword())
         .setCleanSession(options.isCleanSession())
         .setWillTopic(options.getWillTopic())
-        .setWillMessage(StringUtils.getIfBlank(options.getWillMessage(), () -> ""))
+        .setWillMessageBytes(Buffer.buffer(StringUtils.getIfBlank(options.getWillMessage(), () -> "")))
         .setWillFlag(options.isWillFlag())
         .setWillQoS(options.getWillQos())
         .setWillRetain(options.isWillRetain())

@@ -201,7 +201,7 @@ class InfluxDBApiTest {
 
   @Test
   void testWriteFile() {
-    template.write(new File("D:/tmp/cache/influxdb/hs_alarm.line"));
+    template.write(new File("D:/.tmp/cache/influxdb/hs_alarm.line"));
   }
 
   private String generateLine() {
@@ -253,7 +253,7 @@ class InfluxDBApiTest {
 
   @Test
   void testQueryChunk() {
-    IWriter writer = IWriter.createWriter("D:/tmp/cache/influxdb/" + IdUtils.uuid() + ".line", false);
+    IWriter writer = IWriter.create("D:/.tmp/cache/influxdb/" + IdUtils.uuid() + ".line", false);
     template.query("SELECT * FROM hs_wave_package WHERE time >= 1d GROUP BY person_zid LIMIT 100;", 10)
         .subscribe(new QueryObserver() {
           @Override
@@ -366,7 +366,7 @@ class InfluxDBApiTest {
 //            .collect(Collectors.joining(" OR "))
 //        + ")";
 //    String condition = "";
-    File dir = IOUtils.createFile("D:/tmp/cache/influxdb", true);
+    File dir = IOUtils.createFile("D:/.tmp/cache/influxdb", true);
     exportAll(template, dir, startTime, endTime, condition, name -> !name.endsWith("_point"));
 
   }
@@ -401,7 +401,7 @@ class InfluxDBApiTest {
   @Test
   void test_loadLines() {
 //    test_createSubscriptions();
-    File dir = new File("D:/tmp/cache/influxdb");
+    File dir = new File("D:/.tmp/cache/influxdb");
     File[] lines = dir.listFiles(f -> f.length() > 20
         //&& f.getName().endsWith(".line")
         //&& f.getName().endsWith(".point")
@@ -429,7 +429,7 @@ class InfluxDBApiTest {
    */
   @Test
   void test_parseLine2() {
-    File lineFile = new File("D:/tmp/cache/influxdb/hs_darma_mattress.line");
+    File lineFile = new File("D:/.tmp/cache/influxdb/hs_darma_mattress.line");
 //    String type = "hr";
     String type = "rr";
     List<Integer> points = IOUtils.readLines(IOUtils.newBufferedReader(lineFile, StandardCharsets.UTF_8))
@@ -439,7 +439,7 @@ class InfluxDBApiTest {
         .filter(Objects::nonNull)
         .flatMap(Stream::of)
         .collect(Collectors.toList());
-    IWriter writer = IWriter.createWriter(IOUtils.createFile(lineFile.getParentFile(), lineFile.getName().replace(".line", "_" + type + ".csv")), false);
+    IWriter writer = IWriter.create(IOUtils.createFile(lineFile.getParentFile(), lineFile.getName().replace(".line", "_" + type + ".csv")), false);
     String jsonString = JSON.toJSONString(points);
     writer.write(jsonString.substring(1, jsonString.length() - 2)).flush();
     writer.close();
@@ -450,13 +450,13 @@ class InfluxDBApiTest {
    */
   @Test
   void test_WaveToPoints() {
-    File dir = IOUtils.createFile("D:/tmp/cache/influxdb", true);
+    File dir = IOUtils.createFile("D:/.tmp/cache/influxdb", true);
 
     InfluxOptions srcOptions = BeanHelper.copy(options);
-    srcOptions.setUrl("http://39.98.251.12:58086");
+//    srcOptions.setUrl("http://39.98.251.12:58086");
 //    srcOptions.setUrl("http://research.sensecho.com:58086");
 //    srcOptions.setUrl("http://192.168.1.211:58039");
-//    srcOptions.setUrl("http://192.168.1.198:58086");
+    srcOptions.setUrl("http://192.168.1.198:58086");
     srcOptions.setDatabase("hsrg");
     srcOptions.setUsername("admin");
     srcOptions.setPassword("hsrg8888");
@@ -683,7 +683,7 @@ class InfluxDBApiTest {
         ", first(z_points) AS z" +
         " FROM hs_wave_package" + clause + " GROUP BY time(1s) fill(null)";
     log.info("sql: \n{}\n", sql);
-    IWriter writer = IWriter.createWriter(IOUtils.createFile("D:/tmp/sleepData.dat"), false);
+    IWriter writer = IWriter.create(IOUtils.createFile("D:/.tmp/cache/sleepData.dat"), false);
     template.query(sql)
         .subscribe(new QueryObserver() {
           @Override
@@ -718,7 +718,7 @@ class InfluxDBApiTest {
 
   @Test
   void test_Spo2() {
-    IWriter writer = IWriter.createWriter(new File("D:/tmp/cache/influxdb/tmp.txt"), false);
+    IWriter writer = IWriter.create(new File("D:/.tmp/cache/influxdb/tmp.txt"), false);
     template.query("select * from hs_oximeter_package where time > now() - 1d")
         .subscribe(new QueryObserver() {
           JSONObject json = new JSONObject(new LinkedHashMap());
@@ -736,19 +736,19 @@ class InfluxDBApiTest {
 
   @Test
   void test_write() {
-    String base64 = IOUtils.readAsString(new File("D:/tmp/cache/influxdb/base64.txt"));
+    String base64 = IOUtils.readAsString(new File("D:/.tmp/cache/influxdb/base64.txt"));
     byte[] decode = Base64.getDecoder().decode(base64);
     String str = new String(decode, StandardCharsets.UTF_8);
     JSONObject json = JSON.parseObject(str);
     byte[] pdf = Base64.getDecoder().decode(json.getJSONObject("postDataReport").getString("PDFContent"));
-    IOUtils.write(pdf, new File("D:/tmp/cache/influxdb/test.pdf"), true);
+    IOUtils.write(pdf, new File("D:/.tmp/cache/influxdb/test.pdf"), true);
     log.info("str ==>: {}", str);
   }
 
 
 //  @Test
 //  void test_parse() {
-//    List<JSONObject> list = IOUtils.readLines(new File("D:/tmp/cache/data.txt"))
+//    List<JSONObject> list = IOUtils.readLines(new File("D:/.tmp/cache/data.txt"))
 //        .stream()
 //        .map(line -> line.split("\t"))
 //        .map(arr -> new JSONObject(){{
@@ -765,7 +765,7 @@ class InfluxDBApiTest {
 //    log.info(" ==>: \n{}", JSON.toJSONString(list));
 //
 //    for (JSONObject json : list) {
-//      File dir = IOUtils.mkDirs("D:/tmp/cache/data/" + json.getString("personName"));
+//      File dir = IOUtils.mkDirs("D:/.tmp/cache/data/" + json.getString("personName"));
 //      log.info("dir: {}, json: {}", dir, json.toJSONString());
 //      long startTime = DateFmtter.parseToLong(json.getString("startTime"), "yyyy-MM-dd HH:mm:ss.SSS");
 //      long endTime = "finish".equalsIgnoreCase(json.getString("status"))

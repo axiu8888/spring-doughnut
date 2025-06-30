@@ -73,7 +73,7 @@ public class EventPublisher {
       List<Splicer> splicers = SplicerParser.parse(pattern);
       for (Splicer splicer : splicers) {
         if (splicer.isPlaceholder()) {
-          Field field = ReflectUtils.getField(type, f -> {
+          Field field = ReflectUtils.findFirstField(type, f -> {
             if (f.isAnnotationPresent(TopicPlaceholder.class)) {
               TopicPlaceholder flag = f.getAnnotation(TopicPlaceholder.class);
               return flag.name().equals(splicer.getName());

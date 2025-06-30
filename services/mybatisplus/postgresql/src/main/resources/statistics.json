@@ -1,6 +1,6 @@
 {
   //"outDir": "./statistics/",
-  "outDir": "D:/tmp/cache/statistics/",
+  "outDir": "D:/.tmp/cache/statistics/",
   // 开始的日期
   "startDate": "2020-01-01",
   // 结束的日期

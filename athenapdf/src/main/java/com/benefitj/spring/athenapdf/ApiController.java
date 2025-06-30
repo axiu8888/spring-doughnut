@@ -198,19 +198,19 @@ public class ApiController {
     }
 
     public String getUrl() {
-      return getAttribute("url");
+      return getAttr("url");
     }
 
     public void setUrl(String url) {
-      this.setAttribute("url", url);
+      this.setAttr("url", url);
     }
 
     public File getPdf() {
-      return getAttribute("pdf");
+      return getAttr("pdf");
     }
 
     public void setPdf(File pdf) {
-      this.setAttribute("pdf", pdf);
+      this.setAttr("pdf", pdf);
     }
 
   }

@@ -1,13 +1,23 @@
 package com.benefitj.examples;
 
+import com.benefitj.core.EventLoop;
+import com.benefitj.core.IOUtils;
+import com.benefitj.core.PlaceHolder;
 import com.benefitj.spring.ctx.EnableSpringCtxInit;
 import com.benefitj.spring.eventbus.EnableEventBusPoster;
 import com.benefitj.spring.listener.AppStateHook;
 import com.benefitj.spring.redis.EnableRedisMessageListener;
 import lombok.extern.slf4j.Slf4j;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
+
+import java.nio.charset.Charset;
+import java.util.concurrent.TimeUnit;
 
 
 @EnableSpringCtxInit
@@ -31,7 +41,56 @@ public class SpringbootDoughnutApplication {
         evt -> log.info("app started ..."),
         evt -> log.info("app stopped ...")
     );
-    //AppStateHook.registerStart(evt -> onStart(evt));
+    //AppStateHook.registerStart(evt -> terminal());
+  }
+
+  static void terminal() {
+    EventLoop.asyncIO(() -> {
+      try {
+        System.out.println("================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================");
+        //System.getenv().forEach((key, value) -> System.out.println(PlaceHolder.get().format("{}  -->: {}", key, value)));
+        System.getProperties().forEach((key, value) -> System.out.println(PlaceHolder.get().format("{}  -->: {}", key, value)));
+        System.out.println("================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================");
+
+        // Create a terminal
+        Terminal terminal = TerminalBuilder.builder()
+            .system(true)
+            .build();
+
+        // Create line reader
+        LineReader reader = LineReaderBuilder.builder()
+            .terminal(terminal)
+            .build();
+
+        for(;;) {
+          try {
+            Charset charset = Charset.forName(System.getProperty("native.encoding", "UTF-8"));
+            // Prompt and read input
+            String inputContent = reader.readLine("JLine > ");
+            // Print the result
+            System.out.println("You entered: " + inputContent + ", encode: " + charset);
+            final Process process = Runtime.getRuntime().exec(inputContent);
+            while (process.isAlive()) {
+              try {
+                IOUtils.readLines(IOUtils.wrapReader(process.getInputStream(), charset), false, (line, num) -> {
+                  log.info("is [{}] -->: {}", num, line);
+                });
+                IOUtils.readLines(IOUtils.wrapReader(process.getErrorStream(), charset), false, (line, num) -> {
+                  log.info("err [{}] -->: {}", num, line);
+                });
+                EventLoop.sleepSecond(1);//等待1秒
+              } catch (Throwable e) {
+                log.error("throw: " + e.getMessage(), e);
+              }
+            }
+          } catch (Throwable e) {
+            log.error("throw: " + e.getMessage(), e);
+          }
+        }
+      } catch (Exception e) {
+        log.error("throw: " + e.getMessage(), e);
+      }
+    }, 5, TimeUnit.SECONDS);
   }
 
 //  private static void onStart(ApplicationReadyEvent evt) {

@@ -13,21 +13,20 @@ import org.springframework.web.socket.TextMessage;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-@Slf4j
 @Component
 @WebSocketEndpoint({"/sockets/simple"})
+@Slf4j
 public class SimpleWebSocket implements WebSocketListener {
 
-  public static final AtomicReference<WebSocketManager> managerRef = new AtomicReference<>();
+  public static final AtomicReference<WebSocketManager> MANAGER_HOLDER = new AtomicReference<>();
 
   public static WebSocketManager getManager() {
-    return managerRef.get();
+    return MANAGER_HOLDER.get();
   }
 
   @Override
   public void onWebSocketManager(WebSocketManager manager) {
-    if (managerRef.get() == null) {
-      managerRef.set(manager);
+    if (MANAGER_HOLDER.compareAndSet(null, manager)) {
       log.info("onWebSocketManager: {}", manager.getClass());
     }
   }

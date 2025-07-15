@@ -27,7 +27,12 @@ public @interface WebSocketEndpoint {
   /**
    * 允许的域
    */
-  String[] allowedOrigins() default "*";
+  String[] allowedOrigins() default {"*"};
+
+//  /**
+//   * 允许的域模式: * 、 ws://** 、 wss://**
+//   */
+//  String[] allowedOriginPatterns() default {"*"};
 
   /**
    * 拦截器

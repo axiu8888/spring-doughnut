@@ -1,21 +1,25 @@
 package com.benefitj.natproxy.tcp;
 
+import com.benefitj.core.CatchUtils;
 import com.benefitj.core.HexUtils;
 import com.benefitj.netty.client.TcpNettyClient;
-import com.benefitj.netty.handler.*;
+import com.benefitj.netty.handler.ActiveHandler;
+import com.benefitj.netty.handler.IdleStateEventHandler;
+import com.benefitj.netty.handler.InboundHandler;
+import com.benefitj.netty.handler.ShutdownEventHandler;
 import com.benefitj.netty.server.TcpNettyServer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
 import java.time.Duration;
@@ -57,6 +61,7 @@ public class TcpProxyServer extends TcpNettyServer {
       protected void initChannel(Channel ch) throws Exception {
         final TcpOptions.SubOptions ops = TcpProxyServer.this.options;
         ch.pipeline()
+            .addFirst(new LoggingHandler(LogLevel.DEBUG)) // 添加到管道首位
             .addLast(ShutdownEventHandler.INSTANCE)
             .addLast(IdleStateEventHandler.newIdle(ops.getReaderTimeout(), ops.getWriterTimeout(), 0, TimeUnit.SECONDS))
             .addLast(IdleStateEventHandler.newCloseHandler())
@@ -88,7 +93,7 @@ public class TcpProxyServer extends TcpNettyServer {
             .addLast(new ChannelInboundHandlerAdapter() {
               @Override
               public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                cause.printStackTrace();
+                log.error("[error] {} -->: {}", ctx.channel().remoteAddress(), CatchUtils.getLogStackTrace(cause));
               }
             })
         ;
@@ -115,10 +120,6 @@ public class TcpProxyServer extends TcpNettyServer {
                       realityChannel.close();
                     }
                   }) : null)
-              //发送数据
-              .setOutboundHandler(OutboundHandler.newByteBufHandler((handler, ctx, msg, promise) -> {
-                ctx.writeAndFlush(msg, promise);
-              }))
               // 接收数据
               .setInboundHandler(InboundHandler.newByteBufHandler((rhandler, rctx, rmsg) -> {
                 onSendResponse(realityChannel, rhandler, rctx, rmsg);
@@ -126,6 +127,7 @@ public class TcpProxyServer extends TcpNettyServer {
               .group(group)
               .remoteAddress(addr)
               .autoReconnect(ops.isAutoReconnect(), Duration.ofSeconds(ops.getReconnectDelay()))
+              .option((ChannelOption) ChannelOption.IP_MULTICAST_ADDR, Inet4Address.class)
               .start(f ->
                   log.info("[tcp] client shadow started, reality: {}, shadow: {}, success: {}"
                       , realityChannel.remoteAddress(), addr, f.isSuccess())
@@ -237,7 +239,6 @@ public class TcpProxyServer extends TcpNettyServer {
   public static class TcpClient extends TcpNettyClient {
 
     private InboundHandler<ByteBuf> inboundHandler;
-    private OutboundHandler<ByteBuf> outboundHandler;
     private ActiveHandler activeChannelHandler;
 
     public TcpClient() {
@@ -250,15 +251,6 @@ public class TcpProxyServer extends TcpNettyServer {
 
     public InboundHandler<ByteBuf> getInboundHandler() {
       return inboundHandler;
-    }
-
-    public OutboundHandler<ByteBuf> getOutboundHandler() {
-      return outboundHandler;
-    }
-
-    public TcpClient setOutboundHandler(OutboundHandler<ByteBuf> outboundHandler) {
-      this.outboundHandler = outboundHandler;
-      return this;
     }
 
     public ActiveHandler getActiveHandler() {
@@ -285,7 +277,6 @@ public class TcpProxyServer extends TcpNettyServer {
               .addLast(ActiveHandler.newHandler((handler, ctx, state) ->
                   log.info("[tcp] client active change, state: {}, remote: {}", state, ch.remoteAddress())))
               .addLast(getInboundHandler())
-              .addFirst(getOutboundHandler())
               .addLast(new ChannelInboundHandlerAdapter() {
                 @Override
                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

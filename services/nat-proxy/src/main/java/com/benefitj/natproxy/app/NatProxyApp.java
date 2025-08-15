@@ -1,11 +1,14 @@
 package com.benefitj.natproxy.app;
 
 
+import com.benefitj.core.log.Slf4jLogger;
+import com.benefitj.natproxy.NatLogger;
 import com.benefitj.natproxy.tcp.EnableTcpProxy;
 import com.benefitj.natproxy.tcpudp.EnableTcpUdpProxy;
 import com.benefitj.natproxy.udp.EnableUdpProxy;
 import com.benefitj.natproxy.udptcp.EnableUdpTcpProxy;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -19,5 +22,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NatProxyApp {
   public static void main(String[] args) {
     SpringApplication.run(NatProxyApp.class, args);
+  }
+
+
+  static {
+    NatLogger.set(new Slf4jLogger(LoggerFactory.getLogger("NatProxy")));
   }
 }

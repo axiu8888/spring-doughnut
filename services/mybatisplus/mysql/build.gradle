@@ -14,10 +14,10 @@ dependencies {
       "io.springfox:springfox-boot-starter:${swaggerVersion}",
       "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
 
-      "org.springframework.boot:spring-boot-starter-web" ,
-      "org.springframework.boot:spring-boot-starter-websocket" ,
-      "org.springframework.boot:spring-boot-starter-security" ,
-      "org.springframework.boot:spring-boot-starter-data-jpa" ,
+      "org.springframework.boot:spring-boot-starter-web",
+      "org.springframework.boot:spring-boot-starter-websocket",
+      "org.springframework.boot:spring-boot-starter-security",
+      "org.springframework.boot:spring-boot-starter-data-jpa",
 
       "com.github.jsqlparser:jsqlparser:4.5",
       "com.github.pagehelper:pagehelper:5.3.2",

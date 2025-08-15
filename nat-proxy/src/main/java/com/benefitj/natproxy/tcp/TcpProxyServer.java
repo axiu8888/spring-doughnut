@@ -2,10 +2,7 @@ package com.benefitj.natproxy.tcp;
 
 import com.benefitj.core.HexUtils;
 import com.benefitj.netty.client.TcpNettyClient;
-import com.benefitj.netty.handler.ActiveHandler;
-import com.benefitj.netty.handler.IdleStateEventHandler;
-import com.benefitj.netty.handler.InboundHandler;
-import com.benefitj.netty.handler.ShutdownEventHandler;
+import com.benefitj.netty.handler.*;
 import com.benefitj.netty.server.TcpNettyServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -118,9 +115,14 @@ public class TcpProxyServer extends TcpNettyServer {
                       realityChannel.close();
                     }
                   }) : null)
-              // 处理响应的数据
-              .setInboundHandler(InboundHandler.newByteBufHandler(
-                  (rhandler, rctx, rmsg) -> onSendResponse(realityChannel, rhandler, rctx, rmsg)))
+              //发送数据
+              .setOutboundHandler(OutboundHandler.newByteBufHandler((handler, ctx, msg, promise) -> {
+                ctx.writeAndFlush(msg, promise);
+              }))
+              // 接收数据
+              .setInboundHandler(InboundHandler.newByteBufHandler((rhandler, rctx, rmsg) -> {
+                onSendResponse(realityChannel, rhandler, rctx, rmsg);
+              }))
               .group(group)
               .remoteAddress(addr)
               .autoReconnect(ops.isAutoReconnect(), Duration.ofSeconds(ops.getReconnectDelay()))
@@ -235,6 +237,7 @@ public class TcpProxyServer extends TcpNettyServer {
   public static class TcpClient extends TcpNettyClient {
 
     private InboundHandler<ByteBuf> inboundHandler;
+    private OutboundHandler<ByteBuf> outboundHandler;
     private ActiveHandler activeChannelHandler;
 
     public TcpClient() {
@@ -247,6 +250,15 @@ public class TcpProxyServer extends TcpNettyServer {
 
     public InboundHandler<ByteBuf> getInboundHandler() {
       return inboundHandler;
+    }
+
+    public OutboundHandler<ByteBuf> getOutboundHandler() {
+      return outboundHandler;
+    }
+
+    public TcpClient setOutboundHandler(OutboundHandler<ByteBuf> outboundHandler) {
+      this.outboundHandler = outboundHandler;
+      return this;
     }
 
     public ActiveHandler getActiveHandler() {
@@ -273,6 +285,7 @@ public class TcpProxyServer extends TcpNettyServer {
               .addLast(ActiveHandler.newHandler((handler, ctx, state) ->
                   log.info("[tcp] client active change, state: {}, remote: {}", state, ch.remoteAddress())))
               .addLast(getInboundHandler())
+              .addFirst(getOutboundHandler())
               .addLast(new ChannelInboundHandlerAdapter() {
                 @Override
                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

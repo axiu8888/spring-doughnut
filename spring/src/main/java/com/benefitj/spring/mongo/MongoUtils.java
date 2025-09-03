@@ -2,11 +2,14 @@ package com.benefitj.spring.mongo;
 
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.stream.Stream;
 
-
+/**
+ * mongo工具
+ */
 public class MongoUtils {
 
   /**
@@ -33,4 +36,23 @@ public class MongoUtils {
     if (isAllowDiskUse(template)) query.allowDiskUse(true);
     return query;
   }
+
+  /**
+   * 根据ID查询
+   * <p/>
+   * 低版本支持id等于_id，高版本不支持
+   */
+  public static Criteria idCriteria(String id) {
+    return Criteria.where("_id").is(id).orOperator(Criteria.where("id").is(id));
+  }
+
+  /**
+   * 根据ID查询
+   * <p/>
+   * 低版本支持id等于_id，高版本不支持
+   */
+  public static Query idQuery(String id) {
+    return Query.query(idCriteria(id));
+  }
+
 }

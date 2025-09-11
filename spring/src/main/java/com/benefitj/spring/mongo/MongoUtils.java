@@ -43,7 +43,11 @@ public class MongoUtils {
    * 低版本支持id等于_id，高版本不支持
    */
   public static Criteria idCriteria(String id) {
-    return Criteria.where("_id").is(id).orOperator(Criteria.where("id").is(id));
+    return new Criteria().orOperator(
+        Criteria.where("_id").is(id),
+        //Criteria.where("_id").is(new ObjectId(id)),
+        Criteria.where("id").is(id)
+    );
   }
 
   /**

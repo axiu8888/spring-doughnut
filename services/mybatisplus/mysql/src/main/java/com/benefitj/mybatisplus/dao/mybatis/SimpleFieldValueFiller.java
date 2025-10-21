@@ -52,7 +52,7 @@ public class SimpleFieldValueFiller implements FieldValueFiller {
   }
 
   public Field getField(Object target, String name) {
-    return ReflectUtils.getField(target.getClass(), name);
+    return ReflectUtils.findFirstField(target.getClass(), name);
   }
 
   public Map<String, FieldValueCreator> getFields() {

@@ -374,9 +374,10 @@ public class ColumnDefine extends DefineBase.Table {
   private String isUpdatable;
 
   /**
-   * 注释
+   * 字段注释
    */
-  @ApiModelProperty("注释")
-  @JsonProperty("comment")
-  private String comment;
+  @ApiModelProperty("字段注释")
+  @JsonProperty("column_comment")
+  private String columnComment;
+
 }

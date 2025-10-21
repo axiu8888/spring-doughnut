@@ -95,7 +95,7 @@ public class ReportExportApp {
     task_endTime = StringUtils.isBlank(task_endTime) ? report.getString("end_time") : task_endTime;
     startTime = StringUtils.isNotBlank(task_startTime) ? DateFmtter.parseToLong(task_startTime) : startTime;
     endTime = StringUtils.isNotBlank(task_endTime) ? DateFmtter.parseToLong(task_endTime) : endTime;
-    try (final IWriter w = IWriter.createWriter(IOUtils.createFile(dir + "report.json"), false)) {
+    try (final IWriter w = IWriter.create(IOUtils.createFile(dir + "report.json"), false)) {
       w.writeAndFlush(report.toString());
     }
 
@@ -114,7 +114,7 @@ public class ReportExportApp {
     for (String measurement : tables) {
       CountInfo countInfo = influxTemplate.queryCountInfo(measurement, "*", startTime, endTime);
       if (countInfo.getCount() > 10) {
-        try (final FileWriterImpl writer = IWriter.createWriter(dir + measurement + "." + opts.type.toLowerCase(), false);) {
+        try (final FileWriterImpl writer = IWriter.create(dir + measurement + "." + opts.type.toLowerCase(), false);) {
           String sql = "SELECT * FROM " + measurement + " WHERE"
               + " time >= '" + DateFmtter.fmtUtc(startTime) + "'"
               + " AND time < '" + DateFmtter.fmtUtc(endTime) + "'"

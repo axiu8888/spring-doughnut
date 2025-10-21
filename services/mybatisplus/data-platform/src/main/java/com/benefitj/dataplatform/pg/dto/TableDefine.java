@@ -15,24 +15,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class TableDefine {
-  /**
-   * 表类型
-   */
-  @ApiModelProperty("表类型")
-  TableType type;
-
-  /**
-   * 表名
-   */
-  @ApiModelProperty("表名")
-  String name;
+public class TableDefine extends DefineBase.Table {
 
   /**
    * 注释
    */
   @ApiModelProperty("表的注释")
-  String comment;
+  String tableComment;
 
   /**
    * 字段

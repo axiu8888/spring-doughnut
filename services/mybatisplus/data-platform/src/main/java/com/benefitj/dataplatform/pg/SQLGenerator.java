@@ -111,7 +111,7 @@ public class SQLGenerator {
       sb
           .append("\t").append(column.getColumnName())
           .append(" ").append(getColumnType(column))
-          .append("YES".equals(uppercase(column.getIsNullable())) ? " NOT NULL" : "")
+          .append("YES".equals(uppercase(column.getIsNullable())) ? "" : " NOT NULL")
           .append(StringUtils.isNotBlank(column.getColumnDefault()) ? " DEFAULT " + column.getColumnDefault() : "")
           .append(",\n");
     }
@@ -137,8 +137,8 @@ public class SQLGenerator {
   public String columnsComment(String tableName, List<ColumnDefine> columns) {
     return columns
         .stream()
-        .filter(c -> StringUtils.isNotBlank(c.getComment()))
-        .map(c -> "COMMENT ON COLUMN " + tableName + "." + c.getColumnName() + " IS '" + c.getComment() + "';")
+        .filter(c -> StringUtils.isNotBlank(c.getColumnComment()))
+        .map(c -> "COMMENT ON COLUMN " + tableName + "." + c.getColumnName() + " IS '" + c.getColumnComment() + "';")
         .collect(Collectors.joining("\n"));
   }
 
@@ -150,7 +150,8 @@ public class SQLGenerator {
    * @return 返回SQL
    */
   public String tableComment(String tableName, String comment) {
-    return "COMMENT ON COLUMN " + tableName + " IS '" + comment + "';";
+    if (StringUtils.isBlank(comment)) return "";
+    return "COMMENT ON TABLE " + tableName + " IS '" + comment + "';";
   }
 
 
@@ -190,7 +191,7 @@ public class SQLGenerator {
   }
 
   private String uppercase(String v) {
-    return v != null ? v.toLowerCase() : null;
+    return v != null ? v.toUpperCase() : null;
   }
 
 }

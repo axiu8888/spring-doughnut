@@ -37,9 +37,7 @@ public class VertxMqttPublisherApplication {
     }, 1, 5, TimeUnit.SECONDS);
 
     VertxMqttClient client = publisher.getClient();
-    EventLoop.asyncIOFixedRate(() -> {
-      log.info("{}:{}  ==>:  {}", client.getHost(), client.getPort(), client.isConnected());
-    }, 1, 1, TimeUnit.SECONDS);
+    EventLoop.asyncIOFixedRate(() -> log.info("{}  ==>:  {}", client.remoteAddress(), client.isConnected()), 1, 1, TimeUnit.SECONDS);
 
   }
 }

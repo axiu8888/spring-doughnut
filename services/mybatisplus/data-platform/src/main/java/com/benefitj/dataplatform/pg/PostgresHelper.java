@@ -7,6 +7,7 @@ import com.benefitj.dataplatform.pg.dto.IndexDefine;
 import com.benefitj.dataplatform.pg.dto.TableDefine;
 import com.benefitj.dataplatform.pg.dto.TableType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -137,19 +140,19 @@ public class PostgresHelper implements DatabaseHelper {
       // 字段注释
       JSONObject comments = getColumnComments(
           tableName, columns.stream().map(ColumnDefine::getColumnName).toArray(String[]::new));
-      columns.forEach(c -> c.setComment(comments.getString(c.getColumnName())));
+      columns.forEach(c -> c.setColumnComment(comments.getString(c.getColumnName())));
       // 表注释
       String tableComment = getTableComment(tableName);
       // 索引
       List<IndexDefine> indexes = getIndexes(tableName);
       // 表信息对象
       tables.add(TableDefine.builder()
-          .name(tableName)
+          .tableName(tableName)
           .columns(columns)
-          .comment(tableComment)
+          .tableComment(tableComment)
           .primaryKeys(primaryKeys)
           .indexes(indexes)
-          .type(getTableType(tableName).get(tableName))
+          .tableType(getTableType(tableName).get(tableName).name())
           .build());
     }
     return tables;
@@ -242,5 +245,25 @@ public class PostgresHelper implements DatabaseHelper {
     return map;
   }
 
+
+  public int createTable(TableDefine table) {
+    SQLGenerator sqlGenerator = SQLGenerator.get();
+    String tableSQL = sqlGenerator.createTable(table.getTableName(), table.getColumns());
+    String tableCommentSQL = sqlGenerator.tableComment(table.getTableName(), table.getTableComment());
+    String columnCommentSQL = sqlGenerator.columnsComment(table.getTableName(), table.getColumns());
+    String sql = Stream.of(tableSQL, tableCommentSQL, columnCommentSQL)
+        .map(String::trim)
+        .filter(StringUtils::isNotBlank)
+        .map(str -> str.endsWith(";") ? str : str + ";")
+        .collect(Collectors.joining("\n"));
+    log.info("------------------------> 创建表: \n{}", sql);
+    return stmtUpdate(getConnection(), true, stmt -> {
+      int row = 0;
+      row += stmt.executeUpdate(tableSQL);
+      row += StringUtils.isNotBlank(tableCommentSQL) ? stmt.executeUpdate(tableCommentSQL) : 0;
+      row += stmt.executeUpdate(columnCommentSQL);
+      return row;
+    });
+  }
 
 }

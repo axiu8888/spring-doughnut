@@ -2,6 +2,7 @@ package com.benefitj.dataplatform.pg;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.CatchUtils;
+import com.benefitj.core.functions.IFunction;
 import com.benefitj.dataplatform.pg.dto.IndexDefine;
 import com.benefitj.dataplatform.pg.dto.TableDefine;
 
@@ -184,16 +185,32 @@ public interface DatabaseHelper {
    * @return 返回
    */
   default int stmtUpdate(Connection conn, boolean transactional, String sql) {
+    return stmtUpdate(conn, transactional, stmt -> stmt.executeUpdate(sql));
+  }
+
+  /**
+   * 执行更新
+   *
+   * @param conn          连接
+   * @param transactional 是否开启事务
+   * @param executor      执行
+   * @return 返回
+   */
+  default int stmtUpdate(Connection conn, boolean transactional, IFunction<Statement, Integer> executor) {
     try {
       if (transactional) {
         conn.setAutoCommit(false);
       }
       try (final Statement stmt = createStatement(conn)) {
-        int row = stmt.executeUpdate(sql);
-        conn.commit();//提交事务
+        int row = executor.apply(stmt);
+        if (transactional) {
+          conn.commit();//提交事务
+        }
         return row;
-      } catch (SQLException e) {
-        conn.rollback();//回滚事务
+      } catch (Exception e) {
+        if (transactional) {
+          conn.rollback();//回滚事务
+        }
         throw new SqlException(CatchUtils.findRoot(e));
       } finally {
         if (transactional) {

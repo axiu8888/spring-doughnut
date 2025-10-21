@@ -1,0 +1,36 @@
+plugins {
+  id 'org.springframework.boot' version "${springbootVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'java'
+//  id 'org.springframework.experimental.aot' version "${springExperimentalAotVersion}"
+}
+
+apply from: "${scriptFile}"
+
+description("websocket chat")
+
+group = "ws-chat"
+version = ''
+
+jar {
+  archivesBaseName = "ws-chat"
+}
+
+dependencies {
+  [
+      project(":all"),
+  ].forEach {
+    implementation(it) {
+      exclude group: "*"//, module: "spring-boot-starter-tomcat"
+    }
+  }
+  [
+      "org.springframework.boot:spring-boot-starter-web",
+      "org.springframework.boot:spring-boot-starter-websocket",
+      "io.springfox:springfox-boot-starter:${swaggerVersion}",
+      "com.github.xiaoymin:knife4j-openapi2-spring-boot-starter:${knife4jVersion}",
+
+  ].forEach {
+    implementation(it)
+  }
+}

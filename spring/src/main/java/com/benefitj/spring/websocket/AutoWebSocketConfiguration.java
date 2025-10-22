@@ -31,7 +31,7 @@ public class AutoWebSocketConfiguration extends DelegatingWebSocketConfiguration
 
   @ConditionalOnMissingBean(name = "websocketFactory")
   @Bean("websocketFactory")
-  public WebSocketFactory websocketFactory() {
+  public WebSocketFactory<WebSocket> websocketFactory() {
     return WebSocketFactory.INSTANCE;
   }
 

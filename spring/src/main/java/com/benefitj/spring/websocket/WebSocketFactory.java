@@ -5,9 +5,9 @@ import org.springframework.web.socket.WebSocketSession;
 /**
  * WebSocket 工厂
  */
-public interface WebSocketFactory {
+public interface WebSocketFactory<WS extends WebSocket> {
 
-  WebSocketFactory INSTANCE = new WebSocketFactoryImpl();
+  WebSocketFactory<WebSocket> INSTANCE = new WebSocketFactoryImpl();
 
   /**
    * 创建 WebSocket 客户端
@@ -17,7 +17,7 @@ public interface WebSocketFactory {
    */
   WebSocket create(WebSocketSession session);
 
-  class WebSocketFactoryImpl implements WebSocketFactory {
+  class WebSocketFactoryImpl implements WebSocketFactory<WebSocket> {
 
     @Override
     public WebSocket create(WebSocketSession session) {

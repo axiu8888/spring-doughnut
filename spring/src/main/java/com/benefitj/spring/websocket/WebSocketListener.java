@@ -8,7 +8,7 @@ import org.springframework.web.socket.TextMessage;
 /**
  * WebSocket 监听
  */
-public interface WebSocketListener {
+public interface WebSocketListener<WS extends WebSocket> {
 
   /**
    * 接收到WebSocketManager
@@ -24,7 +24,7 @@ public interface WebSocketListener {
    *
    * @param socket WebSocket
    */
-  void onOpen(WebSocket socket);
+  void onOpen(WS socket);
 
   /**
    * 接收到消息
@@ -32,7 +32,7 @@ public interface WebSocketListener {
    * @param socket  WebSocket
    * @param message 文本消息
    */
-  void onTextMessage(WebSocket socket, TextMessage message);
+  void onTextMessage(WS socket, TextMessage message);
 
   /**
    * 接收到二进制消息
@@ -40,7 +40,7 @@ public interface WebSocketListener {
    * @param socket  WebSocket
    * @param message 二进制消息
    */
-  void onBinaryMessage(WebSocket socket, BinaryMessage message);
+  void onBinaryMessage(WS socket, BinaryMessage message);
 
   /**
    * 接收到Ping消息
@@ -48,7 +48,7 @@ public interface WebSocketListener {
    * @param socket  WebSocket
    * @param message Ping消息
    */
-  default void onPingMessage(WebSocket socket, PingMessage message) {
+  default void onPingMessage(WS socket, PingMessage message) {
     // ~
   }
 
@@ -58,14 +58,14 @@ public interface WebSocketListener {
    * @param socket WebSocket
    * @param error  异常
    */
-  void onError(WebSocket socket, Throwable error);
+  void onError(WS socket, Throwable error);
 
   /**
    * 连接关闭调用的方法
    *
    * @param socket WebSocket
    */
-  void onClose(WebSocket socket, CloseStatus reason);
+  void onClose(WS socket, CloseStatus reason);
 
   /**
    * 是否支持分片传输

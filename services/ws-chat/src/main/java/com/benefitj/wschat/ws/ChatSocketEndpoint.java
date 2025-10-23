@@ -4,6 +4,7 @@ import com.benefitj.spring.JsonUtils;
 import com.benefitj.spring.websocket.*;
 import com.benefitj.wschat.message.ChatMessage;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.stereotype.Component;
@@ -15,9 +16,9 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+@Slf4j
 @Component
 @WebSocketEndpoint(value = {"/socket/chat"}, socketFactory = ChatSocketEndpoint.ChatWebSocketFactory.class)
-@Slf4j
 public class ChatSocketEndpoint implements WebSocketListener<ChatSocketEndpoint.ChatWebSocket> {
 
   public static final AtomicReference<WebSocketManager> MANAGER_HOLDER = new AtomicReference<>();
@@ -43,7 +44,7 @@ public class ChatSocketEndpoint implements WebSocketListener<ChatSocketEndpoint.
 
   @Override
   public void onOpen(ChatWebSocket socket) {
-    log.info("WebSocket上线, id: {}, 数量: {}", socket.getId(), getManager().size());
+    log.info("[" + socket.getClass().getSimpleName() + "] 上线, id: {}, 数量: {}", socket.getId(), getManager().size());
 
     // 发送欢迎消息
     socket.send(JsonUtils.toJson(new ChatMessage(
@@ -56,8 +57,8 @@ public class ChatSocketEndpoint implements WebSocketListener<ChatSocketEndpoint.
 
   @Override
   public void onTextMessage(ChatWebSocket socket, TextMessage message) {
-    log.info("WebSocket消息(Text), id: {}, 数量: {}, msg: {}",
-        socket.getId(), getManager().size(), message.getPayload());
+    log.info("[" + socket.getClass().getSimpleName() + "] 消息(Text), id: {}, 数量: {}, msg: {}"
+        , socket.getId(), getManager().size(), message.getPayload());
 
     //socket.send("接收到消息[" + message.getPayload() + "]");
 
@@ -68,19 +69,19 @@ public class ChatSocketEndpoint implements WebSocketListener<ChatSocketEndpoint.
 
   @Override
   public void onBinaryMessage(ChatWebSocket socket, BinaryMessage message) {
-    log.info("WebSocket消息(Binary), id: {}, 数量3: {}, msg: {}",
+    log.info("[" + socket.getClass().getSimpleName() + "] 消息(Binary), id: {}, 数量3: {}, msg: {}",
         socket.getId(), getManager().size(), HexUtils.toHexString(message.getPayload().array()));
   }
 
   @Override
   public void onError(ChatWebSocket socket, Throwable error) {
-    log.info("WebSocket抛出异常, id: {}, 数量: {}, cause: {}",
+    log.info("[" + socket.getClass().getSimpleName() + "] 抛出异常, id: {}, 数量: {}, cause: {}",
         socket.getId(), getManager().size(), error.getMessage());
   }
 
   @Override
   public void onClose(ChatWebSocket socket, CloseStatus reason) {
-    log.info("WebSocket下线, id: {}, 数量: {}", socket.getId(), getManager().size());
+    log.info("[" + socket.getClass().getSimpleName() + "] 下线, id: {}, 数量: {}", socket.getId(), getManager().size());
 
     // 发送离开消息
     broadcastMessage(socket, new ChatMessage(
@@ -106,13 +107,14 @@ public class ChatSocketEndpoint implements WebSocketListener<ChatSocketEndpoint.
   @Component
   public static class ChatWebSocketFactory implements WebSocketFactory<ChatWebSocket> {
     @Override
-    public WebSocket create(WebSocketSession session) {
+    public ChatWebSocket create(WebSocketSession session) {
       return new ChatWebSocket(session);
     }
   }
 
 
   @Data
+  @EqualsAndHashCode(callSuper = true)
   public static class ChatWebSocket extends WebSocketImpl {
 
     private String username;

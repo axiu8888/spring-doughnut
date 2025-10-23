@@ -15,7 +15,7 @@ public interface WebSocketFactory<WS extends WebSocket> {
    * @param session 会话
    * @return 返回新的客户端
    */
-  WebSocket create(WebSocketSession session);
+  WS create(WebSocketSession session);
 
   class WebSocketFactoryImpl implements WebSocketFactory<WebSocket> {
 

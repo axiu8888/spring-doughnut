@@ -168,10 +168,23 @@ public class SimpleController {
     }
   }
 
+  @ApiOperation("测试 write")
   @PostMapping(value = "/write", consumes = {"application/octet-stream;charset=UTF-8"})
   public void write(HttpServletRequest request) throws IOException {
     ServletInputStream in = request.getInputStream();
     IOUtils.write(in, IOUtils.createFile("D:/cache/.tmp/znsx/temp", IdUtils.uuid() +".line"));
   }
+
+//  @ApiOperation("测试JsonParams")
+//  @PostMapping(value = "/testJsonParams")
+//  public void testJsonParams(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//    String str = IOUtils.readFully(request.getInputStream()).toString(StandardCharsets.UTF_8);
+//    JSONObject jsonBody = JsonParamFilter.get().getJsonBody();
+//    //request.getAttribute(JsonParamFilter.KEY_JSONBODY);
+//    ServletUtils.write(response, 200, JsonUtils.toJsonBytes(new LinkedHashMap(){{
+//      put("raw", str);
+//      put("jsonBody", jsonBody);
+//    }}));
+//  }
 
 }

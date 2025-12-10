@@ -6,7 +6,7 @@ import com.benefitj.core.executable.Instantiator;
 import com.benefitj.spring.ServletUtils;
 import com.benefitj.spring.annotation.AnnotationMetadata;
 import com.benefitj.spring.ctx.SpringCtxHolder;
-import com.benefitj.spring.mvc.jsonbody.BodyHttpServletRequestWrapper;
+import com.benefitj.spring.mvc.BodyHttpServletRequestWrapper;
 import com.benefitj.spring.mvc.jsonbody.JsonBodyProcessor;
 import com.benefitj.spring.mvc.jsonbody.JsonBodyMappingSearcher;
 import com.benefitj.spring.mvc.jsonbody.JsonBodyRequest;

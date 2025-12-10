@@ -1,7 +1,8 @@
 package com.benefitj.spring.mvc;
 
-import com.benefitj.spring.mvc.jsonbody.JsonBodyProcessor;
 import com.benefitj.spring.mvc.jsonbody.JsonBodyMappingSearcher;
+import com.benefitj.spring.mvc.jsonbody.JsonBodyProcessor;
+import com.benefitj.spring.mvc.jsonparam.JsonParamArgumentResolver;
 import com.benefitj.spring.mvc.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,6 +43,16 @@ public class CustomArgumentResolverConfiguration {
   @Bean("pageBodyArgumentResolver")
   public QueryBodyArgumentResolver pageBodyArgumentResolver() {
     return new QueryBodyArgumentResolver(PageRequest.class, PageBody.class);
+  }
+
+  /**
+   * json请求 参数解析
+   */
+  @Primary
+  @ConditionalOnMissingBean(name = "jsonParamArgumentResolver")
+  @Bean("jsonParamArgumentResolver")
+  public JsonParamArgumentResolver jsonParamArgumentResolver() {
+    return new JsonParamArgumentResolver();
   }
 
   /**

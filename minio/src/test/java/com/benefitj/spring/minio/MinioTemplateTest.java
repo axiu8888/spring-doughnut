@@ -12,8 +12,6 @@ import com.benefitj.spring.minio.spring.MinioConfiguration;
 import io.minio.*;
 import io.minio.messages.*;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +35,7 @@ import java.util.stream.Stream;
 class MinioTemplateTest {
 
   @Autowired
-  MinioTemplate template;
+  IMinioTemplate template;
 
 //  final String bucketName = "test";
   final String bucketName = "hsrg";

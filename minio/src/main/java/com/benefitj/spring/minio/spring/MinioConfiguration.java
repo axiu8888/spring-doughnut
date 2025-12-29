@@ -1,9 +1,6 @@
 package com.benefitj.spring.minio.spring;
 
-import com.benefitj.spring.minio.IMinioClient;
-import com.benefitj.spring.minio.MinioOptions;
-import com.benefitj.spring.minio.MinioTemplate;
-import com.benefitj.spring.minio.MinioUtils;
+import com.benefitj.spring.minio.*;
 import io.minio.MinioClient;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -50,12 +47,9 @@ public class MinioConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public MinioTemplate minioTemplate(MinioOptions options,
-                                     IMinioClient minioClient) {
-    MinioTemplate template = new MinioTemplate();
-    template.setOptions(options);
-    template.setClient(minioClient);
-    return template;
+  public IMinioTemplate minioTemplate(MinioOptions options,
+                                      IMinioClient minioClient) {
+    return new MinioTemplateImpl(options, minioClient);
   }
 
 }

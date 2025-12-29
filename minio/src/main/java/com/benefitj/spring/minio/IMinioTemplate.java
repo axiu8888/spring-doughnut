@@ -1,6 +1,7 @@
 package com.benefitj.spring.minio;
 
 import com.benefitj.core.CatchUtils;
+import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import io.minio.*;
 import io.minio.messages.*;
@@ -9,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -16,44 +18,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- * MinIO 模板
- */
-public class MinioTemplate {
+public interface IMinioTemplate {
 
-  private MinioOptions options;
 
-  private IMinioClient client;
+  MinioOptions getOptions();
 
-  public MinioTemplate() {
-  }
+  IMinioClient getClient();
 
-  public MinioTemplate(MinioOptions options, IMinioClient client) {
-    this.options = options;
-    this.client = client;
-  }
-
-  public MinioOptions getOptions() {
-    return options;
-  }
-
-  public void setOptions(MinioOptions options) {
-    this.options = options;
-  }
-
-  public IMinioClient getClient() {
-    return client;
-  }
-
-  public void setClient(IMinioClient client) {
-    this.client = client;
-  }
-
-  public <T> T execute(Function<IMinioClient, T> mappedFunc) {
+  default <T> T execute(Function<IMinioClient, T> mappedFunc) {
     return mappedFunc.apply(getClient());
   }
 
-  private void requireBucketExist(String bucketName) {
+  default void requireBucketExist(String bucketName) {
     if (!bucketExists(bucketName)) {
       if (!getOptions().isAutoMakeBucket()) {
         throw new IllegalStateException("bucket不存在");
@@ -64,6 +40,20 @@ public class MinioTemplate {
     }
   }
 
+  default String getBucketName() {
+    return getOptions().getBucketName();
+  }
+
+  /**
+   * 获取对象的信息
+   *
+   * @param objectName 对象
+   * @return 返回检查的结果
+   */
+  default MinioResult<StatObjectResponse> statObject(@Nonnull String objectName) {
+    return statObject(objectName, getBucketName());
+  }
+
   /**
    * 获取对象的信息
    *
@@ -71,7 +61,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public MinioResult<StatObjectResponse> statObject(@Nonnull String objectName, @Nonnull String bucketName) {
+  default MinioResult<StatObjectResponse> statObject(@Nonnull String objectName, @Nonnull String bucketName) {
     return statObject(StatObjectArgs.builder(), objectName, bucketName);
   }
 
@@ -83,11 +73,36 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public MinioResult<StatObjectResponse> statObject(StatObjectArgs.Builder builder,
-                                                    @Nonnull String objectName,
-                                                    @Nonnull String bucketName) {
+  default MinioResult<StatObjectResponse> statObject(StatObjectArgs.Builder builder,
+                                                     @Nonnull String objectName,
+                                                     @Nonnull String bucketName) {
     getClient().statObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult();
+  }
+
+  default String getObjectContent(String objectName, Charset charset) {
+    return getObjectContent(objectName, getBucketName(), charset);
+  }
+
+  default String getObjectContent(String objectName, String bucket, Charset charset) {
+    try (InputStream stream = getClient().getObject(GetObjectArgs.builder()
+        .bucket(bucket)
+        .object(objectName)
+        .build())) {
+      return IOUtils.readAsString(stream, charset);
+    } catch (Exception e) {
+      throw new IllegalStateException(CatchUtils.findRoot(e));
+    }
+  }
+
+  /**
+   * 获取桶对象
+   *
+   * @param objectName 对象名
+   * @return 对象
+   */
+  default MinioResult<GetObjectResponse> getObject(@Nonnull String objectName) {
+    return getObject(objectName, getBucketName());
   }
 
   /**
@@ -97,9 +112,22 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 对象
    */
-  public MinioResult<GetObjectResponse> getObject(@Nonnull String objectName,
-                                                  @Nonnull String bucketName) {
+  default MinioResult<GetObjectResponse> getObject(@Nonnull String objectName, @Nonnull String bucketName) {
     return getObject(objectName, null, null, bucketName);
+  }
+
+  /**
+   * 获取桶对象
+   *
+   * @param objectName 对象名
+   * @param start      开始的位置
+   * @param length     数据长度
+   * @return 是否删除
+   */
+  default MinioResult<GetObjectResponse> getObject(@Nonnull String objectName,
+                                                   @Nullable Long start,
+                                                   @Nullable Long length) {
+    return getObject(objectName, start, length, getBucketName());
   }
 
   /**
@@ -111,10 +139,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否删除
    */
-  public MinioResult<GetObjectResponse> getObject(@Nonnull String objectName,
-                                                  @Nullable Long start,
-                                                  @Nullable Long length,
-                                                  @Nonnull String bucketName) {
+  default MinioResult<GetObjectResponse> getObject(@Nonnull String objectName,
+                                                   @Nullable Long start,
+                                                   @Nullable Long length,
+                                                   @Nonnull String bucketName) {
     return getObject(GetObjectArgs.builder().offset(start).length(length), objectName, bucketName);
   }
 
@@ -126,11 +154,25 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否删除
    */
-  public MinioResult<GetObjectResponse> getObject(GetObjectArgs.Builder builder,
-                                                  @Nonnull String objectName,
-                                                  @Nonnull String bucketName) {
+  default MinioResult<GetObjectResponse> getObject(GetObjectArgs.Builder builder,
+                                                   @Nonnull String objectName,
+                                                   @Nonnull String bucketName) {
     getClient().getObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult();
+  }
+
+  /**
+   * 下载对象
+   *
+   * @param objectName 对象名
+   * @param file       文件路径
+   * @param overwrite  是否覆盖已存在的文件
+   * @return 是否下载
+   */
+  default MinioResult<File> downloadObject(@Nonnull String objectName,
+                                           @Nonnull String file,
+                                           boolean overwrite) {
+    return downloadObject(objectName, file, overwrite, getBucketName());
   }
 
   /**
@@ -142,10 +184,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否下载
    */
-  public MinioResult<File> downloadObject(@Nonnull String objectName,
-                                          @Nonnull String file,
-                                          boolean overwrite,
-                                          @Nonnull String bucketName) {
+  default MinioResult<File> downloadObject(@Nonnull String objectName,
+                                           @Nonnull String file,
+                                           boolean overwrite,
+                                           @Nonnull String bucketName) {
     return downloadObject(DownloadObjectArgs.builder(), objectName, file, overwrite, bucketName);
   }
 
@@ -158,13 +200,27 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否下载
    */
-  public MinioResult<File> downloadObject(DownloadObjectArgs.Builder builder,
-                                          @Nonnull String objectName,
-                                          @Nonnull String file,
-                                          boolean overwrite,
-                                          @Nonnull String bucketName) {
+  default MinioResult<File> downloadObject(DownloadObjectArgs.Builder builder,
+                                           @Nonnull String objectName,
+                                           @Nonnull String file,
+                                           boolean overwrite,
+                                           @Nonnull String bucketName) {
     getClient().downloadObject(MinioUtils.newObjectArgs(builder.filename(file).overwrite(overwrite), objectName, bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful() ? Paths.get(file).toFile() : null));
+  }
+
+  /**
+   * 拷贝一份新的对象（服务器上会多一份新的数据）
+   *
+   * @param source           拷贝的源文件
+   * @param destObjectName   目标对象名
+   * @param taggingDirective 触发指令：拷贝或替换
+   * @return 返回拷贝结果
+   */
+  default MinioResult<ObjectWriteResponse> copyObject(@Nonnull CopySource source,
+                                                      @Nonnull String destObjectName,
+                                                      @Nullable Directive taggingDirective) {
+    return copyObject(source, destObjectName, taggingDirective, getBucketName());
   }
 
   /**
@@ -176,10 +232,10 @@ public class MinioTemplate {
    * @param bucketName       桶
    * @return 返回拷贝结果
    */
-  public MinioResult<ObjectWriteResponse> copyObject(@Nonnull CopySource source,
-                                                     @Nonnull String destObjectName,
-                                                     @Nullable Directive taggingDirective,
-                                                     @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> copyObject(@Nonnull CopySource source,
+                                                      @Nonnull String destObjectName,
+                                                      @Nullable Directive taggingDirective,
+                                                      @Nonnull String bucketName) {
     return copyObject(CopyObjectArgs.builder(), source, destObjectName, taggingDirective, bucketName);
   }
 
@@ -193,11 +249,11 @@ public class MinioTemplate {
    * @param bucketName       桶
    * @return 返回拷贝结果
    */
-  public MinioResult<ObjectWriteResponse> copyObject(CopyObjectArgs.Builder builder,
-                                                     @Nonnull CopySource source,
-                                                     @Nonnull String destObjectName,
-                                                     @Nullable Directive taggingDirective,
-                                                     @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> copyObject(CopyObjectArgs.Builder builder,
+                                                      @Nonnull CopySource source,
+                                                      @Nonnull String destObjectName,
+                                                      @Nullable Directive taggingDirective,
+                                                      @Nonnull String bucketName) {
     getClient().copyObject(MinioUtils.newObjectArgs(builder
             .source(source)
             .taggingDirective(taggingDirective != null ? taggingDirective : Directive.COPY)
@@ -210,12 +266,24 @@ public class MinioTemplate {
    *
    * @param objectName 对象名
    * @param sources    合并的文件源
+   * @return 返回合并结果
+   */
+  default MinioResult<ObjectWriteResponse> composeObject(@Nonnull String objectName,
+                                                         @Nonnull List<ComposeSource> sources) {
+    return composeObject(objectName, sources, getBucketName());
+  }
+
+  /**
+   * 合并对象（将多个数据合并到一个新的数据中）
+   *
+   * @param objectName 对象名
+   * @param sources    合并的文件源
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<ObjectWriteResponse> composeObject(@Nonnull String objectName,
-                                                        @Nonnull List<ComposeSource> sources,
-                                                        @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> composeObject(@Nonnull String objectName,
+                                                         @Nonnull List<ComposeSource> sources,
+                                                         @Nonnull String bucketName) {
     return composeObject(ComposeObjectArgs.builder(), objectName, sources, bucketName);
   }
 
@@ -228,12 +296,22 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<ObjectWriteResponse> composeObject(ComposeObjectArgs.Builder builder,
-                                                        @Nonnull String objectName,
-                                                        @Nonnull List<ComposeSource> sources,
-                                                        @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> composeObject(ComposeObjectArgs.Builder builder,
+                                                         @Nonnull String objectName,
+                                                         @Nonnull List<ComposeSource> sources,
+                                                         @Nonnull String bucketName) {
     getClient().composeObject(MinioUtils.newObjectArgs(builder.sources(sources), objectName, bucketName));
     return getClient().removeResult();
+  }
+
+  /**
+   * 获取对象的URL
+   *
+   * @param objectName 对象名
+   * @return 返回获取结果
+   */
+  default MinioResult<String> getPresignedObjectUrl(@Nonnull String objectName) {
+    return getPresignedObjectUrl(objectName, getBucketName());
   }
 
   /**
@@ -243,8 +321,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回获取结果
    */
-  public MinioResult<String> getPresignedObjectUrl(@Nonnull String objectName,
-                                                   @Nonnull String bucketName) {
+  default MinioResult<String> getPresignedObjectUrl(@Nonnull String objectName,
+                                                    @Nonnull String bucketName) {
     return getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder(), objectName, bucketName);
   }
 
@@ -256,9 +334,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回获取结果
    */
-  public MinioResult<String> getPresignedObjectUrl(GetPresignedObjectUrlArgs.Builder builder,
-                                                   @Nonnull String objectName,
-                                                   @Nonnull String bucketName) {
+  default MinioResult<String> getPresignedObjectUrl(GetPresignedObjectUrlArgs.Builder builder,
+                                                    @Nonnull String objectName,
+                                                    @Nonnull String bucketName) {
     getClient().getPresignedObjectUrl(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult();
   }
@@ -269,9 +347,19 @@ public class MinioTemplate {
    * @param policy 策略
    * @return 返回获取结果
    */
-  public MinioResult<Map<String, String>> getPresignedPostFormData(PostPolicy policy) {
+  default MinioResult<Map<String, String>> getPresignedPostFormData(PostPolicy policy) {
     getClient().getPresignedPostFormData(policy);
     return getClient().removeResult();
+  }
+
+  /**
+   * 移除对象
+   *
+   * @param objectName 对象名
+   * @return 是否移除
+   */
+  default boolean removeObject(@Nonnull String objectName) {
+    return removeObject(objectName, getBucketName());
   }
 
   /**
@@ -281,8 +369,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否移除
    */
-  public boolean removeObject(@Nonnull String objectName,
-                              @Nonnull String bucketName) {
+  default boolean removeObject(@Nonnull String objectName,
+                               @Nonnull String bucketName) {
     return removeObject(RemoveObjectArgs.builder(), objectName, bucketName);
   }
 
@@ -294,11 +382,20 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否移除
    */
-  public boolean removeObject(RemoveObjectArgs.Builder builder,
-                              @Nonnull String objectName,
-                              @Nonnull String bucketName) {
+  default boolean removeObject(RemoveObjectArgs.Builder builder,
+                               @Nonnull String objectName,
+                               @Nonnull String bucketName) {
     getClient().removeObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult().isSuccessful();
+  }
+
+  /**
+   * 移除桶下的全部对象
+   *
+   * @return 返回移除的结果
+   */
+  default MinioResult<List<DeleteError>> removeAllObjects() {
+    return removeAllObjects(getBucketName());
   }
 
   /**
@@ -307,7 +404,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回移除的结果
    */
-  public MinioResult<List<DeleteError>> removeObjects(String bucketName) {
+  default MinioResult<List<DeleteError>> removeAllObjects(String bucketName) {
     return removeObjects(bucketName, item -> true);
   }
 
@@ -318,7 +415,7 @@ public class MinioTemplate {
    * @param filter     过滤
    * @return 返回移除的结果
    */
-  public MinioResult<List<DeleteError>> removeObjects(String bucketName, Predicate<Item> filter) {
+  default MinioResult<List<DeleteError>> removeObjects(String bucketName, Predicate<Item> filter) {
     // 强制删除全部的数据
     MinioResult<List<Item>> r = listObjects(true, bucketName);
     if (r.isSuccessful()) {
@@ -346,9 +443,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回移除的结果
    */
-  public MinioResult<List<DeleteError>> removeObjects(RemoveObjectsArgs.Builder builder,
-                                                      List<DeleteObject> objects,
-                                                      @Nonnull String bucketName) {
+  default MinioResult<List<DeleteError>> removeObjects(RemoveObjectsArgs.Builder builder,
+                                                       List<DeleteObject> objects,
+                                                       @Nonnull String bucketName) {
     // 删除文件
     Iterable<Result<DeleteError>> iterable =
         getClient().removeObjects(MinioUtils.newBucketArgs(builder.objects(objects), bucketName));
@@ -367,7 +464,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<Boolean> restoreObject(String bucketName) {
+  default MinioResult<Boolean> restoreObject(String bucketName) {
     return restoreObject(RestoreObjectArgs.builder(), bucketName);
   }
 
@@ -378,9 +475,19 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<Boolean> restoreObject(RestoreObjectArgs.Builder builder, String bucketName) {
+  default MinioResult<Boolean> restoreObject(RestoreObjectArgs.Builder builder, String bucketName) {
     getClient().restoreObject(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
+  }
+
+  /**
+   * 列出全部的对象
+   *
+   * @param recursive  是否递归获取
+   * @return 返回检查的结果
+   */
+  default MinioResult<List<Item>> listObjects(boolean recursive) {
+    return listObjects(recursive, getBucketName());
   }
 
   /**
@@ -390,7 +497,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public MinioResult<List<Item>> listObjects(boolean recursive, @Nonnull String bucketName) {
+  default MinioResult<List<Item>> listObjects(boolean recursive, @Nonnull String bucketName) {
     return listObjects(ListObjectsArgs.builder(), recursive, bucketName);
   }
 
@@ -402,9 +509,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public MinioResult<List<Item>> listObjects(ListObjectsArgs.Builder builder,
-                                             boolean recursive,
-                                             @Nonnull String bucketName) {
+  default MinioResult<List<Item>> listObjects(ListObjectsArgs.Builder builder,
+                                              boolean recursive,
+                                              @Nonnull String bucketName) {
     Iterable<Result<Item>> results = getClient().listObjects(MinioUtils.newBucketArgs(builder.recursive(recursive), bucketName));
     return getClient().removeResult().handle(r -> {
       List<Item> items = Utils.toList(results)
@@ -426,7 +533,7 @@ public class MinioTemplate {
   /**
    * 列出全部的桶
    */
-  public MinioResult<List<Bucket>> listBuckets() {
+  default MinioResult<List<Bucket>> listBuckets() {
     getClient().listBuckets();
     return getClient().removeResult();
   }
@@ -434,7 +541,7 @@ public class MinioTemplate {
   /**
    * 列出全部的桶
    */
-  public MinioResult<List<Bucket>> listBuckets(ListBucketsArgs.Builder builder) {
+  default MinioResult<List<Bucket>> listBuckets(ListBucketsArgs.Builder builder) {
     getClient().listBuckets(builder.build());
     return getClient().removeResult();
   }
@@ -445,7 +552,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public boolean bucketExists(String bucketName) {
+  default boolean bucketExists(String bucketName) {
     return bucketExists(BucketExistsArgs.builder(), bucketName);
   }
 
@@ -456,7 +563,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回检查的结果
    */
-  public boolean bucketExists(BucketExistsArgs.Builder builder, String bucketName) {
+  default boolean bucketExists(BucketExistsArgs.Builder builder, String bucketName) {
     getClient().bucketExists(MinioUtils.newBucketArgs(builder, bucketName));
     return Boolean.TRUE.equals(getClient().removeResult().getData());
   }
@@ -466,7 +573,7 @@ public class MinioTemplate {
    *
    * @param bucketName 桶
    */
-  public boolean makeBucket(String bucketName) {
+  default boolean makeBucket(String bucketName) {
     return makeBucket(MakeBucketArgs.builder(), bucketName);
   }
 
@@ -477,7 +584,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否创建
    */
-  public boolean makeBucket(MakeBucketArgs.Builder builder, String bucketName) {
+  default boolean makeBucket(MakeBucketArgs.Builder builder, String bucketName) {
     if (bucketExists(bucketName)) {
       return true;
     }
@@ -493,9 +600,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setBucketVersioning(VersioningConfiguration.Status status,
-                                         Boolean mfaDelete,
-                                         String bucketName) {
+  default MinioResult setBucketVersioning(VersioningConfiguration.Status status,
+                                          Boolean mfaDelete,
+                                          String bucketName) {
     return setBucketVersioning(SetBucketVersioningArgs.builder(), status, mfaDelete, bucketName);
   }
 
@@ -508,10 +615,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setBucketVersioning(SetBucketVersioningArgs.Builder builder,
-                                         VersioningConfiguration.Status status,
-                                         Boolean mfaDelete,
-                                         String bucketName) {
+  default MinioResult setBucketVersioning(SetBucketVersioningArgs.Builder builder,
+                                          VersioningConfiguration.Status status,
+                                          Boolean mfaDelete,
+                                          String bucketName) {
     VersioningConfiguration config = status != null
         ? new VersioningConfiguration(status, mfaDelete)
         : new VersioningConfiguration();
@@ -525,7 +632,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<VersioningConfiguration> getBucketVersioning(String bucketName) {
+  default MinioResult<VersioningConfiguration> getBucketVersioning(String bucketName) {
     return getBucketVersioning(GetBucketVersioningArgs.builder(), bucketName);
   }
 
@@ -536,8 +643,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<VersioningConfiguration> getBucketVersioning(GetBucketVersioningArgs.Builder builder,
-                                                                  String bucketName) {
+  default MinioResult<VersioningConfiguration> getBucketVersioning(GetBucketVersioningArgs.Builder builder,
+                                                                   String bucketName) {
     getClient().getBucketVersioning(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -548,7 +655,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setObjectLockConfiguration(String bucketName, RetentionMode mode, RetentionDuration duration) {
+  default MinioResult setObjectLockConfiguration(String bucketName, RetentionMode mode, RetentionDuration duration) {
     return setObjectLockConfiguration(SetObjectLockConfigurationArgs.builder(), mode, duration, bucketName);
   }
 
@@ -559,10 +666,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setObjectLockConfiguration(SetObjectLockConfigurationArgs.Builder builder,
-                                                RetentionMode mode,
-                                                RetentionDuration duration,
-                                                String bucketName) {
+  default MinioResult setObjectLockConfiguration(SetObjectLockConfigurationArgs.Builder builder,
+                                                 RetentionMode mode,
+                                                 RetentionDuration duration,
+                                                 String bucketName) {
     ObjectLockConfiguration config = new ObjectLockConfiguration(mode, duration);
     getClient().setObjectLockConfiguration(MinioUtils.newBucketArgs(builder.config(config), bucketName));
     return getClient().removeResult();
@@ -574,7 +681,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult deleteObjectLockConfiguration(String bucketName) {
+  default MinioResult deleteObjectLockConfiguration(String bucketName) {
     return deleteObjectLockConfiguration(DeleteObjectLockConfigurationArgs.builder(), bucketName);
   }
 
@@ -585,8 +692,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult deleteObjectLockConfiguration(DeleteObjectLockConfigurationArgs.Builder builder,
-                                                   String bucketName) {
+  default MinioResult deleteObjectLockConfiguration(DeleteObjectLockConfigurationArgs.Builder builder,
+                                                    String bucketName) {
     getClient().deleteObjectLockConfiguration(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -597,7 +704,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<ObjectLockConfiguration> getObjectLockConfiguration(String bucketName) {
+  default MinioResult<ObjectLockConfiguration> getObjectLockConfiguration(String bucketName) {
     return getObjectLockConfiguration(GetObjectLockConfigurationArgs.builder(), bucketName);
   }
 
@@ -608,8 +715,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<ObjectLockConfiguration> getObjectLockConfiguration(GetObjectLockConfigurationArgs.Builder builder,
-                                                                         String bucketName) {
+  default MinioResult<ObjectLockConfiguration> getObjectLockConfiguration(GetObjectLockConfigurationArgs.Builder builder,
+                                                                          String bucketName) {
     getClient().getObjectLockConfiguration(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -620,7 +727,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setObjectRetention(String bucketName) {
+  default MinioResult setObjectRetention(String bucketName) {
     return setObjectRetention(SetObjectRetentionArgs.builder(), bucketName);
   }
 
@@ -631,8 +738,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setObjectRetention(SetObjectRetentionArgs.Builder builder,
-                                        String bucketName) {
+  default MinioResult setObjectRetention(SetObjectRetentionArgs.Builder builder,
+                                         String bucketName) {
     getClient().setObjectRetention(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -643,7 +750,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Retention> getObjectRetention(String bucketName) {
+  default MinioResult<Retention> getObjectRetention(String bucketName) {
     return getObjectRetention(GetObjectRetentionArgs.builder(), bucketName);
   }
 
@@ -654,8 +761,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Retention> getObjectRetention(GetObjectRetentionArgs.Builder builder,
-                                                   String bucketName) {
+  default MinioResult<Retention> getObjectRetention(GetObjectRetentionArgs.Builder builder,
+                                                    String bucketName) {
     getClient().getObjectRetention(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -667,7 +774,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult enableObjectLegalHold(String objectName, String bucketName) {
+  default MinioResult enableObjectLegalHold(String objectName, String bucketName) {
     return enableObjectLegalHold(EnableObjectLegalHoldArgs.builder().object(objectName), bucketName);
   }
 
@@ -678,8 +785,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult enableObjectLegalHold(EnableObjectLegalHoldArgs.Builder builder,
-                                           String bucketName) {
+  default MinioResult enableObjectLegalHold(EnableObjectLegalHoldArgs.Builder builder,
+                                            String bucketName) {
     getClient().enableObjectLegalHold(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -691,7 +798,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult disableObjectLegalHold(String objectName, String bucketName) {
+  default MinioResult disableObjectLegalHold(String objectName, String bucketName) {
     return disableObjectLegalHold(DisableObjectLegalHoldArgs.builder().object(objectName), bucketName);
   }
 
@@ -702,8 +809,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult disableObjectLegalHold(DisableObjectLegalHoldArgs.Builder builder,
-                                            String bucketName) {
+  default MinioResult disableObjectLegalHold(DisableObjectLegalHoldArgs.Builder builder,
+                                             String bucketName) {
     getClient().disableObjectLegalHold(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -715,7 +822,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Boolean> isObjectLegalHoldEnabled(String objectName, String bucketName) {
+  default MinioResult<Boolean> isObjectLegalHoldEnabled(String objectName, String bucketName) {
     return isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs.builder().object(objectName), bucketName);
   }
 
@@ -726,8 +833,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Boolean> isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs.Builder builder,
-                                                       String bucketName) {
+  default MinioResult<Boolean> isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs.Builder builder,
+                                                        String bucketName) {
     getClient().isObjectLegalHoldEnabled(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -740,10 +847,10 @@ public class MinioTemplate {
    * @param force      是否强制删除(如果是，则递归删除所有对象)
    * @return 是否删除
    */
-  public boolean removeBucket(RemoveBucketArgs.Builder builder, String bucketName, boolean force) {
+  default boolean removeBucket(RemoveBucketArgs.Builder builder, String bucketName, boolean force) {
     if (bucketExists(bucketName)) {
       if (force) {
-        removeObjects(bucketName);
+        removeAllObjects(bucketName);
       }
       getClient().removeBucket(MinioUtils.newBucketArgs(builder, bucketName));
       return getClient().removeResult().isSuccessful();
@@ -756,7 +863,7 @@ public class MinioTemplate {
    *
    * @param bucketName 桶
    */
-  public boolean removeBucket(String bucketName) {
+  default boolean removeBucket(String bucketName) {
     return removeBucket(RemoveBucketArgs.builder(), bucketName);
   }
 
@@ -767,7 +874,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否删除
    */
-  public boolean removeBucket(RemoveBucketArgs.Builder builder, String bucketName) {
+  default boolean removeBucket(RemoveBucketArgs.Builder builder, String bucketName) {
     return removeBucket(builder, bucketName, false);
   }
 
@@ -780,11 +887,11 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<ObjectWriteResponse> putObject(String objectName,
-                                                    InputStream stream,
-                                                    long objectSize,
-                                                    long partSize,
-                                                    @Nullable String bucketName) {
+  default MinioResult<ObjectWriteResponse> putObject(String objectName,
+                                                     InputStream stream,
+                                                     long objectSize,
+                                                     long partSize,
+                                                     @Nullable String bucketName) {
     partSize = Math.max(partSize, PutObjectArgs.MIN_MULTIPART_SIZE);
     return putObject(PutObjectArgs.builder().stream(stream, objectSize, partSize), objectName, bucketName);
   }
@@ -796,9 +903,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<ObjectWriteResponse> putObject(PutObjectArgs.Builder builder,
-                                                    @Nonnull String objectName,
-                                                    @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> putObject(PutObjectArgs.Builder builder,
+                                                     @Nonnull String objectName,
+                                                     @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().putObject(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult();
@@ -811,8 +918,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<List<ObjectWriteResponse>> putObjects(@Nonnull List<PutObjectArgs.Builder> builders,
-                                                           @Nonnull String bucketName) {
+  default MinioResult<List<ObjectWriteResponse>> putObjects(@Nonnull List<PutObjectArgs.Builder> builders,
+                                                            @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     List<ObjectWriteResponse> list = builders.stream()
         .map(builder -> getClient().putObject(builder
@@ -834,9 +941,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否上传
    */
-  public MinioResult<ObjectWriteResponse> uploadObject(@Nonnull String objectName,
-                                                       @Nonnull String file,
-                                                       @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> uploadObject(@Nonnull String objectName,
+                                                        @Nonnull String file,
+                                                        @Nonnull String bucketName) {
     return uploadObject(UploadObjectArgs.builder(), objectName, file, bucketName);
   }
 
@@ -849,10 +956,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 是否上传
    */
-  public MinioResult<ObjectWriteResponse> uploadObject(UploadObjectArgs.Builder builder,
-                                                       @Nonnull String objectName,
-                                                       @Nonnull String file,
-                                                       @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> uploadObject(UploadObjectArgs.Builder builder,
+                                                        @Nonnull String objectName,
+                                                        @Nonnull String file,
+                                                        @Nonnull String bucketName) {
     if (Files.notExists(Paths.get(file))) {
       throw new IllegalArgumentException("文件不存在: " + file + ", objectName: " + objectName);
     }
@@ -868,7 +975,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<String> getBucketPolicy(String bucketName) {
+  default MinioResult<String> getBucketPolicy(String bucketName) {
     return getBucketPolicy(GetBucketPolicyArgs.builder(), bucketName);
   }
 
@@ -879,7 +986,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<String> getBucketPolicy(GetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
+  default MinioResult<String> getBucketPolicy(GetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().getBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
@@ -891,7 +998,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<String> setBucketPolicy(String bucketName) {
+  default MinioResult<String> setBucketPolicy(String bucketName) {
     return setBucketPolicy(SetBucketPolicyArgs.builder(), bucketName);
   }
 
@@ -902,7 +1009,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<String> setBucketPolicy(SetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
+  default MinioResult<String> setBucketPolicy(SetBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().setBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
@@ -914,7 +1021,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<String> deleteBucketPolicy(String bucketName) {
+  default MinioResult<String> deleteBucketPolicy(String bucketName) {
     return deleteBucketPolicy(DeleteBucketPolicyArgs.builder(), bucketName);
   }
 
@@ -925,7 +1032,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 上传结果
    */
-  public MinioResult<String> deleteBucketPolicy(DeleteBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
+  default MinioResult<String> deleteBucketPolicy(DeleteBucketPolicyArgs.Builder builder, @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().deleteBucketPolicy(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
@@ -937,7 +1044,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> setBucketLifecycle(List<LifecycleRule> rules, String bucketName) {
+  default MinioResult<LifecycleConfiguration> setBucketLifecycle(List<LifecycleRule> rules, String bucketName) {
     return setBucketLifecycle(SetBucketLifecycleArgs.builder().config(new LifecycleConfiguration(rules)), bucketName);
   }
 
@@ -948,8 +1055,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> setBucketLifecycle(SetBucketLifecycleArgs.Builder builder,
-                                                                @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> setBucketLifecycle(SetBucketLifecycleArgs.Builder builder,
+                                                                 @Nonnull String bucketName) {
     getClient().setBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -960,7 +1067,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> deleteBucketLifecycle(String bucketName) {
+  default MinioResult<LifecycleConfiguration> deleteBucketLifecycle(String bucketName) {
     return deleteBucketLifecycle(DeleteBucketLifecycleArgs.builder(), bucketName);
   }
 
@@ -971,8 +1078,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> deleteBucketLifecycle(DeleteBucketLifecycleArgs.Builder builder,
-                                                                   @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> deleteBucketLifecycle(DeleteBucketLifecycleArgs.Builder builder,
+                                                                    @Nonnull String bucketName) {
     getClient().deleteBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -983,7 +1090,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> getBucketLifecycle(String bucketName) {
+  default MinioResult<LifecycleConfiguration> getBucketLifecycle(String bucketName) {
     return getBucketLifecycle(GetBucketLifecycleArgs.builder(), bucketName);
   }
 
@@ -994,8 +1101,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> getBucketLifecycle(GetBucketLifecycleArgs.Builder builder,
-                                                                @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> getBucketLifecycle(GetBucketLifecycleArgs.Builder builder,
+                                                                 @Nonnull String bucketName) {
     getClient().getBucketLifecycle(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1006,7 +1113,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> getBucketNotification(String bucketName) {
+  default MinioResult<LifecycleConfiguration> getBucketNotification(String bucketName) {
     return getBucketNotification(GetBucketNotificationArgs.builder(), bucketName);
   }
 
@@ -1017,8 +1124,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> getBucketNotification(GetBucketNotificationArgs.Builder builder,
-                                                                   @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> getBucketNotification(GetBucketNotificationArgs.Builder builder,
+                                                                    @Nonnull String bucketName) {
     getClient().getBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1029,10 +1136,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> setBucketNotification(List<CloudFunctionConfiguration> cloudFunctionConfigurationList,
-                                                                   List<QueueConfiguration> queueConfigurationList,
-                                                                   List<TopicConfiguration> topicConfigurationList,
-                                                                   String bucketName) {
+  default MinioResult<LifecycleConfiguration> setBucketNotification(List<CloudFunctionConfiguration> cloudFunctionConfigurationList,
+                                                                    List<QueueConfiguration> queueConfigurationList,
+                                                                    List<TopicConfiguration> topicConfigurationList,
+                                                                    String bucketName) {
     return setBucketNotification(SetBucketNotificationArgs.builder(), cloudFunctionConfigurationList, queueConfigurationList, topicConfigurationList, bucketName);
   }
 
@@ -1043,11 +1150,11 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> setBucketNotification(SetBucketNotificationArgs.Builder builder,
-                                                                   List<CloudFunctionConfiguration> cloudFunctionConfigurationList,
-                                                                   List<QueueConfiguration> queueConfigurationList,
-                                                                   List<TopicConfiguration> topicConfigurationList,
-                                                                   @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> setBucketNotification(SetBucketNotificationArgs.Builder builder,
+                                                                    List<CloudFunctionConfiguration> cloudFunctionConfigurationList,
+                                                                    List<QueueConfiguration> queueConfigurationList,
+                                                                    List<TopicConfiguration> topicConfigurationList,
+                                                                    @Nonnull String bucketName) {
     NotificationConfiguration config = new NotificationConfiguration();
     config.setCloudFunctionConfigurationList(cloudFunctionConfigurationList);
     config.setQueueConfigurationList(queueConfigurationList);
@@ -1062,7 +1169,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> deleteBucketNotification(String bucketName) {
+  default MinioResult<LifecycleConfiguration> deleteBucketNotification(String bucketName) {
     return deleteBucketNotification(DeleteBucketNotificationArgs.builder(), bucketName);
   }
 
@@ -1073,8 +1180,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<LifecycleConfiguration> deleteBucketNotification(DeleteBucketNotificationArgs.Builder builder,
-                                                                      @Nonnull String bucketName) {
+  default MinioResult<LifecycleConfiguration> deleteBucketNotification(DeleteBucketNotificationArgs.Builder builder,
+                                                                       @Nonnull String bucketName) {
     getClient().deleteBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1085,7 +1192,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<ReplicationConfiguration> getBucketReplication(String bucketName) {
+  default MinioResult<ReplicationConfiguration> getBucketReplication(String bucketName) {
     getClient().getBucketReplication(MinioUtils.newBucketArgs(GetBucketReplicationArgs.builder(), bucketName));
     return getClient().removeResult();
   }
@@ -1097,8 +1204,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<ReplicationConfiguration> getBucketReplication(GetBucketReplicationArgs.Builder builder,
-                                                                    @Nonnull String bucketName) {
+  default MinioResult<ReplicationConfiguration> getBucketReplication(GetBucketReplicationArgs.Builder builder,
+                                                                     @Nonnull String bucketName) {
     getClient().getBucketReplication(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1111,9 +1218,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setBucketReplication(@Nullable String role,
-                                          @Nonnull List<ReplicationRule> rules,
-                                          @Nonnull String bucketName) {
+  default MinioResult setBucketReplication(@Nullable String role,
+                                           @Nonnull List<ReplicationRule> rules,
+                                           @Nonnull String bucketName) {
     return setBucketReplication(SetBucketReplicationArgs.builder(), role, rules, bucketName);
   }
 
@@ -1126,10 +1233,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult setBucketReplication(SetBucketReplicationArgs.Builder builder,
-                                          @Nullable String role,
-                                          @Nonnull List<ReplicationRule> rules,
-                                          @Nonnull String bucketName) {
+  default MinioResult setBucketReplication(SetBucketReplicationArgs.Builder builder,
+                                           @Nullable String role,
+                                           @Nonnull List<ReplicationRule> rules,
+                                           @Nonnull String bucketName) {
     ReplicationConfiguration config = new ReplicationConfiguration(role, rules);
     getClient().setBucketReplication(MinioUtils.newBucketArgs(builder.config(config), bucketName));
     return getClient().removeResult();
@@ -1141,7 +1248,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult deleteBucketReplication(@Nonnull String bucketName) {
+  default MinioResult deleteBucketReplication(@Nonnull String bucketName) {
     return deleteBucketReplication(DeleteBucketReplicationArgs.builder(), bucketName);
   }
 
@@ -1152,8 +1259,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult deleteBucketReplication(DeleteBucketReplicationArgs.Builder builder,
-                                             @Nonnull String bucketName) {
+  default MinioResult deleteBucketReplication(DeleteBucketReplicationArgs.Builder builder,
+                                              @Nonnull String bucketName) {
     getClient().deleteBucketReplication(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1164,7 +1271,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<CloseableIterator<Result<NotificationRecords>>> listenBucketNotification(@Nonnull String bucketName) {
+  default MinioResult<CloseableIterator<Result<NotificationRecords>>> listenBucketNotification(@Nonnull String bucketName) {
     return listenBucketNotification(ListenBucketNotificationArgs.builder(), bucketName);
   }
 
@@ -1175,8 +1282,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<CloseableIterator<Result<NotificationRecords>>> listenBucketNotification(ListenBucketNotificationArgs.Builder builder,
-                                                                                              @Nonnull String bucketName) {
+  default MinioResult<CloseableIterator<Result<NotificationRecords>>> listenBucketNotification(ListenBucketNotificationArgs.Builder builder,
+                                                                                               @Nonnull String bucketName) {
     getClient().listenBucketNotification(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1188,7 +1295,7 @@ public class MinioTemplate {
    * @param bucketName    桶
    * @return 返回结果
    */
-  public MinioResult<SelectResponseStream> selectObjectContent(String sqlExpression, @Nonnull String bucketName) {
+  default MinioResult<SelectResponseStream> selectObjectContent(String sqlExpression, @Nonnull String bucketName) {
     return selectObjectContent(SelectObjectContentArgs.builder().sqlExpression(sqlExpression), bucketName);
   }
 
@@ -1199,8 +1306,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<SelectResponseStream> selectObjectContent(SelectObjectContentArgs.Builder builder,
-                                                               @Nonnull String bucketName) {
+  default MinioResult<SelectResponseStream> selectObjectContent(SelectObjectContentArgs.Builder builder,
+                                                                @Nonnull String bucketName) {
     getClient().selectObjectContent(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
   }
@@ -1215,7 +1322,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回调用结果
    */
-  public MinioResult<Map<String, String>> getBucketTags(String bucketName) {
+  default MinioResult<Map<String, String>> getBucketTags(String bucketName) {
     return getBucketTags(GetBucketTagsArgs.builder(), bucketName);
   }
 
@@ -1226,7 +1333,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回调用结果
    */
-  public MinioResult<Map<String, String>> getBucketTags(GetBucketTagsArgs.Builder builder, String bucketName) {
+  default MinioResult<Map<String, String>> getBucketTags(GetBucketTagsArgs.Builder builder, String bucketName) {
     Tags bucketTags = getClient().getBucketTags(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult().handle(r -> r.setData(bucketTags != null ? bucketTags.get() : null));
   }
@@ -1238,7 +1345,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> setBucketTags(Map<String, String> tags, String bucketName) {
+  default MinioResult<Boolean> setBucketTags(Map<String, String> tags, String bucketName) {
     return setBucketTags(SetBucketTagsArgs.builder(), tags, bucketName);
   }
 
@@ -1250,9 +1357,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> setBucketTags(SetBucketTagsArgs.Builder builder,
-                                            Map<String, String> tags,
-                                            String bucketName) {
+  default MinioResult<Boolean> setBucketTags(SetBucketTagsArgs.Builder builder,
+                                             Map<String, String> tags,
+                                             String bucketName) {
     getClient().setBucketTags(MinioUtils.newBucketArgs(builder.tags(tags), bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
@@ -1263,7 +1370,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<Boolean> deleteBucketTags(String bucketName) {
+  default MinioResult<Boolean> deleteBucketTags(String bucketName) {
     return deleteBucketTags(DeleteBucketTagsArgs.builder(), bucketName);
   }
 
@@ -1274,7 +1381,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回合并结果
    */
-  public MinioResult<Boolean> deleteBucketTags(DeleteBucketTagsArgs.Builder builder, String bucketName) {
+  default MinioResult<Boolean> deleteBucketTags(DeleteBucketTagsArgs.Builder builder, String bucketName) {
     getClient().deleteBucketTags(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
@@ -1286,8 +1393,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回获取结果
    */
-  public MinioResult<Tags> getObjectTags(@Nonnull String objectName,
-                                         @Nonnull String bucketName) {
+  default MinioResult<Tags> getObjectTags(@Nonnull String objectName,
+                                          @Nonnull String bucketName) {
     return getObjectTags(GetObjectTagsArgs.builder(), objectName, bucketName);
   }
 
@@ -1299,9 +1406,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回获取结果
    */
-  public MinioResult<Tags> getObjectTags(GetObjectTagsArgs.Builder builder,
-                                         @Nonnull String objectName,
-                                         @Nonnull String bucketName) {
+  default MinioResult<Tags> getObjectTags(GetObjectTagsArgs.Builder builder,
+                                          @Nonnull String objectName,
+                                          @Nonnull String bucketName) {
     getClient().getObjectTags(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult();
   }
@@ -1314,9 +1421,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> setObjectTags(@Nonnull String objectName,
-                                            Map<String, String> tags,
-                                            @Nonnull String bucketName) {
+  default MinioResult<Boolean> setObjectTags(@Nonnull String objectName,
+                                             Map<String, String> tags,
+                                             @Nonnull String bucketName) {
     return setObjectTags(SetObjectTagsArgs.builder(), objectName, tags, bucketName);
   }
 
@@ -1329,10 +1436,10 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> setObjectTags(SetObjectTagsArgs.Builder builder,
-                                            @Nonnull String objectName,
-                                            Map<String, String> tags,
-                                            @Nonnull String bucketName) {
+  default MinioResult<Boolean> setObjectTags(SetObjectTagsArgs.Builder builder,
+                                             @Nonnull String objectName,
+                                             Map<String, String> tags,
+                                             @Nonnull String bucketName) {
     getClient().setObjectTags(MinioUtils.newObjectArgs(builder.tags(tags), objectName, bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
@@ -1344,8 +1451,8 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Boolean> deleteObjectTags(@Nonnull String objectName,
-                                               @Nonnull String bucketName) {
+  default MinioResult<Boolean> deleteObjectTags(@Nonnull String objectName,
+                                                @Nonnull String bucketName) {
     return deleteObjectTags(DeleteObjectTagsArgs.builder(), objectName, bucketName);
   }
 
@@ -1357,9 +1464,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回结果
    */
-  public MinioResult<Boolean> deleteObjectTags(DeleteObjectTagsArgs.Builder builder,
-                                               @Nonnull String objectName,
-                                               @Nonnull String bucketName) {
+  default MinioResult<Boolean> deleteObjectTags(DeleteObjectTagsArgs.Builder builder,
+                                                @Nonnull String objectName,
+                                                @Nonnull String bucketName) {
     getClient().deleteObjectTags(MinioUtils.newObjectArgs(builder, objectName, bucketName));
     return getClient().removeResult().handle(r -> r.setData(r.isSuccessful()));
   }
@@ -1374,10 +1481,10 @@ public class MinioTemplate {
    * @return 返回结果
    */
   @Deprecated
-  public MinioResult<ObjectWriteResponse> uploadSnowballObjects(List<SnowballObject> objects,
-                                                                boolean compression,
-                                                                @Nullable String stagingFilename,
-                                                                @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> uploadSnowballObjects(List<SnowballObject> objects,
+                                                                 boolean compression,
+                                                                 @Nullable String stagingFilename,
+                                                                 @Nonnull String bucketName) {
     return uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
             .objects(objects)
             .compression(compression)
@@ -1393,8 +1500,8 @@ public class MinioTemplate {
    * @return 上传结果
    */
   @Deprecated
-  public MinioResult<ObjectWriteResponse> uploadSnowballObjects(UploadSnowballObjectsArgs.Builder builder,
-                                                                @Nonnull String bucketName) {
+  default MinioResult<ObjectWriteResponse> uploadSnowballObjects(UploadSnowballObjectsArgs.Builder builder,
+                                                                 @Nonnull String bucketName) {
     requireBucketExist(bucketName);
     getClient().uploadSnowballObjects(MinioUtils.newBucketArgs(builder, bucketName));
     return getClient().removeResult();
@@ -1407,7 +1514,7 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> addBucketTags(Map<String, String> tags, String bucketName) {
+  default MinioResult<Boolean> addBucketTags(Map<String, String> tags, String bucketName) {
     return addBucketTags(SetBucketTagsArgs.builder(), tags, bucketName);
   }
 
@@ -1419,9 +1526,9 @@ public class MinioTemplate {
    * @param bucketName 桶
    * @return 返回是否设置成功
    */
-  public MinioResult<Boolean> addBucketTags(SetBucketTagsArgs.Builder builder,
-                                            Map<String, String> tags,
-                                            String bucketName) {
+  default MinioResult<Boolean> addBucketTags(SetBucketTagsArgs.Builder builder,
+                                             Map<String, String> tags,
+                                             String bucketName) {
     MinioResult<Map<String, String>> result = getBucketTags(bucketName);
     if (!result.isSuccessful()) {
       return MinioResult.fail(result.getMessage());
@@ -1431,5 +1538,6 @@ public class MinioTemplate {
     newTags.putAll(tags);
     return setBucketTags(builder, newTags, bucketName);
   }
+
 
 }

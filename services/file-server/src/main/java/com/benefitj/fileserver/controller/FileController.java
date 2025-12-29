@@ -3,16 +3,16 @@ package com.benefitj.fileserver.controller;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.*;
 import com.benefitj.core.functions.Pair;
-import com.benefitj.spring.minio.ContentType;
-import com.benefitj.spring.minio.MinioResult;
-import com.benefitj.spring.minio.MinioTemplate;
-import com.benefitj.spring.minio.MinioUtils;
-import com.benefitj.spring.JsonUtils;
-import com.benefitj.spring.ServletUtils;
-import com.benefitj.spring.aop.web.AopWebPointCut;
 import com.benefitj.fileserver.controller.vo.FileItemVo;
 import com.benefitj.fileserver.controller.vo.HttpResult;
 import com.benefitj.fileserver.controller.vo.UploadVo;
+import com.benefitj.spring.JsonUtils;
+import com.benefitj.spring.ServletUtils;
+import com.benefitj.spring.aop.web.AopWebPointCut;
+import com.benefitj.spring.minio.ContentType;
+import com.benefitj.spring.minio.IMinioTemplate;
+import com.benefitj.spring.minio.MinioResult;
+import com.benefitj.spring.minio.MinioUtils;
 import io.minio.GetObjectResponse;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class FileController {
 
   @Autowired
-  private MinioTemplate template;
+  IMinioTemplate template;
 
   @ApiOperation("上传文件")
   @PostMapping(value = "upload", consumes = "multipart/form-data;charset=utf-8")

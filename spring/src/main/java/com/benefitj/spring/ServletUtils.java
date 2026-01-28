@@ -3,6 +3,7 @@ package com.benefitj.spring;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.benefitj.core.CatchUtils;
+import com.benefitj.core.EventLoop;
 import com.benefitj.core.IOUtils;
 import com.benefitj.core.Utils;
 import com.benefitj.core.http.ContentType;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
@@ -25,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -481,6 +485,38 @@ public class ServletUtils {
       throw new IllegalStateException(CatchUtils.findRoot(e));
     }
   }
+
+  static final byte[] NEW_LINE = "\n".getBytes(StandardCharsets.UTF_8);
+
+  /**
+   * 自动刷新换行符，结果服务武器端处理时间较长，导致客户端超时的问题
+   *
+   * @param response 响应
+   * @return 定时任务
+   */
+  public static ScheduledFuture<?> startFlushTimer(ServletResponse response) {
+    return startFlushTimer(response, 1, 5, TimeUnit.SECONDS);
+  }
+
+  /**
+   * 自动刷新换行符，结果服务武器端处理时间较长，导致客户端超时的问题
+   *
+   * @param response 响应
+   * @param initDelay 初始延迟
+   * @param period 刷新间隔
+   * @param unit 时间单位
+   * @return 定时任务
+   */
+  public static ScheduledFuture<?> startFlushTimer(ServletResponse response, long initDelay, long period, TimeUnit unit) {
+    return EventLoop.asyncIOFixedRate(() -> {
+      try {
+        ServletOutputStream out = response.getOutputStream();
+        out.write(NEW_LINE);
+        out.flush();
+      } catch (Exception ignore) {/*^_^*/}
+    }, initDelay, period, unit);
+  }
+
 
 
   // --------------------------------------------------------------------------------------------------
